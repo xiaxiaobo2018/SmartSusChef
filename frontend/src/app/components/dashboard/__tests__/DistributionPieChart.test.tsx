@@ -175,11 +175,11 @@ describe('DistributionPieChart', () => {
             expect(pie.getAttribute('data-data-key')).toBe('value');
         });
 
-        it('should have label prop set', () => {
+        it('should not have label prop set (labels removed per user requirement)', () => {
             render(<DistributionPieChart date="2026-02-09" />);
 
             const pie = screen.getByTestId('pie');
-            expect(pie.getAttribute('data-has-label')).toBe('true');
+            expect(pie.getAttribute('data-has-label')).toBe('false');
         });
     });
 

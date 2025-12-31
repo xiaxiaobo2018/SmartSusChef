@@ -232,18 +232,18 @@ describe('SalesManagement', () => {
 
         it('should disable Edit buttons for old records (non-manager)', () => {
             render(<SalesManagement />);
-            screen.getAllByText('Chicken Rice').filter(el => el.tagName === 'TD');
-            // Find the row with the old date (thirtyDaysAgo or eightDaysAgo)
+            // Find all edit buttons
             const allRows = screen.getAllByRole('row');
-            const oldDataRow = allRows.find(row => {
-                const text = row.textContent;
-                return text?.includes('Chicken Rice') && (text?.includes(format(new Date(eightDaysAgoStr), 'd MMM yyyy')) || text?.includes(format(new Date(thirtyDaysAgoStr), 'd MMM yyyy')));
-            });
-
-            if (oldDataRow) {
-                const editButton = within(oldDataRow).getByRole('button', { name: /edit/i });
-                expect(editButton).toBeDisabled();
-            }
+            
+            // Find a row with "Beef Noodles" (which has an 8-day-old record - s4)
+            // or a row for any old record (just check the date in the table)
+            const allEditButtons = screen.getAllByRole('button', { name: /edit/i });
+            
+            // At least one edit button should be disabled for old records
+            const disabledButtons = allEditButtons.filter(btn => btn.hasAttribute('disabled'));
+            
+            // Should have at least 2 disabled buttons (for s4 and s5, both older than 7 days)
+            expect(disabledButtons.length).toBeGreaterThanOrEqual(2);
         });
 
         it('should show empty state when no data matches filter', () => {

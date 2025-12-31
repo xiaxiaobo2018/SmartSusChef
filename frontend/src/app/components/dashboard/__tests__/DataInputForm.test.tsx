@@ -173,7 +173,13 @@ describe('DataInputForm', () => {
             });
 
             // Check for date selector
-            expect(screen.getByRole('button', { name: /11 feb 2026/i })).toBeInTheDocument();
+            const today = new Date();
+            const formattedDate = today.toLocaleDateString('en-GB', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+            });
+            expect(screen.getByRole('button', { name: new RegExp(formattedDate, 'i') })).toBeInTheDocument();
 
             // Check for tabs
             expect(screen.getByRole('tab', { name: /sales data/i })).toBeInTheDocument();
@@ -226,7 +232,13 @@ describe('DataInputForm', () => {
             renderComponent();
 
             await waitFor(() => {
-                const dateButton = screen.getByRole('button', { name: /11 feb 2026/i });
+                const today = new Date();
+                const formattedDate = today.toLocaleDateString('en-GB', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric'
+                });
+                const dateButton = screen.getByRole('button', { name: new RegExp(formattedDate, 'i') });
                 expect(dateButton).toBeInTheDocument();
             });
         });
@@ -234,11 +246,18 @@ describe('DataInputForm', () => {
         it('should open calendar when date button is clicked', async () => {
             renderComponent();
 
-            await waitFor(() => {
-                expect(screen.getByRole('button', { name: /11 feb 2026/i })).toBeInTheDocument();
+            const today = new Date();
+            const formattedDate = today.toLocaleDateString('en-GB', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
             });
 
-            const dateButton = screen.getByRole('button', { name: /11 feb 2026/i });
+            await waitFor(() => {
+                expect(screen.getByRole('button', { name: new RegExp(formattedDate, 'i') })).toBeInTheDocument();
+            });
+
+            const dateButton = screen.getByRole('button', { name: new RegExp(formattedDate, 'i') });
             await userEvent.click(dateButton);
 
             // Calendar should open (checking for grid role which calendar uses)
@@ -604,7 +623,13 @@ describe('DataInputForm', () => {
             renderComponent({ maxDaysBack: 0 });
 
             await waitFor(() => {
-                expect(screen.getByRole('button', { name: /11 feb 2026/i })).toBeInTheDocument();
+                const today = new Date();
+                const formattedDate = today.toLocaleDateString('en-GB', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric'
+                });
+                expect(screen.getByRole('button', { name: new RegExp(formattedDate, 'i') })).toBeInTheDocument();
             });
 
             // This tests that the prop is passed correctly
@@ -615,7 +640,13 @@ describe('DataInputForm', () => {
             renderComponent({ maxDaysBack: undefined });
 
             await waitFor(() => {
-                expect(screen.getByRole('button', { name: /11 feb 2026/i })).toBeInTheDocument();
+                const today = new Date();
+                const formattedDate = today.toLocaleDateString('en-GB', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric'
+                });
+                expect(screen.getByRole('button', { name: new RegExp(formattedDate, 'i') })).toBeInTheDocument();
             });
 
             // This tests that the prop is passed correctly
@@ -625,7 +656,13 @@ describe('DataInputForm', () => {
             renderComponent({ maxDaysBack: 7 });
 
             await waitFor(() => {
-                expect(screen.getByRole('button', { name: /11 feb 2026/i })).toBeInTheDocument();
+                const today = new Date();
+                const formattedDate = today.toLocaleDateString('en-GB', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric'
+                });
+                expect(screen.getByRole('button', { name: new RegExp(formattedDate, 'i') })).toBeInTheDocument();
             });
 
             // This tests that the prop is passed correctly
