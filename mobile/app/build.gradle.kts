@@ -64,7 +64,9 @@ android {
             enableAndroidTestCoverage = true
         }
         release {
-            isMinifyEnabled = false
+            isDebuggable = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
@@ -103,6 +105,18 @@ android {
         abortOnError = true
         checkTestSources = false
         disable += "NullSafeMutableLiveData"
+    }
+}
+
+// Force-upgrade vulnerable transitive dependencies (Snyk HIGH findings)
+configurations.all {
+    resolutionStrategy {
+        force(
+            "com.google.protobuf:protobuf-java:3.25.5",
+            "io.netty:netty-codec-http2:4.1.125.Final",
+            "io.netty:netty-codec-http:4.1.125.Final",
+            "io.netty:netty-handler:4.1.125.Final",
+        )
     }
 }
 
@@ -177,6 +191,7 @@ ktlint {
     android.set(true)
     debug.set(true)
     outputToConsole.set(true)
+    version.set("1.5.0")
     reporters {
         reporter(org.jlleitschuh.gradle.ktlint.reporter.ReporterType.PLAIN)
         reporter(org.jlleitschuh.gradle.ktlint.reporter.ReporterType.CHECKSTYLE)

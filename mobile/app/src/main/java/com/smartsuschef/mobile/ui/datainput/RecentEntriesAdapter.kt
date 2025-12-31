@@ -39,8 +39,9 @@ class RecentEntriesAdapter(
         holder.bind(getItem(position), actions)
     }
 
-    class RecentViewHolder(private val binding: ItemRecentEntryBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+    class RecentViewHolder(
+        private val binding: ItemRecentEntryBinding,
+    ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(
             item: RecentEntry,
             actions: RecentEntryActions,

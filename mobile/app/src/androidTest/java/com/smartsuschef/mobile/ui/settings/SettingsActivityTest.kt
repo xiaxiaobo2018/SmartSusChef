@@ -93,7 +93,8 @@ class SettingsActivityTest {
     fun settings_showsToolbar() {
         ActivityScenario.launch(SettingsActivity::class.java)
 
-        Espresso.onView(ViewMatchers.withId(R.id.toolbar))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.toolbar))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
     }
 
@@ -101,13 +102,17 @@ class SettingsActivityTest {
     fun settings_showsPasswordSection() {
         ActivityScenario.launch(SettingsActivity::class.java)
 
-        Espresso.onView(ViewMatchers.withId(R.id.etCurrentPassword))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etCurrentPassword))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        Espresso.onView(ViewMatchers.withId(R.id.etNewPassword))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etNewPassword))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        Espresso.onView(ViewMatchers.withId(R.id.etConfirmPassword))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etConfirmPassword))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        Espresso.onView(ViewMatchers.withId(R.id.btnUpdatePassword))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.btnUpdatePassword))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
     }
 
@@ -115,12 +120,18 @@ class SettingsActivityTest {
     fun settings_showsProfileSection() {
         ActivityScenario.launch(SettingsActivity::class.java)
 
-        Espresso.onView(ViewMatchers.withId(R.id.etFullName))
-            .perform(ViewActions.scrollTo()).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        Espresso.onView(ViewMatchers.withId(R.id.etEmail))
-            .perform(ViewActions.scrollTo()).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        Espresso.onView(ViewMatchers.withId(R.id.btnSaveProfile))
-            .perform(ViewActions.scrollTo()).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etFullName))
+            .perform(ViewActions.scrollTo())
+            .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etEmail))
+            .perform(ViewActions.scrollTo())
+            .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.btnSaveProfile))
+            .perform(ViewActions.scrollTo())
+            .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
     }
 
     @Test
@@ -128,10 +139,14 @@ class SettingsActivityTest {
         ActivityScenario.launch(SettingsActivity::class.java)
 
         // IdlingResource waits for API to return; profile fields should be populated
-        Espresso.onView(ViewMatchers.withId(R.id.etFullName))
-            .perform(ViewActions.scrollTo()).check(ViewAssertions.matches(ViewMatchers.withText("Admin User")))
-        Espresso.onView(ViewMatchers.withId(R.id.etEmail))
-            .perform(ViewActions.scrollTo()).check(ViewAssertions.matches(ViewMatchers.withText("admin@smartsuschef.com")))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etFullName))
+            .perform(ViewActions.scrollTo())
+            .check(ViewAssertions.matches(ViewMatchers.withText("Admin User")))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etEmail))
+            .perform(ViewActions.scrollTo())
+            .check(ViewAssertions.matches(ViewMatchers.withText("admin@smartsuschef.com")))
     }
 
     // ============================================================
@@ -143,7 +158,8 @@ class SettingsActivityTest {
         ActivityScenario.launch(SettingsActivity::class.java)
 
         // Type a short password
-        Espresso.onView(ViewMatchers.withId(R.id.etNewPassword))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etNewPassword))
             .perform(ViewActions.replaceText("Ab1!"), ViewActions.closeSoftKeyboard())
 
         // TextInputLayout should show error
@@ -157,7 +173,8 @@ class SettingsActivityTest {
         ActivityScenario.launch(SettingsActivity::class.java)
 
         // 12+ chars, has number and special char, but no uppercase
-        Espresso.onView(ViewMatchers.withId(R.id.etNewPassword))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etNewPassword))
             .perform(ViewActions.replaceText("validpass123!"), ViewActions.closeSoftKeyboard())
 
         Espresso.onView(ViewMatchers.withId(R.id.tilNewPassword)).check(
@@ -170,7 +187,8 @@ class SettingsActivityTest {
         ActivityScenario.launch(SettingsActivity::class.java)
 
         // 12+ chars, has uppercase and special char, but no number
-        Espresso.onView(ViewMatchers.withId(R.id.etNewPassword))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etNewPassword))
             .perform(ViewActions.replaceText("ValidPassWord!"), ViewActions.closeSoftKeyboard())
 
         Espresso.onView(ViewMatchers.withId(R.id.tilNewPassword)).check(
@@ -183,7 +201,8 @@ class SettingsActivityTest {
         ActivityScenario.launch(SettingsActivity::class.java)
 
         // 12+ chars, has uppercase and number, but no special char
-        Espresso.onView(ViewMatchers.withId(R.id.etNewPassword))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etNewPassword))
             .perform(ViewActions.replaceText("ValidPass1234"), ViewActions.closeSoftKeyboard())
 
         Espresso.onView(ViewMatchers.withId(R.id.tilNewPassword)).check(
@@ -199,15 +218,19 @@ class SettingsActivityTest {
     fun password_validAndMatching_noErrors() {
         ActivityScenario.launch(SettingsActivity::class.java)
 
-        Espresso.onView(ViewMatchers.withId(R.id.etNewPassword))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etNewPassword))
             .perform(ViewActions.replaceText("ValidPass123!"), ViewActions.closeSoftKeyboard())
-        Espresso.onView(ViewMatchers.withId(R.id.etConfirmPassword))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etConfirmPassword))
             .perform(ViewActions.replaceText("ValidPass123!"), ViewActions.closeSoftKeyboard())
 
         // Both TextInputLayouts should have no error
-        Espresso.onView(ViewMatchers.withId(R.id.tilNewPassword))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.tilNewPassword))
             .check(ViewAssertions.matches(CustomMatchers.hasNoError()))
-        Espresso.onView(ViewMatchers.withId(R.id.tilConfirmPassword))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.tilConfirmPassword))
             .check(ViewAssertions.matches(CustomMatchers.hasNoError()))
     }
 
@@ -215,9 +238,11 @@ class SettingsActivityTest {
     fun password_mismatch_showsError() {
         ActivityScenario.launch(SettingsActivity::class.java)
 
-        Espresso.onView(ViewMatchers.withId(R.id.etNewPassword))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etNewPassword))
             .perform(ViewActions.replaceText("ValidPass123!"), ViewActions.closeSoftKeyboard())
-        Espresso.onView(ViewMatchers.withId(R.id.etConfirmPassword))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etConfirmPassword))
             .perform(ViewActions.replaceText("DifferentPass456!"), ViewActions.closeSoftKeyboard())
 
         // Confirm password TextInputLayout should show mismatch error
@@ -230,15 +255,19 @@ class SettingsActivityTest {
     fun password_matching_noError() {
         ActivityScenario.launch(SettingsActivity::class.java)
 
-        Espresso.onView(ViewMatchers.withId(R.id.etNewPassword))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etNewPassword))
             .perform(ViewActions.replaceText("ValidPass123!"), ViewActions.closeSoftKeyboard())
-        Espresso.onView(ViewMatchers.withId(R.id.etConfirmPassword))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etConfirmPassword))
             .perform(ViewActions.replaceText("ValidPass123!"), ViewActions.closeSoftKeyboard())
 
         // Both fields should contain matching text and no error
-        Espresso.onView(ViewMatchers.withId(R.id.etConfirmPassword))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etConfirmPassword))
             .check(ViewAssertions.matches(ViewMatchers.withText("ValidPass123!")))
-        Espresso.onView(ViewMatchers.withId(R.id.tilConfirmPassword))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.tilConfirmPassword))
             .check(ViewAssertions.matches(CustomMatchers.hasNoError()))
     }
 
@@ -250,23 +279,29 @@ class SettingsActivityTest {
     fun changePassword_successfulSubmission() {
         ActivityScenario.launch(SettingsActivity::class.java)
 
-        Espresso.onView(ViewMatchers.withId(R.id.etCurrentPassword))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etCurrentPassword))
             .perform(ViewActions.replaceText("OldPass123!!"), ViewActions.closeSoftKeyboard())
-        Espresso.onView(ViewMatchers.withId(R.id.etNewPassword))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etNewPassword))
             .perform(ViewActions.replaceText("NewPass456!a"), ViewActions.closeSoftKeyboard())
-        Espresso.onView(ViewMatchers.withId(R.id.etConfirmPassword))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etConfirmPassword))
             .perform(ViewActions.replaceText("NewPass456!a"), ViewActions.closeSoftKeyboard())
 
         Espresso.onView(ViewMatchers.withId(R.id.btnUpdatePassword)).perform(ViewActions.click())
 
         // IdlingResource waits for network call; button should be re-enabled after completion
-        Espresso.onView(ViewMatchers.withId(R.id.btnUpdatePassword))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.btnUpdatePassword))
             .check(ViewAssertions.matches(ViewMatchers.isEnabled()))
 
         // Password fields should be cleared after successful change
-        Espresso.onView(ViewMatchers.withId(R.id.etCurrentPassword))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etCurrentPassword))
             .check(ViewAssertions.matches(ViewMatchers.withText("")))
-        Espresso.onView(ViewMatchers.withId(R.id.etNewPassword))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etNewPassword))
             .check(ViewAssertions.matches(ViewMatchers.withText("")))
     }
 
@@ -277,17 +312,21 @@ class SettingsActivityTest {
 
         ActivityScenario.launch(SettingsActivity::class.java)
 
-        Espresso.onView(ViewMatchers.withId(R.id.etCurrentPassword))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etCurrentPassword))
             .perform(ViewActions.replaceText("WrongPass!!1"), ViewActions.closeSoftKeyboard())
-        Espresso.onView(ViewMatchers.withId(R.id.etNewPassword))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etNewPassword))
             .perform(ViewActions.replaceText("NewPass456!a"), ViewActions.closeSoftKeyboard())
-        Espresso.onView(ViewMatchers.withId(R.id.etConfirmPassword))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etConfirmPassword))
             .perform(ViewActions.replaceText("NewPass456!a"), ViewActions.closeSoftKeyboard())
 
         Espresso.onView(ViewMatchers.withId(R.id.btnUpdatePassword)).perform(ViewActions.click())
 
         // IdlingResource waits for network response; button should be re-enabled after error
-        Espresso.onView(ViewMatchers.withId(R.id.btnUpdatePassword))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.btnUpdatePassword))
             .check(ViewAssertions.matches(ViewMatchers.isEnabled()))
     }
 
@@ -298,17 +337,21 @@ class SettingsActivityTest {
 
         ActivityScenario.launch(SettingsActivity::class.java)
 
-        Espresso.onView(ViewMatchers.withId(R.id.etCurrentPassword))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etCurrentPassword))
             .perform(ViewActions.replaceText("OldPass123!!"), ViewActions.closeSoftKeyboard())
-        Espresso.onView(ViewMatchers.withId(R.id.etNewPassword))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etNewPassword))
             .perform(ViewActions.replaceText("NewPass456!a"), ViewActions.closeSoftKeyboard())
-        Espresso.onView(ViewMatchers.withId(R.id.etConfirmPassword))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etConfirmPassword))
             .perform(ViewActions.replaceText("NewPass456!a"), ViewActions.closeSoftKeyboard())
 
         Espresso.onView(ViewMatchers.withId(R.id.btnUpdatePassword)).perform(ViewActions.click())
 
         // IdlingResource waits for delayed response; button should be re-enabled after completion
-        Espresso.onView(ViewMatchers.withId(R.id.btnUpdatePassword))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.btnUpdatePassword))
             .check(ViewAssertions.matches(ViewMatchers.isEnabled()))
     }
 
@@ -335,9 +378,11 @@ class SettingsActivityTest {
         )
 
         // Verify fields have new values
-        Espresso.onView(ViewMatchers.withId(R.id.etFullName))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etFullName))
             .check(ViewAssertions.matches(ViewMatchers.withText("Updated Name")))
-        Espresso.onView(ViewMatchers.withId(R.id.etEmail))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etEmail))
             .check(ViewAssertions.matches(ViewMatchers.withText("updated@smartsuschef.com")))
     }
 
@@ -356,12 +401,15 @@ class SettingsActivityTest {
             ViewActions.closeSoftKeyboard(),
         )
 
-        Espresso.onView(ViewMatchers.withId(R.id.btnSaveProfile))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.btnSaveProfile))
             .perform(ViewActions.scrollTo(), ViewActions.click())
 
         // IdlingResource waits for network call; button should be re-enabled after completion
-        Espresso.onView(ViewMatchers.withId(R.id.btnSaveProfile))
-            .perform(ViewActions.scrollTo()).check(ViewAssertions.matches(ViewMatchers.isEnabled()))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.btnSaveProfile))
+            .perform(ViewActions.scrollTo())
+            .check(ViewAssertions.matches(ViewMatchers.isEnabled()))
     }
 
     @Test
@@ -381,12 +429,15 @@ class SettingsActivityTest {
             ViewActions.closeSoftKeyboard(),
         )
 
-        Espresso.onView(ViewMatchers.withId(R.id.btnSaveProfile))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.btnSaveProfile))
             .perform(ViewActions.scrollTo(), ViewActions.click())
 
         // Button should be re-enabled after error
-        Espresso.onView(ViewMatchers.withId(R.id.btnSaveProfile))
-            .perform(ViewActions.scrollTo()).check(ViewAssertions.matches(ViewMatchers.isEnabled()))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.btnSaveProfile))
+            .perform(ViewActions.scrollTo())
+            .check(ViewAssertions.matches(ViewMatchers.isEnabled()))
     }
 
     @Test
@@ -406,14 +457,19 @@ class SettingsActivityTest {
             ViewActions.closeSoftKeyboard(),
         )
 
-        Espresso.onView(ViewMatchers.withId(R.id.btnSaveProfile))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.btnSaveProfile))
             .perform(ViewActions.scrollTo(), ViewActions.click())
 
         // Fields should retain their values after error
-        Espresso.onView(ViewMatchers.withId(R.id.etFullName))
-            .perform(ViewActions.scrollTo()).check(ViewAssertions.matches(ViewMatchers.withText("Updated Name")))
-        Espresso.onView(ViewMatchers.withId(R.id.etEmail))
-            .perform(ViewActions.scrollTo()).check(ViewAssertions.matches(ViewMatchers.withText("updated@smartsuschef.com")))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etFullName))
+            .perform(ViewActions.scrollTo())
+            .check(ViewAssertions.matches(ViewMatchers.withText("Updated Name")))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etEmail))
+            .perform(ViewActions.scrollTo())
+            .check(ViewAssertions.matches(ViewMatchers.withText("updated@smartsuschef.com")))
     }
 
     // ============================================================
@@ -424,7 +480,8 @@ class SettingsActivityTest {
     fun updatePasswordButton_displaysCorrectText() {
         ActivityScenario.launch(SettingsActivity::class.java)
 
-        Espresso.onView(ViewMatchers.withId(R.id.btnUpdatePassword))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.btnUpdatePassword))
             .check(ViewAssertions.matches(ViewMatchers.withText("Update Password")))
     }
 
@@ -432,8 +489,10 @@ class SettingsActivityTest {
     fun saveProfileButton_displaysCorrectText() {
         ActivityScenario.launch(SettingsActivity::class.java)
 
-        Espresso.onView(ViewMatchers.withId(R.id.btnSaveProfile))
-            .perform(ViewActions.scrollTo()).check(ViewAssertions.matches(ViewMatchers.withText("Save Profile Info")))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.btnSaveProfile))
+            .perform(ViewActions.scrollTo())
+            .check(ViewAssertions.matches(ViewMatchers.withText("Save Profile Info")))
     }
 
     // ============================================================
@@ -468,8 +527,7 @@ class SettingsActivityTest {
                                     "updatedAt": "2026-01-01T00:00:00Z"
                                 }
                                 """.trimIndent(),
-                            )
-                            .addHeader("Content-Type", "application/json")
+                            ).addHeader("Content-Type", "application/json")
 
                     // PUT password change
                     path.contains("/api/auth/password") && request.method == "PUT" -> {
@@ -513,8 +571,7 @@ class SettingsActivityTest {
                                         "updatedAt": "2026-02-11T00:00:00Z"
                                     }
                                     """.trimIndent(),
-                                )
-                                .addHeader("Content-Type", "application/json")
+                                ).addHeader("Content-Type", "application/json")
                         }
 
                     else -> MockResponse().setResponseCode(404)

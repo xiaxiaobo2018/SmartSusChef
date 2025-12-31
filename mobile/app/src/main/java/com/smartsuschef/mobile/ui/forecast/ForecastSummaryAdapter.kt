@@ -22,20 +22,22 @@ class ForecastSummaryAdapter(
     }
 
     // Header ViewHolder
-    class HeaderViewHolder(val binding: ItemIngredientHeaderBinding) : RecyclerView.ViewHolder(binding.root)
+    class HeaderViewHolder(
+        val binding: ItemIngredientHeaderBinding,
+    ) : RecyclerView.ViewHolder(binding.root)
 
     // Data ViewHolder
-    class DataViewHolder(val binding: ItemIngredientForecastRowBinding) : RecyclerView.ViewHolder(binding.root)
+    class DataViewHolder(
+        val binding: ItemIngredientForecastRowBinding,
+    ) : RecyclerView.ViewHolder(binding.root)
 
-    override fun getItemViewType(position: Int): Int {
-        return if (position == 0) VIEW_TYPE_HEADER else VIEW_TYPE_ITEM
-    }
+    override fun getItemViewType(position: Int): Int = if (position == 0) VIEW_TYPE_HEADER else VIEW_TYPE_ITEM
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): RecyclerView.ViewHolder {
-        return if (viewType == VIEW_TYPE_HEADER) {
+    ): RecyclerView.ViewHolder =
+        if (viewType == VIEW_TYPE_HEADER) {
             val binding =
                 ItemIngredientHeaderBinding.inflate(
                     LayoutInflater.from(parent.context),
@@ -52,7 +54,6 @@ class ForecastSummaryAdapter(
                 )
             DataViewHolder(binding)
         }
-    }
 
     override fun onBindViewHolder(
         holder: RecyclerView.ViewHolder,
@@ -134,8 +135,8 @@ class ForecastSummaryAdapter(
         diffResult.dispatchUpdatesTo(this)
     }
 
-    private fun formatDate(dateStr: String): String {
-        return try {
+    private fun formatDate(dateStr: String): String =
+        try {
             val parser = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
             val formatter = SimpleDateFormat("d MMM", Locale.getDefault())
             parser.parse(dateStr)?.let { formatter.format(it) } ?: dateStr
@@ -143,5 +144,4 @@ class ForecastSummaryAdapter(
             Log.e(TAG, "Error formatting date: $dateStr", e)
             dateStr
         }
-    }
 }

@@ -39,8 +39,12 @@ object PasswordValidator {
         val hasSpecialChar = password.any { SPECIAL_CHARS.contains(it) }
 
         val isValid =
-            hasMinLength && hasMaxLength && hasUpperCase &&
-                hasLowerCase && hasNumber && hasSpecialChar
+            hasMinLength &&
+                hasMaxLength &&
+                hasUpperCase &&
+                hasLowerCase &&
+                hasNumber &&
+                hasSpecialChar
 
         val errorMessage =
             when {
@@ -66,25 +70,20 @@ object PasswordValidator {
     }
 
     // Quick validation - returns true if password is valid
-    fun isValid(password: String): Boolean {
-        return validate(password).isValid
-    }
+    fun isValid(password: String): Boolean = validate(password).isValid
 
     // Gets the first error message for a password
-    fun getErrorMessage(password: String): String? {
-        return validate(password).errorMessage
-    }
+    fun getErrorMessage(password: String): String? = validate(password).errorMessage
 
     // Gets all password requirements as a list of strings
-    fun getRequirements(): List<String> {
-        return listOf(
+    fun getRequirements(): List<String> =
+        listOf(
             "At least $MIN_LENGTH characters",
             "At least one uppercase letter (A-Z)",
             "At least one lowercase letter (a-z)",
             "At least one number (0-9)",
             "At least one special character ($SPECIAL_CHARS)",
         )
-    }
 
     // Gets requirements with check status for a given password, for real-time UI validation
     fun getRequirementsWithStatus(password: String): List<Pair<String, Boolean>> {

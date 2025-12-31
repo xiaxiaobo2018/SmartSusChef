@@ -36,8 +36,6 @@ class OkHttp3IdlingResource(
         fun create(
             name: String,
             client: OkHttpClient,
-        ): OkHttp3IdlingResource {
-            return OkHttp3IdlingResource(name, client.dispatcher)
-        }
+        ): OkHttp3IdlingResource = OkHttp3IdlingResource(name, client.dispatcher)
     }
 }

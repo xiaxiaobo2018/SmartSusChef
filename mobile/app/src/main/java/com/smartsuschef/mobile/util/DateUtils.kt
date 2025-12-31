@@ -32,8 +32,8 @@ object DateUtils {
     }
 
     // Convert API date string (yyyy-MM-dd) to display format (dd MMM yyyy)
-    fun formatDateForDisplay(apiDateString: String): String {
-        return try {
+    fun formatDateForDisplay(apiDateString: String): String =
+        try {
             val apiFormatter = SimpleDateFormat(Constants.DATE_FORMAT_API, Locale.getDefault())
             val displayFormatter = SimpleDateFormat(Constants.DATE_FORMAT_DISPLAY, Locale.getDefault())
             val date = apiFormatter.parse(apiDateString)
@@ -42,7 +42,6 @@ object DateUtils {
             Log.e(TAG, "Error formatting date: $apiDateString", e)
             apiDateString // Return as-is if parsing fails
         }
-    }
 
     // Convert Date to API format string (yyyy-MM-dd)
     fun formatDateForApi(date: Date): String {
@@ -57,9 +56,7 @@ object DateUtils {
     }
 
     // Check if date string is today
-    fun isToday(apiDateString: String): Boolean {
-        return apiDateString == getTodayFormatted()
-    }
+    fun isToday(apiDateString: String): Boolean = apiDateString == getTodayFormatted()
 
     // Get current timestamp in API format
     fun getCurrentTimestamp(): String {

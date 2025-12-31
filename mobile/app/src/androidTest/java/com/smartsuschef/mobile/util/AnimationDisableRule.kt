@@ -16,8 +16,8 @@ class AnimationDisableRule : TestRule {
     override fun apply(
         base: Statement,
         description: Description,
-    ): Statement {
-        return object : Statement() {
+    ): Statement =
+        object : Statement() {
             override fun evaluate() {
                 val hasPermission = context.checkCallingOrSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
                 if (hasPermission) {
@@ -32,7 +32,6 @@ class AnimationDisableRule : TestRule {
                 }
             }
         }
-    }
 
     private fun toggleAnimation(enable: Boolean) {
         val scale = if (enable) "1" else "0"

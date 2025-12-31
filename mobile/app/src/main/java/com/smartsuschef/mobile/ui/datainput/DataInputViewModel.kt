@@ -339,8 +339,8 @@ class DataInputViewModel
             }
         }
 
-        private fun extractTime(timestamp: String): String {
-            return try {
+        private fun extractTime(timestamp: String): String =
+            try {
                 val apiFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
                 val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
                 val date = apiFormat.parse(timestamp)
@@ -349,7 +349,6 @@ class DataInputViewModel
                 Log.w(TAG, "Failed to parse timestamp: $timestamp", e)
                 "00:00"
             }
-        }
 
         private fun loadRecentEntries() {
             val currentMode = _isSalesMode.value ?: true

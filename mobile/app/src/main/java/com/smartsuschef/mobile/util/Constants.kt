@@ -2,13 +2,8 @@ package com.smartsuschef.mobile.util
 
 object Constants {
     // API Configuration
-    // const val BASE_URL = "http://oversea.zyh111.icu:234/api/"
-
-    // For local development (uncomment when testing locally)
-    // const val BASE_URL = "http://192.168.1.100:5000/api/"
-
-    // For Android Emulator
-    const val BASE_URL = "http://10.0.2.2:5000/api/"
+    // BASE_URL is provided by BuildConfig per flavor (local / uat / production).
+    // Do NOT hardcode URLs here — see build.gradle.kts productFlavors.
 
     // Network Timeouts (seconds)
     const val CONNECT_TIMEOUT = 30L

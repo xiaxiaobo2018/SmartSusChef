@@ -52,6 +52,7 @@ class SalesDetailFragment : Fragment(R.layout.fragment_sales_detail) {
             title = "Sales Details"
         }
         binding.tvDetailTitle.text = "Sales Breakdown: ${args.date}"
+        binding.tvSalesSubtitle.text = ""
     }
 
     // This function now only sets up the chart's appearance
@@ -124,6 +125,7 @@ class SalesDetailFragment : Fragment(R.layout.fragment_sales_detail) {
                 }
                 is Resource.Loading -> {
                     binding.progressBarPieChart.isVisible = true
+                    binding.tvSalesSubtitle.text = ""
                 }
             }
         }
@@ -156,7 +158,8 @@ class SalesDetailFragment : Fragment(R.layout.fragment_sales_detail) {
             if (rawEntries.size > 10) {
                 val topNine = rawEntries.sortedByDescending { it.value }.take(9)
                 val othersSum =
-                    rawEntries.sortedByDescending { it.value }
+                    rawEntries
+                        .sortedByDescending { it.value }
                         .drop(9)
                         .sumOf { it.value.toDouble() }
                         .toFloat()

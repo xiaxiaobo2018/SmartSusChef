@@ -114,6 +114,70 @@ def generate_html(all_findings: list, title: str) -> str:
     file_labels = json.dumps([Path(f[0]).name for f in top_files])
     file_values = json.dumps([f[1] for f in top_files])
 
+    # Build conditional HTML blocks (avoids nested f-strings, compatible with Python < 3.12)
+    if total == 0:
+        charts_section = ""
+        table_section = "<div class='empty'><div class='icon'>&#10003;</div>No security findings detected!</div>"
+        script_section = ""
+    else:
+        charts_section = f'''
+<div class="charts">
+  <div class="chart-card">
+    <h3>Findings by Severity</h3>
+    <canvas id="severityChart"></canvas>
+  </div>
+  <div class="chart-card">
+    <h3>Top Rules</h3>
+    <canvas id="rulesChart"></canvas>
+  </div>
+  <div class="chart-card">
+    <h3>Top Affected Files</h3>
+    <canvas id="filesChart"></canvas>
+  </div>
+</div>
+'''
+        table_section = f'''
+<h2 class="section-title">All Findings ({total})</h2>
+<table>
+  <thead>
+    <tr><th>#</th><th>Severity</th><th>Rule</th><th>Message</th><th>Location</th></tr>
+  </thead>
+  <tbody>
+    {rows_html}
+  </tbody>
+</table>
+'''
+        script_section = f"""
+new Chart(document.getElementById('severityChart'), {{
+  type: 'doughnut',
+  data: {{
+    labels: {severity_labels},
+    datasets: [{{ data: {severity_values}, backgroundColor: {severity_colors}, borderWidth: 2, borderColor: '#fff' }}]
+  }},
+  options: {{ responsive: true, plugins: {{ legend: {{ position: 'bottom' }} }} }}
+}});
+
+new Chart(document.getElementById('rulesChart'), {{
+  type: 'bar',
+  data: {{
+    labels: {rule_labels},
+    datasets: [{{ label: 'Count', data: {rule_values}, backgroundColor: '#3498db', borderRadius: 6 }}]
+  }},
+  options: {{ responsive: true, indexAxis: 'y', plugins: {{ legend: {{ display: false }} }},
+    scales: {{ x: {{ beginAtZero: true, ticks: {{ stepSize: 1 }} }} }} }}
+}});
+
+new Chart(document.getElementById('filesChart'), {{
+  type: 'bar',
+  data: {{
+    labels: {file_labels},
+    datasets: [{{ label: 'Findings', data: {file_values}, backgroundColor: '#e74c3c', borderRadius: 6 }}]
+  }},
+  options: {{ responsive: true, indexAxis: 'y', plugins: {{ legend: {{ display: false }} }},
+    scales: {{ x: {{ beginAtZero: true, ticks: {{ stepSize: 1 }} }} }} }}
+}});
+"""
+
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -181,66 +245,12 @@ def generate_html(all_findings: list, title: str) -> str:
   </div>
 </div>
 
-{"" if total == 0 else f'''
-<div class="charts">
-  <div class="chart-card">
-    <h3>Findings by Severity</h3>
-    <canvas id="severityChart"></canvas>
-  </div>
-  <div class="chart-card">
-    <h3>Top Rules</h3>
-    <canvas id="rulesChart"></canvas>
-  </div>
-  <div class="chart-card">
-    <h3>Top Affected Files</h3>
-    <canvas id="filesChart"></canvas>
-  </div>
-</div>
-'''}
+{charts_section}
 
-{"<div class='empty'><div class='icon'>&#10003;</div>No security findings detected!</div>" if total == 0 else f'''
-<h2 class="section-title">All Findings ({total})</h2>
-<table>
-  <thead>
-    <tr><th>#</th><th>Severity</th><th>Rule</th><th>Message</th><th>Location</th></tr>
-  </thead>
-  <tbody>
-    {rows_html}
-  </tbody>
-</table>
-'''}
+{table_section}
 
 <script>
-{"" if total == 0 else f"""
-new Chart(document.getElementById('severityChart'), {{
-  type: 'doughnut',
-  data: {{
-    labels: {severity_labels},
-    datasets: [{{ data: {severity_values}, backgroundColor: {severity_colors}, borderWidth: 2, borderColor: '#fff' }}]
-  }},
-  options: {{ responsive: true, plugins: {{ legend: {{ position: 'bottom' }} }} }}
-}});
-
-new Chart(document.getElementById('rulesChart'), {{
-  type: 'bar',
-  data: {{
-    labels: {rule_labels},
-    datasets: [{{ label: 'Count', data: {rule_values}, backgroundColor: '#3498db', borderRadius: 6 }}]
-  }},
-  options: {{ responsive: true, indexAxis: 'y', plugins: {{ legend: {{ display: false }} }},
-    scales: {{ x: {{ beginAtZero: true, ticks: {{ stepSize: 1 }} }} }} }}
-}});
-
-new Chart(document.getElementById('filesChart'), {{
-  type: 'bar',
-  data: {{
-    labels: {file_labels},
-    datasets: [{{ label: 'Findings', data: {file_values}, backgroundColor: '#e74c3c', borderRadius: 6 }}]
-  }},
-  options: {{ responsive: true, indexAxis: 'y', plugins: {{ legend: {{ display: false }} }},
-    scales: {{ x: {{ beginAtZero: true, ticks: {{ stepSize: 1 }} }} }} }}
-}});
-"""}
+{script_section}
 </script>
 </body>
 </html>"""

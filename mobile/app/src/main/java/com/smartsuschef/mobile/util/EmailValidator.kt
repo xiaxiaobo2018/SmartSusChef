@@ -22,7 +22,5 @@ class EmailValidator
          * @param email The email string to validate
          * @return true if valid email format, false otherwise
          */
-        fun isValid(email: String): Boolean {
-            return email.matches(EMAIL_REGEX)
-        }
+        fun isValid(email: String): Boolean = email.matches(EMAIL_REGEX)
     }

@@ -172,8 +172,7 @@ class WastageOverviewFragmentTest {
                                     "updatedAt": "2026-01-01T00:00:00Z"
                                 }
                                 """.trimIndent(),
-                            )
-                            .addHeader("Content-Type", "application/json")
+                            ).addHeader("Content-Type", "application/json")
 
                     path.contains("/api/auth/me") ->
                         MockResponse()
@@ -191,12 +190,12 @@ class WastageOverviewFragmentTest {
                                     "updatedAt": "2026-01-01T00:00:00Z"
                                 }
                                 """.trimIndent(),
-                            )
-                            .addHeader("Content-Type", "application/json")
+                            ).addHeader("Content-Type", "application/json")
 
                     path.contains("/api/wastage/trend") ->
                         if (wastageTrendError) {
-                            MockResponse().setResponseCode(500)
+                            MockResponse()
+                                .setResponseCode(500)
                                 .setBody("""{"message": "Internal Server Error"}""")
                                 .addHeader("Content-Type", "application/json")
                         } else {
@@ -209,8 +208,7 @@ class WastageOverviewFragmentTest {
                                         {"date": "2026-02-09", "totalQuantity": 12.0, "totalCarbonFootprint": 2.8, "itemBreakdown": []}
                                     ]
                                     """.trimIndent(),
-                                )
-                                .addHeader("Content-Type", "application/json")
+                                ).addHeader("Content-Type", "application/json")
                         }
 
                     path.contains("/api/sales/trend") ->
@@ -231,8 +229,7 @@ class WastageOverviewFragmentTest {
                                     "humidity": 75
                                 }
                                 """.trimIndent(),
-                            )
-                            .addHeader("Content-Type", "application/json")
+                            ).addHeader("Content-Type", "application/json")
 
                     path.contains("/api/forecast/holidays") ->
                         MockResponse()
@@ -247,7 +244,8 @@ class WastageOverviewFragmentTest {
                             .addHeader("Content-Type", "application/json")
 
                     else ->
-                        MockResponse().setResponseCode(200)
+                        MockResponse()
+                            .setResponseCode(200)
                             .setBody("[]")
                             .addHeader("Content-Type", "application/json")
                 }

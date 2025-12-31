@@ -1,16 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    Production network security config: cleartext traffic is DENIED by default.
+    Only system CA certificates are trusted.
+    Flavor-specific configs (local/uat) override this to allow cleartext where needed.
+-->
 <network-security-config>
-    <base-config cleartextTrafficPermitted="true">
+    <base-config cleartextTrafficPermitted="false">
         <trust-anchors>
             <certificates src="system" />
         </trust-anchors>
     </base-config>
-    <domain-config cleartextTrafficPermitted="true">
-        <!-- For Android Emulator -->
-        <domain includeSubdomains="true">10.0.2.2</domain>
-        <!-- UAT ALB -->
-        <domain includeSubdomains="true">smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com</domain>
-        <!-- Production ALB -->
-        <domain includeSubdomains="true">smartsuschef-prod-alb-909143264.ap-southeast-1.elb.amazonaws.com</domain>
-    </domain-config>
 </network-security-config>

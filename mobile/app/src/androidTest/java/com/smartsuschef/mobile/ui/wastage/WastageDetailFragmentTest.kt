@@ -188,8 +188,7 @@ class WastageDetailFragmentTest {
                                     "updatedAt": "2026-01-01T00:00:00Z"
                                 }
                                 """.trimIndent(),
-                            )
-                            .addHeader("Content-Type", "application/json")
+                            ).addHeader("Content-Type", "application/json")
 
                     path.contains("/api/auth/me") ->
                         MockResponse()
@@ -207,8 +206,7 @@ class WastageDetailFragmentTest {
                                     "updatedAt": "2026-01-01T00:00:00Z"
                                 }
                                 """.trimIndent(),
-                            )
-                            .addHeader("Content-Type", "application/json")
+                            ).addHeader("Content-Type", "application/json")
 
                     path.contains("/api/wastage/trend") ->
                         MockResponse()
@@ -219,8 +217,7 @@ class WastageDetailFragmentTest {
                                     {"date": "2026-02-10", "totalQuantity": 15.5, "totalCarbonFootprint": 3.2, "itemBreakdown": []}
                                 ]
                                 """.trimIndent(),
-                            )
-                            .addHeader("Content-Type", "application/json")
+                            ).addHeader("Content-Type", "application/json")
 
                     path.contains("/api/sales/trend") ->
                         MockResponse()
@@ -240,8 +237,7 @@ class WastageDetailFragmentTest {
                                     "humidity": 75
                                 }
                                 """.trimIndent(),
-                            )
-                            .addHeader("Content-Type", "application/json")
+                            ).addHeader("Content-Type", "application/json")
 
                     path.contains("/api/forecast/holidays") ->
                         MockResponse()
@@ -256,7 +252,8 @@ class WastageDetailFragmentTest {
                             .addHeader("Content-Type", "application/json")
 
                     else ->
-                        MockResponse().setResponseCode(200)
+                        MockResponse()
+                            .setResponseCode(200)
                             .setBody("[]")
                             .addHeader("Content-Type", "application/json")
                 }
