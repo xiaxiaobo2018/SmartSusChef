@@ -49,13 +49,23 @@ async function fetchWithAuth<T>(
     throw new Error('Unauthorized');
   }
 
+  if (response.status === 403) {
+    // Insufficient permissions
+    throw new Error('Forbidden: You do not have permission to perform this action');
+  }
+
   if (response.status === 204) {
     return {} as T;
   }
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({ message: 'Request failed' }));
-    throw new Error(error.message || `HTTP error ${response.status}`);
+    // Handle ASP.NET model validation errors ({ title, errors: { Field: ["msg"] } })
+    if (error.errors && typeof error.errors === 'object') {
+      const messages = Object.values(error.errors).flat().join(' ');
+      throw new Error(messages || error.title || `HTTP error ${response.status}`);
+    }
+    throw new Error(error.message || error.title || `HTTP error ${response.status}`);
   }
 
   return response.json();
@@ -87,9 +97,18 @@ async function fetchBlobWithAuth(
     throw new Error('Unauthorized');
   }
 
+  if (response.status === 403) {
+    // Insufficient permissions
+    throw new Error('Forbidden: You do not have permission to perform this action');
+  }
+
   if (!response.ok) {
     const error = await response.json().catch(() => ({ message: 'Request failed' }));
-    throw new Error(error.message || `HTTP error ${response.status}`);
+    if (error.errors && typeof error.errors === 'object') {
+      const messages = Object.values(error.errors).flat().join(' ');
+      throw new Error(messages || error.title || `HTTP error ${response.status}`);
+    }
+    throw new Error(error.message || error.title || `HTTP error ${response.status}`);
   }
 
   return response.blob();
@@ -167,7 +186,7 @@ export interface ForgotPasswordRequest {
 }
 
 export interface ForgotPasswordResponse {
-  temporaryPassword: string;
+  message: string;
 }
 
 export const authApi = {
@@ -363,7 +382,7 @@ export interface SalesDataDto {
   recipeName: string;
   quantity: number;
   createdAt?: string;
-  modifiedAt?: string;
+  updatedAt?: string;
 }
 
 export interface CreateSalesDataRequest {
@@ -399,6 +418,25 @@ export interface ImportSalesDataRequest {
   salesData: CreateSalesDataRequest[];
 }
 
+// Import by dish name (auto-creates recipes)
+export interface ImportSalesByNameItem {
+  date: string;
+  dishName: string;
+  quantity: number;
+}
+
+export interface ImportSalesByNameRequest {
+  salesData: ImportSalesByNameItem[];
+  dateFormat?: string;  // .NET date format string (e.g. "M/d/yy", "yyyy-MM-dd")
+}
+
+export interface ImportSalesByNameResponse {
+  message: string;
+  imported: number;
+  newDishesCreated: number;
+  newDishes: string[];
+}
+
 export const salesApi = {
   getAll: (startDate?: string, endDate?: string): Promise<SalesDataDto[]> => {
     const params = new URLSearchParams();
@@ -426,6 +464,9 @@ export const salesApi = {
   import: (data: ImportSalesDataRequest): Promise<{ message: string; count: number }> =>
     fetchWithAuth('/sales/import', { method: 'POST', body: JSON.stringify(data) }),
 
+  importByName: (data: ImportSalesByNameRequest): Promise<ImportSalesByNameResponse> =>
+    fetchWithAuth('/sales/import-by-name', { method: 'POST', body: JSON.stringify(data) }),
+
   update: (id: string, data: UpdateSalesDataRequest): Promise<SalesDataDto> =>
     fetchWithAuth(`/sales/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
 
@@ -445,6 +486,7 @@ export interface WastageDataDto {
   unit: string;
   quantity: number;
   carbonFootprint: number;
+  createdAt: string;
   updatedAt: string;
 }
 
@@ -519,6 +561,7 @@ export interface ForecastDto {
   recipeName: string;
   quantity: number;
   ingredients: ForecastIngredientDto[];
+  confidence?: string; // "High" | "Medium" | "Low" — from ML backend
 }
 
 export interface ForecastSummaryDto {
@@ -540,17 +583,68 @@ export interface HolidayDto {
 }
 
 export const forecastApi = {
-  get: (days: number = 7): Promise<ForecastDto[]> =>
-    fetchWithAuth(`/forecast?days=${days}`),
+  get: (days: number = 7, includePastDays: number = 0): Promise<ForecastDto[]> =>
+    fetchWithAuth(`/forecast?days=${days}&includePastDays=${includePastDays}`),
 
-  getSummary: (days: number = 7): Promise<ForecastSummaryDto[]> =>
-    fetchWithAuth(`/forecast/summary?days=${days}`),
+  getSummary: (days: number = 7, includePastDays: number = 0): Promise<ForecastSummaryDto[]> =>
+    fetchWithAuth(`/forecast/summary?days=${days}&includePastDays=${includePastDays}`),
 
   getWeather: (): Promise<WeatherDto | null> =>
     (fetchWithAuth<WeatherDto>('/forecast/weather').catch(() => null)),
 
   getHolidays: (year: number): Promise<HolidayDto[]> =>
     (fetchWithAuth<HolidayDto[]>(`/forecast/holidays/${year}`).catch(() => [])),
+};
+
+// ==========================================
+// ML MODEL API
+// ==========================================
+export type MlModelStatus = 'ready' | 'training' | 'can_train' | 'insufficient_data' | 'unavailable';
+
+export interface MlTrainingProgressDto {
+  trained: number;
+  failed: number;
+  total: number;
+  currentDish: string | null;
+}
+
+export interface MlStatusDto {
+  storeId: number;
+  hasModels: boolean;
+  isTraining: boolean;
+  dishes: string[] | null;
+  daysAvailable: number | null;
+  status: MlModelStatus;
+  message: string;
+  trainingProgress: MlTrainingProgressDto | null;
+}
+
+export interface MlTrainResponseDto {
+  status: string;
+  storeId: number;
+  message: string | null;
+}
+
+export interface MlPredictResponseDto {
+  storeId: number;
+  status: string;
+  message: string | null;
+  daysAvailable: number | null;
+  predictions: Record<string, unknown> | null;
+}
+
+export const mlApi = {
+  /** Get ML model status for the current store */
+  getStatus: (): Promise<MlStatusDto> =>
+    fetchWithAuth('/ml/status'),
+
+  /** Trigger model training for the current store */
+  train: (): Promise<MlTrainResponseDto> =>
+    fetchWithAuth('/ml/train', { method: 'POST' }),
+
+  /** Trigger ML prediction for the current store */
+  predict: (days: number = 7): Promise<MlPredictResponseDto> =>
+    fetchWithAuth(`/ml/predict?days=${days}`, { method: 'POST' }),
 };
 
 // ==========================================

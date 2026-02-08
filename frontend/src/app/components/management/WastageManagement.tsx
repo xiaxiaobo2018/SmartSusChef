@@ -11,7 +11,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/app/components/u
 import { Badge } from '@/app/components/ui/badge';
 import { Trash2, Edit, History, AlertTriangle, Plus } from 'lucide-react';
 import { toast } from 'sonner';
-import { format, differenceInDays, subDays } from 'date-fns';
+import { format, differenceInDays, subDays, parseISO } from 'date-fns';
 import { WastageData, EditHistory } from '@/app/types/index';
 import { getRecipeUnit, calculateRecipeCarbon } from '@/app/utils/recipeCalculations';
 import { getStandardizedQuantity } from '@/app/utils/unitConversion';
@@ -30,6 +30,8 @@ export function WastageManagement() {
   const [newDate, setNewDate] = useState<string>(() => format(new Date(), 'yyyy-MM-dd'));
   const [newItemType, setNewItemType] = useState<'ingredient' | 'recipe'>('ingredient');
   const [newItemId, setNewItemId] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Calculate the allowed date range for creating new records (last 7 days)
   const today = new Date();
@@ -73,10 +75,12 @@ export function WastageManagement() {
 
   const filteredData = useMemo(() => {
     const today = new Date();
+    today.setHours(23, 59, 59, 999); // End of today
     const thirtyDaysAgo = subDays(today, 30);
+    thirtyDaysAgo.setHours(0, 0, 0, 0); // Start of 30 days ago
 
     let data = wastageData.filter((waste) => {
-      const wasteDate = new Date(waste.date);
+      const wasteDate = parseISO(waste.date); // Use parseISO for reliable date parsing
       return wasteDate >= thirtyDaysAgo && wasteDate <= today;
     });
 
@@ -124,7 +128,7 @@ export function WastageManagement() {
   const canEdit = (dateStr: string): boolean => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const dataDate = new Date(dateStr);
+    const dataDate = parseISO(dateStr); // Use parseISO for consistent date parsing
     dataDate.setHours(0, 0, 0, 0);
     const daysDiff = differenceInDays(today, dataDate);
     return daysDiff <= 7;
@@ -155,6 +159,7 @@ export function WastageManagement() {
       return;
     }
 
+    setIsSubmitting(true);
     try {
       await updateWastageData(editingData.id, {
         quantity,
@@ -164,6 +169,8 @@ export function WastageManagement() {
       handleCloseEditDialog();
     } catch (error) {
       toast.error('Failed to update wastage data');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -179,6 +186,7 @@ export function WastageManagement() {
   const handleDeleteRecord = async () => {
     if (!deletingData) return;
 
+    setIsDeleting(true);
     try {
       await deleteWastageData(deletingData.id);
 
@@ -192,6 +200,8 @@ export function WastageManagement() {
     } catch (error) {
       console.error('Failed to delete wastage data:', error);
       toast.error('Failed to delete wastage record');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -207,6 +217,7 @@ export function WastageManagement() {
       return;
     }
 
+    setIsSubmitting(true);
     try {
       // Check for duplicate record
       const existingRecord = wastageData.find(
@@ -237,6 +248,8 @@ export function WastageManagement() {
     } catch (error) {
       console.error('Failed to create wastage data:', error);
       toast.error('Failed to add new wastage record');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -425,13 +438,14 @@ export function WastageManagement() {
                     setDeletingData(editingData);
                     setIsDeleteDialogOpen(true);
                   }}
+                  disabled={isSubmitting}
                   className="bg-red-600 hover:bg-red-700 rounded-[32px] px-6"
                 >
                   Delete Record
                 </Button>
                 <div className="flex gap-2">
-                  <Button variant="outline" onClick={handleCloseEditDialog} className="rounded-[32px] px-6">Cancel</Button>
-                  <Button onClick={handleSubmitEdit} className="bg-[#4F6F52] hover:bg-[#3D563F] text-white rounded-[32px] px-6">Update Record</Button>
+                  <Button variant="outline" onClick={handleCloseEditDialog} disabled={isSubmitting} className="rounded-[32px] px-6">Cancel</Button>
+                  <Button onClick={handleSubmitEdit} disabled={isSubmitting} className="bg-[#4F6F52] hover:bg-[#3D563F] text-white rounded-[32px] px-6">Update Record</Button>
                 </div>
               </div>
             </div>
@@ -483,6 +497,7 @@ export function WastageManagement() {
               <Button
                 variant="outline"
                 onClick={() => setIsDeleteDialogOpen(false)}
+                disabled={isDeleting}
                 className="rounded-[32px] px-6 hover:bg-gray-100"
               >
                 Cancel
@@ -490,6 +505,7 @@ export function WastageManagement() {
               <Button
                 variant="destructive"
                 onClick={handleDeleteRecord}
+                disabled={isDeleting}
                 className="bg-red-600 hover:bg-red-700 rounded-[32px] px-6"
               >
                 Yes, Delete Record
@@ -593,13 +609,13 @@ export function WastageManagement() {
             </div>
 
             <div className="flex justify-end gap-2 pt-4">
-              <Button variant="outline" onClick={handleCloseCreateDialog} className="rounded-[32px] px-6">
+              <Button variant="outline" onClick={handleCloseCreateDialog} disabled={isSubmitting} className="rounded-[32px] px-6">
                 Cancel
               </Button>
               <Button
                 onClick={handleCreateRecord}
                 className="bg-[#4F6F52] hover:bg-[#3D563F] text-white rounded-[32px] px-6"
-                disabled={!newDate || !newItemId || !newQuantity}
+                disabled={!newDate || !newItemId || !newQuantity || isSubmitting}
               >
                 Save Record
               </Button>

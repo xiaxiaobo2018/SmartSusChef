@@ -1,76 +1,103 @@
 package com.smartsuschef.mobile.data
 
 import android.content.Context
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
+import android.content.SharedPreferences
+import android.security.keystore.KeyGenParameterSpec
+import android.security.keystore.KeyProperties
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
 import com.smartsuschef.mobile.util.Constants
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
-
-// Extension property to create the DataStore instance
-private val Context.dataStore by preferencesDataStore(name = Constants.DATASTORE_NAME)
-
+// ...
 class TokenManager(private val context: Context) {
 
-    companion object {
-        private val TOKEN_KEY = stringPreferencesKey(Constants.KEY_AUTH_TOKEN)
-        private val USER_ROLE_KEY = stringPreferencesKey(Constants.KEY_USER_ROLE)
+    private val masterKey: MasterKey by lazy {
+        val keyGenParameterSpec = KeyGenParameterSpec.Builder(
+            MasterKey.DEFAULT_MASTER_KEY_ALIAS,
+            KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
+        )
+            .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+            .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+            .setKeySize(256)
+            .build()
+        MasterKey.Builder(context)
+            .setKeyGenParameterSpec(keyGenParameterSpec)
+            .build()
+    }
+    private val sharedPreferences: SharedPreferences by lazy {
+        EncryptedSharedPreferences.create(
+            context,
+            Constants.SHARED_PREFS_FILE_NAME,
+            masterKey,
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
+    }
+
+    private val _authTokenFlow = MutableStateFlow<String?>(null)
+    val authTokenFlow: Flow<String?> = _authTokenFlow.asStateFlow()
+
+    init {
+        // Load initial token on startup
+        _authTokenFlow.value = sharedPreferences.getString(Constants.KEY_AUTH_TOKEN, null)
     }
 
     /**
-     * Saves the JWT token to DataStore
+     * Saves the JWT token to EncryptedSharedPreferences
      */
-    suspend fun saveToken(token: String) {
-        context.dataStore.edit { preferences ->
-            preferences[TOKEN_KEY] = token
-        }
+    fun saveToken(token: String) {
+        sharedPreferences.edit().putString(Constants.KEY_AUTH_TOKEN, token).apply()
+        _authTokenFlow.value = token
     }
 
     /**
      * Retrieves the JWT token as a Flow (Reactive)
      */
+    // This is now based on MutableStateFlow for reactivity
+    // The initial value is loaded in init block.
+    // Subsequent changes via saveToken will update this flow.
+    // The original getTokenFlow() functionality from DataStore (which watched for external changes)
+    // is now handled by directly updating _authTokenFlow.value when saveToken is called internally.
+    // For external preference changes (e.g., another app changing prefs directly), a more complex
+    // SharedPreferences.OnSharedPreferenceChangeListener would be needed, but usually not for EncryptedSharedPreferences.
     fun getTokenFlow(): Flow<String?> {
-        return context.dataStore.data.map { preferences ->
-            preferences[TOKEN_KEY]
-        }
+        return authTokenFlow
     }
 
     /**
      * Synchronous token retrieval for the Hilt AuthInterceptor
+     * Note: This still uses runBlocking to adapt the Flow to a synchronous call as required by the Interceptor.
      */
     fun getToken(): String? = runBlocking {
-        context.dataStore.data.map { preferences ->
-            preferences[TOKEN_KEY]
-        }.first()
+        _authTokenFlow.first()
     }
 
     /**
-     * Saves the user role (Manager vs Employee) to handle UI restrictions
+     * Saves the user role (Manager vs Employee) to EncryptedSharedPreferences
      */
-    suspend fun saveUserRole(role: String) {
-        context.dataStore.edit { preferences ->
-            preferences[USER_ROLE_KEY] = role
-        }
+    fun saveUserRole(role: String) {
+        sharedPreferences.edit().putString(Constants.KEY_USER_ROLE, role).apply()
     }
 
     /**
      * Retrieves the user role synchronously
      */
-    fun getUserRole(): String? = runBlocking {
-        context.dataStore.data.map { preferences ->
-            preferences[USER_ROLE_KEY]
-        }.first()
+    fun getUserRole(): String? {
+        return sharedPreferences.getString(Constants.KEY_USER_ROLE, null)
     }
 
     /**
      * Clears all session data (Logout)
      */
-    suspend fun clearSession() {
-        context.dataStore.edit { preferences ->
-            preferences.clear()
-        }
+    fun clearSession() {
+        sharedPreferences.edit()
+            .remove(Constants.KEY_AUTH_TOKEN)
+            .remove(Constants.KEY_USER_ROLE)
+            .apply()
+        _authTokenFlow.value = null
     }
 }

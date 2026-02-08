@@ -6,9 +6,8 @@ public record SalesDataDto(
     string RecipeId,
     string RecipeName,
     int Quantity,
-    DateTime UpdatedAt,
-    DateTime? CreatedAt = null,
-    DateTime? ModifiedAt = null
+    DateTime CreatedAt,
+    DateTime UpdatedAt
 );
 
 public record CreateSalesDataRequest(
@@ -42,4 +41,22 @@ public record IngredientUsageDto(
 
 public record ImportSalesDataRequest(
     List<CreateSalesDataRequest> SalesData
+);
+
+// Import by dish name (auto-creates recipe if not found)
+public record ImportSalesByNameItem(
+    string Date,
+    string DishName,
+    int Quantity
+);
+
+public record ImportSalesByNameRequest(
+    List<ImportSalesByNameItem> SalesData,
+    string? DateFormat = null
+);
+
+public record ImportSalesByNameResponse(
+    int Imported,
+    int Created,
+    List<string> NewDishes
 );

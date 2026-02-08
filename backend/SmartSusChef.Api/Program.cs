@@ -5,6 +5,10 @@ using Microsoft.OpenApi.Models;
 using SmartSusChef.Api.Data;
 using SmartSusChef.Api.Services;
 using System.Text;
+using System.Runtime.CompilerServices;
+
+// Allow the test project to access internal members
+[assembly: InternalsVisibleTo("SmartSusChef.Api.Tests")]
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -69,15 +73,36 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
-// CORS
+// CORS - restrict to configured origins
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:5173", "http://localhost:3000")
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
+        var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
+
+        if (allowedOrigins != null && allowedOrigins.Length > 0)
+        {
+            policy.WithOrigins(allowedOrigins)
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials();
+        }
+        else if (builder.Environment.IsDevelopment())
+        {
+            // Development only: allow localhost origins
+            policy.SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials();
+        }
+        else
+        {
+            // Production without explicit config: same-origin only (no cross-origin allowed)
+            policy.WithOrigins("https://smartsuschef.com", "https://uat.smartsuschef.com")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials();
+        }
     });
 });
 
@@ -89,10 +114,24 @@ builder.Services.AddScoped<IIngredientService, IngredientService>();
 builder.Services.AddScoped<IRecipeService, RecipeService>();
 builder.Services.AddScoped<ISalesService, SalesService>();
 builder.Services.AddScoped<IWastageService, WastageService>();
-builder.Services.AddScoped<IForecastService, MockForecastService>();
 builder.Services.AddScoped<IWeatherService, WeatherService>();
 builder.Services.AddScoped<IHolidayService, HolidayService>();
 builder.Services.AddScoped<IStoreService, StoreService>();
+
+// ML Prediction Service — calls the FastAPI ML backend
+var mlApiUrl = builder.Configuration["ExternalApis:MlApiUrl"] ?? "http://localhost:8000";
+builder.Services.AddHttpClient<IMlPredictionService, MlPredictionService>(client =>
+{
+    client.BaseAddress = new Uri(mlApiUrl);
+    client.Timeout = TimeSpan.FromSeconds(120); // ML predicts all dishes + weather in one call
+})
+.ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+{
+    UseProxy = false   // Bypass local proxy (e.g. Clash) for ML service calls
+});
+
+// Forecast Service — uses ML backend with fallback to simple heuristic
+builder.Services.AddScoped<IForecastService, MlForecastService>();
 
 // Configure HttpClient with timeout for external API calls
 builder.Services.AddHttpClient<IWeatherService, WeatherService>(client =>
@@ -106,6 +145,21 @@ builder.Services.AddHttpClient<IHolidayService, HolidayService>(client =>
 builder.Services.AddHttpClient();
 
 var app = builder.Build();
+
+// Apply pending migrations automatically
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    try
+    {
+        dbContext.Database.Migrate();
+        Console.WriteLine("Database migrations applied successfully.");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error applying migrations: {ex.Message}");
+    }
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

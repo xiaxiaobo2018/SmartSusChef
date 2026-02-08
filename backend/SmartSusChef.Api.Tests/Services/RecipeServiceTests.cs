@@ -6,6 +6,10 @@ using SmartSusChef.Api.Data;
 using SmartSusChef.Api.Services;
 using SmartSusChef.Api.Models;
 using Moq;
+using System;
+using System.Threading.Tasks;
+using System.Linq;
+using System.Collections.Generic;
 
 public class RecipeServiceTests
 {
@@ -96,6 +100,54 @@ public class RecipeServiceTests
     }
 
     [Fact]
+    public async Task CreateAsync_ShouldThrowException_WhenNameIsDuplicate()
+    {
+        // Arrange
+        var context = GetDbContext();
+        var storeId = 1;
+        context.Recipes.Add(new Recipe { Id = Guid.NewGuid(), Name = "Margherita Pizza", StoreId = storeId });
+        await context.SaveChangesAsync();
+
+        var mockCurrentUserService = new Mock<ICurrentUserService>();
+        mockCurrentUserService.Setup(s => s.StoreId).Returns(storeId);
+        var service = new RecipeService(context, mockCurrentUserService.Object);
+
+        var request = new DTOs.CreateRecipeRequest(
+            "Margherita Pizza",
+            true,
+            false,
+            new List<DTOs.CreateRecipeIngredientRequest>()
+        );
+
+        // Act & Assert
+        await Assert.ThrowsAsync<InvalidOperationException>(() => service.CreateAsync(request));
+    }
+
+    [Fact]
+    public async Task CreateAsync_ShouldThrowException_WhenIngredientStructureIsInvalid()
+    {
+        // Arrange
+        var context = GetDbContext();
+        var storeId = 1;
+        var mockCurrentUserService = new Mock<ICurrentUserService>();
+        mockCurrentUserService.Setup(s => s.StoreId).Returns(storeId);
+        var service = new RecipeService(context, mockCurrentUserService.Object);
+
+        var request = new DTOs.CreateRecipeRequest(
+            "Invalid Recipe",
+            true,
+            false,
+            new List<DTOs.CreateRecipeIngredientRequest>
+            {
+                new(null, null, 1.0m) // Both null
+            }
+        );
+
+        // Act & Assert
+        await Assert.ThrowsAsync<InvalidOperationException>(() => service.CreateAsync(request));
+    }
+
+    [Fact]
     public async Task GetAllAsync_ShouldReturnOnlyRecipesForCurrentStore()
     {
         // Arrange
@@ -159,9 +211,28 @@ public class RecipeServiceTests
         Assert.Equal(updatedIngredientId.ToString(), result.Ingredients.First().IngredientId);
         
         var recipeInDb = await context.Recipes.Include(r => r.RecipeIngredients).FirstOrDefaultAsync(r => r.Id == recipeId);
+        Assert.NotNull(recipeInDb);
         Assert.Equal("New Pizza", recipeInDb.Name);
         Assert.Single(recipeInDb.RecipeIngredients);
         Assert.Equal(updatedIngredientId, recipeInDb.RecipeIngredients.First().IngredientId);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_ShouldReturnNull_WhenRecipeDoesNotExist()
+    {
+        // Arrange
+        var context = GetDbContext();
+        var storeId = 1;
+        var mockCurrentUserService = new Mock<ICurrentUserService>();
+        mockCurrentUserService.Setup(s => s.StoreId).Returns(storeId);
+        var service = new RecipeService(context, mockCurrentUserService.Object);
+        var updateRequest = new DTOs.UpdateRecipeRequest("New Pizza", true, false, new List<DTOs.CreateRecipeIngredientRequest>());
+
+        // Act
+        var result = await service.UpdateAsync(Guid.NewGuid(), updateRequest);
+
+        // Assert
+        Assert.Null(result);
     }
 
     [Fact]
@@ -185,5 +256,39 @@ public class RecipeServiceTests
         Assert.True(result);
         var recipeInDb = await context.Recipes.FirstOrDefaultAsync(r => r.Id == recipeId);
         Assert.Null(recipeInDb);
+    }
+
+    [Fact]
+    public async Task DeleteAsync_ShouldReturnFalse_WhenRecipeDoesNotExist()
+    {
+        // Arrange
+        var context = GetDbContext();
+        var storeId = 1;
+        var mockCurrentUserService = new Mock<ICurrentUserService>();
+        mockCurrentUserService.Setup(s => s.StoreId).Returns(storeId);
+        var service = new RecipeService(context, mockCurrentUserService.Object);
+
+        // Act
+        var result = await service.DeleteAsync(Guid.NewGuid());
+
+        // Assert
+        Assert.False(result);
+    }
+
+    [Fact]
+    public async Task GetByIdAsync_ShouldReturnNull_WhenRecipeDoesNotExist()
+    {
+        // Arrange
+        var context = GetDbContext();
+        var storeId = 1;
+        var mockCurrentUserService = new Mock<ICurrentUserService>();
+        mockCurrentUserService.Setup(s => s.StoreId).Returns(storeId);
+        var service = new RecipeService(context, mockCurrentUserService.Object);
+
+        // Act
+        var result = await service.GetByIdAsync(Guid.NewGuid());
+
+        // Assert
+        Assert.Null(result);
     }
 }

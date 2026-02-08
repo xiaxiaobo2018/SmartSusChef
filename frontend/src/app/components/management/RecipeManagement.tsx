@@ -9,23 +9,29 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue, SelectSeparator } from '@/app/components/ui/select';
 import { Checkbox } from '@/app/components/ui/checkbox';
 import { Badge } from '@/app/components/ui/badge';
-import { Plus, Edit, Trash2, ChefHat, Utensils, Wheat } from 'lucide-react';
+import { Plus, Edit, Trash2, ChefHat, Utensils, Wheat, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 import { Recipe } from '@/app/types/index';
 
 // Helper type for the form state
 interface FormRow {
   type: 'ingredient' | 'recipe';
-  id: string; 
-  quantity: number;
+  id: string;
+  quantity: string | number;
 }
 
 export function RecipeManagement() {
-  const { recipes, ingredients, addRecipe, updateRecipe, deleteRecipe, storeSettings } = useApp();
-  
+  const { recipes, ingredients, addRecipe, updateRecipe, deleteRecipe, storeSettings, salesData, wastageData } = useApp();
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null);
-  
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [deletingRecipe, setDeletingRecipe] = useState<{ id: string; name: string; salesCount: number; wastageCount: number } | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isRecipeUsageDialogOpen, setIsRecipeUsageDialogOpen] = useState(false);
+  const [recipeInUse, setRecipeInUse] = useState<{ id: string; name: string; usedInRecipes: string[] } | null>(null);
+
   interface RecipeFormState {
     name: string;
     isSubRecipe: boolean;
@@ -35,9 +41,9 @@ export function RecipeManagement() {
   const initialFormState: RecipeFormState = {
     name: '',
     isSubRecipe: false,
-    formRows: [{ type: 'ingredient', id: '', quantity: 0 }],
+    formRows: [{ type: 'ingredient', id: '', quantity: '' }],
   };
-  
+
   const [recipeForm, setRecipeForm] = useState<RecipeFormState>(initialFormState);
   const { name: recipeName, isSubRecipe, formRows } = recipeForm;
 
@@ -50,12 +56,12 @@ export function RecipeManagement() {
       const mappedRows: FormRow[] = recipe.ingredients.map(comp => ({
         type: comp.childRecipeId ? 'recipe' : 'ingredient',
         id: comp.childRecipeId || comp.ingredientId || '',
-        quantity: comp.quantity
+        quantity: comp.quantity.toString()
       }));
       setRecipeForm({
         name: recipe.name,
         isSubRecipe: recipe.isSubRecipe || false,
-        formRows: mappedRows.length > 0 ? mappedRows : [{ type: 'ingredient', id: '', quantity: 0 }]
+        formRows: mappedRows.length > 0 ? mappedRows : [{ type: 'ingredient', id: '', quantity: '' }]
       });
     } else {
       setEditingRecipe(null);
@@ -70,7 +76,7 @@ export function RecipeManagement() {
       if (checked) {
         newRows = prev.formRows.map(row => {
           if (row.type === 'recipe') {
-             return { type: 'ingredient' as const, id: '', quantity: row.quantity };
+            return { type: 'ingredient' as const, id: '', quantity: row.quantity };
           }
           return row;
         });
@@ -82,7 +88,7 @@ export function RecipeManagement() {
   const handleAddRow = () => {
     setRecipeForm(prev => ({
       ...prev,
-      formRows: [...prev.formRows, { type: 'ingredient', id: '', quantity: 0 }]
+      formRows: [...prev.formRows, { type: 'ingredient', id: '', quantity: '' }]
     }));
   };
 
@@ -95,7 +101,7 @@ export function RecipeManagement() {
 
   const handleQuantityChange = (index: number, value: string) => {
     const updatedRows = [...formRows];
-    updatedRows[index].quantity = parseFloat(value) || 0;
+    updatedRows[index].quantity = value;
     setRecipeForm(prev => ({ ...prev, formRows: updatedRows }));
   };
 
@@ -116,7 +122,22 @@ export function RecipeManagement() {
       return;
     }
 
-    const validComponents = formRows.filter(r => r.id && r.quantity > 0);
+    // Check if any selected component has quantity <= 0
+    const invalidComponents = formRows.filter(r => {
+      if (!r.id) return false;
+      const qty = typeof r.quantity === 'string' ? parseFloat(r.quantity) : r.quantity;
+      return isNaN(qty) || qty <= 0;
+    });
+    if (invalidComponents.length > 0) {
+      toast.error('QTY cannot be 0 or negative. Please enter a valid quantity.');
+      return;
+    }
+
+    const validComponents = formRows.filter(r => {
+      if (!r.id) return false;
+      const qty = typeof r.quantity === 'string' ? parseFloat(r.quantity) : r.quantity;
+      return !isNaN(qty) && qty > 0;
+    });
 
     if (validComponents.length === 0) {
       toast.error('Please add at least one component with quantity > 0');
@@ -126,7 +147,7 @@ export function RecipeManagement() {
     const formattedIngredients = validComponents.map(row => ({
       ingredientId: row.type === 'ingredient' ? row.id : undefined,
       childRecipeId: row.type === 'recipe' ? row.id : undefined,
-      quantity: row.quantity
+      quantity: typeof row.quantity === 'string' ? parseFloat(row.quantity) : row.quantity
     }));
 
     const recipeData = {
@@ -135,6 +156,7 @@ export function RecipeManagement() {
       ingredients: formattedIngredients,
     };
 
+    setIsSubmitting(true);
     try {
       if (editingRecipe) {
         await updateRecipe(editingRecipe.id, recipeData);
@@ -146,17 +168,72 @@ export function RecipeManagement() {
       setIsDialogOpen(false);
     } catch (error) {
       toast.error('Failed to save recipe');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const handleDelete = async (id: string, name: string) => {
-    if (confirm(`Are you sure you want to delete "${name}"?`)) {
+  const handleOpenDeleteDialog = (id: string, name: string) => {
+    // First check if this is a sub-recipe used in other recipes
+    const recipeToDelete = recipes.find(r => r.id === id);
+    if (recipeToDelete?.isSubRecipe) {
+      const recipesUsingSubRecipe = recipes.filter(recipe =>
+        recipe.ingredients.some(ing => ing.childRecipeId === id)
+      );
+
+      if (recipesUsingSubRecipe.length > 0) {
+        // Show recipe usage dialog instead of delete dialog
+        setRecipeInUse({
+          id,
+          name,
+          usedInRecipes: recipesUsingSubRecipe.map(r => r.name)
+        });
+        setIsRecipeUsageDialogOpen(true);
+        return;
+      }
+    }
+
+    // Check if recipe exists in Sales Data or Wastage Data
+    const salesCount = salesData.filter(sale => sale.recipeId === id).length;
+    const wastageCount = wastageData.filter(waste => waste.recipeId === id).length;
+
+    setDeletingRecipe({ id, name, salesCount, wastageCount });
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deletingRecipe) return;
+
+    const { salesCount, wastageCount } = deletingRecipe;
+    const hasRelatedData = salesCount > 0 || wastageCount > 0;
+
+    // If no related data, just delete
+    if (!hasRelatedData) {
+      setIsDeleting(true);
       try {
-        await deleteRecipe(id);
+        await deleteRecipe(deletingRecipe.id, false);
         toast.success('Recipe deleted successfully');
+        setIsDeleteDialogOpen(false);
+        setDeletingRecipe(null);
       } catch (error) {
         toast.error('Failed to delete recipe');
+      } finally {
+        setIsDeleting(false);
       }
+      return;
+    }
+
+    // If related data exists, delete with cascade
+    setIsDeleting(true);
+    try {
+      await deleteRecipe(deletingRecipe.id, true);
+      toast.success(`Recipe and ${salesCount + wastageCount} related records deleted successfully`);
+      setIsDeleteDialogOpen(false);
+      setDeletingRecipe(null);
+    } catch (error) {
+      toast.error('Failed to delete recipe and related data');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -170,7 +247,7 @@ export function RecipeManagement() {
   const getComponentUnit = (item: any) => {
     if (item.childRecipeId) {
       const recipe = recipes.find(r => r.id === item.childRecipeId);
-      return recipe?.unit || 'L'; // Use recipe's unit or default to L
+      return recipe?.unit || 'portion'; // Use recipe's unit or default to portion
     }
     return ingredients.find(i => i.id === item.ingredientId)?.unit || '';
   };
@@ -220,10 +297,9 @@ export function RecipeManagement() {
                       {recipe.name}
                     </TableCell>
                     <TableCell>
-                      <Badge className={`rounded-[4px] px-3 py-1 font-medium text-white border-none shadow-none ${
-                          recipe.isSubRecipe 
-                            ? 'bg-[#F59E0B]' // Amber/Orange for Sub-Recipe
-                            : 'bg-[#0EA5E9]' // Sky Blue for Main Dish 
+                      <Badge className={`rounded-[4px] px-3 py-1 font-medium text-white border-none shadow-none ${recipe.isSubRecipe
+                        ? 'bg-[#F59E0B]' // Amber/Orange for Sub-Recipe
+                        : 'bg-[#0EA5E9]' // Sky Blue for Main Dish 
                         }`}
                       >
                         {recipe.isSubRecipe ? 'Sub-Recipe' : 'Main Dish'}
@@ -234,7 +310,7 @@ export function RecipeManagement() {
                         {recipe.ingredients.map((comp, idx) => (
                           <div key={idx} className="flex items-center gap-2 text-sm text-gray-600">
                             {comp.childRecipeId ? (
-                              <Utensils className="w-3 h-3 text-orange-500" /> 
+                              <Utensils className="w-3 h-3 text-orange-500" />
                             ) : (
                               <Wheat className="w-3 h-3 text-[#4F6F52]" />
                             )}
@@ -253,7 +329,7 @@ export function RecipeManagement() {
                         <Button variant="ghost" size="icon" onClick={() => handleOpenDialog(recipe)} className="hover:bg-gray-100">
                           <Edit className="w-4 h-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" onClick={() => handleDelete(recipe.id, recipe.name)} className="hover:bg-gray-100">
+                        <Button variant="ghost" size="icon" onClick={() => handleOpenDeleteDialog(recipe.id, recipe.name)} className="hover:bg-gray-100">
                           <Trash2 className="w-4 h-4 text-red-600" />
                         </Button>
                       </div>
@@ -277,7 +353,7 @@ export function RecipeManagement() {
               Build your recipe by adding raw ingredients or existing sub-recipes.
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-6 px-6 py-2 max-h-[500px] overflow-y-auto">
             {/* 1. Recipe Name & Checkbox */}
             <div className="space-y-3">
@@ -287,20 +363,22 @@ export function RecipeManagement() {
                   id="recipe-name"
                   placeholder="e.g. Mala Xiang Guo"
                   value={recipeName}
-                  onChange={(e) => setRecipeForm(prev => ({ ...prev, name: e.target.value}))}
+                  onChange={(e) => setRecipeForm(prev => ({ ...prev, name: e.target.value }))}
                   className="rounded-[8px] border-gray-300 h-10"
                 />
               </div>
-              
+
               <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="is-sub-recipe" 
-                  checked={isSubRecipe} 
+                <Checkbox
+                  id="is-sub-recipe"
+                  checked={isSubRecipe}
                   onCheckedChange={(checked) => handleSubRecipeToggle(checked as boolean)}
+                  disabled={!!editingRecipe}
                   className="data-[state=checked]:bg-[#4F6F52] border-gray-400 rounded-[4px]"
                 />
-                <Label htmlFor="is-sub-recipe" className="text-sm font-medium cursor-pointer text-gray-700">
+                <Label htmlFor="is-sub-recipe" className={`text-sm font-medium ${editingRecipe ? 'cursor-not-allowed text-gray-400' : 'cursor-pointer text-gray-700'}`}>
                   Set as Sub-Recipe (e.g. Sauce, Stock)
+                  {editingRecipe && <span className="text-xs ml-2">(Cannot be changed)</span>}
                 </Label>
               </div>
 
@@ -310,10 +388,10 @@ export function RecipeManagement() {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label className="text-sm font-bold text-[#1A1C18]">Recipe Components</Label>
-                <Button 
-                  type="button" 
-                  onClick={handleAddRow} 
-                  variant="ghost" 
+                <Button
+                  type="button"
+                  onClick={handleAddRow}
+                  variant="ghost"
                   size="sm"
                   className="text-[#4F6F52] hover:text-[#3D563F] hover:bg-[#4F6F52]/10 h-8 px-2 font-medium"
                 >
@@ -334,10 +412,10 @@ export function RecipeManagement() {
               <div className="space-y-2">
                 {formRows.map((row, index) => (
                   <div key={index} className="grid grid-cols-12 gap-3 items-center">
-                    
+
                     {/* Item Name Dropdown */}
                     <div className="col-span-8">
-                      <Select 
+                      <Select
                         value={row.id ? `${row.type}|${row.id}` : ''}
                         onValueChange={(val) => handleItemSelection(index, val)}
                       >
@@ -354,10 +432,10 @@ export function RecipeManagement() {
                                   <SelectItem key={r.id} value={`recipe|${r.id}`} className="pl-4">
                                     {r.name}
                                   </SelectItem>
-                              ))}
+                                ))}
                             </SelectGroup>
                           )}
-                          
+
                           {!isSubRecipe && <SelectSeparator className="my-1" />}
 
                           <SelectGroup>
@@ -377,7 +455,6 @@ export function RecipeManagement() {
                       <Input
                         type="number"
                         step="0.01"
-                        min="0"
                         value={row.quantity || ''}
                         onChange={(e) => handleQuantityChange(index, e.target.value)}
                         className="bg-white rounded-[8px] h-10 border-gray-300 focus-visible:ring-[#4F6F52]"
@@ -405,13 +482,141 @@ export function RecipeManagement() {
           </div>
 
           <DialogFooter className="p-6 pt-4 bg-gray-50 border-t border-gray-100 gap-3">
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="rounded-[32px] px-6 border-gray-300 h-10 font-medium hover:bg-gray-100">
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)} disabled={isSubmitting} className="rounded-[32px] px-6 border-gray-300 h-10 font-medium hover:bg-gray-100">
               Cancel
             </Button>
-            <Button onClick={handleSubmit} className="bg-[#4F6F52] hover:bg-[#3D563F] text-white rounded-[32px] px-8 h-10 font-medium shadow-sm transition-all hover:shadow-md">
+            <Button onClick={handleSubmit} disabled={isSubmitting} className="bg-[#4F6F52] hover:bg-[#3D563F] text-white rounded-[32px] px-8 h-10 font-medium shadow-sm transition-all hover:shadow-md">
               {editingRecipe ? 'Save Changes' : 'Create Recipe'}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="max-w-md rounded-[12px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-600">
+              <Trash2 className="w-5 h-5" />
+              Confirm Deletion
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              {deletingRecipe && (
+                <>
+                  {deletingRecipe.salesCount > 0 || deletingRecipe.wastageCount > 0 ? (
+                    <>
+                      <p className="text-gray-700">
+                        This recipe has related data records. Deleting it will also remove:
+                      </p>
+                      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 space-y-2">
+                        <div className="font-medium text-amber-900">{deletingRecipe.name}</div>
+                        <div className="space-y-1 text-sm">
+                          {deletingRecipe.salesCount > 0 && (
+                            <div className="text-gray-700">
+                              • <span className="font-semibold text-amber-700">{deletingRecipe.salesCount}</span> Sales Data record{deletingRecipe.salesCount > 1 ? 's' : ''}
+                            </div>
+                          )}
+                          {deletingRecipe.wastageCount > 0 && (
+                            <div className="text-gray-700">
+                              • <span className="font-semibold text-amber-700">{deletingRecipe.wastageCount}</span> Wastage Data record{deletingRecipe.wastageCount > 1 ? 's' : ''}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <p className="text-sm text-red-600 font-medium">
+                        ⚠️ Warning: This will permanently delete the recipe and all {deletingRecipe.salesCount + deletingRecipe.wastageCount} related data records. This action cannot be undone.
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-gray-700">
+                        Are you sure you want to delete this recipe?
+                      </p>
+                      <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                        <div className="text-sm">
+                          <div className="text-gray-600">Recipe Name:</div>
+                          <div className="font-medium text-gray-900 mt-1">
+                            {deletingRecipe.name}
+                          </div>
+                        </div>
+                      </div>
+                      <p className="text-sm text-red-600 font-medium">
+                        Warning: This action cannot be undone.
+                      </p>
+                    </>
+                  )}
+                </>
+              )}
+            </div>
+            <div className="flex justify-end gap-2 pt-2">
+              <Button
+                variant="outline"
+                onClick={() => setIsDeleteDialogOpen(false)}
+                disabled={isDeleting}
+                className="rounded-[32px] px-6 hover:bg-gray-100"
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleDeleteConfirm}
+                disabled={isDeleting}
+                className="bg-red-600 hover:bg-red-700 rounded-[32px] px-6"
+              >
+                Yes, Delete Recipe
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Recipe Usage Warning Dialog */}
+      <Dialog open={isRecipeUsageDialogOpen} onOpenChange={setIsRecipeUsageDialogOpen}>
+        <DialogContent className="max-w-md rounded-[12px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-amber-600">
+              <AlertTriangle className="w-5 h-5" />
+              Cannot Delete Sub-Recipe
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {recipeInUse && (
+              <>
+                <p className="text-gray-700">
+                  This sub-recipe <span className="font-semibold">{recipeInUse.name}</span> is currently used in the following main dish{recipeInUse.usedInRecipes.length > 1 ? 'es' : ''}:
+                </p>
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 max-h-60 overflow-y-auto">
+                  <ul className="space-y-2">
+                    {recipeInUse.usedInRecipes.map((recipeName, index) => (
+                      <li key={index} className="flex items-start gap-2">
+                        <span className="text-amber-600 mt-0.5">•</span>
+                        <span className="text-gray-900 font-medium">{recipeName}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                  <p className="text-sm text-blue-900">
+                    <strong>Note:</strong> You need to remove this sub-recipe from {recipeInUse.usedInRecipes.length > 1 ? 'these dishes' : 'this dish'} before you can delete it.
+                  </p>
+                </div>
+              </>
+            )}
+            <div className="flex justify-end gap-2 pt-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setIsRecipeUsageDialogOpen(false);
+                  setRecipeInUse(null);
+                }}
+                className="rounded-[32px] px-6 hover:bg-gray-100"
+              >
+                OK, I Understand
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

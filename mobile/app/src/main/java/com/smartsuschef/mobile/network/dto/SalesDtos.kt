@@ -20,7 +20,13 @@ data class SalesDataDto(
     val recipeName: String,
 
     @SerializedName("quantity")
-    val quantity: Int
+    val quantity: Int,
+
+    @SerializedName("createdAt")
+    val createdAt: String,
+
+    @SerializedName("updatedAt")
+    val updatedAt: String
 )
 
 /**
@@ -43,12 +49,6 @@ data class CreateSalesDataRequest(
  * Maps to: UpdateSalesDataRequest in SalesDtos.cs
  */
 data class UpdateSalesDataRequest(
-    @SerializedName("date")
-    val date: String,
-
-    @SerializedName("recipeId")
-    val recipeId: String,
-
     @SerializedName("quantity")
     val quantity: Int
 )
