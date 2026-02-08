@@ -21,19 +21,19 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import mean_absolute_error
 
-# --- Dependency Check ---
+
 try:
     from lightgbm import LGBMRegressor
 except ImportError:
     raise ImportError("Missing dependency: lightgbm. Please run: pip install lightgbm")
 
 try:
-    from prophet import Prophet  # type: ignore
+    from prophet import Prophet
 except Exception:
     Prophet = None
 
 try:
-    import optuna  # <--- NEW DEPENDENCY
+    import optuna
     optuna.logging.set_verbosity(optuna.logging.WARNING) # Suppress spammy logs
 except ImportError:
     raise ImportError("Missing dependency: optuna. Please run: pip install optuna")
@@ -46,15 +46,13 @@ except Exception:
 
 import matplotlib.pyplot as plt
 
-# --- Fix Chinese Font Issue for Windows Plots ---
+
 plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei']
 plt.rcParams['axes.unicode_minus'] = False
 warnings.filterwarnings("ignore")
 
-# ==========================
-# Configuration
-# ==========================
-DATA_FOOD = Path("food_sales.csv")
+
+DATA_FOOD = Path("1food_sales_ingredients.csv")
 DATA_WEATHER = Path("df_weather.csv")
 DATA_HOLIDAY = Path("df_holiday.csv")
 DATA_WEATHER_FUTURE = Path("df_weather_future.csv")
@@ -62,12 +60,12 @@ DATA_WEATHER_FUTURE = Path("df_weather_future.csv")
 OUT_DIR = Path("outputs_lgbm_optimized")
 OUT_FORECASTS_DIR = OUT_DIR / "forecasts"
 
-# Hyperparameters
+
 HORIZON_DAYS = 14
 MAX_DISHES = None
 TOP_N_PLOT = 12
 HISTORY_PLOT_DAYS = 90
-OPTUNA_TRIALS = 15  # Number of attempts per dish. Higher = Better but Slower.
+OPTUNA_TRIALS = 15
 
 REG_COLS = ["rain_mm", "avg_temp_c", "avg_humidity_pct"]
 LAGS = (1, 7, 14)
@@ -177,7 +175,7 @@ def _add_lag_roll_features(df_all: pd.DataFrame) -> pd.DataFrame:
         out[f"y_roll_mean_{w}"] = s.rolling(w).mean()
         out[f"y_roll_std_{w}"] = s.rolling(w).std()
         out[f"y_roll_max_{w}"] = s.rolling(w).max()
-        out[f"y_roll_min_{w}"] = s.rolling(w).min() # NEW FEATURE
+        out[f"y_roll_min_{w}"] = s.rolling(w).min()
         
         # NEW FEATURE: Exponential Weighted Moving Average (EWMA)
         # Gives more weight to recent data
@@ -193,7 +191,7 @@ def _fit_prophet_and_predict(train_df, val_df, holidays):
     pred_val = model.predict(val_df[["ds"] + REG_COLS])
     return pred_train["yhat"].values, pred_val["yhat"].values
 
-# --- NEW: Optuna Optimization Function ---
+
 def _optimize_lgbm_params(df_train, feature_cols, target_col="y"):
     """
     Uses Bayesian Optimization to find the best LightGBM parameters for this specific dish.
