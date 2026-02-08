@@ -1,4 +1,4 @@
-Item ID / SKU,Item Name,Qty Change,Stock On Hand当,Transaction Type,Delivery Mode,Audit Time
+Item ID / SKU,Item Name,Qty Change,Stock On Hand,Transaction Type,Delivery Mode,Audit Time
 11747,Chinese Leek Sections,0.7,0.7,,,2025/4/30 23:48
 11747,Chinese Leek Sections,3,3.7,Stock Receipt,Distribution Transfer,2025/5/1 21:48
 11747,Chinese Leek Sections,-0.89,2.81,Consumption Log,,2025/5/1 23:03
@@ -587,4 +587,4 @@ Item ID / SKU,Item Name,Qty Change,Stock On Hand当,Transaction Type,Delivery Mod
 ,,,,,,
 ,,,,,,
 ,,,,,,
-,制表时间:2026-01-23 09:29:17,,,,,
+,锟狡憋拷时锟斤拷:2026-01-23 09:29:17,,,,,
