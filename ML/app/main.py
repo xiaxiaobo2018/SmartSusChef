@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import threading
 from contextlib import asynccontextmanager
 from typing import Any, Dict, List, Optional
 
@@ -122,7 +121,7 @@ class StorePredictRequest(BaseModel):
 
 class StorePredictResponse(BaseModel):
     store_id: int
-    status: str  # "ok" | "training" | "insufficient_data" | "error"
+    status: str  # "ok" | "missing_models" | "error"
     message: Optional[str] = None
     days_available: Optional[int] = None
     predictions: Optional[Dict[str, Any]] = None  # dish -> predictions
@@ -186,58 +185,12 @@ def store_status(store_id: int) -> Dict[str, Any]:
     }
 
 
-@app.post("/store/{store_id}/train")
-def store_train(store_id: int) -> Dict[str, Any]:
-    """
-    Trigger model training for a store.
-    Returns immediately; training runs in a background thread.
-    """
-    if manager is None:
-        raise HTTPException(status_code=503, detail="Manager not initialized")
-
-    if manager.is_training(store_id):
-        return {"status": "already_training", "store_id": store_id}
-
-    # Quick data check
-    try:
-        _, days_available = manager.fetch_store_sales(store_id)
-    except Exception as e:
-        raise HTTPException(
-            status_code=503,
-            detail={"status": "error", "message": f"Cannot connect to database: {e}"},
-        ) from e
-
-    if days_available < StoreModelManager.MIN_TRAINING_DAYS:
-        raise HTTPException(
-            status_code=400,
-            detail={
-                "status": "insufficient_data",
-                "message": f"Need at least {StoreModelManager.MIN_TRAINING_DAYS} days, found {days_available}.",
-                "days_available": days_available,
-                "min_required": StoreModelManager.MIN_TRAINING_DAYS,
-            },
-        )
-
-    # Start training in background
-    thread = threading.Thread(
-        target=manager.train_store_models, args=(store_id,), daemon=True
-    )
-    thread.start()
-
-    return {
-        "status": "training_started",
-        "store_id": store_id,
-        "message": "Model training started in background. Poll /store/{store_id}/status to check progress.",
-    }
-
-
 @app.post("/store/{store_id}/predict", response_model=StorePredictResponse)
 def store_predict(store_id: int, req: StorePredictRequest) -> Dict[str, Any]:
     """
     Generate predictions for ALL dishes of a store.
     - If models exist → predict immediately
-    - If no models & data < 100 days → return insufficient_data
-    - If no models & data >= 100 days → trigger training & return training status
+    - If no models → return missing_models (offline training required)
     """
     if manager is None:
         raise HTTPException(status_code=503, detail="Manager not initialized")
@@ -253,7 +206,8 @@ def store_predict(store_id: int, req: StorePredictRequest) -> Dict[str, Any]:
     # Check if models exist
     ms = manager.get_store(store_id)
     if ms is None:
-        # No models — check data availability
+        # No models — return missing_models (do not train online)
+        days_available = None
         try:
             _, days_available = manager.fetch_store_sales(store_id)
         except Exception as e:
@@ -264,23 +218,11 @@ def store_predict(store_id: int, req: StorePredictRequest) -> Dict[str, Any]:
                 "days_available": 0,
             }
 
-        if days_available < StoreModelManager.MIN_TRAINING_DAYS:
-            return {
-                "store_id": store_id,
-                "status": "insufficient_data",
-                "message": f"Need at least {StoreModelManager.MIN_TRAINING_DAYS} days of sales data to train models. Currently have {days_available} days.",
-                "days_available": days_available,
-            }
-
-        # Enough data — trigger training
-        thread = threading.Thread(
-            target=manager.train_store_models, args=(store_id,), daemon=True
-        )
-        thread.start()
         return {
             "store_id": store_id,
-            "status": "training",
-            "message": "No models found. Training started. Please retry in a few minutes.",
+            "status": "missing_models",
+            "message": "No trained models for this store. Please run offline training.",
+            "days_available": days_available,
         }
 
     # Models exist — predict all dishes
