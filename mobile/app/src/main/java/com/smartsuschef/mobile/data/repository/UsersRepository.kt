@@ -20,7 +20,7 @@ class UsersRepository @Inject constructor(
                 if (response.isSuccessful) {
                     Resource.Success(response.body()!!)
                 } else {
-                    Resource.Error("Failed to fetch user profile: ${response.message()}")
+                    Resource.Error("Failed to fetch user profile: ${response.errorBody()?.string() ?: response.message()}")
                 }
             } catch (e: HttpException) {
                 Resource.Error("An unexpected error occurred: ${e.message()}")
@@ -37,7 +37,7 @@ class UsersRepository @Inject constructor(
                 if (response.isSuccessful) {
                     Resource.Success(response.body()!!)
                 } else {
-                    Resource.Error("Failed to update user: ${response.message()}")
+                    Resource.Error("Failed to update user: ${response.errorBody()?.string() ?: response.message()}")
                 }
             } catch (e: HttpException) {
                 Resource.Error("An unexpected error occurred: ${e.message()}")

@@ -1,0 +1,269 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ForecastSummaryAdapter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.smartsuschef.mobile.ui.forecast</a>
+</div>
+
+<h1>Coverage Summary for Class: ForecastSummaryAdapter (com.smartsuschef.mobile.ui.forecast)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ForecastSummaryAdapter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/39)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ForecastSummaryAdapter$Companion</td>
+  </tr>
+  <tr>
+    <td class="name">ForecastSummaryAdapter$DataViewHolder</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ForecastSummaryAdapter$HeaderViewHolder</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/41)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.smartsuschef.mobile.ui.forecast
+&nbsp;
+&nbsp;import android.view.LayoutInflater
+&nbsp;import android.view.ViewGroup
+&nbsp;import androidx.recyclerview.widget.RecyclerView
+&nbsp;import com.smartsuschef.mobile.databinding.ItemIngredientForecastRowBinding
+&nbsp;import com.smartsuschef.mobile.databinding.ItemIngredientHeaderBinding
+&nbsp;import java.text.SimpleDateFormat
+&nbsp;import java.util.Locale
+&nbsp;
+&nbsp;class ForecastSummaryAdapter(
+<b class="nc">&nbsp;    private var items: List&lt;IngredientForecast&gt;,</b>
+<b class="nc">&nbsp;    private var dates: List&lt;String&gt;</b>
+<b class="nc">&nbsp;) : RecyclerView.Adapter&lt;RecyclerView.ViewHolder&gt;() {</b>
+&nbsp;
+&nbsp;    companion object {
+&nbsp;        private const val VIEW_TYPE_HEADER = 0
+&nbsp;        private const val VIEW_TYPE_ITEM = 1
+&nbsp;    }
+&nbsp;
+&nbsp;    // Header ViewHolder
+<b class="nc">&nbsp;    class HeaderViewHolder(val binding: ItemIngredientHeaderBinding) : RecyclerView.ViewHolder(binding.root)</b>
+&nbsp;
+&nbsp;    // Data ViewHolder
+<b class="nc">&nbsp;    class DataViewHolder(val binding: ItemIngredientForecastRowBinding) : RecyclerView.ViewHolder(binding.root)</b>
+&nbsp;
+&nbsp;    override fun getItemViewType(position: Int): Int {
+<b class="nc">&nbsp;        return if (position == 0) VIEW_TYPE_HEADER else VIEW_TYPE_ITEM</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+<b class="nc">&nbsp;        return if (viewType == VIEW_TYPE_HEADER) {</b>
+<b class="nc">&nbsp;            val binding = ItemIngredientHeaderBinding.inflate(</b>
+<b class="nc">&nbsp;                LayoutInflater.from(parent.context), parent, false</b>
+&nbsp;            )
+<b class="nc">&nbsp;            HeaderViewHolder(binding)</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            val binding = ItemIngredientForecastRowBinding.inflate(</b>
+<b class="nc">&nbsp;                LayoutInflater.from(parent.context), parent, false</b>
+&nbsp;            )
+<b class="nc">&nbsp;            DataViewHolder(binding)</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+<b class="nc">&nbsp;        if (holder is HeaderViewHolder) {</b>
+<b class="nc">&nbsp;            bindHeader(holder)</b>
+<b class="nc">&nbsp;        } else if (holder is DataViewHolder) {</b>
+<b class="nc">&nbsp;            bindData(holder, position - 1) // Adjust for header offset</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun bindHeader(holder: HeaderViewHolder) {
+<b class="nc">&nbsp;        holder.binding.apply {</b>
+&nbsp;            // Set date headers (formatted to &quot;d MMM&quot;)
+<b class="nc">&nbsp;            val headerViews = listOf(day1Header, day2Header, day3Header, day4Header, day5Header, day6Header, day7Header)</b>
+<b class="nc">&nbsp;            dates.take(7).forEachIndexed { index, date -&gt;</b>
+<b class="nc">&nbsp;                if (index &lt; headerViews.size) {</b>
+<b class="nc">&nbsp;                    headerViews[index].text = formatDate(date)</b>
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun bindData(holder: DataViewHolder, position: Int) {
+<b class="nc">&nbsp;        val item = items[position]</b>
+<b class="nc">&nbsp;        holder.binding.apply {</b>
+<b class="nc">&nbsp;            tvIngredientName.text = &quot;${item.name} (${item.unit})&quot;</b>
+&nbsp;
+&nbsp;            // Map the 7 quantities to the 7 textviews
+<b class="nc">&nbsp;            val quantityViews = listOf(day1, day2, day3, day4, day5, day6, day7)</b>
+<b class="nc">&nbsp;            item.totalQuantity.forEachIndexed { index, qty -&gt;</b>
+<b class="nc">&nbsp;                if (index &lt; quantityViews.size) {</b>
+<b class="nc">&nbsp;                    quantityViews[index].text = if (qty &gt; 0) String.format(&quot;%.1f&quot;, qty) else &quot;-&quot;</b>
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    override fun getItemCount() = items.size + 1 // +1 for header</b>
+&nbsp;
+&nbsp;    fun updateData(newItems: List&lt;IngredientForecast&gt;, newDates: List&lt;String&gt;) {
+<b class="nc">&nbsp;        items = newItems</b>
+<b class="nc">&nbsp;        dates = newDates</b>
+<b class="nc">&nbsp;        notifyDataSetChanged()</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun formatDate(dateStr: String): String {
+&nbsp;        return try {
+<b class="nc">&nbsp;            val parser = SimpleDateFormat(&quot;yyyy-MM-dd&quot;, Locale.getDefault())</b>
+<b class="nc">&nbsp;            val formatter = SimpleDateFormat(&quot;d MMM&quot;, Locale.getDefault())</b>
+<b class="nc">&nbsp;            parser.parse(dateStr)?.let { formatter.format(it) } ?: dateStr</b>
+&nbsp;        } catch (e: Exception) {
+<b class="nc">&nbsp;            dateStr</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-02-09 11:59</div>
+</div>
+</body>
+</html>

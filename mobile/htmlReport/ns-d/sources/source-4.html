@@ -1,0 +1,281 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ForecastMarkerView</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.smartsuschef.mobile.ui.forecast</a>
+</div>
+
+<h1>Coverage Summary for Class: ForecastMarkerView (com.smartsuschef.mobile.ui.forecast)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ForecastMarkerView</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/37)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ForecastMarkerView$ChartType</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ForecastMarkerView$ComparisonData</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ForecastMarkerView$WhenMappings</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/43)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.smartsuschef.mobile.ui.forecast
+&nbsp;
+&nbsp;import android.content.Context
+&nbsp;import android.widget.TextView
+&nbsp;import com.github.mikephil.charting.components.MarkerView
+&nbsp;import com.github.mikephil.charting.data.BarEntry
+&nbsp;import com.github.mikephil.charting.data.Entry
+&nbsp;import com.github.mikephil.charting.highlight.Highlight
+&nbsp;import com.github.mikephil.charting.utils.MPPointF
+&nbsp;import com.smartsuschef.mobile.R
+&nbsp;
+&nbsp;/**
+&nbsp; * Enhanced Marker View for displaying detailed data on chart tap
+&nbsp; * Supports:
+&nbsp; * - Simple values (Prediction Summary)
+&nbsp; * - Stacked bar breakdown (Dishes Forecast)
+&nbsp; * - Grouped bar comparison (Predicted vs Actual)
+&nbsp; */
+<b class="nc">&nbsp;class ForecastMarkerView(context: Context, layoutResource: Int) : MarkerView(context, layoutResource) {</b>
+&nbsp;
+<b class="nc">&nbsp;    private val tvDate: TextView = findViewById(R.id.tvMarkerDate)</b>
+<b class="nc">&nbsp;    private val tvQuantity: TextView = findViewById(R.id.tvMarkerQuantity)</b>
+<b class="nc">&nbsp;    private val tvDetails: TextView = findViewById(R.id.tvMarkerDetails)</b>
+&nbsp;
+&nbsp;    // Store dish names for stacked bars
+<b class="nc">&nbsp;    var dishNames: Array&lt;String&gt;? = null</b>
+&nbsp;
+&nbsp;    // Store date labels for display
+<b class="nc">&nbsp;    var labels: List&lt;String&gt;? = null</b>
+&nbsp;
+&nbsp;    // Store chart type for proper formatting
+<b class="nc">&nbsp;    var chartType: ChartType = ChartType.SIMPLE</b>
+&nbsp;
+&nbsp;    enum class ChartType {
+<b class="nc">&nbsp;        SIMPLE,           // Prediction Summary (single value)</b>
+<b class="nc">&nbsp;        STACKED,          // Dishes Forecast (breakdown)</b>
+<b class="nc">&nbsp;        COMPARISON        // Comparison chart (predicted vs actual)</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun refreshContent(e: Entry?, highlight: Highlight?) {
+<b class="nc">&nbsp;        if (e == null) return</b>
+&nbsp;
+&nbsp;        // Set date if available
+<b class="nc">&nbsp;        val index = e.x.toInt()</b>
+<b class="nc">&nbsp;        val dateLabel = labels?.getOrNull(index) ?: &quot;&quot;</b>
+<b class="nc">&nbsp;        tvDate.text = dateLabel</b>
+<b class="nc">&nbsp;        tvDate.visibility = if (dateLabel.isNotEmpty()) VISIBLE else GONE</b>
+&nbsp;
+<b class="nc">&nbsp;        when (chartType) {</b>
+&nbsp;            ChartType.SIMPLE -&gt; {
+&nbsp;                // Prediction Summary Chart
+<b class="nc">&nbsp;                val quantity = e.y.toInt()</b>
+<b class="nc">&nbsp;                tvQuantity.text = &quot;Dishes: $quantity&quot;</b>
+<b class="nc">&nbsp;                tvDetails.visibility = GONE</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            ChartType.STACKED -&gt; {
+&nbsp;                // Dishes Forecast Chart - Show breakdown
+<b class="nc">&nbsp;                if (e is BarEntry &amp;&amp; e.yVals != null) {</b>
+<b class="nc">&nbsp;                    val total = e.yVals.sum().toInt()</b>
+<b class="nc">&nbsp;                    tvQuantity.text = &quot;Total: $total dishes&quot;</b>
+&nbsp;
+&nbsp;                    // Build breakdown string
+<b class="nc">&nbsp;                    val breakdown = StringBuilder()</b>
+<b class="nc">&nbsp;                    e.yVals.forEachIndexed { index, value -&gt;</b>
+<b class="nc">&nbsp;                        val dishName = dishNames?.getOrNull(index) ?: &quot;Dish ${index + 1}&quot;</b>
+<b class="nc">&nbsp;                        breakdown.append(&quot;$dishName: ${value.toInt()}\n&quot;)</b>
+<b class="nc">&nbsp;                    }</b>
+&nbsp;
+<b class="nc">&nbsp;                    tvDetails.text = breakdown.toString().trim()</b>
+<b class="nc">&nbsp;                    tvDetails.visibility = VISIBLE</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    tvQuantity.text = &quot;Dishes: ${e.y.toInt()}&quot;</b>
+<b class="nc">&nbsp;                    tvDetails.visibility = GONE</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+&nbsp;            ChartType.COMPARISON -&gt; {
+&nbsp;                // Comparison Chart - Show both predicted and actual
+&nbsp;                // The data should be passed via Entry.data
+<b class="nc">&nbsp;                if (e.data is ComparisonData) {</b>
+<b class="nc">&nbsp;                    val data = e.data as ComparisonData</b>
+<b class="nc">&nbsp;                    tvQuantity.text = &quot;Predicted: ${data.predicted}&quot;</b>
+<b class="nc">&nbsp;                    tvDetails.text = &quot;Actual: ${data.actual}&quot;</b>
+<b class="nc">&nbsp;                    tvDetails.visibility = VISIBLE</b>
+&nbsp;                } else {
+&nbsp;                    // Fallback if data not provided
+<b class="nc">&nbsp;                    tvQuantity.text = &quot;Dishes: ${e.y.toInt()}&quot;</b>
+<b class="nc">&nbsp;                    tvDetails.visibility = GONE</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        super.refreshContent(e, highlight)</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun getOffset(): MPPointF {
+&nbsp;        // Center the marker above the selected value
+<b class="nc">&nbsp;        return MPPointF((-(width / 2)).toFloat(), (-height).toFloat())</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Data class for comparison chart
+&nbsp;     */
+<b class="nc">&nbsp;    data class ComparisonData(</b>
+<b class="nc">&nbsp;        val predicted: Int,</b>
+<b class="nc">&nbsp;        val actual: Int</b>
+&nbsp;    )
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-02-09 11:59</div>
+</div>
+</body>
+</html>

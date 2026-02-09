@@ -1,0 +1,226 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecipesRepository</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.smartsuschef.mobile.data.repository</a>
+</div>
+
+<h1>Coverage Summary for Class: RecipesRepository (com.smartsuschef.mobile.data.repository)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecipesRepository</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RecipesRepository$create$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (4/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (5/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RecipesRepository$getAll$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    62.5%
+  </span>
+  <span class="absValue">
+    (5/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (5/6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    64.3%
+  </span>
+  <span class="absValue">
+    (9/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.5%
+  </span>
+  <span class="absValue">
+    (14/16)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.smartsuschef.mobile.data.repository
+&nbsp;
+&nbsp;import com.smartsuschef.mobile.network.api.RecipeApiService
+&nbsp;import com.smartsuschef.mobile.network.dto.CreateRecipeRequest
+&nbsp;import com.smartsuschef.mobile.network.dto.RecipeDto
+&nbsp;import com.smartsuschef.mobile.util.Resource
+&nbsp;import kotlinx.coroutines.Dispatchers
+&nbsp;import kotlinx.coroutines.withContext
+&nbsp;import retrofit2.HttpException
+&nbsp;import java.io.IOException
+&nbsp;import javax.inject.Inject
+&nbsp;
+<b class="fc">&nbsp;class RecipesRepository @Inject constructor(</b>
+<b class="fc">&nbsp;    private val recipeApiService: RecipeApiService</b>
+&nbsp;) {
+&nbsp;    suspend fun getAll(): Resource&lt;List&lt;RecipeDto&gt;&gt; {
+<b class="fc">&nbsp;        return withContext(Dispatchers.IO) {</b>
+&nbsp;            try {
+<b class="fc">&nbsp;                val response = recipeApiService.getAll()</b>
+<b class="fc">&nbsp;                if (response.isSuccessful) {</b>
+<b class="pc">&nbsp;                    Resource.Success(response.body() ?: emptyList())</b>
+&nbsp;                } else {
+<b class="pc">&nbsp;                    Resource.Error(&quot;Failed to fetch recipes: ${response.errorBody()?.string() ?: response.message()}&quot;)</b>
+&nbsp;                }
+&nbsp;            } catch (e: HttpException) {
+<b class="nc">&nbsp;                Resource.Error(&quot;An unexpected error occurred: ${e.message()}&quot;)</b>
+&nbsp;            } catch (e: IOException) {
+<b class="fc">&nbsp;                Resource.Error(&quot;Couldn&#39;t reach the server. Check your internet connection.&quot;)</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    suspend fun create(request: CreateRecipeRequest): Resource&lt;RecipeDto&gt; {
+<b class="fc">&nbsp;        return withContext(Dispatchers.IO) {</b>
+&nbsp;            try {
+<b class="fc">&nbsp;                val response = recipeApiService.create(request)</b>
+<b class="fc">&nbsp;                if (response.isSuccessful) {</b>
+<b class="fc">&nbsp;                    Resource.Success(response.body()!!)</b>
+&nbsp;                } else {
+<b class="pc">&nbsp;                    Resource.Error(&quot;Failed to add recipe: ${response.errorBody()?.string() ?: response.message()}&quot;)</b>
+&nbsp;                }
+&nbsp;            } catch (e: HttpException) {
+<b class="nc">&nbsp;                Resource.Error(&quot;An unexpected error occurred: ${e.message()}&quot;)</b>
+&nbsp;            } catch (e: IOException) {
+<b class="fc">&nbsp;                Resource.Error(&quot;Couldn&#39;t reach the server. Check your internet connection.&quot;)</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-02-09 11:59</div>
+</div>
+</body>
+</html>

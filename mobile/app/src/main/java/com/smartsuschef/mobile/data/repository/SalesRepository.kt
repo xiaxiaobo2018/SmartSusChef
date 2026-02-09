@@ -24,7 +24,7 @@ class SalesRepository @Inject constructor(
                 if (response.isSuccessful) {
                     Resource.Success(response.body() ?: emptyList())
                 } else {
-                    Resource.Error("Failed to fetch sales history: ${response.message()}")
+                    Resource.Error("Failed to fetch sales history: ${response.errorBody()?.string() ?: response.message()}")
                 }
             } catch (e: HttpException) {
                 Resource.Error("An unexpected error occurred: ${e.message()}")
@@ -41,7 +41,7 @@ class SalesRepository @Inject constructor(
                 if (response.isSuccessful) {
                     Resource.Success(response.body() ?: emptyList())
                 } else {
-                    Resource.Error("Failed to fetch sales trend: ${response.message()}")
+                    Resource.Error("Failed to fetch sales trend: ${response.errorBody()?.string() ?: response.message()}")
                 }
             } catch (e: HttpException) {
                 Resource.Error("An unexpected error occurred: ${e.message()}")
@@ -58,7 +58,7 @@ class SalesRepository @Inject constructor(
                 if (response.isSuccessful) {
                     Resource.Success(response.body() ?: emptyList())
                 } else {
-                    Resource.Error("Failed to fetch ingredient usage: ${response.message()}")
+                    Resource.Error("Failed to fetch ingredient usage: ${response.errorBody()?.string() ?: response.message()}")
                 }
             } catch (e: HttpException) {
                 Resource.Error("An unexpected error occurred: ${e.message()}")
@@ -75,7 +75,7 @@ class SalesRepository @Inject constructor(
                 if (response.isSuccessful) {
                     Resource.Success(response.body() ?: emptyList())
                 } else {
-                    Resource.Error("Failed to fetch recipe sales: ${response.message()}")
+                    Resource.Error("Failed to fetch recipe sales: ${response.errorBody()?.string() ?: response.message()}")
                 }
             } catch (e: HttpException) {
                 Resource.Error("An unexpected error occurred: ${e.message()}")
@@ -92,7 +92,7 @@ class SalesRepository @Inject constructor(
                 if (response.isSuccessful) {
                     Resource.Success(response.body()!!)
                 } else {
-                    Resource.Error("Failed to add sale: ${response.message()}")
+                    Resource.Error("Failed to add sale: ${response.errorBody()?.string() ?: response.message()}")
                 }
             } catch (e: HttpException) {
                 Resource.Error("An unexpected error occurred: ${e.message()}")
@@ -109,7 +109,7 @@ class SalesRepository @Inject constructor(
                 if (response.isSuccessful) {
                     Resource.Success(response.body()!!)
                 } else {
-                    Resource.Error("Failed to update sale: ${response.message()}")
+                    Resource.Error("Failed to update sale: ${response.errorBody()?.string() ?: response.message()}")
                 }
             } catch (e: HttpException) {
                 Resource.Error("An unexpected error occurred: ${e.message()}")
@@ -126,7 +126,7 @@ class SalesRepository @Inject constructor(
                 if (response.isSuccessful) {
                     Resource.Success(Unit)
                 } else {
-                    Resource.Error("Failed to delete sale: ${response.message()}")
+                    Resource.Error("Failed to delete sale: ${response.errorBody()?.string() ?: response.message()}")
                 }
             } catch (e: HttpException) {
                 Resource.Error("An unexpected error occurred: ${e.message()}")

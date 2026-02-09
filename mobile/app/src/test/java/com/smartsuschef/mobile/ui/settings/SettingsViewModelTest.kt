@@ -172,15 +172,26 @@ class SettingsViewModelTest {
         verify(mockUsersRepository, never()).updateUser(any())
     }
 
+    @Test
+    fun `updateProfile when email is blank should show validation error`() = runTest {
+        // ACT
+        viewModel.updateProfile("Valid Name", "")
+
+        // ASSERT
+        assertEquals("Email cannot be empty", viewModel.profileUpdateResult.value)
+        assertEquals(false, viewModel.isLoadingProfile.value)
+        verify(mockUsersRepository, never()).updateUser(any())
+    }
+
     // --- Change Password Tests ---
     @Test
     fun `changePassword when succeeds should update passwordResult`() = runTest {
         // ARRANGE
-        val request = ChangePasswordRequest("oldPass", "newPass")
+        val request = ChangePasswordRequest("oldPass", "newValidPassword123!")
         whenever(mockAuthRepository.changePassword(request)).thenReturn(Resource.Success(Unit))
 
         // ACT
-        viewModel.changePassword("oldPass", "newPass", "newPass")
+        viewModel.changePassword("oldPass", "newValidPassword123!", "newValidPassword123!")
 
         // ASSERT
         assertEquals("Password changed successfully", viewModel.passwordUpdateResult.value)
@@ -191,12 +202,12 @@ class SettingsViewModelTest {
     @Test
     fun `changePassword when fails should update passwordResultWithError`() = runTest {
         // ARRANGE
-        val request = ChangePasswordRequest("oldPass", "newPass")
+        val request = ChangePasswordRequest("oldPass", "newValidPassword123!")
         val errorMessage = "Current password incorrect"
         whenever(mockAuthRepository.changePassword(request)).thenReturn(Resource.Error(errorMessage))
 
         // ACT
-        viewModel.changePassword("oldPass", "newPass", "newPass")
+        viewModel.changePassword("oldPass", "newValidPassword123!", "newValidPassword123!")
 
         // ASSERT
         assertEquals("Failed to change password: $errorMessage", viewModel.passwordUpdateResult.value)
@@ -210,6 +221,17 @@ class SettingsViewModelTest {
 
         // ASSERT
         assertEquals("New password is required", viewModel.passwordUpdateResult.value)
+        assertEquals(false, viewModel.isLoadingPassword.value)
+        verify(mockAuthRepository, never()).changePassword(any())
+    }
+
+    @Test
+    fun `changePassword when current password is blank should show validation error`() = runTest {
+        // ACT
+        viewModel.changePassword("", "newValidPassword123", "newValidPassword123")
+
+        // ASSERT
+        assertEquals("Current password is required", viewModel.passwordUpdateResult.value)
         assertEquals(false, viewModel.isLoadingPassword.value)
         verify(mockAuthRepository, never()).changePassword(any())
     }
@@ -233,6 +255,56 @@ class SettingsViewModelTest {
         // ASSERT
         assertEquals("New password must be different from current password", viewModel.passwordUpdateResult.value)
         assertEquals(false, viewModel.isLoadingPassword.value)
+        verify(mockAuthRepository, never()).changePassword(any())
+    }
+
+    @Test
+    fun `changePassword when new password is too short should show validation error`() = runTest {
+        // ACT
+        viewModel.changePassword("oldPassword123", "short", "short")
+
+        // ASSERT
+        assertEquals("Password must be at least 12 characters", viewModel.passwordUpdateResult.value)
+        verify(mockAuthRepository, never()).changePassword(any())
+    }
+
+    @Test
+    fun `changePassword when new password has no uppercase should show validation error`() = runTest {
+        // ACT
+        viewModel.changePassword("oldPassword123", "nouppercase123!", "nouppercase123!")
+
+        // ASSERT
+        assertEquals("Password must contain at least one uppercase letter", viewModel.passwordUpdateResult.value)
+        verify(mockAuthRepository, never()).changePassword(any())
+    }
+
+    @Test
+    fun `changePassword when new password has no lowercase should show validation error`() = runTest {
+        // ACT
+        viewModel.changePassword("oldPassword123", "NOLOWERCASE123!", "NOLOWERCASE123!")
+
+        // ASSERT
+        assertEquals("Password must contain at least one lowercase letter", viewModel.passwordUpdateResult.value)
+        verify(mockAuthRepository, never()).changePassword(any())
+    }
+
+    @Test
+    fun `changePassword when new password has no number should show validation error`() = runTest {
+        // ACT
+        viewModel.changePassword("oldPassword123", "NoNumberPassword!", "NoNumberPassword!")
+
+        // ASSERT
+        assertEquals("Password must contain at least one number", viewModel.passwordUpdateResult.value)
+        verify(mockAuthRepository, never()).changePassword(any())
+    }
+
+    @Test
+    fun `changePassword when new password has no special char should show validation error`() = runTest {
+        // ACT
+        viewModel.changePassword("oldPassword123", "NoSpecialChar123", "NoSpecialChar123")
+
+        // ASSERT
+        assertEquals("Password must contain at least one special character (@$!%*?&#^()-_=+[]{}|;:',.<>/~`)", viewModel.passwordUpdateResult.value)
         verify(mockAuthRepository, never()).changePassword(any())
     }
 }
