@@ -12,7 +12,7 @@ import com.smartsuschef.mobile.util.showToast
 import com.smartsuschef.mobile.util.visible
 import com.smartsuschef.mobile.util.gone
 import dagger.hilt.android.AndroidEntryPoint
-
+ 
 @AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
 
