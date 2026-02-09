@@ -92,8 +92,9 @@ Write-Host "[2/3] Starting Backend (port 5000)..." -ForegroundColor Cyan
 Start-Process powershell -ArgumentList "-NoExit", "-Command", @"
     `$Host.UI.RawUI.WindowTitle = 'SmartSusChef - Backend (5000)'
     Set-Location '$Root\backend\SmartSusChef.Api'
+    `$env:ASPNETCORE_ENVIRONMENT = 'Development'
     `$env:ConnectionStrings__DefaultConnection = '$connStr'
-    Write-Host 'Backend starting...' -ForegroundColor Green
+    Write-Host 'Backend starting (Development)...' -ForegroundColor Green
     dotnet run
 "@
 
