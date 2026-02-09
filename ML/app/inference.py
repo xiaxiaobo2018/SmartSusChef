@@ -18,11 +18,11 @@ from training_logic_v2 import (
 )
 
 try:
-    import openmeteo_requests  # type: ignore
-    from retry_requests import retry  # type: ignore
+    import openmeteo_requests
+    from retry_requests import retry
 except Exception:  # pragma: no cover
-    openmeteo_requests = None  # type: ignore
-    retry = None  # type: ignore
+    openmeteo_requests = None  # type: ignore[assignment]
+    retry = None  # type: ignore[assignment]
 
 
 TIME_FEATURES = ["day_of_week", "month", "day", "dayofyear", "is_weekend"]
