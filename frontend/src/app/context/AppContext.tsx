@@ -209,6 +209,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const loadAllData = useCallback(async () => {
     setDataLoading(true);
     try {
+      console.log('[AppContext] Loading all data...');
       // Load all data in parallel
       const [
         ingredientsData,
@@ -220,15 +221,23 @@ export function AppProvider({ children }: { children: ReactNode }) {
         holidaysData,
         storeData,
       ] = await Promise.all([
-        ingredientsApi.getAll().catch(() => []),
-        recipesApi.getAll().catch(() => []),
-        salesApi.getAll().catch(() => []),
-        wastageApi.getAll().catch(() => []),
-        forecastApi.get(7, 7).catch(() => []), // Get 7 days future + 7 days past (including today)
-        forecastApi.getWeather().catch(() => null),
-        forecastApi.getHolidays(new Date().getFullYear()).catch(() => []),
-        storeApi.get().catch(() => null),
+        ingredientsApi.getAll().catch((err) => { console.error('[AppContext] Failed to load ingredients:', err); return []; }),
+        recipesApi.getAll().catch((err) => { console.error('[AppContext] Failed to load recipes:', err); return []; }),
+        salesApi.getAll().catch((err) => { console.error('[AppContext] Failed to load sales:', err); return []; }),
+        wastageApi.getAll().catch((err) => { console.error('[AppContext] Failed to load wastage:', err); return []; }),
+        forecastApi.get(7, 7).catch((err) => { console.error('[AppContext] Failed to load forecast:', err); return []; }), // Get 7 days future + 7 days past (including today)
+        forecastApi.getWeather().catch((err) => { console.error('[AppContext] Failed to load weather:', err); return null; }),
+        forecastApi.getHolidays(new Date().getFullYear()).catch((err) => { console.error('[AppContext] Failed to load holidays:', err); return []; }),
+        storeApi.get().catch((err) => { console.error('[AppContext] Failed to load store:', err); return null; }),
       ]);
+
+      console.log('[AppContext] Data loaded successfully:', {
+        ingredients: ingredientsData.length,
+        recipes: recipesData.length,
+        sales: salesDataResult.length,
+        wastage: wastageDataResult.length,
+        forecast: forecastDataResult.length
+      });
 
       setIngredients(ingredientsData.map(mapIngredientDto));
       setRecipes(recipesData.map(mapRecipeDto));
