@@ -329,14 +329,19 @@ export function IngredientManagement({ onNavigateToRecipes }: IngredientManageme
                 <Label htmlFor="ingredient-unit">
                   Unit {selectedGlobalIngredientId && <span className="text-xs text-gray-500">(Read-only)</span>}
                 </Label>
-                <Input
+                <select
                   id="ingredient-unit"
                   value={unit}
                   onChange={(e) => setUnit(e.target.value)}
-                  placeholder="e.g., kg, g, L, ml"
                   disabled={selectedGlobalIngredientId !== null}
-                  className={selectedGlobalIngredientId ? 'bg-gray-100 cursor-not-allowed' : ''}
-                />
+                  className={`w-full border rounded-md p-2 ${selectedGlobalIngredientId ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                >
+                  <option value="">-- Select unit --</option>
+                  <option value="g">g (gram)</option>
+                  <option value="kg">kg (kilogram)</option>
+                  <option value="ml">ml (milliliter)</option>
+                  <option value="L">L (liter)</option>
+                </select>
               </div>
 
               <div className="space-y-2">
