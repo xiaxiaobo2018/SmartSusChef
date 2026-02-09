@@ -692,7 +692,6 @@ jobs:
       github.ref == 'refs/heads/main' && github.event_name == 'push'
     environment:
       name: production
-      url: https://smartsuschef.com
 
     steps:
       - name: Checkout code
@@ -709,13 +708,23 @@ jobs:
         id: aws-account
         run: echo "account_id=$(aws sts get-caller-identity --query Account --output text)" >> $GITHUB_OUTPUT
 
-      - name: Load environment config
+      - name: Load environment config (reuse UAT RDS)
         id: env-config
         run: |
-          RDS_EP=$(aws rds describe-db-instances --db-instance-identifier smartsuschef-production-db --query 'DBInstances[0].Endpoint.Address' --output text 2>/dev/null || echo "smartsuschef-production-db.cluster.ap-southeast-1.rds.amazonaws.com")
+          RDS_EP=$(aws rds describe-db-instances --db-instance-identifier smartsuschef-uat-db \
+            --query 'DBInstances[0].Endpoint.Address' --output text 2>/dev/null \
+            || echo "smartsuschef-uat-db.cluster.ap-southeast-1.rds.amazonaws.com")
           echo "rds_endpoint=$RDS_EP" >> $GITHUB_OUTPUT
 
-      - name: Prepare task definitions
+      - name: Discover Production ALB URL
+        id: prod-alb
+        run: |
+          PROD_ALB_DNS=$(aws elbv2 describe-load-balancers --names smartsuschef-prod-alb \
+            --query 'LoadBalancers[0].DNSName' --output text 2>/dev/null || echo "")
+          echo "alb_dns=$PROD_ALB_DNS" >> $GITHUB_OUTPUT
+          echo "Production ALB: $PROD_ALB_DNS"
+
+      - name: Prepare production task definitions
         env:
           ENVIRONMENT: production
           AWS_ACCOUNT_ID: ${{ steps.aws-account.outputs.account_id }}
@@ -724,9 +733,9 @@ jobs:
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           RDS_ENDPOINT: ${{ steps.env-config.outputs.rds_endpoint }}
         run: |
-          envsubst < .aws/task-definitions/backend.json > backend-task-def.json
-          envsubst < .aws/task-definitions/frontend.json > frontend-task-def.json
-          envsubst < .aws/task-definitions/ml.json > ml-task-def.json
+          envsubst < .aws/task-definitions/backend-prod.json > backend-task-def.json
+          envsubst < .aws/task-definitions/frontend-prod.json > frontend-task-def.json
+          envsubst < .aws/task-definitions/ml-prod.json > ml-task-def.json
 
       - name: Update Backend task definition
         id: task-def-backend
@@ -752,9 +761,9 @@ jobs:
           container-name: smartsuschef-ml
           image: ${{ needs.docker-build-push.outputs.ml-image }}
 
-      - name: Deploy all services to Production ECS (parallel)
+      - name: Deploy all services to Production ECS (shared UAT cluster)
         env:
-          CLUSTER: smartsuschef-production-cluster
+          CLUSTER: smartsuschef-uat-cluster
           ML_CHANGED: ${{ needs.detect-changes.outputs.ml }}
           BACKEND_CHANGED: ${{ needs.detect-changes.outputs.backend }}
           FRONTEND_CHANGED: ${{ needs.detect-changes.outputs.frontend }}
@@ -776,22 +785,22 @@ jobs:
           }
 
           if [ "$ML_CHANGED" = "true" ] || [ "$INFRA_CHANGED" = "true" ]; then
-            deploy_service "ML" "$ML_TASK_DEF" "smartsuschef-production-ml-service"
-            SERVICES="$SERVICES smartsuschef-production-ml-service"
+            deploy_service "ML" "$ML_TASK_DEF" "smartsuschef-prod-ml-service"
+            SERVICES="$SERVICES smartsuschef-prod-ml-service"
           else
             echo "[ML] No changes, skipping."
           fi
 
           if [ "$BACKEND_CHANGED" = "true" ] || [ "$INFRA_CHANGED" = "true" ]; then
-            deploy_service "Backend" "$BACKEND_TASK_DEF" "smartsuschef-production-backend-service"
-            SERVICES="$SERVICES smartsuschef-production-backend-service"
+            deploy_service "Backend" "$BACKEND_TASK_DEF" "smartsuschef-prod-backend-service"
+            SERVICES="$SERVICES smartsuschef-prod-backend-service"
           else
             echo "[Backend] No changes, skipping."
           fi
 
           if [ "$FRONTEND_CHANGED" = "true" ] || [ "$INFRA_CHANGED" = "true" ]; then
-            deploy_service "Frontend" "$FRONTEND_TASK_DEF" "smartsuschef-production-frontend-service"
-            SERVICES="$SERVICES smartsuschef-production-frontend-service"
+            deploy_service "Frontend" "$FRONTEND_TASK_DEF" "smartsuschef-prod-frontend-service"
+            SERVICES="$SERVICES smartsuschef-prod-frontend-service"
           else
             echo "[Frontend] No changes, skipping."
           fi
@@ -831,9 +840,18 @@ jobs:
           fi
 
       - name: Production Smoke Tests
+        env:
+          PROD_ALB_DNS: ${{ steps.prod-alb.outputs.alb_dns }}
         run: |
           echo "Running production smoke tests..."
+          if [ -z "$PROD_ALB_DNS" ]; then
+            echo "[WARN] Production ALB DNS not found. Run setup-production.sh first."
+            exit 0
+          fi
           sleep 30
+          ALB_URL="http://$PROD_ALB_DNS"
+          curl -sf "$ALB_URL/" -o /dev/null && echo "[PASS] Frontend OK" || echo "[WARN] Frontend not ready"
+          curl -sf "$ALB_URL/api/health" -o /dev/null && echo "[PASS] Backend OK" || echo "[WARN] Backend not ready"
           echo "[PASS] Production deployment completed!"
 
   # ==========================================
