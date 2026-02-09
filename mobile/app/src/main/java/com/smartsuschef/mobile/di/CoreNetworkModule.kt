@@ -10,6 +10,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import com.smartsuschef.mobile.util.ApdexInterceptor
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -95,6 +96,7 @@ object CoreNetworkModule {
     ): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(authInterceptor)      // Add auth token to requests
+            .addInterceptor(ApdexInterceptor())   // Log Apdex performance metrics
             .addInterceptor(loggingInterceptor)   // Log requests/responses
             .connectTimeout(30, TimeUnit.SECONDS) // Connection timeout
             .readTimeout(30, TimeUnit.SECONDS)    // Read timeout
