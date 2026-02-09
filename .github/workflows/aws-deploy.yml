@@ -258,22 +258,18 @@ jobs:
       - name: Ruff lint
         run: ruff check . --output-format=json --output-file=ruff-report.json && ruff format . --check --diff
         working-directory: ./ML
-        continue-on-error: true
 
       - name: Mypy type check
         run: mypy > mypy-report.txt
         working-directory: ./ML
-        continue-on-error: true
 
       - name: Bandit security scan
         run: bandit -c bandit.yaml -r app/ -f json -o bandit-report.json
         working-directory: ./ML
-        continue-on-error: true
 
       - name: Pytest
         run: pytest --cov=app --cov-report=xml --junitxml=pytest-report.xml
         working-directory: ./ML
-        continue-on-error: true
 
       - name: Data validation (placeholder)
         run: |
