@@ -667,12 +667,189 @@ jobs:
           echo "UAT deployment completed!"
 
   # ==========================================
+  # STAGE 4b: E2E Tests with Playwright
+  # ==========================================
+  e2e-tests-playwright:
+    name: "E2E Tests (Playwright)"
+    runs-on: ubuntu-latest
+    needs: [deploy-uat, detect-changes]
+    if: |
+      !cancelled() && !failure() &&
+      (needs.detect-changes.outputs.frontend == 'true' || needs.detect-changes.outputs.backend == 'true')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install Playwright dependencies
+        run: |
+          cd frontend
+          npm ci
+          npx playwright install --with-deps
+
+      - name: Run Playwright tests
+        env:
+          BASE_URL: http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com
+        run: |
+          cd frontend
+          npx playwright test
+        continue-on-error: true
+
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: frontend/playwright-report/
+          retention-days: 30
+
+  # ==========================================
+  # STAGE 4c: Performance Tests with JMeter
+  # ==========================================
+  performance-tests-jmeter:
+    name: "Performance Tests (JMeter)"
+    runs-on: ubuntu-latest
+    needs: [deploy-uat, detect-changes]
+    if: |
+      !cancelled() && !failure() &&
+      (needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.ml == 'true')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+
+      - name: Install JMeter
+        run: |
+          wget https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-5.6.3.tgz
+          tar -xzf apache-jmeter-5.6.3.tgz
+          echo "$(pwd)/apache-jmeter-5.6.3/bin" >> $GITHUB_PATH
+
+      - name: Run JMeter tests
+        run: |
+          jmeter -n \
+            -t tests/jmeter/load-test.jmx \
+            -l results.jtl \
+            -e -o reports/ \
+            -Jhost=smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com \
+            -Jport=80 \
+            -Jthreads=10 \
+            -Jduration=60
+        continue-on-error: true
+
+      - name: Check Apdex score
+        run: |
+          python3 << 'EOF'
+          import csv
+          
+          threshold_ms = 500
+          satisfied = tolerating = frustrated = 0
+          
+          try:
+              with open('results.jtl', 'r') as f:
+                  reader = csv.DictReader(f, delimiter='\t')
+                  for row in reader:
+                      try:
+                          elapsed = int(row['elapsed'])
+                          if elapsed <= threshold_ms:
+                              satisfied += 1
+                          elif elapsed <= 4 * threshold_ms:
+                              tolerating += 1
+                          else:
+                              frustrated += 1
+                      except (KeyError, ValueError):
+                          continue
+              
+              total = satisfied + tolerating + frustrated
+              if total > 0:
+                  apdex = (satisfied + tolerating/2) / total
+                  print(f"Apdex Score: {apdex:.3f}")
+                  print(f"Satisfied: {satisfied}, Tolerating: {tolerating}, Frustrated: {frustrated}")
+                  
+                  if apdex < 0.85:
+                      print("WARNING: Apdex score below threshold (0.85)")
+              else:
+                  print("No valid results found")
+          except FileNotFoundError:
+              print("Results file not found")
+          EOF
+
+      - name: Upload JMeter reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: jmeter-reports
+          path: |
+            results.jtl
+            reports/
+          retention-days: 30
+
+  # ==========================================
+  # STAGE 4d: DAST Security Scan with OWASP ZAP
+  # ==========================================
+  dast-owasp-zap:
+    name: "DAST Scan (OWASP ZAP)"
+    runs-on: ubuntu-latest
+    needs: [deploy-uat, detect-changes]
+    if: |
+      !cancelled() && !failure() &&
+      (needs.detect-changes.outputs.frontend == 'true' || needs.detect-changes.outputs.backend == 'true')
+    permissions:
+      security-events: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: ZAP Baseline Scan (Frontend)
+        uses: zaproxy/action-baseline@v0.12.0
+        with:
+          target: 'http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com'
+          rules_file_name: '.zap/rules.tsv'
+          cmd_options: '-a -j -m 5 -T 60'
+          fail_action: false
+          allow_issue_writing: false
+        continue-on-error: true
+
+      - name: ZAP API Scan (Backend)
+        uses: zaproxy/action-api-scan@v0.7.0
+        with:
+          target: 'http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/api'
+          format: 'openapi'
+          api_spec: 'backend/swagger.json'
+          cmd_options: '-a -j -m 5 -T 60'
+          fail_action: false
+          allow_issue_writing: false
+        continue-on-error: true
+
+      - name: Upload ZAP reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: zap-reports
+          path: |
+            report_html.html
+            report_md.md
+            report_json.json
+          retention-days: 30
+
+  # ==========================================
   # STAGE 5: Deploy to Production (requires GitHub Environment approval)
   # ==========================================
   deploy-production:
     name: "Deploy to Production"
     runs-on: ubuntu-latest
-    needs: [deploy-uat, docker-build-push, detect-changes]
+    needs: [deploy-uat, docker-build-push, detect-changes, e2e-tests-playwright, performance-tests-jmeter, dast-owasp-zap]
     if: |
       !cancelled() && !failure() &&
       github.ref == 'refs/heads/main' && github.event_name == 'push'
@@ -846,7 +1023,7 @@ jobs:
   notify:
     name: "Pipeline Summary"
     runs-on: ubuntu-latest
-    needs: [detect-changes, backend-build, frontend-build, ml-build, docker-build-push, deploy-uat, deploy-production]
+    needs: [detect-changes, backend-build, frontend-build, ml-build, docker-build-push, deploy-uat, e2e-tests-playwright, performance-tests-jmeter, dast-owasp-zap, deploy-production]
     if: always()
 
     steps:
@@ -861,4 +1038,7 @@ jobs:
           echo "| ML Service Build & Test | ${{ needs.ml-build.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Docker Build & Push | ${{ needs.docker-build-push.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Deploy to UAT | ${{ needs.deploy-uat.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| E2E Tests (Playwright) | ${{ needs.e2e-tests-playwright.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Performance Tests (JMeter) | ${{ needs.performance-tests-jmeter.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| DAST Scan (OWASP ZAP) | ${{ needs.dast-owasp-zap.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Deploy to Production | ${{ needs.deploy-production.result }} |" >> $GITHUB_STEP_SUMMARY
