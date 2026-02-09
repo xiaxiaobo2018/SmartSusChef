@@ -4,13 +4,28 @@
 
 set -e
 
-DB_SERVER="${DB_SERVER:-oversea.zyh111.icu}"
-DB_PORT="${DB_PORT:-33333}"
-DB_USER="${DB_USER:-grp4}"
-DB_PASSWORD="${DB_PASSWORD:-grp4}"
-DB_NAME="${DB_NAME:-smartsuschef}"
-
 ROOT="$(cd "$(dirname "$0")" && pwd)"
+
+# -- Load .env file ---------------------------------------------------------
+ENV_FILE="$ROOT/.env"
+if [ -f "$ENV_FILE" ]; then
+    echo "[OK] Loading config from .env"
+    set -a
+    # shellcheck disable=SC1090
+    . "$ENV_FILE"
+    set +a
+else
+    echo "[WARN] No .env file found. Copy .env.example to .env and fill in your values."
+    echo "       Run: cp .env.example .env"
+    exit 1
+fi
+
+# Env vars from .env, can still be overridden by exporting before running
+DB_SERVER="${DB_SERVER:?DB_SERVER not set in .env}"
+DB_PORT="${DB_PORT:?DB_PORT not set in .env}"
+DB_USER="${DB_USER:?DB_USER not set in .env}"
+DB_PASSWORD="${DB_PASSWORD:?DB_PASSWORD not set in .env}"
+DB_NAME="${DB_NAME:?DB_NAME not set in .env}"
 
 echo ""
 echo "=========================================="
