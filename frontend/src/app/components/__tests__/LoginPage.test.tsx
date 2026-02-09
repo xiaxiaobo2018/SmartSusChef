@@ -1,7 +1,5 @@
-import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { LoginPage } from '../LoginPage';
 import { authApi } from '@/app/services/api';
 
@@ -52,10 +50,9 @@ describe('LoginPage', () => {
     expect(screen.getByRole('button', { name: /sign in/i })).toBeInTheDocument();
   });
 
-  it('shows register link and triggers callback', async () => {
+  it('shows register link and triggers callback', () => {
     renderPage();
-    const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: /register as manager/i }));
+    fireEvent.click(screen.getByRole('button', { name: /register as manager/i }));
     expect(mockOnNavigateToRegister).toHaveBeenCalledTimes(1);
   });
 
@@ -63,10 +60,9 @@ describe('LoginPage', () => {
     loginMock.mockResolvedValue(true);
     renderPage();
 
-    const user = userEvent.setup();
-    await user.type(screen.getByLabelText(/username/i), 'testuser');
-    await user.type(screen.getByLabelText(/password/i), 'password123');
-    await user.click(screen.getByRole('button', { name: /sign in/i }));
+    fireEvent.change(screen.getByLabelText(/username/i), { target: { value: 'testuser' } });
+    fireEvent.change(screen.getByLabelText(/password/i), { target: { value: 'password123' } });
+    fireEvent.click(screen.getByRole('button', { name: /sign in/i }));
 
     await waitFor(() => {
       expect(loginMock).toHaveBeenCalledWith('testuser', 'password123');
@@ -78,10 +74,9 @@ describe('LoginPage', () => {
     loginMock.mockResolvedValue(false);
     renderPage();
 
-    const user = userEvent.setup();
-    await user.type(screen.getByLabelText(/username/i), 'bad');
-    await user.type(screen.getByLabelText(/password/i), 'bad');
-    await user.click(screen.getByRole('button', { name: /sign in/i }));
+    fireEvent.change(screen.getByLabelText(/username/i), { target: { value: 'bad' } });
+    fireEvent.change(screen.getByLabelText(/password/i), { target: { value: 'bad' } });
+    fireEvent.click(screen.getByRole('button', { name: /sign in/i }));
 
     expect(await screen.findByText(/invalid credentials/i)).toBeInTheDocument();
   });
@@ -90,10 +85,9 @@ describe('LoginPage', () => {
     loginMock.mockRejectedValue(new Error('Network error'));
     renderPage();
 
-    const user = userEvent.setup();
-    await user.type(screen.getByLabelText(/username/i), 'user');
-    await user.type(screen.getByLabelText(/password/i), 'pass');
-    await user.click(screen.getByRole('button', { name: /sign in/i }));
+    fireEvent.change(screen.getByLabelText(/username/i), { target: { value: 'user' } });
+    fireEvent.change(screen.getByLabelText(/password/i), { target: { value: 'pass' } });
+    fireEvent.click(screen.getByRole('button', { name: /sign in/i }));
 
     expect(await screen.findByText(/failed to connect to the server/i)).toBeInTheDocument();
   });
@@ -106,12 +100,11 @@ describe('LoginPage', () => {
     loginMock.mockReturnValue(loginPromise);
 
     renderPage();
-    const user = userEvent.setup();
     const button = screen.getByRole('button', { name: /sign in/i });
 
-    await user.type(screen.getByLabelText(/username/i), 'test');
-    await user.type(screen.getByLabelText(/password/i), 'test');
-    await user.click(button);
+    fireEvent.change(screen.getByLabelText(/username/i), { target: { value: 'test' } });
+    fireEvent.change(screen.getByLabelText(/password/i), { target: { value: 'test' } });
+    fireEvent.click(button);
 
     expect(button).toBeDisabled();
     resolveLogin!(true);
@@ -122,12 +115,11 @@ describe('LoginPage', () => {
     vi.mocked(authApi.forgotPassword).mockResolvedValue({ message: 'Reset sent' });
     renderPage();
 
-    const user = userEvent.setup();
-    await user.click(screen.getByText(/forgot password/i));
+    fireEvent.click(screen.getByText(/forgot password/i));
     expect(screen.getByText(/request password reset/i)).toBeInTheDocument();
 
-    await user.type(screen.getByPlaceholderText(/email or username/i), 'test@example.com');
-    await user.click(screen.getByRole('button', { name: /send reset link/i }));
+    fireEvent.change(screen.getByPlaceholderText(/email or username/i), { target: { value: 'test@example.com' } });
+    fireEvent.click(screen.getByRole('button', { name: /send reset link/i }));
 
     await waitFor(() => {
       expect(authApi.forgotPassword).toHaveBeenCalledWith({ emailOrUsername: 'test@example.com' });
@@ -138,13 +130,12 @@ describe('LoginPage', () => {
     vi.mocked(authApi.forgotPassword).mockResolvedValue({ message: 'Password reset successfully' });
     renderPage();
 
-    const user = userEvent.setup();
-    await user.click(screen.getByText(/forgot password/i));
-    await user.type(screen.getByPlaceholderText(/email or username/i), 'test@example.com');
-    await user.click(screen.getByRole('button', { name: /send reset link/i }));
+    fireEvent.click(screen.getByText(/forgot password/i));
+    fireEvent.change(screen.getByPlaceholderText(/email or username/i), { target: { value: 'test@example.com' } });
+    fireEvent.click(screen.getByRole('button', { name: /send reset link/i }));
 
     expect(await screen.findByRole('heading', { name: /password reset/i })).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: /return to login/i }));
+    fireEvent.click(screen.getByRole('button', { name: /return to login/i }));
     expect(await screen.findByRole('button', { name: /sign in/i })).toBeInTheDocument();
   });
 });

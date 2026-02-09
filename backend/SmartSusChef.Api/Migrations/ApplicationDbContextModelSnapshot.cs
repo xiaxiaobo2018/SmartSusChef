@@ -49,7 +49,7 @@ namespace SmartSusChef.Api.Migrations
 
                     b.HasIndex("StoreId");
 
-                    b.ToTable("ForecastData", (string)null);
+                    b.ToTable("ForecastData");
                 });
 
             modelBuilder.Entity("SmartSusChef.Api.Models.GlobalCalendarSignals", b =>
@@ -77,7 +77,238 @@ namespace SmartSusChef.Api.Migrations
 
                     b.HasKey("Date");
 
-                    b.ToTable("GlobalCalendarSignals", (string)null);
+                    b.ToTable("GlobalCalendarSignals");
+                });
+
+            modelBuilder.Entity("SmartSusChef.Api.Models.GlobalIngredient", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<decimal>("CarbonFootprint")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("IsDefault")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("Unit")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("GlobalIngredients");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("a0000000-0000-0000-0000-000000000001"),
+                            CarbonFootprint = 1.10m,
+                            CreatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2771),
+                            IsDefault = true,
+                            Name = "Tomato",
+                            Unit = "kg",
+                            UpdatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2772)
+                        },
+                        new
+                        {
+                            Id = new Guid("a0000000-0000-0000-0000-000000000002"),
+                            CarbonFootprint = 13.50m,
+                            CreatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2775),
+                            IsDefault = true,
+                            Name = "Cheese",
+                            Unit = "kg",
+                            UpdatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2776)
+                        },
+                        new
+                        {
+                            Id = new Guid("a0000000-0000-0000-0000-000000000003"),
+                            CarbonFootprint = 0.95m,
+                            CreatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2779),
+                            IsDefault = true,
+                            Name = "Flour",
+                            Unit = "kg",
+                            UpdatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2779)
+                        },
+                        new
+                        {
+                            Id = new Guid("a0000000-0000-0000-0000-000000000004"),
+                            CarbonFootprint = 2.70m,
+                            CreatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2782),
+                            IsDefault = true,
+                            Name = "Rice",
+                            Unit = "kg",
+                            UpdatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2783)
+                        },
+                        new
+                        {
+                            Id = new Guid("a0000000-0000-0000-0000-000000000005"),
+                            CarbonFootprint = 27.00m,
+                            CreatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2786),
+                            IsDefault = true,
+                            Name = "Beef",
+                            Unit = "kg",
+                            UpdatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2786)
+                        },
+                        new
+                        {
+                            Id = new Guid("a0000000-0000-0000-0000-000000000006"),
+                            CarbonFootprint = 12.10m,
+                            CreatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2789),
+                            IsDefault = true,
+                            Name = "Pork",
+                            Unit = "kg",
+                            UpdatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2789)
+                        },
+                        new
+                        {
+                            Id = new Guid("a0000000-0000-0000-0000-000000000007"),
+                            CarbonFootprint = 6.90m,
+                            CreatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2792),
+                            IsDefault = true,
+                            Name = "Chicken",
+                            Unit = "kg",
+                            UpdatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2800)
+                        },
+                        new
+                        {
+                            Id = new Guid("a0000000-0000-0000-0000-000000000008"),
+                            CarbonFootprint = 0.50m,
+                            CreatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2803),
+                            IsDefault = true,
+                            Name = "Lettuce",
+                            Unit = "kg",
+                            UpdatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2804)
+                        },
+                        new
+                        {
+                            Id = new Guid("a0000000-0000-0000-0000-000000000009"),
+                            CarbonFootprint = 0.30m,
+                            CreatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2807),
+                            IsDefault = true,
+                            Name = "Potato",
+                            Unit = "kg",
+                            UpdatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2808)
+                        },
+                        new
+                        {
+                            Id = new Guid("a0000000-0000-0000-0000-00000000000a"),
+                            CarbonFootprint = 0.70m,
+                            CreatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2811),
+                            IsDefault = true,
+                            Name = "Onion",
+                            Unit = "kg",
+                            UpdatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2812)
+                        },
+                        new
+                        {
+                            Id = new Guid("a0000000-0000-0000-0000-00000000000b"),
+                            CarbonFootprint = 1.50m,
+                            CreatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2815),
+                            IsDefault = true,
+                            Name = "Garlic",
+                            Unit = "kg",
+                            UpdatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2815)
+                        },
+                        new
+                        {
+                            Id = new Guid("a0000000-0000-0000-0000-00000000000c"),
+                            CarbonFootprint = 1.80m,
+                            CreatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2818),
+                            IsDefault = true,
+                            Name = "Sugar",
+                            Unit = "kg",
+                            UpdatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2818)
+                        },
+                        new
+                        {
+                            Id = new Guid("a0000000-0000-0000-0000-00000000000d"),
+                            CarbonFootprint = 11.90m,
+                            CreatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2822),
+                            IsDefault = true,
+                            Name = "Butter",
+                            Unit = "kg",
+                            UpdatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2822)
+                        },
+                        new
+                        {
+                            Id = new Guid("a0000000-0000-0000-0000-00000000000e"),
+                            CarbonFootprint = 1.90m,
+                            CreatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2825),
+                            IsDefault = true,
+                            Name = "Milk",
+                            Unit = "L",
+                            UpdatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2826)
+                        },
+                        new
+                        {
+                            Id = new Guid("a0000000-0000-0000-0000-00000000000f"),
+                            CarbonFootprint = 0.30m,
+                            CreatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2829),
+                            IsDefault = true,
+                            Name = "Egg",
+                            Unit = "pcs",
+                            UpdatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2829)
+                        },
+                        new
+                        {
+                            Id = new Guid("a0000000-0000-0000-0000-000000000010"),
+                            CarbonFootprint = 6.00m,
+                            CreatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2832),
+                            IsDefault = true,
+                            Name = "Olive Oil",
+                            Unit = "L",
+                            UpdatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2833)
+                        },
+                        new
+                        {
+                            Id = new Guid("a0000000-0000-0000-0000-000000000011"),
+                            CarbonFootprint = 2.20m,
+                            CreatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2851),
+                            IsDefault = true,
+                            Name = "Soy Sauce",
+                            Unit = "L",
+                            UpdatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2851)
+                        },
+                        new
+                        {
+                            Id = new Guid("a0000000-0000-0000-0000-000000000012"),
+                            CarbonFootprint = 0.05m,
+                            CreatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2855),
+                            IsDefault = true,
+                            Name = "Salt",
+                            Unit = "kg",
+                            UpdatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2855)
+                        },
+                        new
+                        {
+                            Id = new Guid("a0000000-0000-0000-0000-000000000013"),
+                            CarbonFootprint = 8.00m,
+                            CreatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2867),
+                            IsDefault = true,
+                            Name = "Pepper",
+                            Unit = "kg",
+                            UpdatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2867)
+                        });
                 });
 
             modelBuilder.Entity("SmartSusChef.Api.Models.HolidayCalendar", b =>
@@ -98,7 +329,7 @@ namespace SmartSusChef.Api.Migrations
 
                     b.HasKey("CountryCode", "Year");
 
-                    b.ToTable("HolidayCalendars", (string)null);
+                    b.ToTable("HolidayCalendars");
                 });
 
             modelBuilder.Entity("SmartSusChef.Api.Models.Ingredient", b =>
@@ -114,76 +345,84 @@ namespace SmartSusChef.Api.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<Guid?>("GlobalIngredientId")
+                        .HasColumnType("char(36)");
+
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
 
                     b.Property<int>("StoreId")
                         .HasColumnType("int");
 
                     b.Property<string>("Unit")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime(6)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("StoreId");
+                    b.HasIndex("GlobalIngredientId");
 
-                    b.ToTable("Ingredients", (string)null);
+                    b.HasIndex("StoreId", "Name")
+                        .IsUnique();
+
+                    b.ToTable("Ingredients");
 
                     b.HasData(
                         new
                         {
                             Id = new Guid("33333333-3333-3333-3333-333333333333"),
                             CarbonFootprint = 1.1m,
-                            CreatedAt = new DateTime(2026, 1, 29, 10, 32, 34, 246, DateTimeKind.Utc).AddTicks(6434),
+                            CreatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2139),
                             Name = "Tomato",
                             StoreId = 1,
                             Unit = "kg",
-                            UpdatedAt = new DateTime(2026, 1, 29, 10, 32, 34, 246, DateTimeKind.Utc).AddTicks(6434)
+                            UpdatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2139)
                         },
                         new
                         {
                             Id = new Guid("44444444-4444-4444-4444-444444444444"),
                             CarbonFootprint = 13.5m,
-                            CreatedAt = new DateTime(2026, 1, 29, 10, 32, 34, 246, DateTimeKind.Utc).AddTicks(6438),
+                            CreatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2143),
                             Name = "Cheese",
                             StoreId = 1,
                             Unit = "kg",
-                            UpdatedAt = new DateTime(2026, 1, 29, 10, 32, 34, 246, DateTimeKind.Utc).AddTicks(6439)
+                            UpdatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2144)
                         },
                         new
                         {
                             Id = new Guid("55555555-5555-5555-5555-555555555555"),
                             CarbonFootprint = 0.9m,
-                            CreatedAt = new DateTime(2026, 1, 29, 10, 32, 34, 246, DateTimeKind.Utc).AddTicks(6459),
+                            CreatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2146),
                             Name = "Dough",
                             StoreId = 1,
                             Unit = "kg",
-                            UpdatedAt = new DateTime(2026, 1, 29, 10, 32, 34, 246, DateTimeKind.Utc).AddTicks(6460)
+                            UpdatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2147)
                         },
                         new
                         {
                             Id = new Guid("66666666-6666-6666-6666-666666666666"),
                             CarbonFootprint = 0.5m,
-                            CreatedAt = new DateTime(2026, 1, 29, 10, 32, 34, 246, DateTimeKind.Utc).AddTicks(6463),
+                            CreatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2149),
                             Name = "Lettuce",
                             StoreId = 1,
                             Unit = "kg",
-                            UpdatedAt = new DateTime(2026, 1, 29, 10, 32, 34, 246, DateTimeKind.Utc).AddTicks(6463)
+                            UpdatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2150)
                         },
                         new
                         {
                             Id = new Guid("77777777-7777-7777-7777-777777777777"),
                             CarbonFootprint = 27.0m,
-                            CreatedAt = new DateTime(2026, 1, 29, 10, 32, 34, 246, DateTimeKind.Utc).AddTicks(6466),
+                            CreatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2152),
                             Name = "Beef",
                             StoreId = 1,
                             Unit = "kg",
-                            UpdatedAt = new DateTime(2026, 1, 29, 10, 32, 34, 246, DateTimeKind.Utc).AddTicks(6467)
+                            UpdatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2153)
                         });
                 });
 
@@ -204,7 +443,8 @@ namespace SmartSusChef.Api.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
 
                     b.Property<int>("StoreId")
                         .HasColumnType("int");
@@ -214,30 +454,31 @@ namespace SmartSusChef.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("StoreId");
+                    b.HasIndex("StoreId", "Name")
+                        .IsUnique();
 
-                    b.ToTable("Recipes", (string)null);
+                    b.ToTable("Recipes");
 
                     b.HasData(
                         new
                         {
                             Id = new Guid("88888888-8888-8888-8888-888888888888"),
-                            CreatedAt = new DateTime(2026, 1, 29, 10, 32, 34, 246, DateTimeKind.Utc).AddTicks(6562),
+                            CreatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2314),
                             IsSellable = false,
                             IsSubRecipe = false,
                             Name = "Margherita Pizza",
                             StoreId = 1,
-                            UpdatedAt = new DateTime(2026, 1, 29, 10, 32, 34, 246, DateTimeKind.Utc).AddTicks(6564)
+                            UpdatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2316)
                         },
                         new
                         {
                             Id = new Guid("99999999-9999-9999-9999-999999999999"),
-                            CreatedAt = new DateTime(2026, 1, 29, 10, 32, 34, 246, DateTimeKind.Utc).AddTicks(6566),
+                            CreatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2318),
                             IsSellable = false,
                             IsSubRecipe = false,
                             Name = "Beef Burger",
                             StoreId = 1,
-                            UpdatedAt = new DateTime(2026, 1, 29, 10, 32, 34, 246, DateTimeKind.Utc).AddTicks(6567)
+                            UpdatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(2318)
                         });
                 });
 
@@ -268,7 +509,7 @@ namespace SmartSusChef.Api.Migrations
 
                     b.HasIndex("RecipeId");
 
-                    b.ToTable("RecipeIngredients", (string)null);
+                    b.ToTable("RecipeIngredients");
 
                     b.HasData(
                         new
@@ -343,9 +584,10 @@ namespace SmartSusChef.Api.Migrations
 
                     b.HasIndex("RecipeId");
 
-                    b.HasIndex("StoreId");
+                    b.HasIndex("StoreId", "Date", "RecipeId")
+                        .IsUnique();
 
-                    b.ToTable("SalesData", (string)null);
+                    b.ToTable("SalesData");
                 });
 
             modelBuilder.Entity("SmartSusChef.Api.Models.Store", b =>
@@ -354,7 +596,8 @@ namespace SmartSusChef.Api.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Address")
-                        .HasColumnType("longtext");
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
 
                     b.Property<string>("CompanyName")
                         .IsRequired()
@@ -407,7 +650,7 @@ namespace SmartSusChef.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Store", (string)null);
+                    b.ToTable("Store");
 
                     b.HasData(
                         new
@@ -415,7 +658,7 @@ namespace SmartSusChef.Api.Migrations
                             Id = 1,
                             CompanyName = "Smart Sus Chef Corp",
                             ContactNumber = "+65 6000 0000",
-                            CreatedAt = new DateTime(2026, 1, 29, 10, 32, 34, 7, DateTimeKind.Utc).AddTicks(7704),
+                            CreatedAt = new DateTime(2026, 2, 9, 6, 52, 24, 826, DateTimeKind.Utc).AddTicks(644),
                             IsActive = true,
                             Latitude = 0m,
                             Longitude = 0m,
@@ -423,7 +666,7 @@ namespace SmartSusChef.Api.Migrations
                             OutletLocation = "123 Orchard Road",
                             StoreName = "Downtown Outlet",
                             UEN = "202400001A",
-                            UpdatedAt = new DateTime(2026, 1, 29, 10, 32, 34, 7, DateTimeKind.Utc).AddTicks(7707)
+                            UpdatedAt = new DateTime(2026, 2, 9, 6, 52, 24, 826, DateTimeKind.Utc).AddTicks(646)
                         });
                 });
 
@@ -443,7 +686,8 @@ namespace SmartSusChef.Api.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
@@ -477,32 +721,32 @@ namespace SmartSusChef.Api.Migrations
                     b.HasIndex("Username")
                         .IsUnique();
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
 
                     b.HasData(
                         new
                         {
                             Id = new Guid("11111111-1111-1111-1111-111111111111"),
-                            CreatedAt = new DateTime(2026, 1, 29, 10, 32, 34, 125, DateTimeKind.Utc).AddTicks(4058),
+                            CreatedAt = new DateTime(2026, 2, 9, 6, 52, 24, 982, DateTimeKind.Utc).AddTicks(6576),
                             Email = "",
                             Name = "Administrator",
-                            PasswordHash = "$2a$11$UgKlLTqGhRjy8vBUxfq4D.rAslh1BvCkBfTNIFeLmL5pmyk1p.1he",
+                            PasswordHash = "$2a$11$ILGJIiRwrLF54nvgfjB0me73ZizNzeRyySZlYkOiKL6v7qKvLIWoe",
                             Role = "Manager",
                             StoreId = 1,
-                            UpdatedAt = new DateTime(2026, 1, 29, 10, 32, 34, 125, DateTimeKind.Utc).AddTicks(4067),
+                            UpdatedAt = new DateTime(2026, 2, 9, 6, 52, 24, 982, DateTimeKind.Utc).AddTicks(6583),
                             UserStatus = "Active",
                             Username = "admin"
                         },
                         new
                         {
                             Id = new Guid("22222222-2222-2222-2222-222222222222"),
-                            CreatedAt = new DateTime(2026, 1, 29, 10, 32, 34, 246, DateTimeKind.Utc).AddTicks(5605),
+                            CreatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(1471),
                             Email = "",
                             Name = "Employee User",
-                            PasswordHash = "$2a$11$9cbaY78NhA4ZnhWUdW9hs.Hh.OiEoL1RZTaBzL3Ng5fPoqUwWgJz2",
+                            PasswordHash = "$2a$11$gJFernJcrgvg.TEo7eA2IONHxA8SChtMBOuWHtZws5rLwdGpdXjNG",
                             Role = "Employee",
                             StoreId = 1,
-                            UpdatedAt = new DateTime(2026, 1, 29, 10, 32, 34, 246, DateTimeKind.Utc).AddTicks(5611),
+                            UpdatedAt = new DateTime(2026, 2, 9, 6, 52, 25, 152, DateTimeKind.Utc).AddTicks(1476),
                             UserStatus = "Active",
                             Username = "employee"
                         });
@@ -544,7 +788,7 @@ namespace SmartSusChef.Api.Migrations
 
                     b.HasIndex("StoreId");
 
-                    b.ToTable("WastageData", (string)null);
+                    b.ToTable("WastageData");
                 });
 
             modelBuilder.Entity("SmartSusChef.Api.Models.WeatherDaily", b =>
@@ -575,7 +819,7 @@ namespace SmartSusChef.Api.Migrations
 
                     b.HasKey("StoreId", "Date");
 
-                    b.ToTable("WeatherDaily", (string)null);
+                    b.ToTable("WeatherDaily");
                 });
 
             modelBuilder.Entity("SmartSusChef.Api.Models.ForecastData", b =>
@@ -599,11 +843,17 @@ namespace SmartSusChef.Api.Migrations
 
             modelBuilder.Entity("SmartSusChef.Api.Models.Ingredient", b =>
                 {
+                    b.HasOne("SmartSusChef.Api.Models.GlobalIngredient", "GlobalIngredient")
+                        .WithMany()
+                        .HasForeignKey("GlobalIngredientId");
+
                     b.HasOne("SmartSusChef.Api.Models.Store", "Store")
                         .WithMany("Ingredients")
                         .HasForeignKey("StoreId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("GlobalIngredient");
 
                     b.Navigation("Store");
                 });
@@ -629,7 +879,7 @@ namespace SmartSusChef.Api.Migrations
                     b.HasOne("SmartSusChef.Api.Models.Ingredient", "Ingredient")
                         .WithMany("RecipeIngredients")
                         .HasForeignKey("IngredientId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("SmartSusChef.Api.Models.Recipe", "Recipe")
                         .WithMany("RecipeIngredients")
