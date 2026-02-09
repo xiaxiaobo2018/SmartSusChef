@@ -29,18 +29,19 @@ if (Test-Path $envFile) {
             }
         }
     }
-} else {
+}
+else {
     Write-Host "[WARN] No .env file found. Copy .env.example to .env and fill in your values." -ForegroundColor Yellow
     Write-Host "       Run: Copy-Item .env.example .env" -ForegroundColor Yellow
     exit 1
 }
 
 # Apply: CLI params override .env, .env overrides empty
-if (-not $DbServer)   { $DbServer   = $env:DB_SERVER }
-if (-not $DbPort)     { $DbPort     = [int]$env:DB_PORT }
-if (-not $DbUser)     { $DbUser     = $env:DB_USER }
+if (-not $DbServer) { $DbServer = $env:DB_SERVER }
+if (-not $DbPort) { $DbPort = [int]$env:DB_PORT }
+if (-not $DbUser) { $DbUser = $env:DB_USER }
 if (-not $DbPassword) { $DbPassword = $env:DB_PASSWORD }
-if (-not $DbName)     { $DbName     = $env:DB_NAME }
+if (-not $DbName) { $DbName = $env:DB_NAME }
 
 Write-Host ""
 Write-Host "==========================================" -ForegroundColor Green
