@@ -491,12 +491,26 @@ jobs:
           path: trivy-*-image.sarif
           retention-days: 30
 
-      - name: Upload Trivy image results to GitHub Security
+      - name: Upload Trivy Backend SARIF to GitHub Security
         uses: github/codeql-action/upload-sarif@v3
-        if: always()
+        if: always() && (needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.infra == 'true')
         with:
-          sarif_file: '.'
-          category: 'trivy-image-scan'
+          sarif_file: 'trivy-backend-image.sarif'
+          category: 'trivy-image-backend'
+
+      - name: Upload Trivy Frontend SARIF to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always() && (needs.detect-changes.outputs.frontend == 'true' || needs.detect-changes.outputs.infra == 'true')
+        with:
+          sarif_file: 'trivy-frontend-image.sarif'
+          category: 'trivy-image-frontend'
+
+      - name: Upload Trivy ML SARIF to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always() && (needs.detect-changes.outputs.ml == 'true' || needs.detect-changes.outputs.infra == 'true')
+        with:
+          sarif_file: 'trivy-ml-image.sarif'
+          category: 'trivy-image-ml'
 
   # ==========================================
   # STAGE 4: Deploy to UAT Environment
