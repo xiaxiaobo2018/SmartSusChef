@@ -27,6 +27,7 @@ import {
   salesApi,
   wastageApi,
   forecastApi,
+  exportApi,
   setAuthToken,
   getAuthToken,
   UserDto,
@@ -49,6 +50,8 @@ interface AppContextType {
   login: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
   register: (username: string, password: string, name: string, email: string) => Promise<{ success: boolean; storeSetupRequired: boolean; error?: string }>;
+  updateProfile: (data: { name?: string; email?: string }) => Promise<void>;
+  changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
   setupStore: (settings: Partial<StoreSettings>) => Promise<void>;
   storeSettings: StoreSettings;
   updateStoreSettings: (settings: Partial<StoreSettings>) => Promise<void>;
@@ -63,10 +66,10 @@ interface AppContextType {
   forecastData: ForecastData[];
   addIngredient: (ingredient: Omit<Ingredient, "id">) => Promise<void>;
   updateIngredient: (id: string, ingredient: Partial<Ingredient>) => Promise<void>;
-  deleteIngredient: (id: string) => Promise<void>;
+  deleteIngredient: (id: string, cascadeDelete?: boolean) => Promise<void>;
   addRecipe: (recipe: Omit<Recipe, "id">) => Promise<void>;
   updateRecipe: (id: string, recipe: Partial<Recipe>) => Promise<void>;
-  deleteRecipe: (id: string) => Promise<void>;
+  deleteRecipe: (id: string, cascadeDelete?: boolean) => Promise<void>;
   addSalesData: (data: Omit<SalesData, "id">) => Promise<void>;
   updateSalesData: (id: string, data: Partial<SalesData>) => Promise<void>;
   deleteSalesData: (id: string) => Promise<void>;
@@ -75,7 +78,7 @@ interface AppContextType {
   deleteWastageData: (id: string) => Promise<void>;
   updateForecastData: (data: ForecastData[]) => void;
   importSalesData: (data: SalesData[]) => Promise<void>;
-  exportData: (type: "sales" | "wastage" | "forecast") => void;
+  exportData: (type: "sales" | "wastage" | "forecast") => Promise<void>;
   holidays: HolidayEvent[];
   weather: WeatherData | null;
   refreshData: () => Promise<void>;
@@ -109,6 +112,7 @@ const mapStoreDto = (dto: StoreDto): StoreSettings => ({
   countryCode: dto.countryCode || '',
 });
 
+// --- Ingredient DTO Mapping and Global Ingredient Support ---
 const mapIngredientDto = (dto: IngredientDto): Ingredient => ({
   id: dto.id,
   name: dto.name,
@@ -133,6 +137,8 @@ const mapSalesDataDto = (dto: SalesDataDto): SalesData => ({
   date: dto.date,
   recipeId: dto.recipeId,
   quantity: dto.quantity,
+  createdAt: dto.createdAt,
+  modifiedAt: dto.updatedAt,
 });
 
 const mapWastageDataDto = (dto: WastageDataDto): WastageData => ({
@@ -141,6 +147,8 @@ const mapWastageDataDto = (dto: WastageDataDto): WastageData => ({
   ingredientId: dto.ingredientId,
   recipeId: dto.recipeId,
   quantity: dto.quantity,
+  createdAt: dto.createdAt,
+  updatedAt: dto.updatedAt,
 });
 
 const mapForecastDto = (dto: ForecastDto): ForecastData => ({
@@ -155,7 +163,7 @@ const mapHolidayDto = (dto: HolidayDto): HolidayEvent => ({
 });
 
 const mapWeatherDto = (dto: WeatherDto | null): WeatherData | null => {
-  if (!dto) return null;
+  if (!dto || dto.temperature === undefined) return null;
   return {
     temperature: dto.temperature,
     condition: dto.condition,
@@ -202,6 +210,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const loadAllData = useCallback(async () => {
     setDataLoading(true);
     try {
+      console.log('[AppContext] Loading all data...');
       // Load all data in parallel
       const [
         ingredientsData,
@@ -213,24 +222,38 @@ export function AppProvider({ children }: { children: ReactNode }) {
         holidaysData,
         storeData,
       ] = await Promise.all([
-        ingredientsApi.getAll().catch(() => []),
-        recipesApi.getAll().catch(() => []),
-        salesApi.getAll().catch(() => []),
-        wastageApi.getAll().catch(() => []),
-        forecastApi.get(7).catch(() => []),
-        forecastApi.getWeather().catch(() => null),
-        forecastApi.getHolidays(new Date().getFullYear()).catch(() => []),
-        storeApi.get().catch(() => null),
+        ingredientsApi.getAll().catch((err) => { console.error('[AppContext] Failed to load ingredients:', err); return []; }),
+        recipesApi.getAll().catch((err) => { console.error('[AppContext] Failed to load recipes:', err); return []; }),
+        salesApi.getAll().catch((err) => { console.error('[AppContext] Failed to load sales:', err); return []; }),
+        wastageApi.getAll().catch((err) => { console.error('[AppContext] Failed to load wastage:', err); return []; }),
+        forecastApi.get(7, 7).catch((err) => { console.error('[AppContext] Failed to load forecast:', err); return []; }), // Get 7 days future + 7 days past (including today)
+        forecastApi.getWeather().catch((err) => { console.error('[AppContext] Failed to load weather:', err); return null; }),
+        forecastApi.getHolidays(new Date().getFullYear()).catch((err) => { console.error('[AppContext] Failed to load holidays:', err); return []; }),
+        storeApi.get().catch((err) => { console.error('[AppContext] Failed to load store:', err); return null; }),
       ]);
+
+      console.log('[AppContext] Data loaded successfully:', {
+        ingredients: ingredientsData.length,
+        recipes: recipesData.length,
+        sales: salesDataResult.length,
+        wastage: wastageDataResult.length,
+        forecast: forecastDataResult.length
+      });
 
       setIngredients(ingredientsData.map(mapIngredientDto));
       setRecipes(recipesData.map(mapRecipeDto));
       setSalesData(salesDataResult.map(mapSalesDataDto));
       setWastageData(wastageDataResult.map(mapWastageDataDto));
-      setForecastData(forecastDataResult.map(mapForecastDto));
+
+      const mappedForecast = forecastDataResult.map(mapForecastDto);
+      console.log('[AppContext] Raw forecast data from API:', forecastDataResult.length);
+      console.log('[AppContext] Mapped forecast data:', mappedForecast.length);
+      console.log('[AppContext] Sample forecast dates:', mappedForecast.slice(0, 5).map(f => f.date));
+      setForecastData(mappedForecast);
+
       setWeather(mapWeatherDto(weatherData));
       setHolidays(holidaysData.map(mapHolidayDto));
-      
+
       if (storeData) {
         setStoreSettings(mapStoreDto(storeData));
       }
@@ -242,6 +265,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       }
     } catch (error) {
       console.error('Failed to load data:', error);
+    } finally {
+      setDataLoading(false);
     }
   }, [user?.role]);
 
@@ -318,6 +343,25 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const updateProfile = async (data: { name?: string; email?: string }) => {
+    try {
+      const updated = await authApi.updateProfile(data);
+      setUser(mapUserDto(updated));
+    } catch (error) {
+      console.error('Failed to update profile:', error);
+      throw error;
+    }
+  };
+
+  const changePassword = async (currentPassword: string, newPassword: string) => {
+    try {
+      await authApi.changePassword({ currentPassword, newPassword });
+    } catch (error) {
+      console.error('Failed to change password:', error);
+      throw error;
+    }
+  };
+
   // ==========================================
   // STORE SETTINGS FUNCTIONS
   // ==========================================
@@ -367,9 +411,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
   // ==========================================
   const addUser = async (userData: Omit<User, "id"> & { password?: string }) => {
     try {
+      if (!userData.password) {
+        throw new Error('Password is required');
+      }
       const newUser = await usersApi.create({
         username: userData.username,
-        password: userData.password || 'password',
+        password: userData.password,
         name: userData.name,
         email: userData.email || '',
         role: userData.role,
@@ -429,7 +476,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     try {
       const current = ingredients.find(i => i.id === id);
       if (!current) throw new Error('Ingredient not found');
-      
+
       const updated = await ingredientsApi.update(id, {
         name: ingredientData.name || current.name,
         unit: ingredientData.unit || current.unit,
@@ -442,8 +489,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const deleteIngredient = async (id: string) => {
+  const deleteIngredient = async (id: string, cascadeDelete: boolean = false) => {
     try {
+      // If cascade delete is enabled, first delete all related wastage data
+      if (cascadeDelete) {
+        const relatedWastageData = wastageData.filter(w => w.ingredientId === id);
+        await Promise.all(
+          relatedWastageData.map(waste => wastageApi.delete(waste.id))
+        );
+        setWastageData(prev => prev.filter(w => w.ingredientId !== id));
+      }
+
+      // Then delete the ingredient
       await ingredientsApi.delete(id);
       setIngredients(prev => prev.filter(i => i.id !== id));
     } catch (error) {
@@ -478,7 +535,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     try {
       const current = recipes.find(r => r.id === id);
       if (!current) throw new Error('Recipe not found');
-      
+
       const updated = await recipesApi.update(id, {
         name: recipeData.name || current.name,
         isSellable: recipeData.isSellable ?? current.isSellable ?? !current.isSubRecipe,
@@ -496,8 +553,23 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const deleteRecipe = async (id: string) => {
+  const deleteRecipe = async (id: string, cascadeDelete: boolean = false) => {
     try {
+      // If cascade delete is enabled, first delete all related sales and wastage data
+      if (cascadeDelete) {
+        const relatedSalesData = salesData.filter(s => s.recipeId === id);
+        const relatedWastageData = wastageData.filter(w => w.recipeId === id);
+
+        await Promise.all([
+          ...relatedSalesData.map(sale => salesApi.delete(sale.id)),
+          ...relatedWastageData.map(waste => wastageApi.delete(waste.id)),
+        ]);
+
+        setSalesData(prev => prev.filter(s => s.recipeId !== id));
+        setWastageData(prev => prev.filter(w => w.recipeId !== id));
+      }
+
+      // Then delete the recipe
       await recipesApi.delete(id);
       setRecipes(prev => prev.filter(r => r.id !== id));
     } catch (error) {
@@ -527,10 +599,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     try {
       const current = salesData.find(s => s.id === id);
       if (!current) throw new Error('Sales data not found');
-      
+
+      // Only quantity can be updated
       const updated = await salesApi.update(id, {
-        date: data.date || current.date,
-        recipeId: data.recipeId || current.recipeId,
         quantity: data.quantity ?? current.quantity,
       });
       setSalesData(prev => prev.map(s => s.id === id ? mapSalesDataDto(updated) : s));
@@ -590,7 +661,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     try {
       const current = wastageData.find(w => w.id === id);
       if (!current) throw new Error('Wastage data not found');
-      
+
       const updated = await wastageApi.update(id, {
         date: data.date || current.date,
         ingredientId: data.ingredientId || current.ingredientId,
@@ -624,32 +695,36 @@ export function AppProvider({ children }: { children: ReactNode }) {
   // ==========================================
   // EXPORT FUNCTION
   // ==========================================
-  const exportData = (type: "sales" | "wastage" | "forecast") => {
-    let dataToExport: any[] = [];
-    let filename = '';
-    
-    switch (type) {
-      case 'sales':
-        dataToExport = salesData;
-        filename = 'sales_data.json';
-        break;
-      case 'wastage':
-        dataToExport = wastageData;
-        filename = 'wastage_data.json';
-        break;
-      case 'forecast':
-        dataToExport = forecastData;
-        filename = 'forecast_data.json';
-        break;
+  const exportData = async (type: "sales" | "wastage" | "forecast") => {
+    try {
+      let blob: Blob;
+      let filename = '';
+
+      if (type === 'sales') {
+        blob = await exportApi.getSalesCsv();
+        filename = 'sales_data.csv';
+      } else if (type === 'wastage') {
+        blob = await exportApi.getWastageCsv();
+        filename = 'wastage_data.csv';
+      } else if (type === 'forecast') {
+        blob = await exportApi.getForecastCsv();
+        filename = 'forecast_data.csv';
+      } else {
+        throw new Error('Invalid export type');
+      }
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Failed to export data:', error);
+      // You might want to show a toast notification here
     }
-    
-    const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    a.click();
-    URL.revokeObjectURL(url);
   };
 
   // ==========================================
@@ -662,10 +737,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const value: AppContextType = {
     user,
     loading,
+    dataLoading,
     storeSetupRequired,
     login,
     logout,
     register,
+    updateProfile,
+    changePassword,
     setupStore,
     storeSettings,
     updateStoreSettings,
@@ -701,10 +779,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }
 
-export function useApp() {
+export function useAppContext() {
   const context = useContext(AppContext);
   if (!context) {
-    throw new Error("useApp must be used within AppProvider");
+    throw new Error("useAppContext must be used within an AppProvider");
   }
   return context;
 }
+
+// Alias for backwards compatibility
+export const useApp = useAppContext;

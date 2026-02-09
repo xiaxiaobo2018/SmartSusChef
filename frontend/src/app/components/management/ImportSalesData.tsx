@@ -3,34 +3,259 @@ import { useApp } from '@/app/context/AppContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/app/components/ui/card';
 import { Button } from '@/app/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/app/components/ui/table';
-import { Upload, Download, AlertCircle, CheckCircle, ArrowRight, ChefHat, FileText } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/app/components/ui/dialog';
+import { Upload, Download, AlertCircle, CheckCircle, ArrowRight, ChefHat, FileText, AlertTriangle, CalendarDays } from 'lucide-react';
 import { toast } from 'sonner';
 import { parse } from 'papaparse';
-import { CSVValidator } from '@/app/utils/csvValidator';
+import { format } from 'date-fns';
+import { CSVValidator, DATE_FORMATS } from '@/app/utils/csvValidator';
 import { CSVValidationError } from '@/app/types/csv';
+import { SalesData } from '@/app/types';
+import { salesApi } from '@/app/services/api';
 
 interface CSVRow {
   Date: string;
   Dish_Name: string;
   Quantity_Sold: string;
-  Total_Revenue_SGD?: string;
-  Unit_Cost_SGD?: string;
 }
 
 export function ImportSalesData() {
-  const { recipes, addSalesData } = useApp();
+  const { recipes, salesData, refreshData } = useApp();
   const [isDragging, setIsDragging] = useState(false);
   const [csvData, setCsvData] = useState<CSVRow[]>([]);
   const [errors, setErrors] = useState<CSVValidationError[]>([]);
   const [showPreview, setShowPreview] = useState(false);
+  const [duplicates, setDuplicates] = useState<{ date: string; dish: string; rows: number[] }[]>([]);
+  const [isImporting, setIsImporting] = useState(false);
+  const [isOverwriteDialogSubmitting, setIsOverwriteDialogSubmitting] = useState(false);
+  const [dateFormat, setDateFormat] = useState(DATE_FORMATS[0].value);
+
+  // Add after the existing state declarations
+  const [overwriteConfirmData, setOverwriteConfirmData] = useState<{
+    isOpen: boolean;
+    duplicates: Array<{
+      date: string;
+      dishName: string;
+      existingQuantity: number;
+      newQuantity: number;
+    }>;
+    importData: Array<{ date: string; recipeId: string; quantity: number }>;
+  }>({
+    isOpen: false,
+    duplicates: [],
+    importData: [],
+  });
+
+  // Check which records in the imported data will be overwritten
+  const checkForExistingDuplicates = (
+    importData: Array<{ date: string; recipeId: string; quantity: number }>
+  ): Array<{
+    date: string;
+    dishName: string;
+    existingQuantity: number;
+    newQuantity: number;
+  }> => {
+    const duplicates: Array<{
+      date: string;
+      dishName: string;
+      existingQuantity: number;
+      newQuantity: number;
+    }> = [];
+
+    // Create a mapping of existing data for quick lookup
+    const existingMap = new Map<string, { quantity: number; recipeName: string }>();
+
+    salesData.forEach(item => {
+      const key = `${item.date}|${item.recipeId}`;
+      const recipe = recipes.find(r => r.id === item.recipeId);
+      existingMap.set(key, {
+        quantity: item.quantity,
+        recipeName: recipe?.name || 'Unknown',
+      });
+    });
+
+    console.log('[checkForExistingDuplicates] Existing data keys (first 5):',
+      Array.from(existingMap.keys()).slice(0, 5));
+    console.log('[checkForExistingDuplicates] Import data keys (first 5):',
+      importData.slice(0, 5).map(item => `${item.date}|${item.recipeId}`));
+
+    // Check which records in the imported data will be overwritten
+    importData.forEach(item => {
+      const key = `${item.date}|${item.recipeId}`;
+      const existing = existingMap.get(key);
+
+      if (existing) {
+        const recipe = recipes.find(r => r.id === item.recipeId);
+        duplicates.push({
+          date: item.date,
+          dishName: recipe?.name || 'Unknown',
+          existingQuantity: existing.quantity,
+          newQuantity: item.quantity,
+        });
+      }
+    });
+
+    console.log('[checkForExistingDuplicates] Found duplicates:', duplicates.length);
+    return duplicates;
+  };
+
+  const handleConfirmOverwrite = async () => {
+    setIsOverwriteDialogSubmitting(true);
+    try {
+      // Use importByName API to handle the import with overwrite
+      const salesToImport = csvData.map(row => ({
+        date: row.Date,
+        dishName: row.Dish_Name.trim(),
+        quantity: parseInt(row.Quantity_Sold, 10),
+      }));
+
+      const result = await salesApi.importByName({ salesData: salesToImport, dateFormat });
+
+      let msg = `Successfully imported ${result.imported} sales records (${overwriteConfirmData.duplicates.length} overwritten)`;
+      if (result.newDishesCreated > 0) {
+        msg += `. Auto-created ${result.newDishesCreated} new dish(es): ${result.newDishes.join(', ')}`;
+      }
+      toast.success(msg);
+
+      // Turn off all states
+      setOverwriteConfirmData({
+        isOpen: false,
+        duplicates: [],
+        importData: [],
+      });
+      setCsvData([]);
+      setErrors([]);
+      setShowPreview(false);
+
+      // Refresh data
+      await new Promise(resolve => setTimeout(resolve, 500));
+      await refreshData();
+    } catch (error: any) {
+      toast.error(`Failed to import sales data: ${error.message}`);
+    } finally {
+      setIsOverwriteDialogSubmitting(false);
+    }
+  };
+
+  const handleCancelOverwrite = () => {
+    setOverwriteConfirmData({
+      isOpen: false,
+      duplicates: [],
+      importData: [],
+    });
+  };
+
+  // Find duplicate rows (same date, same dish) in the CSV file
+  const findDuplicatesInCSV = (data: CSVRow[]): { date: string; dish: string; rows: number[] }[] => {
+    const duplicates: { date: string; dish: string; rows: number[] }[] = [];
+    const seen = new Map<string, number[]>(); // key: date|dish, value: row number array
+
+    data.forEach((row, index) => {
+      const key = `${row.Date}|${row.Dish_Name}`;
+      if (!seen.has(key)) {
+        seen.set(key, [index + 2]);
+      } else {
+        seen.get(key)?.push(index + 2);
+      }
+    });
+
+    // Find entries with duplicates
+    seen.forEach((rows, key) => {
+      if (rows.length > 1) {
+        const [date, dish] = key.split('|');
+        duplicates.push({ date, dish, rows });
+      }
+    });
+
+    return duplicates;
+  };
+
+  // Handling duplicate rows: Keep the last row and delete the others
+  const handleMergeDuplicates = () => {
+    if (!csvData.length || !duplicates.length) return;
+
+    const mergedData: CSVRow[] = [];
+    const seen = new Map<string, CSVRow>();
+
+    // Reverse traversal, keeping only the last one
+    for (let i = csvData.length - 1; i >= 0; i--) {
+      const row = csvData[i];
+      const key = `${row.Date}|${row.Dish_Name}`;
+
+      if (!seen.has(key)) {
+        seen.set(key, row);
+      }
+    }
+
+    // Convert back to array
+    seen.forEach(row => mergedData.push(row));
+
+    setCsvData(mergedData);
+    setDuplicates([]);
+    setShowPreview(true);
+    toast.success(`Merged ${duplicates.length} duplicate entries. Keeping last record for each duplicate.`);
+  };
+
+  const handleImportOnlyNew = async (newRecords: Array<{ date: string; recipeId: string; quantity: number }>) => {
+    if (newRecords.length === 0) {
+      toast.info('No new records to import');
+      setOverwriteConfirmData({
+        isOpen: false,
+        duplicates: [],
+        importData: [],
+      });
+      setCsvData([]);
+      setErrors([]);
+      setShowPreview(false);
+      return;
+    }
+
+    setIsOverwriteDialogSubmitting(true);
+    try {
+      // Filter CSV data to only include new records (not duplicates)
+      const newRecordKeys = new Set(newRecords.map(r => `${r.date}|${r.recipeId}`));
+      const filteredCsvData = csvData.filter(row => {
+        const dishName = row.Dish_Name.trim();
+        const recipe = recipes.find(r => r.name.toLowerCase() === dishName.toLowerCase());
+        const key = `${row.Date}|${recipe?.id}`;
+        return newRecordKeys.has(key);
+      });
+
+      const salesToImport = filteredCsvData.map(row => ({
+        date: row.Date,
+        dishName: row.Dish_Name.trim(),
+        quantity: parseInt(row.Quantity_Sold, 10),
+      }));
+
+      const result = await salesApi.importByName({ salesData: salesToImport, dateFormat });
+      toast.success(`Successfully imported ${result.imported} new records (skipped ${overwriteConfirmData.duplicates.length} duplicates)`);
+
+      setOverwriteConfirmData({
+        isOpen: false,
+        duplicates: [],
+        importData: [],
+      });
+      setCsvData([]);
+      setErrors([]);
+      setShowPreview(false);
+
+      // Refresh data
+      await new Promise(resolve => setTimeout(resolve, 500));
+      await refreshData();
+    } catch (error: any) {
+      toast.error(`Failed to import sales data: ${error.message}`);
+    } finally {
+      setIsOverwriteDialogSubmitting(false);
+    }
+  };
 
   const handleDownloadTemplate = () => {
+    const fmt = DATE_FORMATS.find(f => f.value === dateFormat) || DATE_FORMATS[0];
     const template = [
-      ['Date', 'Dish_Name', 'Quantity_Sold', 'Total_Revenue_SGD', 'Unit_Cost_SGD'],
-      ['2026-01-20', 'Laksa', '85', '510.00', '6.00'],
-      ['2026-01-20', 'Hainanese Chicken Rice', '120', '660.00', '5.50'],
-      ['2026-01-21', 'Laksa', '70', '420.00', '6.00'],
-      ['2026-01-21', 'Chicken Salad', '45', '360.00', '8.00'],
+      ['Date', 'Dish_Name', 'Quantity_Sold'],
+      [fmt.example, 'Laksa', '85'],
+      [fmt.example, 'Hainanese Chicken Rice', '120'],
+      [fmt.example, 'Chicken Salad', '45'],
     ];
 
     const csv = template.map(row => row.join(',')).join('\n');
@@ -53,7 +278,7 @@ export function ImportSalesData() {
     const reader = new FileReader();
     reader.onload = (e) => {
       const text = e.target?.result as string;
-      
+
       parse<CSVRow>(text, {
         header: true,
         skipEmptyLines: true,
@@ -63,14 +288,25 @@ export function ImportSalesData() {
             return;
           }
 
+          // Check for duplicate rows within the CSV file
+          const duplicates = findDuplicatesInCSV(results.data);
+          if (duplicates.length > 0) {
+            // Display duplicate line warning
+            setDuplicates(duplicates);
+            setCsvData(results.data);
+            setShowPreview(false);
+            toast.error(`Found ${duplicates.length} duplicate entries in CSV file`);
+            return;
+          }
+
           // Use CSV Validator
-          const validator = new CSVValidator(recipes);
+          const validator = new CSVValidator(recipes, dateFormat);
           const validationResult = validator.validate(results.data);
-          
+
           if (validationResult.errors.length > 50) {
             // High volume failure - download error log
             const errorLog = CSVValidator.generateErrorLog(validationResult.errors);
-            
+
             const blob = new Blob([errorLog], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -95,7 +331,7 @@ export function ImportSalesData() {
             setCsvData(results.data);
             setErrors([]);
             setShowPreview(true);
-            
+
             if (validationResult.warnings.length > 0) {
               toast.success(`CSV validated successfully! ${validationResult.warnings.length} value(s) auto-corrected.`);
             } else {
@@ -103,7 +339,7 @@ export function ImportSalesData() {
             }
           }
         },
-        error: (error) => {
+        error: (error: Error) => {
           toast.error(`Failed to parse CSV: ${error.message}`);
         },
       });
@@ -115,45 +351,128 @@ export function ImportSalesData() {
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    
+
     const file = e.dataTransfer.files[0];
     if (file) {
       handleFileUpload(file);
     }
   };
 
+  // Add import logic to the handleImport function
   const handleImport = async () => {
     if (errors.length > 0) {
       toast.error('Please fix all errors before importing');
       return;
     }
 
-    const recipeMap = new Map(recipes.map(r => [r.name.toLowerCase(), r.id]));
-    const salesToImport: { date: string; recipeId: string; quantity: number }[] = [];
+    // Check for duplicates within the imported data
+    const seenInImport = new Set<string>();
+    const duplicatesInImport: string[] = [];
 
-    csvData.forEach((row) => {
-      const recipeId = recipeMap.get(row.Dish_Name.trim().toLowerCase());
-      if (recipeId) {
-        const quantity = parseFloat(row.Quantity_Sold);
-        salesToImport.push({
-          date: row.Date,
-          recipeId,
-          quantity,
-        });
+    csvData.forEach((row, index) => {
+      const key = `${row.Date}|${row.Dish_Name}`.toLowerCase();
+
+      if (seenInImport.has(key)) {
+        duplicatesInImport.push(`Row ${index + 2}: ${row.Dish_Name} on ${row.Date}`);
+      } else {
+        seenInImport.add(key);
       }
     });
 
+    if (duplicatesInImport.length > 0) {
+      toast.error(`Found ${duplicatesInImport.length} duplicates in import file. Please fix them first.`);
+      return;
+    }
+
+    // Get the date parser for the selected format
+    const dateFormatOption = DATE_FORMATS.find(f => f.value === dateFormat) || DATE_FORMATS[0];
+
+    // Map dish names to recipe IDs and normalize dates
+    const importDataWithRecipeIds = csvData.map(row => {
+      const dishName = row.Dish_Name.trim();
+      const recipe = recipes.find(r => r.name.toLowerCase() === dishName.toLowerCase());
+
+      // Parse the date and convert to yyyy-MM-dd format
+      const parsedDate = dateFormatOption.parse(row.Date);
+      const normalizedDate = parsedDate ? format(parsedDate, 'yyyy-MM-dd') : row.Date;
+
+      return {
+        date: normalizedDate,
+        dishName: dishName,
+        recipeId: recipe?.id || null,
+        quantity: parseInt(row.Quantity_Sold, 10),
+      };
+    });
+
+    console.log('[ImportSalesData] Normalized dates for comparison:', importDataWithRecipeIds.slice(0, 3));
+
+    // Check for duplicates with existing database records
+    const importDataForCheck = importDataWithRecipeIds
+      .filter(item => item.recipeId !== null)
+      .map(item => ({
+        date: item.date,
+        recipeId: item.recipeId!,
+        quantity: item.quantity,
+      }));
+
+    const existingDuplicates = checkForExistingDuplicates(importDataForCheck);
+
+    // If there are duplicates with existing data, show confirmation dialog
+    if (existingDuplicates.length > 0) {
+      console.log('[ImportSalesData] Found duplicates with existing data:', existingDuplicates);
+      setOverwriteConfirmData({
+        isOpen: true,
+        duplicates: existingDuplicates,
+        importData: importDataForCheck,
+      });
+      return;
+    }
+
+    // No duplicates, proceed with direct import
+    const salesToImport = csvData.map(row => ({
+      date: row.Date,
+      dishName: row.Dish_Name.trim(),
+      quantity: parseInt(row.Quantity_Sold, 10),
+    }));
+
+    setIsImporting(true);
     try {
-      // Import all sales data
-      for (const sale of salesToImport) {
-        await addSalesData(sale);
+      console.log('[ImportSalesData] Starting import...', { recordCount: salesToImport.length });
+      const result = await salesApi.importByName({ salesData: salesToImport, dateFormat });
+      console.log('[ImportSalesData] Import completed:', result);
+
+      let msg = `Successfully imported ${result.imported} sales records`;
+      if (result.newDishesCreated > 0) {
+        msg += `. Auto-created ${result.newDishesCreated} new dish(es): ${result.newDishes.join(', ')}`;
       }
-      toast.success(`Successfully imported ${salesToImport.length} sales records`);
+      toast.success(msg);
+
+      // Clear form data
       setCsvData([]);
       setErrors([]);
       setShowPreview(false);
-    } catch (error) {
-      toast.error('Failed to import sales data');
+
+      // Wait a moment to ensure database transaction is committed
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      console.log('[ImportSalesData] Refreshing data...');
+      // Refresh all data to show imported sales and new recipes
+      try {
+        await refreshData();
+        console.log('[ImportSalesData] Data refreshed successfully. Current sales count:', salesData.length);
+        console.log('[ImportSalesData] Current recipes count:', recipes.length);
+      } catch (refreshError) {
+        console.error('[ImportSalesData] Failed to refresh data:', refreshError);
+        toast.warning('Data imported successfully, but failed to refresh. Please reload the page.');
+      }
+    } catch (error: any) {
+      if (error.message?.includes('duplicate')) {
+        toast.error('Duplicate records detected. The system prevents duplicate entries for the same date and recipe.');
+      } else {
+        toast.error(`Failed to import sales data: ${error.message}`);
+      }
+    } finally {
+      setIsImporting(false);
     }
   };
 
@@ -173,27 +492,55 @@ export function ImportSalesData() {
         <p className="text-gray-600 mt-1">Upload CSV file from your POS system</p>
       </div>
 
-      {/* Template Download */}
+      {/* Date Format & Template */}
       <Card className="border-[#4F6F52]/20">
         <CardHeader>
-          <CardTitle>Step 1: Download Template</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <CalendarDays className="w-5 h-5 text-[#4F6F52]" />
+            Step 1: Select Date Format & Download Template
+          </CardTitle>
           <CardDescription>
-            Use our standard template to ensure your data is formatted correctly
+            Choose the date format used in your CSV file, then download the template
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
+          {/* Date Format Selector */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Date Format in CSV</label>
+            <select
+              value={dateFormat}
+              title="Select date format for CSV import"
+              onChange={(e) => {
+                setDateFormat(e.target.value);
+                // Reset validation when format changes
+                if (csvData.length > 0) {
+                  setCsvData([]);
+                  setErrors([]);
+                  setShowPreview(false);
+                  toast.info('Date format changed. Please re-upload your CSV file.');
+                }
+              }}
+              className="w-full max-w-md border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4F6F52] focus:border-[#4F6F52] bg-white"
+            >
+              {DATE_FORMATS.map((fmt) => (
+                <option key={fmt.value} value={fmt.value}>
+                  {fmt.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Template Download */}
           <Button onClick={handleDownloadTemplate} variant="outline" className="gap-2">
             <Download className="w-4 h-4" />
             Download Sample Template (.csv)
           </Button>
-          <div className="mt-4 p-4 bg-[#E6EFE0] rounded-lg border border-[#4F6F52]/20">
+          <div className="p-4 bg-[#E6EFE0] rounded-lg border border-[#4F6F52]/20">
             <p className="text-sm font-medium text-[#1A1C18] mb-2">Required Columns:</p>
             <ul className="text-sm text-gray-700 space-y-1">
-              <li>• <strong>Date</strong>: YYYY-MM-DD format (e.g., 2026-01-20)</li>
-              <li>• <strong>Dish_Name</strong>: Must match exactly with recipes in your database</li>
+              <li>• <strong>Date</strong>: {DATE_FORMATS.find(f => f.value === dateFormat)?.label || dateFormat}</li>
+              <li>• <strong>Dish_Name</strong>: Dish name (new dishes will be auto-created)</li>
               <li>• <strong>Quantity_Sold</strong>: Number of dishes sold</li>
-              <li>• <strong>Total_Revenue_SGD</strong>: Optional (will auto-correct "S$ 5" to "5.00")</li>
-              <li>• <strong>Unit_Cost_SGD</strong>: Optional</li>
             </ul>
           </div>
         </CardContent>
@@ -210,11 +557,10 @@ export function ImportSalesData() {
             onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
             onDragLeave={() => setIsDragging(false)}
             onDrop={handleDrop}
-            className={`border-2 border-dashed rounded-lg p-12 text-center transition-colors ${
-              isDragging
-                ? 'border-[#4F6F52] bg-[#E6EFE0]'
-                : 'border-gray-300 hover:border-[#4F6F52] hover:bg-gray-50'
-            }`}
+            className={`border-2 border-dashed rounded-lg p-12 text-center transition-colors ${isDragging
+              ? 'border-[#4F6F52] bg-[#E6EFE0]'
+              : 'border-gray-300 hover:border-[#4F6F52] hover:bg-gray-50'
+              }`}
           >
             <Upload className="w-12 h-12 mx-auto mb-4 text-gray-400" />
             <p className="text-lg font-medium text-gray-700 mb-2">
@@ -250,7 +596,7 @@ export function ImportSalesData() {
               Upload Failed: {errors.length} issue{errors.length > 1 ? 's' : ''} detected
             </CardTitle>
             <CardDescription>
-              Please fix the errors below before importing. Missing dishes must be added to Recipe Management first.
+              Please fix the errors below before importing.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -301,6 +647,246 @@ export function ImportSalesData() {
         </Card>
       )}
 
+      {/* Duplicate Entries Display */}
+      {duplicates.length > 0 && (
+        <Card className="border-[#E74C3C]">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-[#E74C3C]">
+              <AlertTriangle className="w-5 h-5" />
+              Duplicate Entries Found
+            </CardTitle>
+            <CardDescription>
+              Found {duplicates.length} duplicate entries in CSV file (same date and dish).
+              We recommend merging duplicates before importing.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="border rounded-lg overflow-hidden">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-[#E74C3C]/10">
+                      <TableHead>Date</TableHead>
+                      <TableHead>Dish Name</TableHead>
+                      <TableHead>Rows in CSV</TableHead>
+                      <TableHead>Action</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {duplicates.map((dup, index) => (
+                      <TableRow key={index} className="bg-[#FDEDEC]">
+                        <TableCell>{dup.date}</TableCell>
+                        <TableCell className="font-medium">{dup.dish}</TableCell>
+                        <TableCell>{dup.rows.join(', ')}</TableCell>
+                        <TableCell>
+                          <span className="text-[#E74C3C] font-medium">Will keep last record</span>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+
+              <div className="flex gap-2">
+                <Button
+                  onClick={handleMergeDuplicates}
+                  className="bg-[#E74C3C] hover:bg-[#C0392B]"
+                >
+                  Merge Duplicates (Keep Last Record)
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setDuplicates([]);
+                    setCsvData([]);
+                    setShowPreview(false);
+                  }}
+                >
+                  Cancel Upload
+                </Button>
+              </div>
+
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                <div className="flex items-start gap-2">
+                  <AlertTriangle className="w-4 h-4 text-yellow-600 mt-0.5" />
+                  <div className="text-sm text-yellow-800">
+                    <p className="font-medium">Note:</p>
+                    <p>Duplicate entries (same date and dish) will be merged. The last record in the CSV file will be kept.</p>
+                    <p className="mt-1">If you import this data, existing database records with the same date and dish will be overwritten.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Overwrite Confirmation Dialog */}
+      <Dialog open={overwriteConfirmData.isOpen} onOpenChange={(open) => {
+        if (!open) handleCancelOverwrite();
+      }}>
+        <DialogContent className="max-w-[95vw] lg:max-w-[1200px] max-h-[85vh] overflow-y-auto p-4 sm:p-6">
+          <DialogHeader className="px-2 sm:px-0">
+            <DialogTitle className="flex items-center gap-2 text-amber-600 text-lg sm:text-xl">
+              <AlertTriangle className="w-5 h-5 sm:w-6 sm:h-6" />
+              Overwrite Existing Records
+            </DialogTitle>
+            <DialogDescription className="pt-1 text-sm sm:text-base">
+              The following records already exist in the database and will be overwritten.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 px-2 sm:px-0">
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 sm:p-4">
+              <div className="flex items-start gap-2 sm:gap-3">
+                <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
+                <div className="text-sm sm:text-base text-amber-800">
+                  <p className="font-medium">Warning: Overwriting existing data</p>
+                  <p>
+                    {overwriteConfirmData.duplicates.length} record(s) will overwrite existing data.
+                    The new quantities will replace the existing ones.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {overwriteConfirmData.duplicates.length > 0 && (
+              <div className="border rounded-lg overflow-hidden">
+                <div className="overflow-x-auto">
+                  <Table className="min-w-[800px] sm:min-w-full">
+                    <TableHeader>
+                      <TableRow className="bg-gray-50">
+                        <TableHead className="whitespace-nowrap w-32 px-3 py-3">Date</TableHead>
+                        <TableHead className="whitespace-nowrap min-w-40 px-3 py-3">Recipe</TableHead>
+                        <TableHead className="whitespace-nowrap w-40 px-3 py-3 text-right">Existing Quantity</TableHead>
+                        <TableHead className="whitespace-nowrap w-40 px-3 py-3 text-right">New Quantity</TableHead>
+                        <TableHead className="whitespace-nowrap w-40 px-3 py-3 text-right">Change</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {overwriteConfirmData.duplicates.map((dup, index) => {
+                        const change = dup.newQuantity - dup.existingQuantity;
+                        const changePercent = dup.existingQuantity > 0
+                          ? ((change / dup.existingQuantity) * 100).toFixed(1)
+                          : '∞';
+
+                        return (
+                          <TableRow key={index} className="hover:bg-amber-50/50">
+                            <TableCell className="font-medium whitespace-nowrap px-3 py-3">
+                              {format(new Date(dup.date), 'd MMM yyyy')}
+                            </TableCell>
+                            <TableCell className="whitespace-nowrap px-3 py-3 truncate max-w-[200px]" title={dup.dishName}>
+                              {dup.dishName}
+                            </TableCell>
+                            <TableCell className="text-right whitespace-nowrap px-3 py-3">
+                              {dup.existingQuantity} dishes
+                            </TableCell>
+                            <TableCell className="text-right whitespace-nowrap px-3 py-3">
+                              {dup.newQuantity} dishes
+                            </TableCell>
+                            <TableCell className="text-right whitespace-nowrap px-3 py-3">
+                              <span className={`font-medium ${change > 0
+                                ? 'text-green-600'
+                                : change < 0
+                                  ? 'text-red-600'
+                                  : 'text-gray-600'
+                                }`}>
+                                {change > 0 ? '+' : ''}{change} ({changePercent}%)
+                              </span>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-gray-50 rounded-lg p-4">
+                <p className="text-sm font-medium text-gray-700 mb-3">Import Summary</p>
+                <div className="space-y-2 text-sm text-gray-600">
+                  <div className="flex justify-between items-center py-1 border-b border-gray-200">
+                    <span>Total records to import:</span>
+                    <span className="font-medium text-lg">{overwriteConfirmData.importData.length}</span>
+                  </div>
+                  <div className="flex justify-between items-center py-1 border-b border-gray-200">
+                    <span>New records:</span>
+                    <span className="font-medium text-lg">
+                      {overwriteConfirmData.importData.length - overwriteConfirmData.duplicates.length}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center py-1">
+                    <span>Records to overwrite:</span>
+                    <span className="font-medium text-lg text-amber-600">
+                      {overwriteConfirmData.duplicates.length}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-blue-50 rounded-lg p-4">
+                <p className="text-sm font-medium text-blue-700 mb-3">How this works</p>
+                <ul className="text-sm text-blue-600 space-y-2">
+                  <li className="flex items-start gap-2">
+                    <span className="bg-blue-100 rounded-full w-5 h-5 flex items-center justify-center text-xs mt-0.5">1</span>
+                    <span>New records will be added to the database</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="bg-blue-100 rounded-full w-5 h-5 flex items-center justify-center text-xs mt-0.5">2</span>
+                    <span>Existing records with the same date and recipe will be overwritten</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="bg-blue-100 rounded-full w-5 h-5 flex items-center justify-center text-xs mt-0.5">3</span>
+                    <span>Edit history for overwritten records will be preserved</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="pt-6 border-t">
+              <div className="flex flex-col md:flex-row justify-between gap-4">
+                <Button
+                  variant="outline"
+                  onClick={handleCancelOverwrite}
+                  disabled={isOverwriteDialogSubmitting}
+                  className="hover:bg-gray-100 w-full md:w-auto order-2 md:order-1 py-3 text-base"
+                >
+                  Cancel Import
+                </Button>
+                <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto order-1 md:order-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      const newRecords = overwriteConfirmData.importData.filter(item => {
+                        const existing = salesData.find(s =>
+                          s.date === item.date && s.recipeId === item.recipeId
+                        );
+                        return !existing;
+                      });
+
+                      handleImportOnlyNew(newRecords);
+                    }}
+                    disabled={isOverwriteDialogSubmitting}
+                    className="text-blue-600 border-blue-300 hover:bg-blue-50 w-full sm:w-auto py-3 text-base"
+                  >
+                    {isOverwriteDialogSubmitting ? 'Importing...' : 'Import Only New'}
+                  </Button>
+                  <Button
+                    onClick={handleConfirmOverwrite}
+                    disabled={isOverwriteDialogSubmitting}
+                    className="bg-amber-600 hover:bg-amber-700 w-full sm:w-auto py-3 text-base"
+                  >
+                    {isOverwriteDialogSubmitting ? 'Importing...' : 'Overwrite & Import All'}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Preview Table */}
       {showPreview && csvData.length > 0 && errors.length === 0 && (
         <Card className="border-[#4F6F52]/20">
@@ -316,10 +902,10 @@ export function ImportSalesData() {
                 </CardDescription>
               </div>
               <div className="flex gap-2">
-                <Button variant="outline" onClick={handleCancel}>
+                <Button variant="outline" onClick={handleCancel} disabled={isImporting}>
                   Cancel
                 </Button>
-                <Button onClick={handleImport} className="gap-2 bg-[#4F6F52] hover:bg-[#3A4D39]">
+                <Button onClick={handleImport} disabled={isImporting} className="gap-2 bg-[#4F6F52] hover:bg-[#3A4D39]">
                   <ArrowRight className="w-4 h-4" />
                   Import Data
                 </Button>
@@ -334,7 +920,6 @@ export function ImportSalesData() {
                     <TableHead>Date</TableHead>
                     <TableHead>Dish Name</TableHead>
                     <TableHead>Quantity</TableHead>
-                    <TableHead>Revenue (S$)</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -343,7 +928,6 @@ export function ImportSalesData() {
                       <TableCell className="font-mono">{row.Date}</TableCell>
                       <TableCell className="font-medium">{row.Dish_Name}</TableCell>
                       <TableCell>{row.Quantity_Sold}</TableCell>
-                      <TableCell>{row.Total_Revenue_SGD || '-'}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

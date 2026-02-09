@@ -1,20 +1,24 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace SmartSusChef.Api.DTOs;
 
 public record IngredientDto(
     string Id,
     string Name,
     string Unit,
-    decimal CarbonFootprint
+    decimal CarbonFootprint,
+    DateTime CreatedAt,
+    DateTime UpdatedAt
 );
 
 public record CreateIngredientRequest(
-    string Name,
-    string Unit,
-    decimal CarbonFootprint
+    [Required][StringLength(100)] string Name,
+    [Required][StringLength(20)] string Unit,
+    [Range(0, double.MaxValue)] decimal CarbonFootprint
 );
 
 public record UpdateIngredientRequest(
-    string Name,
-    string Unit,
-    decimal CarbonFootprint
+    [Required][StringLength(100)] string Name,
+    [Required][StringLength(20)] string Unit,
+    [Range(0, double.MaxValue)] decimal CarbonFootprint
 );

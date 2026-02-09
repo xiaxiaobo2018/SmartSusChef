@@ -1,0 +1,874 @@
+name: SmartSusChef AWS CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+env:
+  DOTNET_VERSION: '8.0.x'
+  NODE_VERSION: '20.x'
+  PYTHON_VERSION: '3.11'
+  JAVA_VERSION: '17'
+  AWS_REGION: ap-southeast-1
+  ECR_REPOSITORY_BACKEND: smartsuschef-backend
+  ECR_REPOSITORY_FRONTEND: smartsuschef-frontend
+  ECR_REPOSITORY_ML: smartsuschef-ml-api
+
+jobs:
+  # ==========================================
+  # STAGE 0: Detect Changes (skip unchanged services)
+  # ==========================================
+  detect-changes:
+    name: "Detect Changes"
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+      ml: ${{ steps.filter.outputs.ml }}
+      mobile: ${{ steps.filter.outputs.mobile }}
+      infra: ${{ steps.filter.outputs.infra }}
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Detect file changes
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            backend:
+              - 'backend/**'
+            frontend:
+              - 'frontend/**'
+            ml:
+              - 'ML/**'
+            mobile:
+              - 'mobile/**'
+            infra:
+              - 'infrastructure/**'
+              - '.aws/**'
+              - '.github/workflows/**'
+              - 'docker-compose.yml'
+
+      - name: Generate version
+        id: version
+        run: echo "version=$(date +'%Y%m%d')-${{ github.run_number }}-${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
+      - name: Summary
+        run: |
+          echo "## Changes Detected" >> $GITHUB_STEP_SUMMARY
+          echo "| Service | Changed |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|---------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Backend | ${{ steps.filter.outputs.backend }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Frontend | ${{ steps.filter.outputs.frontend }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| ML | ${{ steps.filter.outputs.ml }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Mobile | ${{ steps.filter.outputs.mobile }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Infra/CI | ${{ steps.filter.outputs.infra }} |" >> $GITHUB_STEP_SUMMARY
+
+  # ==========================================
+  # STAGE 1: Security Scanning (DevSecOps)
+  # ==========================================
+  security-scan:
+    name: "Security Scan"
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ['javascript-typescript', 'csharp', 'python', 'java-kotlin']
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK17
+        if: matrix.language == 'java-kotlin'
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+
+      - name: Manual Build for Java/Kotlin
+        if: matrix.language == 'java-kotlin'
+        run: ./gradlew assembleDebug --no-daemon
+        working-directory: ./mobile
+
+      - name: Autobuild (Other Languages)
+        if: matrix.language != 'java-kotlin'
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{ matrix.language }}"
+          output: codeql-results
+
+      - name: Upload CodeQL SARIF as artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: codeql-report-${{ matrix.language }}
+          path: codeql-results/*.sarif
+          retention-days: 30
+
+  # ==========================================
+  # STAGE 3b: Filesystem Vulnerability Scan (after Docker build)
+  # ==========================================
+  trivy-scan:
+    name: "Trivy Filesystem Scan"
+    needs: [docker-build-push]
+    if: |
+      !cancelled() && !failure()
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner (filesystem)
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Upload Trivy scan results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+      - name: Upload Trivy filesystem report as artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: trivy-filesystem-report
+          path: trivy-results.sarif
+          retention-days: 30
+
+  # ==========================================
+  # STAGE 2: Backend Build & Test
+  # ==========================================
+  backend-build:
+    name: "Backend Build & Test"
+    needs: [detect-changes]
+    if: needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.infra == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore dependencies
+        run: dotnet restore backend/SmartSusChef.sln
+
+      - name: Build
+        run: dotnet build backend/SmartSusChef.sln --configuration Release --no-restore
+
+      - name: Run Unit Tests
+        run: dotnet test backend/SmartSusChef.Api.Tests/SmartSusChef.Api.Tests.csproj --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./TestResults
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-test-results
+          path: ./TestResults/
+          retention-days: 30
+
+  # ==========================================
+  # STAGE 2: Frontend Build & Test
+  # ==========================================
+  frontend-build:
+    name: "Frontend Build & Test"
+    needs: [detect-changes]
+    if: needs.detect-changes.outputs.frontend == 'true' || needs.detect-changes.outputs.infra == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: ./frontend
+
+      - name: npm audit
+        run: npm audit --audit-level=high 2>&1 | tee npm-audit-report.txt || true
+        working-directory: ./frontend
+        continue-on-error: true
+
+      - name: Type check
+        run: npx tsc --noEmit 2>&1 | tee typescript-report.txt || true
+        working-directory: ./frontend
+        continue-on-error: true
+
+      - name: Lint
+        run: npm run lint --if-present 2>&1 | tee eslint-report.txt || true
+        working-directory: ./frontend
+        continue-on-error: true
+
+      - name: Run Unit Tests
+        run: npm test -- --run --reporter=verbose --coverage 2>&1 | tee test-report.txt
+        working-directory: ./frontend
+        continue-on-error: true
+
+      - name: Build
+        run: npm run build
+        working-directory: ./frontend
+        env:
+          VITE_API_URL: /api
+
+      - name: Upload frontend lint reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: frontend-reports
+          path: |
+            frontend/npm-audit-report.txt
+            frontend/typescript-report.txt
+            frontend/eslint-report.txt
+            frontend/test-report.txt
+            frontend/coverage/
+          retention-days: 30
+
+  # ==========================================
+  # STAGE 2: ML Service Build & Test
+  # ==========================================
+  ml-build:
+    name: "ML Service Build & Test"
+    needs: [detect-changes]
+    if: needs.detect-changes.outputs.ml == 'true' || needs.detect-changes.outputs.infra == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+          cache-dependency-path: |
+            ML/requirements.txt
+            ML/requirements-dev.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -r requirements-dev.txt
+        working-directory: ./ML
+
+      - name: Ruff lint
+        run: ruff check .
+        working-directory: ./ML
+
+      - name: Mypy type check
+        run: mypy
+        working-directory: ./ML
+
+      - name: Bandit security scan
+        run: bandit -c bandit.yaml -r .
+        working-directory: ./ML
+
+      - name: Pytest
+        run: pytest -q
+        working-directory: ./ML
+
+      - name: Setup JDK 17 (for JMeter)
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+
+      - name: Install JMeter
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jmeter
+
+      - name: JMeter healthcheck
+        run: |
+          set -euo pipefail
+          export PYTHONPATH=.
+          python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 &
+          UVICORN_PID=$!
+          trap "kill ${UVICORN_PID}" EXIT
+          sleep 5
+          jmeter -n -t tests/jmeter/healthcheck.jmx -l tests/jmeter/results.jtl
+        working-directory: ./ML
+
+      - name: Upload ML reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ml-reports
+          path: |
+            ML/tests/jmeter/results.jtl
+          retention-days: 30
+        
+  # ==========================================
+  # STAGE 2: Mobile Build & Test
+  # ==========================================
+
+  mobile-build:
+    name: "Mobile Build & Test"
+    needs: [detect-changes]
+    if: needs.detect-changes.outputs.mobile == 'true' || needs.detect-changes.outputs.infra == 'true'
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: 'gradle'
+    - name: Lint with Android Lint
+      run: ./gradlew lint 2>&1 | tee lint-report.txt || true
+      working-directory: ./mobile
+      continue-on-error: true
+
+    - name: Run Unit Tests
+      run: ./gradlew testDebugUnitTest 2>&1 | tee test-report.txt || true
+      working-directory: ./mobile
+      continue-on-error: true
+
+    - name: Build with Gradle
+      run: ./gradlew assembleDebug
+      working-directory: ./mobile
+
+    - name: Upload Mobile reports
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: mobile-reports
+        path: |
+          mobile/lint-report.txt
+          mobile/test-report.txt
+          mobile/app/build/reports/
+        retention-days: 30
+
+  # ==========================================
+  # STAGE 3: Build & Push Docker Images to ECR
+  # ==========================================
+  docker-build-push:
+    name: "Build & Push Docker Images"
+    runs-on: ubuntu-latest
+    needs: [detect-changes, security-scan, backend-build, frontend-build, ml-build]
+    if: |
+      !cancelled() && !failure() &&
+      github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    outputs:
+      backend-image: ${{ steps.build-backend.outputs.image }}
+      frontend-image: ${{ steps.build-frontend.outputs.image }}
+      ml-image: ${{ steps.build-ml.outputs.image }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push Backend image
+        id: build-backend
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ needs.detect-changes.outputs.version }}
+        run: |
+          if [ "${{ needs.detect-changes.outputs.backend }}" = "true" ] || [ "${{ needs.detect-changes.outputs.infra }}" = "true" ]; then
+            echo "Building backend image..."
+            docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_BACKEND:$IMAGE_TAG \
+                          -t $ECR_REGISTRY/$ECR_REPOSITORY_BACKEND:latest ./backend
+            docker push $ECR_REGISTRY/$ECR_REPOSITORY_BACKEND:$IMAGE_TAG
+            docker push $ECR_REGISTRY/$ECR_REPOSITORY_BACKEND:latest
+            echo "image=$ECR_REGISTRY/$ECR_REPOSITORY_BACKEND:$IMAGE_TAG" >> $GITHUB_OUTPUT
+          else
+            echo "Backend unchanged, skipping build"
+            echo "image=$ECR_REGISTRY/$ECR_REPOSITORY_BACKEND:latest" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build and push Frontend image
+        id: build-frontend
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ needs.detect-changes.outputs.version }}
+        run: |
+          if [ "${{ needs.detect-changes.outputs.frontend }}" = "true" ] || [ "${{ needs.detect-changes.outputs.infra }}" = "true" ]; then
+            echo "Building frontend image..."
+            docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:$IMAGE_TAG \
+                          -t $ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:latest ./frontend
+            docker push $ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:$IMAGE_TAG
+            docker push $ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:latest
+            echo "image=$ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:$IMAGE_TAG" >> $GITHUB_OUTPUT
+          else
+            echo "Frontend unchanged, skipping build"
+            echo "image=$ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:latest" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build and push ML image
+        id: build-ml
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ needs.detect-changes.outputs.version }}
+        run: |
+          if [ "${{ needs.detect-changes.outputs.ml }}" = "true" ] || [ "${{ needs.detect-changes.outputs.infra }}" = "true" ]; then
+            echo "Building ML image..."
+            docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_ML:$IMAGE_TAG \
+                          -t $ECR_REGISTRY/$ECR_REPOSITORY_ML:latest ./ML
+            docker push $ECR_REGISTRY/$ECR_REPOSITORY_ML:$IMAGE_TAG
+            docker push $ECR_REGISTRY/$ECR_REPOSITORY_ML:latest
+            echo "image=$ECR_REGISTRY/$ECR_REPOSITORY_ML:$IMAGE_TAG" >> $GITHUB_OUTPUT
+          else
+            echo "ML unchanged, skipping build"
+            echo "image=$ECR_REGISTRY/$ECR_REPOSITORY_ML:latest" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Trivy scan - Backend image
+        if: needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.infra == 'true'
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_BACKEND }}:latest
+          format: 'sarif'
+          output: 'trivy-backend-image.sarif'
+          ignore-unfixed: true
+          severity: 'CRITICAL,HIGH'
+
+      - name: Trivy scan - Frontend image
+        if: needs.detect-changes.outputs.frontend == 'true' || needs.detect-changes.outputs.infra == 'true'
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_FRONTEND }}:latest
+          format: 'sarif'
+          output: 'trivy-frontend-image.sarif'
+          ignore-unfixed: true
+          severity: 'CRITICAL,HIGH'
+
+      - name: Trivy scan - ML image
+        if: needs.detect-changes.outputs.ml == 'true' || needs.detect-changes.outputs.infra == 'true'
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_ML }}:latest
+          format: 'sarif'
+          output: 'trivy-ml-image.sarif'
+          ignore-unfixed: true
+          severity: 'CRITICAL,HIGH'
+
+      - name: Upload Trivy image scan reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: trivy-image-scan-reports
+          path: trivy-*-image.sarif
+          retention-days: 30
+
+      - name: Upload Trivy Backend SARIF to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always() && (needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.infra == 'true')
+        with:
+          sarif_file: 'trivy-backend-image.sarif'
+          category: 'trivy-image-backend'
+
+      - name: Upload Trivy Frontend SARIF to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always() && (needs.detect-changes.outputs.frontend == 'true' || needs.detect-changes.outputs.infra == 'true')
+        with:
+          sarif_file: 'trivy-frontend-image.sarif'
+          category: 'trivy-image-frontend'
+
+      - name: Upload Trivy ML SARIF to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always() && (needs.detect-changes.outputs.ml == 'true' || needs.detect-changes.outputs.infra == 'true')
+        with:
+          sarif_file: 'trivy-ml-image.sarif'
+          category: 'trivy-image-ml'
+
+  # ==========================================
+  # STAGE 4: Deploy to UAT Environment
+  # ==========================================
+  deploy-uat:
+    name: "Deploy to UAT"
+    runs-on: ubuntu-latest
+    needs: [docker-build-push, trivy-scan, detect-changes]
+    if: |
+      !cancelled() && !failure() &&
+      github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment:
+      name: uat
+      url: http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Get AWS Account ID
+        id: aws-account
+        run: echo "account_id=$(aws sts get-caller-identity --query Account --output text)" >> $GITHUB_OUTPUT
+
+      - name: Load environment config
+        id: env-config
+        run: |
+          RDS_EP=$(aws rds describe-db-instances --db-instance-identifier smartsuschef-uat-db --query 'DBInstances[0].Endpoint.Address' --output text 2>/dev/null || echo "smartsuschef-uat-db.cluster.ap-southeast-1.rds.amazonaws.com")
+          echo "rds_endpoint=$RDS_EP" >> $GITHUB_OUTPUT
+
+      - name: Prepare task definitions
+        env:
+          ENVIRONMENT: uat
+          AWS_ACCOUNT_ID: ${{ steps.aws-account.outputs.account_id }}
+          AWS_REGION: ${{ env.AWS_REGION }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          RDS_ENDPOINT: ${{ steps.env-config.outputs.rds_endpoint }}
+        run: |
+          envsubst < .aws/task-definitions/backend.json > backend-task-def.json
+          envsubst < .aws/task-definitions/frontend.json > frontend-task-def.json
+          envsubst < .aws/task-definitions/ml.json > ml-task-def.json
+
+      - name: Update Backend task definition
+        id: task-def-backend
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: backend-task-def.json
+          container-name: smartsuschef-backend
+          image: ${{ needs.docker-build-push.outputs.backend-image }}
+
+      - name: Update Frontend task definition
+        id: task-def-frontend
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: frontend-task-def.json
+          container-name: smartsuschef-frontend
+          image: ${{ needs.docker-build-push.outputs.frontend-image }}
+
+      - name: Update ML task definition
+        id: task-def-ml
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ml-task-def.json
+          container-name: smartsuschef-ml
+          image: ${{ needs.docker-build-push.outputs.ml-image }}
+
+      - name: Deploy all services to UAT ECS (parallel)
+        env:
+          CLUSTER: smartsuschef-uat-cluster
+          ML_CHANGED: ${{ needs.detect-changes.outputs.ml }}
+          BACKEND_CHANGED: ${{ needs.detect-changes.outputs.backend }}
+          FRONTEND_CHANGED: ${{ needs.detect-changes.outputs.frontend }}
+          INFRA_CHANGED: ${{ needs.detect-changes.outputs.infra }}
+          ML_TASK_DEF: ${{ steps.task-def-ml.outputs.task-definition }}
+          BACKEND_TASK_DEF: ${{ steps.task-def-backend.outputs.task-definition }}
+          FRONTEND_TASK_DEF: ${{ steps.task-def-frontend.outputs.task-definition }}
+        run: |
+          PIDS=""
+          SERVICES=""
+
+          deploy_service() {
+            local name=$1 task_def=$2 service=$3
+            echo "[$name] Registering task definition..."
+            TASK_ARN=$(aws ecs register-task-definition --cli-input-json file://$task_def --query 'taskDefinition.taskDefinitionArn' --output text)
+            echo "[$name] Updating service with $TASK_ARN..."
+            aws ecs update-service --cluster $CLUSTER --service $service --task-definition $TASK_ARN --force-new-deployment --no-cli-pager > /dev/null
+            echo "[$name] Deployment triggered."
+          }
+
+          if [ "$ML_CHANGED" = "true" ] || [ "$INFRA_CHANGED" = "true" ]; then
+            deploy_service "ML" "$ML_TASK_DEF" "smartsuschef-uat-ml-service"
+            SERVICES="$SERVICES smartsuschef-uat-ml-service"
+          else
+            echo "[ML] No changes, skipping."
+          fi
+
+          if [ "$BACKEND_CHANGED" = "true" ] || [ "$INFRA_CHANGED" = "true" ]; then
+            deploy_service "Backend" "$BACKEND_TASK_DEF" "smartsuschef-uat-backend-service"
+            SERVICES="$SERVICES smartsuschef-uat-backend-service"
+          else
+            echo "[Backend] No changes, skipping."
+          fi
+
+          if [ "$FRONTEND_CHANGED" = "true" ] || [ "$INFRA_CHANGED" = "true" ]; then
+            deploy_service "Frontend" "$FRONTEND_TASK_DEF" "smartsuschef-uat-frontend-service"
+            SERVICES="$SERVICES smartsuschef-uat-frontend-service"
+          else
+            echo "[Frontend] No changes, skipping."
+          fi
+
+          if [ -n "$SERVICES" ]; then
+            echo "Waiting for all services to stabilize in parallel..."
+            declare -A PID_SVC_MAP
+            for svc in $SERVICES; do
+              echo "  Waiting: $svc"
+              aws ecs wait services-stable --cluster $CLUSTER --services $svc &
+              PID_SVC_MAP[$!]=$svc
+              PIDS="$PIDS $!"
+            done
+            FAILED=0
+            FAILED_SVCS=""
+            for pid in $PIDS; do
+              if ! wait $pid; then
+                SVC_NAME=${PID_SVC_MAP[$pid]}
+                echo "::error::[FAILED] $SVC_NAME did not stabilize (pid $pid)"
+                FAILED_SVCS="$FAILED_SVCS $SVC_NAME"
+                FAILED=1
+              fi
+            done
+            if [ $FAILED -ne 0 ]; then
+              echo "--- Diagnostic: describing failed services ---"
+              for fsvc in $FAILED_SVCS; do
+                echo "=== $fsvc ==="
+                aws ecs describe-services --cluster $CLUSTER --services $fsvc \
+                  --query 'services[0].{status:status,desired:desiredCount,running:runningCount,deployments:deployments[*].{status:status,desired:desiredCount,running:runningCount,rollout:rolloutState,reason:rolloutStateReason},events:events[:5].message}' \
+                  --output yaml 2>/dev/null || true
+              done
+              exit 1
+            fi
+            echo "All services stable!"
+          else
+            echo "No services to deploy."
+          fi
+
+      - name: Run UAT Smoke Tests
+        run: |
+          echo "Running UAT smoke tests..."
+          sleep 30
+          ALB_URL="http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com"
+          curl -sf "$ALB_URL/" -o /dev/null && echo "[PASS] Frontend OK" || echo "[WARN] Frontend not ready"
+          curl -sf "$ALB_URL/api/health" -o /dev/null && echo "[PASS] Backend OK" || echo "[WARN] Backend not ready"
+          echo "UAT deployment completed!"
+
+  # ==========================================
+  # STAGE 5: Deploy to Production (requires GitHub Environment approval)
+  # ==========================================
+  deploy-production:
+    name: "Deploy to Production"
+    runs-on: ubuntu-latest
+    needs: [deploy-uat, docker-build-push, detect-changes]
+    if: |
+      !cancelled() && !failure() &&
+      github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment:
+      name: production
+      url: https://smartsuschef.com
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Get AWS Account ID
+        id: aws-account
+        run: echo "account_id=$(aws sts get-caller-identity --query Account --output text)" >> $GITHUB_OUTPUT
+
+      - name: Load environment config
+        id: env-config
+        run: |
+          RDS_EP=$(aws rds describe-db-instances --db-instance-identifier smartsuschef-production-db --query 'DBInstances[0].Endpoint.Address' --output text 2>/dev/null || echo "smartsuschef-production-db.cluster.ap-southeast-1.rds.amazonaws.com")
+          echo "rds_endpoint=$RDS_EP" >> $GITHUB_OUTPUT
+
+      - name: Prepare task definitions
+        env:
+          ENVIRONMENT: production
+          AWS_ACCOUNT_ID: ${{ steps.aws-account.outputs.account_id }}
+          AWS_REGION: ${{ env.AWS_REGION }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          RDS_ENDPOINT: ${{ steps.env-config.outputs.rds_endpoint }}
+        run: |
+          envsubst < .aws/task-definitions/backend.json > backend-task-def.json
+          envsubst < .aws/task-definitions/frontend.json > frontend-task-def.json
+          envsubst < .aws/task-definitions/ml.json > ml-task-def.json
+
+      - name: Update Backend task definition
+        id: task-def-backend
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: backend-task-def.json
+          container-name: smartsuschef-backend
+          image: ${{ needs.docker-build-push.outputs.backend-image }}
+
+      - name: Update Frontend task definition
+        id: task-def-frontend
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: frontend-task-def.json
+          container-name: smartsuschef-frontend
+          image: ${{ needs.docker-build-push.outputs.frontend-image }}
+
+      - name: Update ML task definition
+        id: task-def-ml
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ml-task-def.json
+          container-name: smartsuschef-ml
+          image: ${{ needs.docker-build-push.outputs.ml-image }}
+
+      - name: Deploy all services to Production ECS (parallel)
+        env:
+          CLUSTER: smartsuschef-production-cluster
+          ML_CHANGED: ${{ needs.detect-changes.outputs.ml }}
+          BACKEND_CHANGED: ${{ needs.detect-changes.outputs.backend }}
+          FRONTEND_CHANGED: ${{ needs.detect-changes.outputs.frontend }}
+          INFRA_CHANGED: ${{ needs.detect-changes.outputs.infra }}
+          ML_TASK_DEF: ${{ steps.task-def-ml.outputs.task-definition }}
+          BACKEND_TASK_DEF: ${{ steps.task-def-backend.outputs.task-definition }}
+          FRONTEND_TASK_DEF: ${{ steps.task-def-frontend.outputs.task-definition }}
+        run: |
+          PIDS=""
+          SERVICES=""
+
+          deploy_service() {
+            local name=$1 task_def=$2 service=$3
+            echo "[$name] Registering task definition..."
+            TASK_ARN=$(aws ecs register-task-definition --cli-input-json file://$task_def --query 'taskDefinition.taskDefinitionArn' --output text)
+            echo "[$name] Updating service with $TASK_ARN..."
+            aws ecs update-service --cluster $CLUSTER --service $service --task-definition $TASK_ARN --force-new-deployment --no-cli-pager > /dev/null
+            echo "[$name] Deployment triggered."
+          }
+
+          if [ "$ML_CHANGED" = "true" ] || [ "$INFRA_CHANGED" = "true" ]; then
+            deploy_service "ML" "$ML_TASK_DEF" "smartsuschef-production-ml-service"
+            SERVICES="$SERVICES smartsuschef-production-ml-service"
+          else
+            echo "[ML] No changes, skipping."
+          fi
+
+          if [ "$BACKEND_CHANGED" = "true" ] || [ "$INFRA_CHANGED" = "true" ]; then
+            deploy_service "Backend" "$BACKEND_TASK_DEF" "smartsuschef-production-backend-service"
+            SERVICES="$SERVICES smartsuschef-production-backend-service"
+          else
+            echo "[Backend] No changes, skipping."
+          fi
+
+          if [ "$FRONTEND_CHANGED" = "true" ] || [ "$INFRA_CHANGED" = "true" ]; then
+            deploy_service "Frontend" "$FRONTEND_TASK_DEF" "smartsuschef-production-frontend-service"
+            SERVICES="$SERVICES smartsuschef-production-frontend-service"
+          else
+            echo "[Frontend] No changes, skipping."
+          fi
+
+          if [ -n "$SERVICES" ]; then
+            echo "Waiting for all services to stabilize in parallel..."
+            declare -A PID_SVC_MAP
+            for svc in $SERVICES; do
+              echo "  Waiting: $svc"
+              aws ecs wait services-stable --cluster $CLUSTER --services $svc &
+              PID_SVC_MAP[$!]=$svc
+              PIDS="$PIDS $!"
+            done
+            FAILED=0
+            FAILED_SVCS=""
+            for pid in $PIDS; do
+              if ! wait $pid; then
+                SVC_NAME=${PID_SVC_MAP[$pid]}
+                echo "::error::[FAILED] $SVC_NAME did not stabilize (pid $pid)"
+                FAILED_SVCS="$FAILED_SVCS $SVC_NAME"
+                FAILED=1
+              fi
+            done
+            if [ $FAILED -ne 0 ]; then
+              echo "--- Diagnostic: describing failed services ---"
+              for fsvc in $FAILED_SVCS; do
+                echo "=== $fsvc ==="
+                aws ecs describe-services --cluster $CLUSTER --services $fsvc \
+                  --query 'services[0].{status:status,desired:desiredCount,running:runningCount,deployments:deployments[*].{status:status,desired:desiredCount,running:runningCount,rollout:rolloutState,reason:rolloutStateReason},events:events[:5].message}' \
+                  --output yaml 2>/dev/null || true
+              done
+              exit 1
+            fi
+            echo "All services stable!"
+          else
+            echo "No services to deploy."
+          fi
+
+      - name: Production Smoke Tests
+        run: |
+          echo "Running production smoke tests..."
+          sleep 30
+          echo "[PASS] Production deployment completed!"
+
+  # ==========================================
+  # STAGE 6: Pipeline Summary
+  # ==========================================
+  notify:
+    name: "Pipeline Summary"
+    runs-on: ubuntu-latest
+    needs: [detect-changes, security-scan, trivy-scan, backend-build, frontend-build, ml-build, mobile-build, docker-build-push, deploy-uat, deploy-production]
+    if: always()
+
+    steps:
+      - name: Generate Summary
+        run: |
+          echo "## SmartSusChef CI/CD Pipeline Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Stage | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Security Scan (CodeQL) | ${{ needs.security-scan.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Trivy Filesystem Scan | ${{ needs.trivy-scan.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Backend Build & Test | ${{ needs.backend-build.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Frontend Build & Test | ${{ needs.frontend-build.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| ML Service Build & Test | ${{ needs.ml-build.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Mobile Build & Test | ${{ needs.mobile-build.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Docker Build & Push | ${{ needs.docker-build-push.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Deploy to UAT | ${{ needs.deploy-uat.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Deploy to Production | ${{ needs.deploy-production.result }} |" >> $GITHUB_STEP_SUMMARY

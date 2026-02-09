@@ -22,15 +22,77 @@ export const getAuthToken = (): string | null => {
   return authToken;
 };
 
+// Apdex metric logging
+const logApdexMetric = (endpoint: string, durationMs: number, options: RequestInit, statusCode?: number) => {
+  console.log(
+    `ApdexMetrics: Endpoint=${endpoint}, Method=${options.method || 'GET'}, StatusCode=${statusCode || 'N/A'}, DurationMs=${durationMs.toFixed(2)}`
+  );
+};
+
 // Generic fetch wrapper with auth
 async function fetchWithAuth<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
+  const startTime = performance.now();
+  let response: Response | undefined;
+  try {
+    const token = getAuthToken();
+
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    };
+
+    if (token) {
+      (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
+    }
+
+    response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      ...options,
+      headers,
+    });
+
+    if (response.status === 401) {
+      // Token expired or invalid
+      setAuthToken(null);
+      throw new Error('Unauthorized');
+    }
+
+    if (response.status === 403) {
+      // Insufficient permissions
+      throw new Error('Forbidden: You do not have permission to perform this action');
+    }
+
+    if (response.status === 204) {
+      return {} as T;
+    }
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ message: 'Request failed' }));
+      // Handle ASP.NET model validation errors ({ title, errors: { Field: ["msg"] } })
+      if (error.errors && typeof error.errors === 'object') {
+        const messages = Object.values(error.errors).flat().join(' ');
+        throw new Error(messages || error.title || `HTTP error ${response.status}`);
+      }
+      throw new Error(error.message || error.title || `HTTP error ${response.status}`);
+    }
+
+    return response.json();
+  } finally {
+    const durationMs = performance.now() - startTime;
+    logApdexMetric(endpoint, durationMs, options, response?.status);
+  }
+}
+
+// Generic fetch wrapper for blob responses
+async function fetchBlobWithAuth(
+  endpoint: string,
+  options: RequestInit = {}
+): Promise<Blob> {
   const token = getAuthToken();
-  
+
   const headers: HeadersInit = {
-    'Content-Type': 'application/json',
     ...options.headers,
   };
 
@@ -49,16 +111,21 @@ async function fetchWithAuth<T>(
     throw new Error('Unauthorized');
   }
 
-  if (response.status === 204) {
-    return {} as T;
+  if (response.status === 403) {
+    // Insufficient permissions
+    throw new Error('Forbidden: You do not have permission to perform this action');
   }
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({ message: 'Request failed' }));
-    throw new Error(error.message || `HTTP error ${response.status}`);
+    if (error.errors && typeof error.errors === 'object') {
+      const messages = Object.values(error.errors).flat().join(' ');
+      throw new Error(messages || error.title || `HTTP error ${response.status}`);
+    }
+    throw new Error(error.message || error.title || `HTTP error ${response.status}`);
   }
 
-  return response.json();
+  return response.blob();
 }
 
 // ==========================================
@@ -118,18 +185,45 @@ export interface UpdateUserRequest {
   status?: string;
 }
 
+export interface UpdateProfileRequest {
+  name?: string;
+  email?: string;
+}
+
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+}
+
+export interface ForgotPasswordRequest {
+  emailOrUsername: string;
+}
+
+export interface ForgotPasswordResponse {
+  message: string;
+}
+
 export const authApi = {
   login: (data: LoginRequest): Promise<LoginResponse> =>
     fetchWithAuth('/auth/login', { method: 'POST', body: JSON.stringify(data) }),
-  
+
   register: (data: RegisterRequest): Promise<RegisterResponse> =>
     fetchWithAuth('/auth/register', { method: 'POST', body: JSON.stringify(data) }),
-  
+
   getCurrentUser: (): Promise<UserDto> =>
     fetchWithAuth('/auth/me'),
-  
+
   checkStoreSetupRequired: (): Promise<{ storeSetupRequired: boolean }> =>
     fetchWithAuth('/auth/store-setup-required'),
+
+  updateProfile: (data: UpdateProfileRequest): Promise<UserDto> =>
+    fetchWithAuth('/auth/profile', { method: 'PUT', body: JSON.stringify(data) }),
+
+  changePassword: (data: ChangePasswordRequest): Promise<void> =>
+    fetchWithAuth('/auth/password', { method: 'PUT', body: JSON.stringify(data) }),
+
+  forgotPassword: (data: ForgotPasswordRequest): Promise<ForgotPasswordResponse> =>
+    fetchWithAuth('/auth/forgot-password', { method: 'POST', body: JSON.stringify(data) }),
 };
 
 // ==========================================
@@ -138,13 +232,13 @@ export const authApi = {
 export const usersApi = {
   getAll: (): Promise<UserListDto[]> =>
     fetchWithAuth('/users'),
-  
+
   create: (data: CreateUserRequest): Promise<UserListDto> =>
     fetchWithAuth('/users', { method: 'POST', body: JSON.stringify(data) }),
-  
+
   update: (id: string, data: UpdateUserRequest): Promise<UserListDto> =>
     fetchWithAuth(`/users/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
-  
+
   delete: (id: string): Promise<void> =>
     fetchWithAuth(`/users/${id}`, { method: 'DELETE' }),
 };
@@ -184,15 +278,15 @@ export interface UpdateStoreRequest {
 }
 
 export const storeApi = {
-  get: (): Promise<StoreDto> =>
+  get: (): Promise<StoreDto | null> =>
     fetchWithAuth('/store'),
-  
+
   getStatus: (): Promise<{ isSetupComplete: boolean; storeSetupRequired: boolean }> =>
     fetchWithAuth('/store/status'),
-  
+
   setup: (data: UpdateStoreRequest): Promise<StoreDto> =>
     fetchWithAuth('/store/setup', { method: 'POST', body: JSON.stringify(data) }),
-  
+
   update: (data: UpdateStoreRequest): Promise<StoreDto> =>
     fetchWithAuth('/store', { method: 'PUT', body: JSON.stringify(data) }),
 };
@@ -200,6 +294,9 @@ export const storeApi = {
 // ==========================================
 // INGREDIENTS API
 // ==========================================
+// --- API Types and DTOs for Ingredients Management ---
+// IngredientDto: simple ingredient model for direct user input
+// CreateIngredientRequest/UpdateIngredientRequest: name, unit, and carbonFootprint
 export interface IngredientDto {
   id: string;
   name: string;
@@ -222,16 +319,16 @@ export interface UpdateIngredientRequest {
 export const ingredientsApi = {
   getAll: (): Promise<IngredientDto[]> =>
     fetchWithAuth('/ingredients'),
-  
+
   getById: (id: string): Promise<IngredientDto> =>
     fetchWithAuth(`/ingredients/${id}`),
-  
+
   create: (data: CreateIngredientRequest): Promise<IngredientDto> =>
     fetchWithAuth('/ingredients', { method: 'POST', body: JSON.stringify(data) }),
-  
+
   update: (id: string, data: UpdateIngredientRequest): Promise<IngredientDto> =>
     fetchWithAuth(`/ingredients/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
-  
+
   delete: (id: string): Promise<void> =>
     fetchWithAuth(`/ingredients/${id}`, { method: 'DELETE' }),
 };
@@ -278,16 +375,16 @@ export interface UpdateRecipeRequest {
 export const recipesApi = {
   getAll: (): Promise<RecipeDto[]> =>
     fetchWithAuth('/recipes'),
-  
+
   getById: (id: string): Promise<RecipeDto> =>
     fetchWithAuth(`/recipes/${id}`),
-  
+
   create: (data: CreateRecipeRequest): Promise<RecipeDto> =>
     fetchWithAuth('/recipes', { method: 'POST', body: JSON.stringify(data) }),
-  
+
   update: (id: string, data: UpdateRecipeRequest): Promise<RecipeDto> =>
     fetchWithAuth(`/recipes/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
-  
+
   delete: (id: string): Promise<void> =>
     fetchWithAuth(`/recipes/${id}`, { method: 'DELETE' }),
 };
@@ -301,6 +398,8 @@ export interface SalesDataDto {
   recipeId: string;
   recipeName: string;
   quantity: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface CreateSalesDataRequest {
@@ -310,8 +409,6 @@ export interface CreateSalesDataRequest {
 }
 
 export interface UpdateSalesDataRequest {
-  date: string;
-  recipeId: string;
   quantity: number;
 }
 
@@ -338,6 +435,25 @@ export interface ImportSalesDataRequest {
   salesData: CreateSalesDataRequest[];
 }
 
+// Import by dish name (auto-creates recipes)
+export interface ImportSalesByNameItem {
+  date: string;
+  dishName: string;
+  quantity: number;
+}
+
+export interface ImportSalesByNameRequest {
+  salesData: ImportSalesByNameItem[];
+  dateFormat?: string;  // .NET date format string (e.g. "M/d/yy", "yyyy-MM-dd")
+}
+
+export interface ImportSalesByNameResponse {
+  message: string;
+  imported: number;
+  newDishesCreated: number;
+  newDishes: string[];
+}
+
 export const salesApi = {
   getAll: (startDate?: string, endDate?: string): Promise<SalesDataDto[]> => {
     const params = new URLSearchParams();
@@ -346,28 +462,31 @@ export const salesApi = {
     const query = params.toString() ? `?${params.toString()}` : '';
     return fetchWithAuth(`/sales${query}`);
   },
-  
+
   getById: (id: string): Promise<SalesDataDto> =>
     fetchWithAuth(`/sales/${id}`),
-  
+
   getTrend: (startDate: string, endDate: string): Promise<SalesTrendDto[]> =>
     fetchWithAuth(`/sales/trend?startDate=${startDate}&endDate=${endDate}`),
-  
+
   getIngredientUsageByDate: (date: string): Promise<IngredientUsageDto[]> =>
     fetchWithAuth(`/sales/ingredients/${date}`),
-  
+
   getRecipeSalesByDate: (date: string): Promise<RecipeSalesDto[]> =>
     fetchWithAuth(`/sales/recipes/${date}`),
-  
+
   create: (data: CreateSalesDataRequest): Promise<SalesDataDto> =>
     fetchWithAuth('/sales', { method: 'POST', body: JSON.stringify(data) }),
-  
+
   import: (data: ImportSalesDataRequest): Promise<{ message: string; count: number }> =>
     fetchWithAuth('/sales/import', { method: 'POST', body: JSON.stringify(data) }),
-  
+
+  importByName: (data: ImportSalesByNameRequest): Promise<ImportSalesByNameResponse> =>
+    fetchWithAuth('/sales/import-by-name', { method: 'POST', body: JSON.stringify(data) }),
+
   update: (id: string, data: UpdateSalesDataRequest): Promise<SalesDataDto> =>
     fetchWithAuth(`/sales/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
-  
+
   delete: (id: string): Promise<void> =>
     fetchWithAuth(`/sales/${id}`, { method: 'DELETE' }),
 };
@@ -384,6 +503,8 @@ export interface WastageDataDto {
   unit: string;
   quantity: number;
   carbonFootprint: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface CreateWastageDataRequest {
@@ -424,19 +545,19 @@ export const wastageApi = {
     const query = params.toString() ? `?${params.toString()}` : '';
     return fetchWithAuth(`/wastage${query}`);
   },
-  
+
   getById: (id: string): Promise<WastageDataDto> =>
     fetchWithAuth(`/wastage/${id}`),
-  
+
   getTrend: (startDate: string, endDate: string): Promise<WastageTrendDto[]> =>
     fetchWithAuth(`/wastage/trend?startDate=${startDate}&endDate=${endDate}`),
-  
+
   create: (data: CreateWastageDataRequest): Promise<WastageDataDto> =>
     fetchWithAuth('/wastage', { method: 'POST', body: JSON.stringify(data) }),
-  
+
   update: (id: string, data: UpdateWastageDataRequest): Promise<WastageDataDto> =>
     fetchWithAuth(`/wastage/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
-  
+
   delete: (id: string): Promise<void> =>
     fetchWithAuth(`/wastage/${id}`, { method: 'DELETE' }),
 };
@@ -457,6 +578,7 @@ export interface ForecastDto {
   recipeName: string;
   quantity: number;
   ingredients: ForecastIngredientDto[];
+  confidence?: string; // "High" | "Medium" | "Low" — from ML backend
 }
 
 export interface ForecastSummaryDto {
@@ -478,15 +600,90 @@ export interface HolidayDto {
 }
 
 export const forecastApi = {
-  get: (days: number = 7): Promise<ForecastDto[]> =>
-    fetchWithAuth(`/forecast?days=${days}`),
-  
-  getSummary: (days: number = 7): Promise<ForecastSummaryDto[]> =>
-    fetchWithAuth(`/forecast/summary?days=${days}`),
-  
+  get: (days: number = 7, includePastDays: number = 0): Promise<ForecastDto[]> =>
+    fetchWithAuth(`/forecast?days=${days}&includePastDays=${includePastDays}`),
+
+  getSummary: (days: number = 7, includePastDays: number = 0): Promise<ForecastSummaryDto[]> =>
+    fetchWithAuth(`/forecast/summary?days=${days}&includePastDays=${includePastDays}`),
+
   getWeather: (): Promise<WeatherDto | null> =>
-    fetchWithAuth('/forecast/weather').catch(() => null),
-  
+    (fetchWithAuth<WeatherDto>('/forecast/weather').catch(() => null)),
+
   getHolidays: (year: number): Promise<HolidayDto[]> =>
-    fetchWithAuth(`/forecast/holidays/${year}`).catch(() => []),
+    (fetchWithAuth<HolidayDto[]>(`/forecast/holidays/${year}`).catch(() => [])),
+};
+
+// ==========================================
+// ML MODEL API
+// ==========================================
+export type MlModelStatus = 'ready' | 'training' | 'can_train' | 'insufficient_data' | 'unavailable';
+
+export interface MlTrainingProgressDto {
+  trained: number;
+  failed: number;
+  total: number;
+  currentDish: string | null;
+}
+
+export interface MlStatusDto {
+  storeId: number;
+  hasModels: boolean;
+  isTraining: boolean;
+  dishes: string[] | null;
+  daysAvailable: number | null;
+  status: MlModelStatus;
+  message: string;
+  trainingProgress: MlTrainingProgressDto | null;
+}
+
+export interface MlTrainResponseDto {
+  status: string;
+  storeId: number;
+  message: string | null;
+}
+
+export interface MlPredictResponseDto {
+  storeId: number;
+  status: string;
+  message: string | null;
+  daysAvailable: number | null;
+  predictions: Record<string, unknown> | null;
+}
+
+export const mlApi = {
+  /** Get ML model status for the current store */
+  getStatus: (): Promise<MlStatusDto> =>
+    fetchWithAuth('/ml/status'),
+
+  /** Trigger model training for the current store */
+  train: (): Promise<MlTrainResponseDto> =>
+    fetchWithAuth('/ml/train', { method: 'POST' }),
+
+  /** Trigger ML prediction for the current store */
+  predict: (days: number = 7): Promise<MlPredictResponseDto> =>
+    fetchWithAuth(`/ml/predict?days=${days}`, { method: 'POST' }),
+};
+
+// ==========================================
+// EXPORT API
+// ==========================================
+export const exportApi = {
+  getSalesCsv: (startDate?: string, endDate?: string): Promise<Blob> => {
+    const params = new URLSearchParams();
+    if (startDate) params.append('startDate', startDate);
+    if (endDate) params.append('endDate', endDate);
+    const query = params.toString() ? `?${params.toString()}` : '';
+    return fetchBlobWithAuth(`/export/sales/csv${query}`);
+  },
+
+  getWastageCsv: (startDate?: string, endDate?: string): Promise<Blob> => {
+    const params = new URLSearchParams();
+    if (startDate) params.append('startDate', startDate);
+    if (endDate) params.append('endDate', endDate);
+    const query = params.toString() ? `?${params.toString()}` : '';
+    return fetchBlobWithAuth(`/export/wastage/csv${query}`);
+  },
+
+  getForecastCsv: (days: number = 7): Promise<Blob> =>
+    fetchBlobWithAuth(`/export/forecast/csv?days=${days}`),
 };

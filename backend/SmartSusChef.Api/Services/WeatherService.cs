@@ -88,10 +88,12 @@ public class WeatherService : IWeatherService
         }
     }
 
-    private async Task<WeatherDto?> GetWeatherForCoordinates(double latitude, double longitude)
+    // Changed from private to internal to allow testing via InternalsVisibleTo
+    internal async Task<WeatherDto?> GetWeatherForCoordinates(double latitude, double longitude)
     {
         var baseUrl = _configuration["ExternalApis:WeatherApiUrl"];
-        var url = $"{baseUrl}?latitude={latitude}&longitude={longitude}&current_weather=true&hourly=relativehumidity_2m&timezone=auto";
+        // Use 'current' parameter to get current humidity directly (more reliable than matching hourly times)
+        var url = $"{baseUrl}?latitude={latitude}&longitude={longitude}&current=temperature_2m,relative_humidity_2m,weather_code&timezone=auto";
 
         var response = await _httpClient.GetAsync(url);
         response.EnsureSuccessStatusCode();
@@ -99,49 +101,56 @@ public class WeatherService : IWeatherService
         var content = await response.Content.ReadAsStringAsync();
         using var doc = JsonDocument.Parse(content);
 
-        if (!doc.RootElement.TryGetProperty("current_weather", out var currentWeather))
+        // Try new API format first (using 'current' object)
+        if (doc.RootElement.TryGetProperty("current", out var current))
         {
-            return null;
-        }
+            var temperature = current.GetProperty("temperature_2m").GetDouble();
+            var weatherCode = current.GetProperty("weather_code").GetInt32();
 
-        var temperature = currentWeather.GetProperty("temperature").GetDouble();
-        var weatherCode = currentWeather.GetProperty("weathercode").GetInt32();
-        var currentTime = currentWeather.TryGetProperty("time", out var timeEl) ? timeEl.GetString() : null;
-
-        var (condition, description) = MapWeatherCode(weatherCode);
-
-        if (!doc.RootElement.TryGetProperty("hourly", out var hourly) ||
-            !hourly.TryGetProperty("time", out var times) ||
-            !hourly.TryGetProperty("relativehumidity_2m", out var humidities))
-        {
-            return null;
-        }
-
-        int? humidityValue = null;
-        if (!string.IsNullOrWhiteSpace(currentTime))
-        {
-            for (var i = 0; i < times.GetArrayLength(); i++)
+            int? humidityValue = null;
+            if (current.TryGetProperty("relative_humidity_2m", out var humidityEl) &&
+                humidityEl.ValueKind != JsonValueKind.Null)
             {
-                if (times[i].GetString() == currentTime &&
-                    humidities[i].ValueKind != JsonValueKind.Null)
-                {
-                    humidityValue = humidities[i].GetInt32();
-                    break;
-                }
+                humidityValue = humidityEl.GetInt32();
             }
+
+            var (condition, description) = MapWeatherCode(weatherCode);
+
+            if (humidityValue == null)
+            {
+                return new WeatherDto(
+                    (decimal)temperature,
+                    condition,
+                    0,
+                    $"{description} (Humidity data unavailable)"
+                );
+            }
+
+            return new WeatherDto(
+                (decimal)temperature,
+                condition,
+                humidityValue.Value,
+                description
+            );
         }
 
-        if (humidityValue == null)
+        // Fall back to old API format (using 'current_weather' object)
+        if (doc.RootElement.TryGetProperty("current_weather", out var currentWeather))
         {
-            return null;
+            var temperature = currentWeather.GetProperty("temperature").GetDouble();
+            var weatherCode = currentWeather.GetProperty("weathercode").GetInt32();
+
+            var (condition, description) = MapWeatherCode(weatherCode);
+
+            return new WeatherDto(
+                (decimal)temperature,
+                condition,
+                0,
+                $"{description} (Humidity data unavailable - legacy API)"
+            );
         }
 
-        return new WeatherDto(
-            (decimal)temperature,
-            condition,
-            humidityValue.Value,
-            description
-        );
+        return null;
     }
 
     public async Task<WeatherForecastDto?> GetWeatherForecastAsync(DateTime date, decimal latitude, decimal longitude)
@@ -268,7 +277,8 @@ public class WeatherService : IWeatherService
         await _context.SaveChangesAsync();
     }
 
-    private static (string Condition, string Description) MapWeatherCode(int code)
+    // Changed from private to internal to allow testing via InternalsVisibleTo
+    internal static (string Condition, string Description) MapWeatherCode(int code)
     {
         return code switch
         {
@@ -287,7 +297,8 @@ public class WeatherService : IWeatherService
     /// <summary>
     /// Convert WMO weather code to description (matching Python script logic)
     /// </summary>
-    private static string GetWeatherDescription(int code)
+    // Changed from private to internal to allow testing via InternalsVisibleTo
+    internal static string GetWeatherDescription(int code)
     {
         return code switch
         {

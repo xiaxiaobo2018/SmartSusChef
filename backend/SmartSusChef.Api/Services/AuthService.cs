@@ -38,7 +38,9 @@ public class AuthService : IAuthService
             user.Name,
             user.Email,
             user.Role.ToString().ToLower(),
-            user.UserStatus
+            user.UserStatus,
+            user.CreatedAt,
+            user.UpdatedAt
         );
 
         // Check if store setup is required (empty store name means not set up)
@@ -58,7 +60,9 @@ public class AuthService : IAuthService
             user.Name,
             user.Email,
             user.Role.ToString().ToLower(),
-            user.UserStatus
+            user.UserStatus,
+            user.CreatedAt,
+            user.UpdatedAt
         );
     }
 
@@ -125,7 +129,9 @@ public class AuthService : IAuthService
             newUser.Name,
             newUser.Email,
             newUser.Role.ToString().ToLower(),
-            newUser.UserStatus
+            newUser.UserStatus,
+            newUser.CreatedAt,
+            newUser.UpdatedAt
         );
 
         // storeSetupRequired is true for new stores (empty StoreName)
@@ -176,7 +182,8 @@ public class AuthService : IAuthService
             user.Email,
             user.Role.ToString().ToLower(),
             user.UserStatus,
-            user.CreatedAt
+            user.CreatedAt,
+            user.UpdatedAt
         );
     }
 
@@ -195,7 +202,8 @@ public class AuthService : IAuthService
             u.Email,
             u.Role.ToString().ToLower(),
             u.UserStatus,
-            u.CreatedAt
+            u.CreatedAt,
+            u.UpdatedAt
         )).ToList();
     }
 
@@ -238,8 +246,63 @@ public class AuthService : IAuthService
             user.Email,
             user.Role.ToString().ToLower(),
             user.UserStatus,
-            user.CreatedAt
+            user.CreatedAt,
+            user.UpdatedAt
         );
+    }
+
+    public async Task<UserDto?> UpdateProfileAsync(Guid userId, UpdateProfileRequest request)
+    {
+        var user = await _context.Users.FindAsync(userId);
+        if (user == null) return null;
+
+        if (!string.IsNullOrWhiteSpace(request.Name))
+            user.Name = request.Name;
+
+        if (!string.IsNullOrWhiteSpace(request.Email))
+            user.Email = request.Email;
+
+        user.UpdatedAt = DateTime.UtcNow;
+        await _context.SaveChangesAsync();
+
+        return new UserDto(
+            user.Id.ToString(),
+            user.Username,
+            user.Name,
+            user.Email,
+            user.Role.ToString().ToLower(),
+            user.UserStatus,
+            user.CreatedAt,
+            user.UpdatedAt
+        );
+    }
+
+    public async Task<bool> ChangePasswordAsync(Guid userId, string currentPassword, string newPassword)
+    {
+        var user = await _context.Users.FindAsync(userId);
+        if (user == null) return false;
+
+        if (!BCrypt.Net.BCrypt.Verify(currentPassword, user.PasswordHash))
+            return false;
+
+        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+        user.UpdatedAt = DateTime.UtcNow;
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<string?> ResetPasswordAsync(string emailOrUsername)
+    {
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u => u.Email == emailOrUsername || u.Username == emailOrUsername);
+
+        if (user == null) return null;
+
+        var tempPassword = Guid.NewGuid().ToString("N")[..8];
+        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(tempPassword);
+        user.UpdatedAt = DateTime.UtcNow;
+        await _context.SaveChangesAsync();
+        return tempPassword;
     }
 
     public async Task<bool> DeleteUserAsync(Guid userId)

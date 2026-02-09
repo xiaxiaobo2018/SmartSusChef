@@ -65,6 +65,9 @@ public class ApplicationDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.CarbonFootprint).HasPrecision(18, 3);
 
+            // Unique index for (StoreId, Name)
+            entity.HasIndex(e => new { e.StoreId, e.Name }).IsUnique();
+
             entity.HasOne(e => e.Store)
                   .WithMany(s => s.Ingredients)
                   .HasForeignKey(e => e.StoreId);
@@ -74,6 +77,10 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<Recipe>(entity =>
         {
             entity.HasKey(e => e.Id);
+
+            // Unique index for (StoreId, Name)
+            entity.HasIndex(e => new { e.StoreId, e.Name }).IsUnique();
+
             entity.HasOne(e => e.Store)
                   .WithMany(s => s.Recipes)
                   .HasForeignKey(e => e.StoreId);
@@ -94,7 +101,7 @@ public class ApplicationDbContext : DbContext
             entity.HasOne(e => e.Ingredient)
                   .WithMany(i => i.RecipeIngredients)
                   .HasForeignKey(e => e.IngredientId)
-                  .OnDelete(DeleteBehavior.SetNull);
+                  .OnDelete(DeleteBehavior.Restrict);
 
             // Optional link to Child Sub-Recipe
             entity.HasOne(e => e.ChildRecipe)
@@ -113,6 +120,9 @@ public class ApplicationDbContext : DbContext
             entity.HasOne(e => e.Recipe)
                   .WithMany(r => r.SalesRecords)
                   .HasForeignKey(e => e.RecipeId);
+            modelBuilder.Entity<SalesData>()
+                        .HasIndex(s => new { s.StoreId, s.Date, s.RecipeId })
+                        .IsUnique();
         });
 
         // WastageData Configuration (Either/Or Logic)
@@ -258,5 +268,6 @@ public class ApplicationDbContext : DbContext
             new RecipeIngredient { Id = Guid.Parse("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee"), RecipeId = burgerId, IngredientId = lettuceId, Quantity = 0.05m },
             new RecipeIngredient { Id = Guid.Parse("ffffffff-ffff-ffff-ffff-ffffffffffff"), RecipeId = burgerId, IngredientId = tomatoId, Quantity = 0.05m }
         );
+
     }
 }

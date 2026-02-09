@@ -6,12 +6,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/app
 import { ChefHat, AlertCircle, ArrowLeft, MailCheck, UserPlus } from 'lucide-react';
 import { useApp } from '@/app/context/AppContext';
 import { toast } from 'sonner';
+import { authApi } from '@/app/services/api';
 
 interface LoginPageProps {
   onNavigateToRegister?: () => void;
+  onLoginSuccess?: () => void;
 }
 
-export function LoginPage({ onNavigateToRegister }: LoginPageProps) {
+export function LoginPage({ onNavigateToRegister, onLoginSuccess }: LoginPageProps) {
   const context = useApp();
   if (!context) return null;
   const { login } = context;
@@ -19,6 +21,7 @@ export function LoginPage({ onNavigateToRegister }: LoginPageProps) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
+  const [resetMessage, setResetMessage] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -30,6 +33,8 @@ export function LoginPage({ onNavigateToRegister }: LoginPageProps) {
       const success = await login(username, password);
       if (!success) {
         setError('Invalid credentials. Please key in the correct username and password.');
+      } else {
+        onLoginSuccess?.();
       }
     } catch (err) {
       setError('Failed to connect to the server. Please try again.');
@@ -38,12 +43,16 @@ export function LoginPage({ onNavigateToRegister }: LoginPageProps) {
     }
   };
 
-  const handleResetRequest = (e: React.FormEvent) => {
+  const handleResetRequest = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Feature 18B logic
-    // Simulate sending email
-    setView('success');
-    toast.success(`Reset link sent to ${email}`);
+    try {
+      const response = await authApi.forgotPassword({ emailOrUsername: email });
+      setResetMessage(response.message);
+      setView('success');
+      toast.success('Password reset request submitted');
+    } catch (err) {
+      toast.error('Failed to reset password. Please try again later.');
+    }
   };
 
   /* --- View 1: Success Message --- */
@@ -58,8 +67,11 @@ export function LoginPage({ onNavigateToRegister }: LoginPageProps) {
               </div>
             </div>
             <div className="space-y-2">
-              <h2 className="text-2xl font-bold text-[#1A1C18]">Check your email</h2>
-              <p className="text-gray-500">We've sent a password reset link to <strong>{email}</strong></p>
+              <h2 className="text-2xl font-bold text-[#1A1C18]">Password Reset</h2>
+              <p className="text-gray-500">{resetMessage || 'If the account exists, the password has been reset.'}</p>
+              <div className="bg-[#F9FBF7] border border-[#E6EFE0] rounded-lg px-3 py-2 text-sm text-[#1A1C18]">
+                Please contact your store manager for the new temporary password.
+              </div>
             </div>
             <Button onClick={() => setView('login')} variant="outline" className="w-full rounded-[32px] border-[#4F6F52] text-[#4F6F52]">
               Return to Login
@@ -104,7 +116,7 @@ export function LoginPage({ onNavigateToRegister }: LoginPageProps) {
                 <div className="flex justify-between items-center">
                   <Label htmlFor="password">Password</Label>
                   {/* Password Reset Trigger */}
-                  <button 
+                  <button
                     type="button"
                     onClick={() => setView('forgot-password')}
                     className="text-xs text-[#4F6F52] hover:underline font-medium"
@@ -137,7 +149,7 @@ export function LoginPage({ onNavigateToRegister }: LoginPageProps) {
               <div className="pt-4 border-t">
                 <p className="text-sm text-gray-600 text-center mb-3">Don't have an account?</p>
                 {onNavigateToRegister && (
-                  <Button 
+                  <Button
                     type="button"
                     variant="outline"
                     onClick={onNavigateToRegister}
@@ -153,11 +165,11 @@ export function LoginPage({ onNavigateToRegister }: LoginPageProps) {
             /* --- View 3: Forgot Password Form --- */
             <form onSubmit={handleResetRequest} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="reset-email">Email Address</Label>
+                <Label htmlFor="reset-email">Email or Username</Label>
                 <Input
                   id="reset-email"
-                  type="email"
-                  placeholder="Enter your registered email"
+                  type="text"
+                  placeholder="Enter your email or username"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -167,8 +179,8 @@ export function LoginPage({ onNavigateToRegister }: LoginPageProps) {
               <Button type="submit" className="bg-[#4F6F52] hover:bg-[#3d563f] text-white w-full rounded-[32px]">
                 Send Reset Link
               </Button>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={() => setView('login')}
                 className="flex items-center justify-center gap-2 w-full text-sm text-gray-500 hover:text-gray-800 transition-colors"
               >

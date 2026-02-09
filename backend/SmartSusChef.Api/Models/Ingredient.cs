@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 namespace SmartSusChef.Api.Models;
 
 public class Ingredient
@@ -5,9 +6,18 @@ public class Ingredient
     public Guid Id { get; set; }
     // Foreign Key for the Store
     public int StoreId { get; set; }
+
+    [Required]
+    [StringLength(100)]
     public string Name { get; set; } = string.Empty;
+
+    [Required]
+    [StringLength(20)]
     public string Unit { get; set; } = string.Empty;
+
+    [Range(0, double.MaxValue)]
     public decimal CarbonFootprint { get; set; } // kg CO2 per unit
+    
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 

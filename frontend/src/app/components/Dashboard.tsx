@@ -14,8 +14,10 @@ import { IngredientTable } from "@/app/components/dashboard/IngredientTable";
 import { CalendarWidget } from "@/app/components/dashboard/CalendarWidget";
 import { WeatherWidget } from "@/app/components/dashboard/WeatherWidget";
 import { PredictionSummary } from "@/app/components/dashboard/PredictionSummary";
+import { PredictionAccuracy } from "@/app/components/dashboard/PredictionAccuracy";
 import { PredictionDetail } from "@/app/components/dashboard/PredictionDetail";
 import { DishesForecast } from "@/app/components/dashboard/DishesForecast";
+import { MlModelStatusCard } from "@/app/components/dashboard/MlModelStatus";
 import { WastageTrendChart } from "@/app/components/dashboard/WastageTrendChart";
 import { WastageDistribution } from "@/app/components/dashboard/WastageDistribution";
 import { Button } from "@/app/components/ui/button";
@@ -39,7 +41,7 @@ export function Dashboard({
   const [selectedWastageDate, setSelectedWastageDate] =
     useState<string | null>(null);
   const [dateRange, setDateRange] = useState<
-    "today" | "7days" | "custom"
+    "today" | "7days" | "30days" | "90days" | "all" | "custom"
   >("7days");
 
   return (
@@ -124,9 +126,11 @@ export function Dashboard({
             value="predictions"
             className="space-y-6"
           >
+            <MlModelStatusCard />
             <PredictionSummary />
             <DishesForecast />
             <PredictionDetail />
+            <PredictionAccuracy />
           </TabsContent>
 
           {/* Wastage Tab */}

@@ -1,5 +1,6 @@
 package com.smartsuschef.mobile.data.models
 
+import com.google.gson.annotations.SerializedName
 import java.util.Date
 
 data class User(
@@ -14,12 +15,12 @@ data class User(
 )
 
 enum class UserRole {
-    Employee,
-    Manager;
+    @SerializedName("employee") Employee, // Explicitly match backend lowercase
+    @SerializedName("manager") Manager;
 
     companion object {
         fun fromString(role: String): UserRole {
-            return when (value.lowercase()) {
+            return when (role.lowercase()) {
                 "employee" -> Employee
                 "manager" -> Manager
                 else -> throw IllegalArgumentException("Invalid user role: $role")
