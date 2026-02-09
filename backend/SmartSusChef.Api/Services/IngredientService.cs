@@ -44,6 +44,16 @@ public partial class IngredientService : IIngredientService
         ValidateUnit(request.Unit);
         await ValidateNameIsUnique(request.Name);
 
+        // If a GlobalIngredientId is provided, validate it exists
+        if (!string.IsNullOrEmpty(request.GlobalIngredientId) && Guid.TryParse(request.GlobalIngredientId, out var globalIngId))
+        {
+            var globalIngExists = await _context.GlobalIngredients.AnyAsync(g => g.Id == globalIngId);
+            if (!globalIngExists)
+            {
+                throw new InvalidOperationException("The specified global ingredient does not exist.");
+            }
+        }
+
         var ingredient = new Ingredient
         {
             Id = Guid.NewGuid(),
@@ -51,6 +61,7 @@ public partial class IngredientService : IIngredientService
             Name = request.Name,
             Unit = request.Unit,
             CarbonFootprint = request.CarbonFootprint,
+            GlobalIngredientId = !string.IsNullOrEmpty(request.GlobalIngredientId) && Guid.TryParse(request.GlobalIngredientId, out var id) ? id : null,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
@@ -75,9 +86,20 @@ public partial class IngredientService : IIngredientService
             await ValidateNameIsUnique(request.Name, ingredient.Id);
         }
 
+        // If a GlobalIngredientId is provided, validate it exists
+        if (!string.IsNullOrEmpty(request.GlobalIngredientId) && Guid.TryParse(request.GlobalIngredientId, out var globalIngId))
+        {
+            var globalIngExists = await _context.GlobalIngredients.AnyAsync(g => g.Id == globalIngId);
+            if (!globalIngExists)
+            {
+                throw new InvalidOperationException("The specified global ingredient does not exist.");
+            }
+        }
+
         ingredient.Name = request.Name;
         ingredient.Unit = request.Unit;
         ingredient.CarbonFootprint = request.CarbonFootprint;
+        ingredient.GlobalIngredientId = !string.IsNullOrEmpty(request.GlobalIngredientId) && Guid.TryParse(request.GlobalIngredientId, out var id2) ? id2 : null;
         ingredient.UpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
@@ -139,6 +161,7 @@ public partial class IngredientService : IIngredientService
             ingredient.Name,
             ingredient.Unit,
             ingredient.CarbonFootprint,
+            ingredient.GlobalIngredientId?.ToString(),
             ingredient.CreatedAt,
             ingredient.UpdatedAt
         );
