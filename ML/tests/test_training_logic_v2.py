@@ -61,11 +61,13 @@ class TrainingLogicV2Tests(unittest.TestCase):
         self.assertAlmostEqual(feats["y_roll_std_4"], 1.414213, places=5)
 
     def test_sanitize_sparse_data_fills_dates(self):
-        df = pd.DataFrame({
-            "date": pd.to_datetime(["2024-01-01", "2024-01-03"]),
-            "sales": [0.0, 2.0],
-            "dish": ["A", "A"],
-        })
+        df = pd.DataFrame(
+            {
+                "date": pd.to_datetime(["2024-01-01", "2024-01-03"]),
+                "sales": [0.0, 2.0],
+                "dish": ["A", "A"],
+            }
+        )
         out = sanitize_sparse_data(df, "US")
 
         self.assertEqual(len(out), 3)
@@ -85,9 +87,11 @@ class TrainingLogicV2Tests(unittest.TestCase):
         df = pd.DataFrame({"date": pd.to_datetime(["2024-01-01", "2024-01-02"]), "sales": [1, 2]})
         config = PipelineConfig()
 
-        with patch("training_logic_v2.get_location_details", return_value=(None, None, None)), \
-             patch("training_logic_v2.fetch_weather_from_db", return_value=None), \
-             patch("training_logic_v2.get_historical_weather", return_value=None):
+        with (
+            patch("training_logic_v2.get_location_details", return_value=(None, None, None)),
+            patch("training_logic_v2.fetch_weather_from_db", return_value=None),
+            patch("training_logic_v2.get_historical_weather", return_value=None),
+        ):
             out, country, lat, lon = add_local_context(df, "BadAddress", config=config)
 
         self.assertEqual(country, config.default_fallback_country)

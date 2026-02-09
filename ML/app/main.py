@@ -24,6 +24,7 @@ async def lifespan(app: FastAPI):
 
     # Store-aware manager
     import os
+
     manager = StoreModelManager(base_model_dir=os.getenv("MODEL_DIR", "models"))
     yield
 
@@ -109,6 +110,7 @@ def predict(req: PredictRequest) -> dict[str, Any]:
 # Store-aware endpoints (called by .NET backend)
 # =====================================================================
 
+
 class StorePredictRequest(BaseModel):
     store_id: int = Field(..., description="Store ID from the .NET database")
     horizon_days: int = Field(14, ge=1, le=30)
@@ -163,6 +165,7 @@ def store_status(store_id: int) -> dict[str, Any]:
         _, days_available = manager.fetch_store_sales(store_id)
     except Exception as e:
         import logging
+
         logging.getLogger(__name__).warning(
             "Could not fetch sales data for store %d: %s", store_id, e
         )
@@ -241,6 +244,7 @@ def store_predict(store_id: int, req: StorePredictRequest) -> dict[str, Any]:
     if lat is not None and lon is not None:
         try:
             from app.inference import _fetch_weather_forecast
+
             weather_df = _fetch_weather_forecast(
                 latitude=float(lat),
                 longitude=float(lon),
@@ -252,15 +256,20 @@ def store_predict(store_id: int, req: StorePredictRequest) -> dict[str, Any]:
                 if hasattr(row.get("date"), "strftime"):
                     row["date"] = row["date"].strftime("%Y-%m-%d")
             import logging
+
             logging.getLogger(__name__).info(
                 "Store %d: Fetched weather once for %d days, sharing across %d dishes",
-                store_id, len(shared_weather_rows), len(dishes),
+                store_id,
+                len(shared_weather_rows),
+                len(dishes),
             )
         except Exception as e:
             import logging
+
             logging.getLogger(__name__).warning(
                 "Store %d: Weather API failed (%s), predictions will use fallback",
-                store_id, e,
+                store_id,
+                e,
             )
 
     all_predictions: dict[str, Any] = {}
@@ -268,9 +277,13 @@ def store_predict(store_id: int, req: StorePredictRequest) -> dict[str, Any]:
     for dish in dishes:
         try:
             # Get recent sales from stored data
-            recent_sales_path = ms.model_dir / f"recent_sales_{dish.replace(' ', '_').replace('-', '_').replace('/', '_')}.pkl"
+            recent_sales_path = (
+                ms.model_dir
+                / f"recent_sales_{dish.replace(' ', '_').replace('-', '_').replace('/', '_')}.pkl"
+            )
             if recent_sales_path.exists():
                 import joblib
+
                 recent_df = joblib.load(str(recent_sales_path))
                 recent_sales = recent_df["sales"].astype(float).tolist()
             else:

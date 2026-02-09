@@ -28,12 +28,14 @@ DISH_MAP = {
     "麻辣味黔鱼": "Mala flavor - Qian fish",
 }
 
+
 def replace_row(row, dish_col_idx):
     if dish_col_idx is not None and 0 <= dish_col_idx < len(row):
         v = row[dish_col_idx]
         if v in DISH_MAP:
             row[dish_col_idx] = DISH_MAP[v]
     return row
+
 
 def main():
     if len(sys.argv) != 3:
@@ -43,8 +45,10 @@ def main():
     in_path, out_path = sys.argv[1], sys.argv[2]
 
     # utf-8-sig: handle BOM in the first header (e.g., "﻿date")
-    with open(in_path, encoding="utf-8-sig", newline="") as f_in, \
-         open(out_path, "w", encoding="utf-8", newline="") as f_out:
+    with (
+        open(in_path, encoding="utf-8-sig", newline="") as f_in,
+        open(out_path, "w", encoding="utf-8", newline="") as f_out,
+    ):
         reader = csv.reader(f_in)
         writer = csv.writer(f_out)
 
@@ -70,6 +74,7 @@ def main():
         print("Unmapped dish values (kept as-is):")
         for v in sorted(missing):
             print(" -", v)
+
 
 if __name__ == "__main__":
     main()

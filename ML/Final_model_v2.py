@@ -33,6 +33,7 @@ os.environ.setdefault("CMDSTANPY_LOG_LEVEL", "WARNING")
 # Load environment variables from .env file
 try:
     from dotenv import load_dotenv
+
     load_dotenv()
 except ImportError:
     pass  # python-dotenv not installed, use system env vars
@@ -52,10 +53,11 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 if not logger.handlers:
     _handler = logging.StreamHandler()
-    _handler.setFormatter(logging.Formatter(
-        "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S"
-    ))
+    _handler.setFormatter(
+        logging.Formatter(
+            "%(asctime)s [%(levelname)s] %(name)s: %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
+        )
+    )
     logger.addHandler(_handler)
 
 try:
@@ -105,7 +107,7 @@ from training_logic_v2 import (
 )
 
 # Silence verbose logging (centralized in training_logic_v2)
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
 _silence_logs()
 
 logger.info("Libraries loaded successfully.")
@@ -157,7 +159,7 @@ def get_weather_forecast(latitude, longitude):
             "longitude": longitude,
             "daily": WEATHER_COLS,
             "forecast_days": 16,
-            "timezone": "auto"
+            "timezone": "auto",
         }
 
         responses = om.weather_api(url, params=params)
@@ -168,17 +170,19 @@ def get_weather_forecast(latitude, longitude):
             start=pd.to_datetime(daily.Time(), unit="s", utc=True),
             end=pd.to_datetime(daily.TimeEnd(), unit="s", utc=True),
             freq=pd.Timedelta(seconds=daily.Interval()),
-            inclusive="left"
+            inclusive="left",
         )
 
-        forecast_df = pd.DataFrame({
-            "date": dates,
-            WEATHER_COLS[0]: daily.Variables(0).ValuesAsNumpy(),
-            WEATHER_COLS[1]: daily.Variables(1).ValuesAsNumpy(),
-            WEATHER_COLS[2]: daily.Variables(2).ValuesAsNumpy(),
-            WEATHER_COLS[3]: daily.Variables(3).ValuesAsNumpy(),
-        })
-        forecast_df['date'] = forecast_df['date'].dt.tz_localize(None).dt.normalize()
+        forecast_df = pd.DataFrame(
+            {
+                "date": dates,
+                WEATHER_COLS[0]: daily.Variables(0).ValuesAsNumpy(),
+                WEATHER_COLS[1]: daily.Variables(1).ValuesAsNumpy(),
+                WEATHER_COLS[2]: daily.Variables(2).ValuesAsNumpy(),
+                WEATHER_COLS[3]: daily.Variables(3).ValuesAsNumpy(),
+            }
+        )
+        forecast_df["date"] = forecast_df["date"].dt.tz_localize(None).dt.normalize()
 
         logger.info("Fetched %d-day weather forecast.", len(forecast_df))
         return forecast_df
@@ -203,7 +207,7 @@ def _predict_hybrid_multiday(
     recent_sales_df: pd.DataFrame,
     config: PipelineConfig,
     country_code: str,
-    dish_mae: float
+    dish_mae: float,
 ) -> list:
     """
     Recursive multi-day forecast using Prophet + Tree hybrid model.
@@ -216,7 +220,7 @@ def _predict_hybrid_multiday(
     Returns list of {date, qty, lower, upper, explanation} dicts.
     """
     results = []
-    sales_history = recent_sales_df['sales'].values.tolist()
+    sales_history = recent_sales_df["sales"].values.tolist()
 
     # Build feature name -> group mapping from config
     feat_to_group = {}
@@ -240,7 +244,7 @@ def _predict_hybrid_multiday(
 
         # Get weather from real forecast data for this date
         weather_row = forecast_weather_df[
-            forecast_weather_df['date'].dt.normalize() == dt.normalize()
+            forecast_weather_df["date"].dt.normalize() == dt.normalize()
         ]
         if len(weather_row) > 0:
             weather_vals = {col: float(weather_row[col].iloc[0]) for col in WEATHER_COLS}
@@ -249,10 +253,7 @@ def _predict_hybrid_multiday(
             weather_vals = {col: float(forecast_weather_df[col].mean()) for col in WEATHER_COLS}
 
         # Get Prophet prediction for this date
-        future_df_prophet = pd.DataFrame([{
-            "date": dt,
-            **weather_vals
-        }])
+        future_df_prophet = pd.DataFrame([{"date": dt, **weather_vals}])
         prophet_yhat = float(_prophet_predict(prophet_model, future_df_prophet)[0])
 
         # Compute lag features from history
@@ -321,13 +322,15 @@ def _predict_hybrid_multiday(
                 "ResidualBase": 0.0,
             }
 
-        results.append({
-            "date": dt.strftime('%Y-%m-%d'),
-            "qty": qty,
-            "lower": pred_lower,
-            "upper": pred_upper,
-            "explanation": expl
-        })
+        results.append(
+            {
+                "date": dt.strftime("%Y-%m-%d"),
+                "qty": qty,
+                "lower": pred_lower,
+                "upper": pred_upper,
+                "explanation": expl,
+            }
+        )
 
         # Append prediction to history for next iteration
         sales_history.append(yhat)
@@ -335,7 +338,9 @@ def _predict_hybrid_multiday(
     return results
 
 
-def get_prediction(dish: str, date_str: str, address: str, model: str = 'auto', config: PipelineConfig = CFG):
+def get_prediction(
+    dish: str, date_str: str, address: str, model: str = "auto", config: PipelineConfig = CFG
+):
     """
     Multi-day prediction API using hybrid Prophet + Tree model.
 
@@ -347,42 +352,51 @@ def get_prediction(dish: str, date_str: str, address: str, model: str = 'auto', 
     # Resolve location from address (cached)
     lat, lon, country = _get_location_cached(address)
     if lat is None:
-        country, lat, lon = 'CN', 31.23, 121.47
+        country, lat, lon = "CN", 31.23, 121.47
     if not country or country not in holidays.list_supported_countries():
-        country = 'CN'
+        country = "CN"
 
     safe_name = safe_filename(dish)
     dish_mae = 0.0
 
     # Registry lookup
     try:
-        registry = _load_cached(f'{config.model_dir}/champion_registry.pkl')
+        registry = _load_cached(f"{config.model_dir}/champion_registry.pkl")
         dish_info = registry[dish]
-        if model == 'auto':
-            model = dish_info['model']
-        dish_mae = dish_info.get('all_mae', {}).get(model, 0.0) if dish_info.get('all_mae') else 0.0
+        if model == "auto":
+            model = dish_info["model"]
+        dish_mae = dish_info.get("all_mae", {}).get(model, 0.0) if dish_info.get("all_mae") else 0.0
     except Exception:
-        if model == 'auto':
-            model = 'lightgbm'
+        if model == "auto":
+            model = "lightgbm"
 
     # Average-only dishes (fallback for very sparse data)
-    if model == 'average':
+    if model == "average":
         try:
-            avg_sales = _load_cached(f'{config.model_dir}/average_{safe_name}.pkl')
+            avg_sales = _load_cached(f"{config.model_dir}/average_{safe_name}.pkl")
         except Exception:
             avg_sales = 0
         results = []
         for day_offset in range(config.forecast_horizon):
             d = dt + pd.Timedelta(days=day_offset)
-            results.append({
-                "Dish": dish, "Date": d.strftime('%Y-%m-%d'),
-                "Model Used": "AVERAGE",
-                "Prediction": avg_sales,
-                "Prediction_Lower": avg_sales,
-                "Prediction_Upper": avg_sales,
-                "Explanation": {"ProphetTrend": float(avg_sales), "Seasonality": 0.0,
-                                "Holiday": 0.0, "Weather": 0.0, "Lags/Trend": 0.0, "ResidualBase": 0.0}
-            })
+            results.append(
+                {
+                    "Dish": dish,
+                    "Date": d.strftime("%Y-%m-%d"),
+                    "Model Used": "AVERAGE",
+                    "Prediction": avg_sales,
+                    "Prediction_Lower": avg_sales,
+                    "Prediction_Upper": avg_sales,
+                    "Explanation": {
+                        "ProphetTrend": float(avg_sales),
+                        "Seasonality": 0.0,
+                        "Holiday": 0.0,
+                        "Weather": 0.0,
+                        "Lags/Trend": 0.0,
+                        "ResidualBase": 0.0,
+                    },
+                }
+            )
         return results
 
     # Get real weather forecast (cached)
@@ -391,10 +405,10 @@ def get_prediction(dish: str, date_str: str, address: str, model: str = 'auto', 
         return [{"Error": "Cannot generate forecast without valid weather forecast data"}]
 
     try:
-        if model in ('catboost', 'xgboost', 'lightgbm'):
+        if model in ("catboost", "xgboost", "lightgbm"):
             # Load both Prophet and tree models
             prophet_model, tree_model = _load_hybrid_models(dish, model, config)
-            recent = _load_cached(f'{config.model_dir}/recent_sales_{safe_name}.pkl')
+            recent = _load_cached(f"{config.model_dir}/recent_sales_{safe_name}.pkl")
 
             multiday = _predict_hybrid_multiday(
                 prophet_model=prophet_model,
@@ -404,21 +418,23 @@ def get_prediction(dish: str, date_str: str, address: str, model: str = 'auto', 
                 recent_sales_df=recent,
                 config=config,
                 country_code=country,
-                dish_mae=dish_mae
+                dish_mae=dish_mae,
             )
 
             results = []
             model_label = f"Prophet+{model.upper()}"
             for entry in multiday:
-                results.append({
-                    "Dish": dish,
-                    "Date": entry['date'],
-                    "Model Used": model_label,
-                    "Prediction": entry['qty'],
-                    "Prediction_Lower": entry['lower'],
-                    "Prediction_Upper": entry['upper'],
-                    "Explanation": entry['explanation']
-                })
+                results.append(
+                    {
+                        "Dish": dish,
+                        "Date": entry["date"],
+                        "Model Used": model_label,
+                        "Prediction": entry["qty"],
+                        "Prediction_Lower": entry["lower"],
+                        "Prediction_Upper": entry["upper"],
+                        "Explanation": entry["explanation"],
+                    }
+                )
             return results
 
     except FileNotFoundError as e:
@@ -430,7 +446,7 @@ def get_prediction(dish: str, date_str: str, address: str, model: str = 'auto', 
 # --- VISUALIZATION FUNCTIONS ---
 def plot_mae_comparison(results_table: pd.DataFrame) -> None:
     """Plot MAE comparison bar chart for all models."""
-    ml_rows = results_table[~results_table['Winner'].str.contains('AVERAGE', na=False)].copy()
+    ml_rows = results_table[~results_table["Winner"].str.contains("AVERAGE", na=False)].copy()
 
     if len(ml_rows) == 0:
         logger.info("No ML-trained dishes to plot.")
@@ -438,36 +454,35 @@ def plot_mae_comparison(results_table: pd.DataFrame) -> None:
 
     fig, ax = plt.subplots(figsize=(16, 6))
 
-    dishes = ml_rows['Dish']
+    dishes = ml_rows["Dish"]
     x = np.arange(len(dishes))
     width = 0.25
 
-    ax.bar(x - width, ml_rows['XGBoost MAE'].astype(float), width,
-           label='XGBoost', color='#55A868')
-    ax.bar(x, ml_rows['CatBoost MAE'].astype(float), width,
-           label='CatBoost', color='#DD8452')
-    ax.bar(x + width, ml_rows['LightGBM MAE'].astype(float), width,
-           label='LightGBM', color='#4C72B0')
+    ax.bar(x - width, ml_rows["XGBoost MAE"].astype(float), width, label="XGBoost", color="#55A868")
+    ax.bar(x, ml_rows["CatBoost MAE"].astype(float), width, label="CatBoost", color="#DD8452")
+    ax.bar(
+        x + width, ml_rows["LightGBM MAE"].astype(float), width, label="LightGBM", color="#4C72B0"
+    )
 
     # Mark winners with stars
     for i, (_, row) in enumerate(ml_rows.iterrows()):
-        x_mae = float(row['XGBoost MAE'])
-        c_mae = float(row['CatBoost MAE'])
-        l_mae = float(row['LightGBM MAE'])
+        x_mae = float(row["XGBoost MAE"])
+        c_mae = float(row["CatBoost MAE"])
+        l_mae = float(row["LightGBM MAE"])
         winner_mae = min(x_mae, c_mae, l_mae)
-        if 'XGBOOST' in row['Winner']:
+        if "XGBOOST" in row["Winner"]:
             offset = -width
-        elif 'CATBOOST' in row['Winner']:
+        elif "CATBOOST" in row["Winner"]:
             offset = 0
         else:
             offset = width
-        ax.plot(x[i] + offset, winner_mae, marker='*', color='gold', markersize=14, zorder=5)
+        ax.plot(x[i] + offset, winner_mae, marker="*", color="gold", markersize=14, zorder=5)
 
-    ax.set_xlabel('Dish')
-    ax.set_ylabel('MAE (plates)')
-    ax.set_title('Prophet + Tree Hybrid Model MAE Comparison by Dish (lower is better)')
+    ax.set_xlabel("Dish")
+    ax.set_ylabel("MAE (plates)")
+    ax.set_title("Prophet + Tree Hybrid Model MAE Comparison by Dish (lower is better)")
     ax.set_xticks(x)
-    ax.set_xticklabels(dishes, rotation=45, ha='right', fontsize=8)
+    ax.set_xticklabels(dishes, rotation=45, ha="right", fontsize=8)
     ax.legend()
     ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
     plt.tight_layout()
@@ -486,35 +501,37 @@ def plot_forecasts(all_forecasts: dict, forecast_horizon: int) -> None:
     fig, axes = plt.subplots(nrows, ncols, figsize=(18, 4 * nrows), squeeze=False)
 
     colors_map = {
-        'Prophet+LIGHTGBM': '#4C72B0',
-        'Prophet+CATBOOST': '#DD8452',
-        'Prophet+XGBOOST': '#55A868',
-        'AVERAGE': '#999999'
+        "Prophet+LIGHTGBM": "#4C72B0",
+        "Prophet+CATBOOST": "#DD8452",
+        "Prophet+XGBOOST": "#55A868",
+        "AVERAGE": "#999999",
     }
 
     for idx, (dish_name, preds) in enumerate(all_forecasts.items()):
         ax = axes[idx // ncols][idx % ncols]
-        dates = [pd.to_datetime(p['Date']) for p in preds]
-        qtys = [p['Prediction'] for p in preds]
-        lowers = [p['Prediction_Lower'] for p in preds]
-        uppers = [p['Prediction_Upper'] for p in preds]
-        model_used = preds[0]['Model Used']
-        color = colors_map.get(model_used, '#333333')
+        dates = [pd.to_datetime(p["Date"]) for p in preds]
+        qtys = [p["Prediction"] for p in preds]
+        lowers = [p["Prediction_Lower"] for p in preds]
+        uppers = [p["Prediction_Upper"] for p in preds]
+        model_used = preds[0]["Model Used"]
+        color = colors_map.get(model_used, "#333333")
 
-        ax.plot(dates, qtys, marker='o', markersize=3, color=color, linewidth=1.5,
-                label=model_used)
+        ax.plot(dates, qtys, marker="o", markersize=3, color=color, linewidth=1.5, label=model_used)
         ax.fill_between(dates, lowers, uppers, alpha=0.2, color=color)
 
-        ax.set_title(f"{dish_name}\n({model_used})", fontsize=8, fontweight='bold')
-        ax.tick_params(axis='x', rotation=30, labelsize=6)
-        ax.tick_params(axis='y', labelsize=7)
+        ax.set_title(f"{dish_name}\n({model_used})", fontsize=8, fontweight="bold")
+        ax.tick_params(axis="x", rotation=30, labelsize=6)
+        ax.tick_params(axis="y", labelsize=7)
         ax.legend(fontsize=7)
 
     for idx in range(n_dishes, nrows * ncols):
         axes[idx // ncols][idx % ncols].set_visible(False)
 
-    fig.suptitle(f'{forecast_horizon}-Day Rolling Forecast per Dish (Prophet + Tree Hybrid)',
-                 fontsize=13, y=1.01)
+    fig.suptitle(
+        f"{forecast_horizon}-Day Rolling Forecast per Dish (Prophet + Tree Hybrid)",
+        fontsize=13,
+        y=1.01,
+    )
     plt.tight_layout()
     plt.show()
 
@@ -528,20 +545,25 @@ def plot_forecasts(all_forecasts: dict, forecast_horizon: int) -> None:
 # --- MAIN EXECUTION ---
 if __name__ == "__main__":
     # Parse command-line arguments
-    parser = argparse.ArgumentParser(description="SmartSus Chef: Hybrid Prophet + Tree Demand Forecasting")
+    parser = argparse.ArgumentParser(
+        description="SmartSus Chef: Hybrid Prophet + Tree Demand Forecasting"
+    )
     parser.add_argument(
-        "--forecast_date", type=str,
+        "--forecast_date",
+        type=str,
         help="Date to start forecasting from (YYYY-MM-DD). Defaults to tomorrow.",
-        default=(pd.Timestamp.today() + pd.Timedelta(days=1)).strftime("%Y-%m-%d")
+        default=(pd.Timestamp.today() + pd.Timedelta(days=1)).strftime("%Y-%m-%d"),
     )
     parser.add_argument(
-        "--address", type=str,
+        "--address",
+        type=str,
         help="Restaurant location address for weather/holiday context.",
-        default="Shanghai, China"
+        default="Shanghai, China",
     )
     parser.add_argument(
-        "--debug", action="store_true",
-        help="Run in sequential debug mode (no parallel processing)."
+        "--debug",
+        action="store_true",
+        help="Run in sequential debug mode (no parallel processing).",
     )
     args = parser.parse_args()
 
@@ -561,13 +583,15 @@ if __name__ == "__main__":
     enriched_df, country, lat, lon = add_local_context(raw_df, address_input)
 
     # 3. Run the full training pipeline in parallel for each dish
-    unique_dishes = enriched_df['dish'].unique()
+    unique_dishes = enriched_df["dish"].unique()
     results = []
 
     logger.info("=" * 95)
     logger.info(
         "STARTING HYBRID PROPHET + TREE TRAINING FOR %d DISHES (%d workers, %d Optuna trials each)",
-        len(unique_dishes), config.max_workers, config.n_optuna_trials
+        len(unique_dishes),
+        config.max_workers,
+        config.n_optuna_trials,
     )
     logger.info("=" * 95)
 
@@ -582,11 +606,13 @@ if __name__ == "__main__":
             try:
                 result = process_dish(dish, enriched_df, country, config)
                 results.append(result)
-                mae = result['mae']
+                mae = result["mae"]
                 logger.info(
                     "  SUCCESS: X=%s C=%s L=%s -> Prophet+%s",
-                    mae['xgboost'], mae['catboost'], mae['lightgbm'],
-                    result['champion'].upper()
+                    mae["xgboost"],
+                    mae["catboost"],
+                    mae["lightgbm"],
+                    result["champion"].upper(),
                 )
             except Exception as e:
                 logger.error("  FAILED: %s", e)
@@ -609,9 +635,11 @@ if __name__ == "__main__":
                 try:
                     result = future.result()
                     results.append(result)
-                    mae = result['mae']
-                    msg = (f"  {dish_name:<35} | X={mae['xgboost']:<7} C={mae['catboost']:<7} "
-                           f"L={mae['lightgbm']:<7} -> Prophet+{result['champion'].upper()}")
+                    mae = result["mae"]
+                    msg = (
+                        f"  {dish_name:<35} | X={mae['xgboost']:<7} C={mae['catboost']:<7} "
+                        f"L={mae['lightgbm']:<7} -> Prophet+{result['champion'].upper()}"
+                    )
                     if tqdm is not None:
                         tqdm.write(msg)
                     else:
@@ -630,25 +658,27 @@ if __name__ == "__main__":
     results_rows = []
 
     for r in results:
-        dish = r['dish']
+        dish = r["dish"]
         champion_map[dish] = {
-            'model': r['champion'],
-            'mae': r.get('champion_mae', 0.0),
-            'all_mae': r['mae'],
-            'best_params': r['best_params'],
-            'model_type': r.get('model_type', 'hybrid'),
+            "model": r["champion"],
+            "mae": r.get("champion_mae", 0.0),
+            "all_mae": r["mae"],
+            "best_params": r["best_params"],
+            "model_type": r.get("model_type", "hybrid"),
         }
 
-        results_rows.append({
-            'Dish': dish,
-            'XGBoost MAE': r['mae']['xgboost'],
-            'CatBoost MAE': r['mae']['catboost'],
-            'LightGBM MAE': r['mae']['lightgbm'],
-            'Winner': f"Prophet+{r['champion'].upper()}"
-        })
+        results_rows.append(
+            {
+                "Dish": dish,
+                "XGBoost MAE": r["mae"]["xgboost"],
+                "CatBoost MAE": r["mae"]["catboost"],
+                "LightGBM MAE": r["mae"]["lightgbm"],
+                "Winner": f"Prophet+{r['champion'].upper()}",
+            }
+        )
 
     # Save champion registry using joblib (safer serialization)
-    joblib.dump(champion_map, f'{config.model_dir}/champion_registry.pkl')
+    joblib.dump(champion_map, f"{config.model_dir}/champion_registry.pkl")
 
     clear_model_cache()
 
@@ -676,42 +706,45 @@ if __name__ == "__main__":
         all_forecasts = {}
         day1_summary = []
 
-        for dish_name in enriched_df['dish'].unique():
+        for dish_name in enriched_df["dish"].unique():
             preds = get_prediction(
-                dish=dish_name, date_str=forecast_date,
-                address=address_input, config=config
+                dish=dish_name, date_str=forecast_date, address=address_input, config=config
             )
-            if preds and 'Error' not in preds[0]:
+            if preds and "Error" not in preds[0]:
                 all_forecasts[dish_name] = preds
                 p0 = preds[0]
-                expl = p0.get('Explanation', {})
-                day1_summary.append({
-                    'Dish': p0['Dish'],
-                    'Day 1 Qty': p0['Prediction'],
-                    'Lower': p0['Prediction_Lower'],
-                    'Upper': p0['Prediction_Upper'],
-                    'Model': p0['Model Used'],
-                    'ProphetTrend': expl.get('ProphetTrend', 0),
-                    'Seasonality': expl.get('Seasonality', 0),
-                    'Holiday': expl.get('Holiday', 0),
-                    'Weather': expl.get('Weather', 0),
-                    'Lags/Trend': expl.get('Lags/Trend', 0),
-                })
+                expl = p0.get("Explanation", {})
+                day1_summary.append(
+                    {
+                        "Dish": p0["Dish"],
+                        "Day 1 Qty": p0["Prediction"],
+                        "Lower": p0["Prediction_Lower"],
+                        "Upper": p0["Prediction_Upper"],
+                        "Model": p0["Model Used"],
+                        "ProphetTrend": expl.get("ProphetTrend", 0),
+                        "Seasonality": expl.get("Seasonality", 0),
+                        "Holiday": expl.get("Holiday", 0),
+                        "Weather": expl.get("Weather", 0),
+                        "Lags/Trend": expl.get("Lags/Trend", 0),
+                    }
+                )
 
         # Build 14-Day Forecast Table (rows=dishes, columns=dates)
         forecast_table_rows = []
         for dish_name, preds in all_forecasts.items():
-            row = {'Dish': dish_name}
+            row = {"Dish": dish_name}
             for pred in preds:
-                date_str = pred['Date']
-                row[date_str] = pred['Prediction']
+                date_str = pred["Date"]
+                row[date_str] = pred["Prediction"]
             forecast_table_rows.append(row)
 
         forecast_14day_df = pd.DataFrame(forecast_table_rows)
 
         logger.info(
             "Forecast starting: %s | Location: %s | Horizon: %d days",
-            forecast_date, address_input, config.forecast_horizon
+            forecast_date,
+            address_input,
+            config.forecast_horizon,
         )
         logger.info("Model: Prophet + Tree Residual Stacking")
         logger.info("=" * 90)
@@ -728,19 +761,21 @@ if __name__ == "__main__":
             fig_height = max(4, n_rows * 0.5 + 1)
 
             fig, ax = plt.subplots(figsize=(fig_width, fig_height))
-            ax.axis('off')
+            ax.axis("off")
 
             table = ax.table(
                 cellText=forecast_14day_df.values,
                 colLabels=forecast_14day_df.columns,
-                loc='center',
-                cellLoc='center'
+                loc="center",
+                cellLoc="center",
             )
             table.auto_set_font_size(False)
             table.set_fontsize(9)
             table.scale(1.2, 1.5)
 
-            fig.suptitle('14-Day Forecast Quantities - Graphical View', fontsize=14, fontweight='bold')
+            fig.suptitle(
+                "14-Day Forecast Quantities - Graphical View", fontsize=14, fontweight="bold"
+            )
             fig.tight_layout()
             plt.show()
 

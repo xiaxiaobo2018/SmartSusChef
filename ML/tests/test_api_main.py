@@ -51,8 +51,10 @@ def _make_client(monkeypatch, store=_SENTINEL, manager=_SENTINEL):
     main.manager = None
     if store is not _SENTINEL:
         if store is None:
+
             def _raise():
                 raise FileNotFoundError("no registry")
+
             monkeypatch.setattr(main, "create_store_from_env", _raise)
         else:
             monkeypatch.setattr(main, "create_store_from_env", lambda: store)
@@ -82,11 +84,15 @@ def test_predict_success(monkeypatch):
         "model_combo": "Prophet+xgboost",
         "horizon_days": 2,
         "start_date": "2024-01-01",
-        "predictions": [{"date": "2024-01-01", "yhat": 1.0, "prophet_yhat": 1.0, "residual_hat": 0.0}],
+        "predictions": [
+            {"date": "2024-01-01", "yhat": 1.0, "prophet_yhat": 1.0, "residual_hat": 0.0}
+        ],
     }
     monkeypatch.setattr(main, "predict_dish", lambda **kwargs: expected)
     with _make_client(monkeypatch, store=store, manager=manager) as client:
-        resp = client.post("/predict", json={"dish": "A", "recent_sales": [1, 2], "horizon_days": 2})
+        resp = client.post(
+            "/predict", json={"dish": "A", "recent_sales": [1, 2], "horizon_days": 2}
+        )
     assert resp.status_code == 200
     assert resp.json() == expected
 
@@ -159,6 +165,7 @@ def test_store_predict_ok(monkeypatch, tmp_path):
     recent_df = pd.DataFrame({"sales": [1.0, 2.0, 3.0]})
     recent_path = store_dir / "recent_sales_DishA.pkl"
     import joblib
+
     joblib.dump(recent_df, recent_path)
 
     def _predict(**kwargs) -> dict[str, Any]:
