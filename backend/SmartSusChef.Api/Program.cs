@@ -171,6 +171,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("AllowFrontend");
 
+app.UseMiddleware<ApdexMiddleware>();
+
 app.UseAuthentication();
 app.UseAuthorization();
 

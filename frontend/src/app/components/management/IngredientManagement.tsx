@@ -70,6 +70,10 @@ export function IngredientManagement({ onNavigateToRecipes }: IngredientManageme
   const [isDeleting, setIsDeleting] = useState(false);
   const [isRecipeUsageDialogOpen, setIsRecipeUsageDialogOpen] = useState(false);
   const [ingredientInUse, setIngredientInUse] = useState<{ id: string; name: string; usedInRecipes: string[] } | null>(null);
+  const [isUnitChangeDialogOpen, setIsUnitChangeDialogOpen] = useState(false);
+  const [unitChangeIngredientUsage, setUnitChangeIngredientUsage] = useState<{ id: string; name: string; usedInRecipes: string[] } | null>(null);
+  const [pendingUnit, setPendingUnit] = useState('');
+  const [baselineUnit, setBaselineUnit] = useState('');
 
   // Load global ingredients from API
   useEffect(() => {
@@ -92,6 +96,7 @@ export function IngredientManagement({ onNavigateToRecipes }: IngredientManageme
   const handleOpenDialog = (ingredient?: Ingredient) => {
     if (ingredient) {
       setEditingIngredient(ingredient);
+      setBaselineUnit(ingredient.unit);
       // Check if ingredient is a global ingredient
       if (ingredient.globalIngredientId) {
         const globalIng = globalIngredients.find(g => g.id === ingredient.globalIngredientId);
@@ -99,6 +104,7 @@ export function IngredientManagement({ onNavigateToRecipes }: IngredientManageme
           setSelectedName(globalIng.id);
           setSelectedGlobalIngredientId(globalIng.id);
           setUnit(globalIng.unit);
+          setBaselineUnit(globalIng.unit);
           setCarbonFootprint(globalIng.carbonFootprint.toString());
           setOtherName('');
         }
@@ -117,7 +123,9 @@ export function IngredientManagement({ onNavigateToRecipes }: IngredientManageme
       setOtherName('');
       setUnit('');
       setCarbonFootprint('');
+      setBaselineUnit('');
     }
+    setPendingUnit('');
     setIsDialogOpen(true);
   };
 
@@ -148,6 +156,43 @@ export function IngredientManagement({ onNavigateToRecipes }: IngredientManageme
     setOtherName('');
     setUnit('');
     setCarbonFootprint('');
+    setBaselineUnit('');
+    setPendingUnit('');
+    setIsUnitChangeDialogOpen(false);
+    setUnitChangeIngredientUsage(null);
+  };
+
+  const handleUnitChange = (nextUnit: string) => {
+    if (selectedGlobalIngredientId !== null || !editingIngredient) {
+      setUnit(nextUnit);
+      if (!editingIngredient) {
+        setBaselineUnit(nextUnit);
+      }
+      return;
+    }
+
+    if (nextUnit === baselineUnit) {
+      setUnit(nextUnit);
+      return;
+    }
+
+    const recipesUsingIngredient = recipes.filter(recipe =>
+      recipe.ingredients.some(ing => ing.ingredientId === editingIngredient.id)
+    );
+
+    if (recipesUsingIngredient.length === 0) {
+      setUnit(nextUnit);
+      setBaselineUnit(nextUnit);
+      return;
+    }
+
+    setPendingUnit(nextUnit);
+    setUnitChangeIngredientUsage({
+      id: editingIngredient.id,
+      name: editingIngredient.name,
+      usedInRecipes: recipesUsingIngredient.map(r => r.name)
+    });
+    setIsUnitChangeDialogOpen(true);
   };
 
   const handleSubmit = async () => {
@@ -332,7 +377,7 @@ export function IngredientManagement({ onNavigateToRecipes }: IngredientManageme
                 <select
                   id="ingredient-unit"
                   value={unit}
-                  onChange={(e) => setUnit(e.target.value)}
+                  onChange={(e) => handleUnitChange(e.target.value)}
                   disabled={selectedGlobalIngredientId !== null}
                   className={`w-full border rounded-md p-2 ${selectedGlobalIngredientId ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                 >
@@ -553,6 +598,70 @@ export function IngredientManagement({ onNavigateToRecipes }: IngredientManageme
                   <ExternalLink className="w-4 h-4" />
                 </Button>
               )}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Unit Change Warning Dialog */}
+      <Dialog open={isUnitChangeDialogOpen} onOpenChange={setIsUnitChangeDialogOpen}>
+        <DialogContent className="max-w-md rounded-[12px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-amber-600">
+              <AlertTriangle className="w-5 h-5" />
+              Unit Change Warning
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {unitChangeIngredientUsage && (
+              <>
+                <p className="text-gray-700">
+                  This ingredient <span className="font-semibold">{unitChangeIngredientUsage.name}</span> is currently used in the following recipe{unitChangeIngredientUsage.usedInRecipes.length > 1 ? 's' : ''}:
+                </p>
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 max-h-60 overflow-y-auto">
+                  <ul className="space-y-2">
+                    {unitChangeIngredientUsage.usedInRecipes.map((recipeName, index) => (
+                      <li key={index} className="flex items-start gap-2">
+                        <span className="text-amber-600 mt-0.5">•</span>
+                        <span className="text-gray-900 font-medium">{recipeName}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                  <p className="text-sm text-blue-900">
+                    <strong>Note:</strong> If you change the unit, please also update the carbon footprint to keep data consistent.
+                  </p>
+                </div>
+              </>
+            )}
+            <div className="flex justify-end gap-2 pt-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setIsUnitChangeDialogOpen(false);
+                  setUnitChangeIngredientUsage(null);
+                  setPendingUnit('');
+                  handleCloseDialog();
+                }}
+                className="rounded-[32px] px-6 hover:bg-gray-100"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  setIsUnitChangeDialogOpen(false);
+                  setUnitChangeIngredientUsage(null);
+                  if (pendingUnit) {
+                    setUnit(pendingUnit);
+                    setBaselineUnit(pendingUnit);
+                  }
+                  setPendingUnit('');
+                }}
+                className="bg-[#4F6F52] hover:bg-[#3D563F] text-white rounded-[32px] px-6"
+              >
+                Confirm
+              </Button>
             </div>
           </div>
         </DialogContent>

@@ -31,6 +31,7 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000
 - `GET /health`
 - `GET /dishes`
 - `POST /predict`
+- `POST /store/{store_id}/predict`（仅推理，不触发训练）
 
 ## 3. /predict 请求示例
 
@@ -87,7 +88,21 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000
 
 如果模型放在其他路径，给容器设置 `MODEL_DIR`。
 
-## 7. 生产建议
+## 7. 离线训练（推荐）
+
+训练与推理已拆分，**训练应通过离线任务执行**，不要在 API 调用时触发。
+
+训练入口：
+
+```bash
+python3 train_offline.py --store-id 123
+python3 train_offline.py --all
+```
+
+建议在 ECS 中创建 **Scheduled Task（每周触发）**，并保留 **手动触发** 的一次性任务。
+训练任务与推理服务应共享同一模型目录（`MODEL_DIR`），推荐挂载 **EFS** 到 `/app/models`。
+
+## 8. 生产建议
 
 1. 把模型文件放在镜像内（简单）或挂载 EFS/S3 拉取（更灵活）。
 2. 为 ECS Service 配置 ALB + 健康检查 `/health`。

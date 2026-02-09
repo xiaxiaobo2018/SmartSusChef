@@ -22,53 +22,66 @@ export const getAuthToken = (): string | null => {
   return authToken;
 };
 
+// Apdex metric logging
+const logApdexMetric = (endpoint: string, durationMs: number, options: RequestInit) => {
+  console.log(
+    `ApdexMetrics: Endpoint=${endpoint}, Method=${options.method || 'GET'}, DurationMs=${durationMs.toFixed(2)}`
+  );
+};
+
 // Generic fetch wrapper with auth
 async function fetchWithAuth<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const token = getAuthToken();
+  const startTime = performance.now();
+  try {
+    const token = getAuthToken();
 
-  const headers: HeadersInit = {
-    'Content-Type': 'application/json',
-    ...options.headers,
-  };
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    };
 
-  if (token) {
-    (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
-  }
-
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    ...options,
-    headers,
-  });
-
-  if (response.status === 401) {
-    // Token expired or invalid
-    setAuthToken(null);
-    throw new Error('Unauthorized');
-  }
-
-  if (response.status === 403) {
-    // Insufficient permissions
-    throw new Error('Forbidden: You do not have permission to perform this action');
-  }
-
-  if (response.status === 204) {
-    return {} as T;
-  }
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Request failed' }));
-    // Handle ASP.NET model validation errors ({ title, errors: { Field: ["msg"] } })
-    if (error.errors && typeof error.errors === 'object') {
-      const messages = Object.values(error.errors).flat().join(' ');
-      throw new Error(messages || error.title || `HTTP error ${response.status}`);
+    if (token) {
+      (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
     }
-    throw new Error(error.message || error.title || `HTTP error ${response.status}`);
-  }
 
-  return response.json();
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      ...options,
+      headers,
+    });
+
+    if (response.status === 401) {
+      // Token expired or invalid
+      setAuthToken(null);
+      throw new Error('Unauthorized');
+    }
+
+    if (response.status === 403) {
+      // Insufficient permissions
+      throw new Error('Forbidden: You do not have permission to perform this action');
+    }
+
+    if (response.status === 204) {
+      return {} as T;
+    }
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ message: 'Request failed' }));
+      // Handle ASP.NET model validation errors ({ title, errors: { Field: ["msg"] } })
+      if (error.errors && typeof error.errors === 'object') {
+        const messages = Object.values(error.errors).flat().join(' ');
+        throw new Error(messages || error.title || `HTTP error ${response.status}`);
+      }
+      throw new Error(error.message || error.title || `HTTP error ${response.status}`);
+    }
+
+    return response.json();
+  } finally {
+    const durationMs = performance.now() - startTime;
+    logApdexMetric(endpoint, durationMs, options);
+  }
 }
 
 // Generic fetch wrapper for blob responses
