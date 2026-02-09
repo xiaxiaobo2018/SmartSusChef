@@ -129,46 +129,6 @@ jobs:
           retention-days: 30
 
   # ==========================================
-  # STAGE 3b: Filesystem Vulnerability Scan (after Docker build)
-  # ==========================================
-  trivy-scan:
-    name: "Trivy Filesystem Scan"
-    needs: [docker-build-push]
-    if: |
-      !cancelled() && !failure()
-    runs-on: ubuntu-latest
-    permissions:
-      security-events: write
-      contents: read
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Run Trivy vulnerability scanner (filesystem)
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: 'fs'
-          scan-ref: '.'
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-          severity: 'CRITICAL,HIGH'
-
-      - name: Upload Trivy scan results to GitHub Security
-        uses: github/codeql-action/upload-sarif@v3
-        if: always()
-        with:
-          sarif_file: 'trivy-results.sarif'
-
-      - name: Upload Trivy filesystem report as artifact
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: trivy-filesystem-report
-          path: trivy-results.sarif
-          retention-days: 30
-
-  # ==========================================
   # STAGE 2: Backend Build & Test
   # ==========================================
   backend-build:
@@ -497,13 +457,37 @@ jobs:
           sarif_file: 'trivy-ml-image.sarif'
           category: 'trivy-image-ml'
 
+      - name: Run Trivy filesystem scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-fs-results.sarif'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Upload Trivy filesystem SARIF to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-fs-results.sarif'
+          category: 'trivy-filesystem'
+
+      - name: Upload Trivy filesystem report as artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: trivy-filesystem-report
+          path: trivy-fs-results.sarif
+          retention-days: 30
+
   # ==========================================
   # STAGE 4: Deploy to UAT Environment
   # ==========================================
   deploy-uat:
     name: "Deploy to UAT"
     runs-on: ubuntu-latest
-    needs: [docker-build-push, trivy-scan, detect-changes]
+    needs: [docker-build-push, detect-changes]
     if: |
       !cancelled() && !failure() &&
       github.ref == 'refs/heads/main' && github.event_name == 'push'
@@ -818,7 +802,7 @@ jobs:
   notify:
     name: "Pipeline Summary"
     runs-on: ubuntu-latest
-    needs: [detect-changes, security-scan, trivy-scan, backend-build, frontend-build, ml-build, docker-build-push, deploy-uat, deploy-production]
+    needs: [detect-changes, security-scan, backend-build, frontend-build, ml-build, docker-build-push, deploy-uat, deploy-production]
     if: always()
 
     steps:
@@ -829,7 +813,6 @@ jobs:
           echo "| Stage | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
           echo "| Security Scan (CodeQL) | ${{ needs.security-scan.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Trivy Filesystem Scan | ${{ needs.trivy-scan.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Backend Build & Test | ${{ needs.backend-build.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Frontend Build & Test | ${{ needs.frontend-build.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| ML Service Build & Test | ${{ needs.ml-build.result }} |" >> $GITHUB_STEP_SUMMARY
