@@ -23,7 +23,7 @@ class WastageRepository @Inject constructor(
                 if (response.isSuccessful) {
                     Resource.Success(response.body() ?: emptyList())
                 } else {
-                    Resource.Error("Failed to fetch wastage trend: ${response.message()}")
+                    Resource.Error("Failed to fetch wastage trend: ${response.errorBody()?.string() ?: response.message()}")
                 }
             } catch (e: HttpException) {
                 Resource.Error("An unexpected error occurred: ${e.message()}")
@@ -40,7 +40,7 @@ class WastageRepository @Inject constructor(
                 if (response.isSuccessful) {
                     Resource.Success(response.body()!!)
                 } else {
-                    Resource.Error("Failed to add wastage: ${response.message()}")
+                    Resource.Error("Failed to add wastage: ${response.errorBody()?.string() ?: response.message()}")
                 }
             } catch (e: HttpException) {
                 Resource.Error("An unexpected error occurred: ${e.message()}")
@@ -57,7 +57,7 @@ class WastageRepository @Inject constructor(
                 if (response.isSuccessful) {
                     Resource.Success(response.body()!!)
                 } else {
-                    Resource.Error("Failed to update wastage: ${response.message()}")
+                    Resource.Error("Failed to update wastage: ${response.errorBody()?.string() ?: response.message()}")
                 }
             } catch (e: HttpException) {
                 Resource.Error("An unexpected error occurred: ${e.message()}")
@@ -74,7 +74,7 @@ class WastageRepository @Inject constructor(
                 if (response.isSuccessful) {
                     Resource.Success(Unit)
                 } else {
-                    Resource.Error("Failed to delete wastage: ${response.message()}")
+                    Resource.Error("Failed to delete wastage: ${response.errorBody()?.string() ?: response.message()}")
                 }
             } catch (e: HttpException) {
                 Resource.Error("An unexpected error occurred: ${e.message()}")

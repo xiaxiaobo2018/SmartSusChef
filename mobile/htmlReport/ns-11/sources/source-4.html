@@ -1,0 +1,323 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ExtensionsKt</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.smartsuschef.mobile.util</a>
+</div>
+
+<h1>Coverage Summary for Class: ExtensionsKt (com.smartsuschef.mobile.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ExtensionsKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/44)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ExtensionsKt$addValidationWatcher$textWatcher$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/50)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.smartsuschef.mobile.util
+&nbsp;
+&nbsp;import android.content.Context
+&nbsp;import android.text.Editable
+&nbsp;import android.text.TextWatcher
+&nbsp;import com.google.android.material.textfield.TextInputLayout
+&nbsp;import android.view.View
+&nbsp;import android.widget.Toast
+&nbsp;import com.google.android.material.snackbar.Snackbar
+&nbsp;
+&nbsp;// Context Extensions
+<b class="nc">&nbsp;fun Context.showToast(message: String, duration: Int = Toast.LENGTH_SHORT) {</b>
+<b class="nc">&nbsp;    Toast.makeText(this, message, duration).show()</b>
+&nbsp;}
+&nbsp;
+&nbsp;// View Extensions
+&nbsp;fun View.visible() {
+<b class="nc">&nbsp;    visibility = View.VISIBLE</b>
+&nbsp;}
+&nbsp;
+&nbsp;fun View.gone() {
+<b class="nc">&nbsp;    visibility = View.GONE</b>
+&nbsp;}
+&nbsp;
+&nbsp;fun View.invisible() {
+<b class="nc">&nbsp;    visibility = View.INVISIBLE</b>
+&nbsp;}
+&nbsp;
+<b class="nc">&nbsp;fun View.showSnackbar(message: String, duration: Int = Snackbar.LENGTH_SHORT) {</b>
+<b class="nc">&nbsp;    Snackbar.make(this, message, duration).show()</b>
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Extension functions for form validation for text input
+&nbsp; */
+&nbsp;
+&nbsp;// Sets error message on TextInputLayout
+&nbsp;fun TextInputLayout.setError(message: String?) {
+<b class="nc">&nbsp;    error = message</b>
+<b class="nc">&nbsp;    isErrorEnabled = message != null</b>
+&nbsp;}
+&nbsp;
+&nbsp;// Clears error from TextInputLayout
+&nbsp;fun TextInputLayout.clearError() {
+<b class="nc">&nbsp;    error = null</b>
+<b class="nc">&nbsp;    isErrorEnabled = false</b>
+&nbsp;}
+&nbsp;
+&nbsp;// Gets the text from the TextInputLayout&#39;s EditText
+&nbsp;fun TextInputLayout.getText(): String {
+<b class="nc">&nbsp;    return editText?.text?.toString() ?: &quot;&quot;</b>
+&nbsp;}
+&nbsp;
+&nbsp;// Adds a text change listener that validates on each change
+&nbsp;// Returns the TextWatcher so it can be removed if needed
+&nbsp;
+&nbsp;fun TextInputLayout.addValidationWatcher(
+&nbsp;    validator: (String) -&gt; String?
+&nbsp;): TextWatcher {
+<b class="nc">&nbsp;    val textWatcher = object : TextWatcher {</b>
+<b class="nc">&nbsp;        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}</b>
+<b class="nc">&nbsp;        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}</b>
+&nbsp;        override fun afterTextChanged(s: Editable?) {
+<b class="nc">&nbsp;            val text = s?.toString() ?: &quot;&quot;</b>
+<b class="nc">&nbsp;            val errorMessage = validator(text)</b>
+<b class="nc">&nbsp;            setError(errorMessage)</b>
+&nbsp;        }
+&nbsp;    }
+<b class="nc">&nbsp;    editText?.addTextChangedListener(textWatcher)</b>
+<b class="nc">&nbsp;    return textWatcher</b>
+&nbsp;}
+&nbsp;
+&nbsp;// Validates password field using PasswordValidator
+&nbsp;// Shows first error encountered
+&nbsp;fun TextInputLayout.validatePassword(): Boolean {
+<b class="nc">&nbsp;    val password = getText()</b>
+<b class="nc">&nbsp;    val result = PasswordValidator.validate(password)</b>
+<b class="nc">&nbsp;    setError(result.errorMessage)</b>
+<b class="nc">&nbsp;    return result.isValid</b>
+&nbsp;}
+&nbsp;
+&nbsp;// Validates that two password fields match
+&nbsp;fun TextInputLayout.validatePasswordMatch(otherField: TextInputLayout): Boolean {
+<b class="nc">&nbsp;    val password1 = getText()</b>
+<b class="nc">&nbsp;    val password2 = otherField.getText()</b>
+&nbsp;
+<b class="nc">&nbsp;    return if (password1 != password2) {</b>
+<b class="nc">&nbsp;        setError(&quot;Passwords do not match&quot;)</b>
+<b class="nc">&nbsp;        false</b>
+&nbsp;    } else {
+<b class="nc">&nbsp;        clearError()</b>
+<b class="nc">&nbsp;        true</b>
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;// Validates that field is not empty
+<b class="nc">&nbsp;fun TextInputLayout.validateNotEmpty(fieldName: String = &quot;This field&quot;): Boolean {</b>
+<b class="nc">&nbsp;    val text = getText()</b>
+<b class="nc">&nbsp;    return if (text.isBlank()) {</b>
+<b class="nc">&nbsp;        setError(&quot;$fieldName is required&quot;)</b>
+<b class="nc">&nbsp;        false</b>
+&nbsp;    } else {
+<b class="nc">&nbsp;        clearError()</b>
+<b class="nc">&nbsp;        true</b>
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;// Validates email format using pure Kotlin regex (no Android framework dependencies)
+&nbsp;// Uses RFC 5322 compliant pattern for email validation
+&nbsp;fun TextInputLayout.validateEmail(): Boolean {
+<b class="nc">&nbsp;    val email = getText()</b>
+&nbsp;
+&nbsp;    // RFC 5322 compliant email regex (simplified version)
+&nbsp;    // Matches: user@domain.com, user.name@domain.co.uk, user+tag@domain.com
+<b class="nc">&nbsp;    val emailRegex = &quot;^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$&quot;.toRegex()</b>
+&nbsp;
+<b class="nc">&nbsp;    return when {</b>
+<b class="nc">&nbsp;        email.isBlank() -&gt; {</b>
+<b class="nc">&nbsp;            setError(&quot;Email is required&quot;)</b>
+<b class="nc">&nbsp;            false</b>
+&nbsp;        }
+<b class="nc">&nbsp;        !email.matches(emailRegex) -&gt; {</b>
+<b class="nc">&nbsp;            setError(&quot;Please enter a valid email address&quot;)</b>
+<b class="nc">&nbsp;            false</b>
+&nbsp;        }
+&nbsp;        else -&gt; {
+<b class="nc">&nbsp;            clearError()</b>
+<b class="nc">&nbsp;            true</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Usage Examples:
+&nbsp; *
+&nbsp; * // In Activity/Fragment:
+&nbsp; * showToast(&quot;Login successful&quot;)
+&nbsp; * binding.root.showSnackbar(&quot;Error occurred&quot;)
+&nbsp; *
+&nbsp; * // View visibility:
+&nbsp; * binding.progressBar.visible()
+&nbsp; * binding.errorText.gone()
+&nbsp; *
+&nbsp; * // TextInputLayout validation in Activity/Fragment:
+&nbsp; * if (!binding.tilPassword.validatePassword()) {
+&nbsp; *     return // Error already shown
+&nbsp; * }
+&nbsp; *
+&nbsp; * if (!binding.tilConfirmPassword.validatePasswordMatch(binding.tilPassword)) {
+&nbsp; *     return // Error already shown
+&nbsp; * }
+&nbsp; *
+&nbsp; * if (!binding.tilEmail.validateEmail()) {
+&nbsp; *     return // Error already shown
+&nbsp; * }
+&nbsp; *
+&nbsp; * // For ViewModel validation, inject validators:
+&nbsp; * class MyViewModel @Inject constructor(
+&nbsp; *     private val emailValidator: EmailValidator
+&nbsp; * ) {
+&nbsp; *     private fun isValidEmail(email: String): Boolean {
+&nbsp; *         return emailValidator.isValid(email)  // Testable without Robolectric
+&nbsp; *     }
+&nbsp; * }
+&nbsp; */
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-02-09 11:59</div>
+</div>
+</body>
+</html>

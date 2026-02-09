@@ -19,7 +19,8 @@ class ForecastRepository @Inject constructor(
                 if (response.isSuccessful) {
                     Resource.Success(response.body() ?: emptyList())
                 } else {
-                    Resource.Error("Failed to fetch forecast: ${response.message()}")
+                    val errorBody = response.errorBody()?.string()
+                    Resource.Error("Failed to fetch forecast: ${errorBody ?: response.message()}")
                 }
             } catch (e: HttpException) {
                 Resource.Error("An unexpected error occurred: ${e.message()}")

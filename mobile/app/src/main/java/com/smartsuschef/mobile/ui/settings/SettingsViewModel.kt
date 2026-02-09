@@ -76,6 +76,10 @@ class SettingsViewModel @Inject constructor(
             _profileUpdateResult.value = "Name cannot be empty"
             return
         }
+        if (email.isBlank()) {
+            _profileUpdateResult.value = "Email cannot be empty"
+            return
+        }
         if (!isValidEmail(email)) {
             _profileUpdateResult.value = "Please enter a valid email address"
             return
@@ -104,28 +108,29 @@ class SettingsViewModel @Inject constructor(
 
     // Change password with comprehensive validation
     fun changePassword(currentPassword: String, newPassword: String, confirmPassword: String) {
-        // Basic validation
         if (currentPassword.isBlank()) {
             _passwordUpdateResult.value = "Current password is required"
             return
         }
 
-        // Comprehensive password validation using PasswordValidator
-        val validationResult = PasswordValidator.validate(newPassword)
-        if (!validationResult.isValid) {
-            _passwordUpdateResult.value = validationResult.errorMessage
+        if (newPassword.isBlank()) {
+            _passwordUpdateResult.value = "New password is required"
             return
         }
 
-        // Check passwords match
         if (newPassword != confirmPassword) {
             _passwordUpdateResult.value = "Passwords do not match"
             return
         }
 
-        // Check new password is different from current
         if (currentPassword == newPassword) {
             _passwordUpdateResult.value = "New password must be different from current password"
+            return
+        }
+
+        val validationResult = PasswordValidator.validate(newPassword)
+        if (!validationResult.isValid) {
+            _passwordUpdateResult.value = validationResult.errorMessage
             return
         }
 
@@ -142,7 +147,7 @@ class SettingsViewModel @Inject constructor(
                     _isLoadingPassword.value = false
                 }
                 is Resource.Error -> {
-                    _passwordUpdateResult.value = result.message ?: "Failed to change password"
+                    _passwordUpdateResult.value = "Failed to change password: ${result.message}"
                     _isLoadingPassword.value = false
                 }
                 is Resource.Loading -> {

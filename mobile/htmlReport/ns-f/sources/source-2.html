@@ -1,0 +1,391 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SettingsActivity</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.smartsuschef.mobile.ui.settings</a>
+</div>
+
+<h1>Coverage Summary for Class: SettingsActivity (com.smartsuschef.mobile.ui.settings)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SettingsActivity</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/64)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SettingsActivity$sam$androidx_lifecycle_Observer$0</td>
+  </tr>
+  <tr>
+    <td class="name">SettingsActivity$setupPasswordValidation$$inlined$addTextChangedListener$default$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SettingsActivity$setupPasswordValidation$$inlined$addTextChangedListener$default$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SettingsActivity$special$$inlined$viewModels$default$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SettingsActivity$special$$inlined$viewModels$default$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SettingsActivity$special$$inlined$viewModels$default$3</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/67)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.smartsuschef.mobile.ui.settings
+&nbsp;
+&nbsp;import android.os.Bundle
+&nbsp;import android.view.MenuItem
+&nbsp;import androidx.activity.viewModels
+&nbsp;import androidx.appcompat.app.AppCompatActivity
+&nbsp;import androidx.core.view.isVisible
+&nbsp;import androidx.core.widget.addTextChangedListener
+&nbsp;import com.smartsuschef.mobile.R
+&nbsp;import com.smartsuschef.mobile.databinding.ActivitySettingsBinding
+&nbsp;import com.smartsuschef.mobile.util.showToast
+&nbsp;import com.smartsuschef.mobile.util.PasswordValidator
+&nbsp;import dagger.hilt.android.AndroidEntryPoint
+&nbsp;
+&nbsp;@AndroidEntryPoint
+<b class="nc">&nbsp;class SettingsActivity : AppCompatActivity() {</b>
+&nbsp;
+&nbsp;    private lateinit var binding: ActivitySettingsBinding
+<b class="nc">&nbsp;    private val viewModel: SettingsViewModel by viewModels()</b>
+&nbsp;
+&nbsp;    override fun onCreate(savedInstanceState: Bundle?) {
+<b class="nc">&nbsp;        super.onCreate(savedInstanceState)</b>
+<b class="nc">&nbsp;        binding = ActivitySettingsBinding.inflate(layoutInflater)</b>
+<b class="nc">&nbsp;        setContentView(binding.root)</b>
+&nbsp;
+<b class="nc">&nbsp;        setupToolbar()</b>
+<b class="nc">&nbsp;        setupPasswordValidation()</b>
+<b class="nc">&nbsp;        setupObservers()</b>
+<b class="nc">&nbsp;        setupClickListeners()</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun setupToolbar() {
+<b class="nc">&nbsp;        setSupportActionBar(binding.toolbar)</b>
+<b class="nc">&nbsp;        supportActionBar?.apply {</b>
+<b class="nc">&nbsp;            setDisplayHomeAsUpEnabled(true)</b>
+<b class="nc">&nbsp;            setDisplayShowHomeEnabled(true)</b>
+<b class="nc">&nbsp;            title = &quot;Settings&quot;</b>
+<b class="nc">&nbsp;            subtitle = &quot;Manage your profile and account security&quot;</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Setup real-time password validation
+&nbsp;     * Shows errors as user types in the new password field
+&nbsp;     */
+&nbsp;    private fun setupPasswordValidation() {
+&nbsp;        // Real-time validation for new password
+<b class="nc">&nbsp;        binding.tilNewPassword.editText?.addTextChangedListener { text -&gt;</b>
+&nbsp;            val password = text?.toString() ?: &quot;&quot;
+&nbsp;
+&nbsp;            // Don&#39;t show errors for empty field (until user starts typing)
+&nbsp;            if (password.isEmpty()) {
+&nbsp;                binding.tilNewPassword.error = null
+&nbsp;                binding.tilNewPassword.isErrorEnabled = false
+&nbsp;                return@addTextChangedListener
+&nbsp;            }
+&nbsp;
+&nbsp;            // Show validation errors as user types
+&nbsp;            val result = PasswordValidator.validate(password)
+&nbsp;            binding.tilNewPassword.error = result.errorMessage
+&nbsp;            binding.tilNewPassword.isErrorEnabled = result.errorMessage != null
+&nbsp;        }
+&nbsp;
+&nbsp;        // Real-time validation for confirm password (check if matches)
+<b class="nc">&nbsp;        binding.tilConfirmPassword.editText?.addTextChangedListener { text -&gt;</b>
+&nbsp;            val confirmPassword = text?.toString() ?: &quot;&quot;
+&nbsp;            val newPassword = binding.tilNewPassword.editText?.text?.toString() ?: &quot;&quot;
+&nbsp;
+&nbsp;            // Don&#39;t show errors for empty field
+&nbsp;            if (confirmPassword.isEmpty()) {
+&nbsp;                binding.tilConfirmPassword.error = null
+&nbsp;                binding.tilConfirmPassword.isErrorEnabled = false
+&nbsp;                return@addTextChangedListener
+&nbsp;            }
+&nbsp;
+&nbsp;            // Check if passwords match
+&nbsp;            if (confirmPassword != newPassword) {
+&nbsp;                binding.tilConfirmPassword.error = &quot;Passwords do not match&quot;
+&nbsp;                binding.tilConfirmPassword.isErrorEnabled = true
+<b class="nc">&nbsp;            } else {</b>
+&nbsp;                binding.tilConfirmPassword.error = null
+&nbsp;                binding.tilConfirmPassword.isErrorEnabled = false
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+<b class="nc">&nbsp;    private fun setupObservers() {</b>
+&nbsp;        // Observe current user to populate profile fields
+<b class="nc">&nbsp;        viewModel.currentUser.observe(this) { user -&gt;</b>
+<b class="nc">&nbsp;            user?.let {</b>
+<b class="nc">&nbsp;                binding.etFullName.setText(it.name)</b>
+<b class="nc">&nbsp;                binding.etEmail.setText(it.email)</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Observe profile loading state
+<b class="nc">&nbsp;        viewModel.isLoadingProfile.observe(this) { loading -&gt;</b>
+<b class="nc">&nbsp;            binding.btnSaveProfile.isEnabled = !loading</b>
+<b class="nc">&nbsp;            binding.progressBarProfile.isVisible = loading</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Observe password loading state
+<b class="nc">&nbsp;        viewModel.isLoadingPassword.observe(this) { loading -&gt;</b>
+<b class="nc">&nbsp;            binding.btnUpdatePassword.isEnabled = !loading</b>
+<b class="nc">&nbsp;            binding.progressBarPassword.isVisible = loading</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Observe profile update results
+<b class="nc">&nbsp;        viewModel.profileUpdateResult.observe(this) { message -&gt;</b>
+<b class="nc">&nbsp;            message?.let {</b>
+<b class="nc">&nbsp;                showToast(it)</b>
+<b class="nc">&nbsp;                viewModel.clearProfileResult()</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Observe password update results
+<b class="nc">&nbsp;        viewModel.passwordUpdateResult.observe(this) { message -&gt;</b>
+<b class="nc">&nbsp;            message?.let {</b>
+<b class="nc">&nbsp;                showToast(it)</b>
+<b class="nc">&nbsp;                if (it.contains(&quot;successfully&quot;, ignoreCase = true)) {</b>
+<b class="nc">&nbsp;                    clearPasswordFields()</b>
+&nbsp;                }
+<b class="nc">&nbsp;                viewModel.clearPasswordResult()</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun setupClickListeners() {
+&nbsp;        // Update Password button
+<b class="nc">&nbsp;        binding.btnUpdatePassword.setOnClickListener {</b>
+<b class="nc">&nbsp;            val currentPassword = binding.etCurrentPassword.text.toString()</b>
+<b class="nc">&nbsp;            val newPassword = binding.etNewPassword.text.toString()</b>
+<b class="nc">&nbsp;            val confirmPassword = binding.etConfirmPassword.text.toString()</b>
+&nbsp;
+<b class="nc">&nbsp;            viewModel.changePassword(currentPassword, newPassword, confirmPassword)</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Save Profile button
+<b class="nc">&nbsp;        binding.btnSaveProfile.setOnClickListener {</b>
+<b class="nc">&nbsp;            val name = binding.etFullName.text.toString()</b>
+<b class="nc">&nbsp;            val email = binding.etEmail.text.toString()</b>
+&nbsp;
+<b class="nc">&nbsp;            viewModel.updateProfile(name, email)</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun clearPasswordFields() {
+<b class="nc">&nbsp;        binding.etCurrentPassword.text?.clear()</b>
+<b class="nc">&nbsp;        binding.etNewPassword.text?.clear()</b>
+<b class="nc">&nbsp;        binding.etConfirmPassword.text?.clear()</b>
+&nbsp;
+&nbsp;        // Clear any error states
+<b class="nc">&nbsp;        binding.tilCurrentPassword.error = null</b>
+<b class="nc">&nbsp;        binding.tilCurrentPassword.isErrorEnabled = false</b>
+<b class="nc">&nbsp;        binding.tilNewPassword.error = null</b>
+<b class="nc">&nbsp;        binding.tilNewPassword.isErrorEnabled = false</b>
+<b class="nc">&nbsp;        binding.tilConfirmPassword.error = null</b>
+<b class="nc">&nbsp;        binding.tilConfirmPassword.isErrorEnabled = false</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+<b class="nc">&nbsp;        return when (item.itemId) {</b>
+<b class="nc">&nbsp;            android.R.id.home -&gt; {</b>
+<b class="nc">&nbsp;                finish()</b>
+<b class="nc">&nbsp;                true</b>
+&nbsp;            }
+<b class="nc">&nbsp;            else -&gt; super.onOptionsItemSelected(item)</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-02-09 11:59</div>
+</div>
+</body>
+</html>

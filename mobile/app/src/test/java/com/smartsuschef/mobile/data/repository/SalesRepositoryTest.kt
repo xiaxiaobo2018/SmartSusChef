@@ -14,6 +14,7 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.whenever
 import retrofit2.HttpException
 import retrofit2.Response
@@ -87,7 +88,7 @@ class SalesRepositoryTest {
         // Arrange
         val errorMessage = "Unauthorized"
         val errorResponse = Response.error<List<SalesDataDto>>(401, errorMessage.toResponseBody(null))
-        whenever(mockSalesApiService.getAll(any(), any())).thenReturn(errorResponse)
+        whenever(mockSalesApiService.getAll(anyOrNull(), anyOrNull())).thenReturn(errorResponse)
 
         // Act
         val result = salesRepository.getAll(null, null)
@@ -100,7 +101,7 @@ class SalesRepositoryTest {
     @Test
     fun `getAll network error should return error resource with network message`() = runTest(testDispatcher) {
         // Arrange
-        whenever(mockSalesApiService.getAll(any(), any())).thenAnswer { throw IOException("No internet") }
+        whenever(mockSalesApiService.getAll(anyOrNull(), anyOrNull())).thenAnswer { throw IOException("No internet") }
 
         // Act
         val result = salesRepository.getAll(null, null)

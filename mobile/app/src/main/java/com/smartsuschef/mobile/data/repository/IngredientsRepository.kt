@@ -20,7 +20,7 @@ class IngredientsRepository @Inject constructor(
                 if (response.isSuccessful) {
                     Resource.Success(response.body() ?: emptyList())
                 } else {
-                    Resource.Error("Failed to fetch ingredients: ${response.message()}")
+                    Resource.Error("Failed to fetch ingredients: ${response.errorBody()?.string() ?: response.message()}")
                 }
             } catch (e: HttpException) {
                 Resource.Error("An unexpected error occurred: ${e.message()}")
@@ -37,7 +37,7 @@ class IngredientsRepository @Inject constructor(
                 if (response.isSuccessful) {
                     Resource.Success(response.body()!!)
                 } else {
-                    Resource.Error("Failed to add ingredient: ${response.message()}")
+                    Resource.Error("Failed to add ingredient: ${response.errorBody()?.string() ?: response.message()}")
                 }
             } catch (e: HttpException) {
                 Resource.Error("An unexpected error occurred: ${e.message()}")

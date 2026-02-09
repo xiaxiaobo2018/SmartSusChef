@@ -1,0 +1,121 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecentEntryActions</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.smartsuschef.mobile.ui.datainput</a>
+</div>
+
+<h1>Coverage Summary for Class: RecentEntryActions (com.smartsuschef.mobile.ui.datainput)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">RecentEntryActions</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.smartsuschef.mobile.ui.datainput
+&nbsp;
+&nbsp;import android.view.LayoutInflater
+&nbsp;import android.view.ViewGroup
+&nbsp;import androidx.recyclerview.widget.DiffUtil
+&nbsp;import androidx.recyclerview.widget.ListAdapter
+&nbsp;import androidx.recyclerview.widget.RecyclerView
+&nbsp;import com.smartsuschef.mobile.databinding.ItemRecentEntryBinding
+&nbsp;
+&nbsp;interface RecentEntryActions {
+&nbsp;    fun onEditClick(entry: RecentEntry)
+&nbsp;    fun onDeleteClick(entry: RecentEntry)
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Adapter to display today&#39;s submitted sales or wastage entries.
+&nbsp; */
+&nbsp;class RecentEntriesAdapter(private val actions: RecentEntryActions) : ListAdapter&lt;RecentEntry, RecentEntriesAdapter.RecentViewHolder&gt;(DiffCallback) {
+&nbsp;
+&nbsp;    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecentViewHolder {
+&nbsp;        val binding = ItemRecentEntryBinding.inflate(
+&nbsp;            LayoutInflater.from(parent.context),
+&nbsp;            parent,
+&nbsp;            false
+&nbsp;        )
+&nbsp;        return RecentViewHolder(binding)
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun onBindViewHolder(holder: RecentViewHolder, position: Int) {
+&nbsp;        holder.bind(getItem(position), actions)
+&nbsp;    }
+&nbsp;
+&nbsp;    class RecentViewHolder(private val binding: ItemRecentEntryBinding) :
+&nbsp;        RecyclerView.ViewHolder(binding.root) {
+&nbsp;
+&nbsp;        fun bind(item: RecentEntry, actions: RecentEntryActions) {
+&nbsp;            binding.tvItemName.text = item.name
+&nbsp;            binding.tvQuantity.text = &quot;${item.quantity} ${item.unit}&quot;
+&nbsp;            binding.tvEntryTime.text = item.time // Display only the time
+&nbsp;            // Assuming your layout has these buttons
+&nbsp;            binding.btnEdit.setOnClickListener { actions.onEditClick(item) }
+&nbsp;            binding.btnDelete.setOnClickListener { actions.onDeleteClick(item) }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    companion object DiffCallback : DiffUtil.ItemCallback&lt;RecentEntry&gt;() {
+&nbsp;        override fun areItemsTheSame(oldItem: RecentEntry, newItem: RecentEntry) =
+&nbsp;            oldItem.id == newItem.id // Compare by ID now
+&nbsp;
+&nbsp;        override fun areContentsTheSame(oldItem: RecentEntry, newItem: RecentEntry) =
+&nbsp;            oldItem == newItem
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-02-09 11:59</div>
+</div>
+</body>
+</html>

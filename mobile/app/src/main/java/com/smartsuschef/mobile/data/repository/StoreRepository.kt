@@ -19,7 +19,7 @@ class StoreRepository @Inject constructor(
                 if (response.isSuccessful) {
                     Resource.Success(response.body()!!)
                 } else {
-                    Resource.Error("Failed to fetch store details: ${response.message()}")
+                    Resource.Error("Failed to fetch store details: ${response.errorBody()?.string() ?: response.message()}")
                 }
             } catch (e: HttpException) {
                 Resource.Error("An unexpected error occurred: ${e.message()}")

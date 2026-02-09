@@ -1,0 +1,535 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ForecastApiService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.smartsuschef.mobile.network.api</a>
+</div>
+
+<h1>Coverage Summary for Class: ForecastApiService (com.smartsuschef.mobile.network.api)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+  <tr>
+    <td class="name">ForecastApiService$DefaultImpls</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ForecastApiService$MockitoMock$LeSfw5v6</td>
+  </tr>
+  <tr>
+    <td class="name">ForecastApiService$MockitoMock$LeSfw5v6$auxiliary$gI6OPwsW</td>
+  </tr>
+  <tr>
+    <td class="name">ForecastApiService$MockitoMock$LeSfw5v6$auxiliary$nPW51jj7</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.smartsuschef.mobile.network.api
+&nbsp;
+&nbsp;import com.smartsuschef.mobile.network.dto.*
+&nbsp;import retrofit2.Response
+&nbsp;import retrofit2.http.*
+&nbsp;
+&nbsp;/**
+&nbsp; * API Services for SmartSus Chef (Mobile)
+&nbsp; * // Old Base URL: http://oversea.zyh111.icu:234/api/
+&nbsp; * Base URL: http://192.168.50.133:5001/api/
+&nbsp; * All endpoints require JWT token in Authorization header (except login/resetPassword)
+&nbsp; *
+&nbsp; * Employee Restrictions:
+&nbsp; * - Can only view data for TODAY or last 7 days
+&nbsp; * - Can only input sales/wastage data for TODAY
+&nbsp; * - Cannot create/edit/delete recipes or ingredients
+&nbsp; *
+&nbsp; * Manager Additional Access (if using mobile):
+&nbsp; * - Can view up to 30 days of data
+&nbsp; * - Can manage recipes/ingredients (though typically done on web)
+&nbsp; */
+&nbsp;
+&nbsp;/**
+&nbsp; * Authentication API Service
+&nbsp; * Maps to: AuthController.cs
+&nbsp; * Base Route: /api/auth
+&nbsp; */
+&nbsp;interface AuthApiService {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Login with username and password
+&nbsp;     * POST /api/auth/login
+&nbsp;     */
+&nbsp;    @POST(&quot;auth/login&quot;)
+&nbsp;    suspend fun login(@Body request: LoginRequest): Response&lt;LoginResponse&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get current user information
+&nbsp;     * GET /api/auth/me
+&nbsp;     * Requires: Authorization header with JWT token
+&nbsp;     */
+&nbsp;    @GET(&quot;auth/me&quot;)
+&nbsp;    suspend fun getCurrentUser(): Response&lt;UserDto&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Update own profile (name and email)
+&nbsp;     * PUT /api/auth/profile
+&nbsp;     * Requires: Authorization header with JWT token
+&nbsp;     * Note: Username cannot be changed
+&nbsp;     */
+&nbsp;    @PUT(&quot;auth/profile&quot;)
+&nbsp;    suspend fun updateOwnProfile(@Body request: UpdateProfileRequest): Response&lt;UserDto&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Change own password
+&nbsp;     * PUT /api/auth/password
+&nbsp;     * Requires: Authorization header with JWT token
+&nbsp;     */
+&nbsp;    @PUT(&quot;auth/password&quot;)
+&nbsp;    suspend fun changePassword(@Body request: ChangePasswordRequest): Response&lt;Unit&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Request password reset (Forgot Password)
+&nbsp;     * POST /api/auth/forgot-password
+&nbsp;     */
+&nbsp;    @POST(&quot;auth/forgot-password&quot;)
+&nbsp;    suspend fun forgotPassword(@Body request: ForgotPasswordRequest): Response&lt;Unit&gt;
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Sales Data API Service
+&nbsp; * Maps to: SalesController.cs
+&nbsp; * Base Route: /api/sales
+&nbsp; *
+&nbsp; * Employee Usage: Primarily for inputting TODAY&#39;s sales data
+&nbsp; */
+&nbsp;interface SalesApiService {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get all sales data with optional date filtering
+&nbsp;     * GET /api/sales?startDate={startDate}&amp;endDate={endDate}
+&nbsp;     * Employee: Use last 7 days max
+&nbsp;     * Manager: Use last 30 days max
+&nbsp;     */
+&nbsp;    @GET(&quot;sales&quot;)
+&nbsp;    suspend fun getAll(
+&nbsp;        @Query(&quot;startDate&quot;) startDate: String? = null,
+&nbsp;        @Query(&quot;endDate&quot;) endDate: String? = null
+&nbsp;    ): Response&lt;List&lt;SalesDataDto&gt;&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get sales data by ID
+&nbsp;     * GET /api/sales/{id}
+&nbsp;     */
+&nbsp;    @GET(&quot;sales/{id}&quot;)
+&nbsp;    suspend fun getById(@Path(&quot;id&quot;) id: String): Response&lt;SalesDataDto&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get sales trend (grouped by date with recipe breakdown)
+&nbsp;     * GET /api/sales/trend?startDate={startDate}&amp;endDate={endDate}
+&nbsp;     * Used for dashboard charts
+&nbsp;     */
+&nbsp;    @GET(&quot;sales/trend&quot;)
+&nbsp;    suspend fun getTrend(
+&nbsp;        @Query(&quot;startDate&quot;) startDate: String,
+&nbsp;        @Query(&quot;endDate&quot;) endDate: String
+&nbsp;    ): Response&lt;List&lt;SalesTrendDto&gt;&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get ingredient usage for a specific date
+&nbsp;     * GET /api/sales/ingredients/{date}
+&nbsp;     * Used for &quot;Ingredient Breakdown&quot; section
+&nbsp;     */
+&nbsp;    @GET(&quot;sales/ingredients/{date}&quot;)
+&nbsp;    suspend fun getIngredientUsageByDate(@Path(&quot;date&quot;) date: String): Response&lt;List&lt;IngredientUsageDto&gt;&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get recipe sales for a specific date
+&nbsp;     * GET /api/sales/recipes/{date}
+&nbsp;     * Used for &quot;Sales Distribution&quot; pie chart
+&nbsp;     */
+&nbsp;    @GET(&quot;sales/recipes/{date}&quot;)
+&nbsp;    suspend fun getRecipeSalesByDate(@Path(&quot;date&quot;) date: String): Response&lt;List&lt;RecipeSalesDto&gt;&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Create new sales data (Employee primary function)
+&nbsp;     * POST /api/sales
+&nbsp;     * Employee: Can only create for TODAY
+&nbsp;     */
+&nbsp;    @POST(&quot;sales&quot;)
+&nbsp;    suspend fun create(@Body request: CreateSalesDataRequest): Response&lt;SalesDataDto&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Update existing sales data
+&nbsp;     * PUT /api/sales/{id}
+&nbsp;     * Employee: Can only update TODAY&#39;s entries
+&nbsp;     */
+&nbsp;    @PUT(&quot;sales/{id}&quot;)
+&nbsp;    suspend fun update(
+&nbsp;        @Path(&quot;id&quot;) id: String,
+&nbsp;        @Body request: UpdateSalesDataRequest
+&nbsp;    ): Response&lt;SalesDataDto&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Delete sales data
+&nbsp;     * DELETE /api/sales/{id}
+&nbsp;     * Employee: Can only delete TODAY&#39;s entries
+&nbsp;     */
+&nbsp;    @DELETE(&quot;sales/{id}&quot;)
+&nbsp;    suspend fun delete(@Path(&quot;id&quot;) id: String): Response&lt;Unit&gt;
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Wastage Data API Service
+&nbsp; * Maps to: WastageController.cs
+&nbsp; * Base Route: /api/wastage
+&nbsp; *
+&nbsp; * Employee Usage: Primarily for inputting TODAY&#39;s wastage data
+&nbsp; */
+&nbsp;interface WastageApiService {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get all wastage data with optional date filtering
+&nbsp;     * GET /api/wastage?startDate={startDate}&amp;endDate={endDate}
+&nbsp;     * Employee: Use last 7 days max
+&nbsp;     * Manager: Use last 30 days max
+&nbsp;     */
+&nbsp;    @GET(&quot;wastage&quot;)
+&nbsp;    suspend fun getAll(
+&nbsp;        @Query(&quot;startDate&quot;) startDate: String? = null,
+&nbsp;        @Query(&quot;endDate&quot;) endDate: String? = null
+&nbsp;    ): Response&lt;List&lt;WastageDataDto&gt;&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get wastage data by ID
+&nbsp;     * GET /api/wastage/{id}
+&nbsp;     */
+&nbsp;    @GET(&quot;wastage/{id}&quot;)
+&nbsp;    suspend fun getById(@Path(&quot;id&quot;) id: String): Response&lt;WastageDataDto&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get wastage trend (grouped by date with item breakdown)
+&nbsp;     * GET /api/wastage/trend?startDate={startDate}&amp;endDate={endDate}
+&nbsp;     * Used for wastage dashboard charts
+&nbsp;     */
+&nbsp;    @GET(&quot;wastage/trend&quot;)
+&nbsp;    suspend fun getTrend(
+&nbsp;        @Query(&quot;startDate&quot;) startDate: String,
+&nbsp;        @Query(&quot;endDate&quot;) endDate: String
+&nbsp;    ): Response&lt;List&lt;WastageTrendDto&gt;&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Create new wastage data (Employee primary function)
+&nbsp;     * POST /api/wastage
+&nbsp;     * Employee: Can only create for TODAY
+&nbsp;     */
+&nbsp;    @POST(&quot;wastage&quot;)
+&nbsp;    suspend fun create(@Body request: CreateWastageDataRequest): Response&lt;WastageDataDto&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Update existing wastage data
+&nbsp;     * PUT /api/wastage/{id}
+&nbsp;     * Employee: Can only update TODAY&#39;s entries
+&nbsp;     */
+&nbsp;    @PUT(&quot;wastage/{id}&quot;)
+&nbsp;    suspend fun update(
+&nbsp;        @Path(&quot;id&quot;) id: String,
+&nbsp;        @Body request: UpdateWastageDataRequest
+&nbsp;    ): Response&lt;WastageDataDto&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Delete wastage data
+&nbsp;     * DELETE /api/wastage/{id}
+&nbsp;     * Employee: Can only delete TODAY&#39;s entries
+&nbsp;     */
+&nbsp;    @DELETE(&quot;wastage/{id}&quot;)
+&nbsp;    suspend fun delete(@Path(&quot;id&quot;) id: String): Response&lt;Unit&gt;
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Forecast Data API Service
+&nbsp; * Maps to: ForecastController.cs
+&nbsp; * Base Route: /api/forecast
+&nbsp; *
+&nbsp; * Employee/Manager Usage: View ML predictions and calendar signals
+&nbsp; */
+&nbsp;interface ForecastApiService {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get forecast for next N days (1-30)
+&nbsp;     * GET /api/forecast?days={days}
+&nbsp;     * Employee: Typically views 7 days
+&nbsp;     * Manager: Can view up to 30 days
+&nbsp;     */
+&nbsp;    @GET(&quot;forecast&quot;)
+<b class="nc">&nbsp;    suspend fun getForecast(@Query(&quot;days&quot;) days: Int = 7): Response&lt;List&lt;ForecastDto&gt;&gt;</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get forecast summary for next N days
+&nbsp;     * GET /api/forecast/summary?days={days}
+&nbsp;     * Used for &quot;Prediction Summary&quot; card
+&nbsp;     */
+&nbsp;    @GET(&quot;forecast/summary&quot;)
+<b class="nc">&nbsp;    suspend fun getForecastSummary(@Query(&quot;days&quot;) days: Int = 7): Response&lt;List&lt;ForecastSummaryDto&gt;&gt;</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get current weather
+&nbsp;     * GET /api/forecast/weather
+&nbsp;     * Used for dashboard &quot;Current Weather&quot; widget
+&nbsp;     */
+&nbsp;    @GET(&quot;forecast/weather&quot;)
+&nbsp;    suspend fun getWeather(): Response&lt;WeatherDto&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get holidays for a specific year
+&nbsp;     * GET /api/forecast/holidays/{year}
+&nbsp;     * Used for &quot;Upcoming Events&quot; section
+&nbsp;     */
+&nbsp;    @GET(&quot;forecast/holidays/{year}&quot;)
+&nbsp;    suspend fun getHolidays(@Path(&quot;year&quot;) year: Int): Response&lt;List&lt;HolidayDto&gt;&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get tomorrow&#39;s forecast and calendar information
+&nbsp;     * GET /api/forecast/tomorrow
+&nbsp;     * Primary endpoint for employee dashboard
+&nbsp;     */
+&nbsp;    @GET(&quot;forecast/tomorrow&quot;)
+&nbsp;    suspend fun getTomorrowForecast(): Response&lt;TomorrowForecastDto&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get calendar and weather information for a specific date
+&nbsp;     * GET /api/forecast/calendar/{date}
+&nbsp;     */
+&nbsp;    @GET(&quot;forecast/calendar/{date}&quot;)
+&nbsp;    suspend fun getCalendarDay(@Path(&quot;date&quot;) date: String): Response&lt;CalendarDayDto&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get calendar and weather information for a date range
+&nbsp;     * GET /api/forecast/calendar?startDate={startDate}&amp;endDate={endDate}
+&nbsp;     * Used for dashboard overview
+&nbsp;     */
+&nbsp;    @GET(&quot;forecast/calendar&quot;)
+&nbsp;    suspend fun getCalendarRange(
+&nbsp;        @Query(&quot;startDate&quot;) startDate: String,
+&nbsp;        @Query(&quot;endDate&quot;) endDate: String
+&nbsp;    ): Response&lt;List&lt;CalendarDayDto&gt;&gt;
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Recipe API Service
+&nbsp; * Maps to: RecipesController.cs
+&nbsp; * Base Route: /api/recipes
+&nbsp; *
+&nbsp; * Employee Usage: READ-ONLY (for viewing recipes in dropdowns)
+&nbsp; * Manager Usage: Full CRUD (typically done on web)
+&nbsp; */
+&nbsp;interface RecipeApiService {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get all recipes
+&nbsp;     * GET /api/recipes
+&nbsp;     * Employee: Uses this to populate &quot;Select Dish&quot; dropdown
+&nbsp;     */
+&nbsp;    @GET(&quot;recipes&quot;)
+&nbsp;    suspend fun getAll(): Response&lt;List&lt;RecipeDto&gt;&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get recipe by ID
+&nbsp;     * GET /api/recipes/{id}
+&nbsp;     * Used to view recipe details
+&nbsp;     */
+&nbsp;    @GET(&quot;recipes/{id}&quot;)
+&nbsp;    suspend fun getById(@Path(&quot;id&quot;) id: String): Response&lt;RecipeDto&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Create new recipe (Manager only - typically web-only)
+&nbsp;     * POST /api/recipes
+&nbsp;     */
+&nbsp;    @POST(&quot;recipes&quot;)
+&nbsp;    suspend fun create(@Body request: CreateRecipeRequest): Response&lt;RecipeDto&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Update existing recipe (Manager only - typically web-only)
+&nbsp;     * PUT /api/recipes/{id}
+&nbsp;     */
+&nbsp;    @PUT(&quot;recipes/{id}&quot;)
+&nbsp;    suspend fun update(
+&nbsp;        @Path(&quot;id&quot;) id: String,
+&nbsp;        @Body request: UpdateRecipeRequest
+&nbsp;    ): Response&lt;RecipeDto&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Delete recipe (Manager only - typically web-only)
+&nbsp;     * DELETE /api/recipes/{id}
+&nbsp;     */
+&nbsp;    @DELETE(&quot;recipes/{id}&quot;)
+&nbsp;    suspend fun delete(@Path(&quot;id&quot;) id: String): Response&lt;Unit&gt;
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Ingredient API Service
+&nbsp; * Maps to: IngredientsController.cs
+&nbsp; * Base Route: /api/ingredients
+&nbsp; *
+&nbsp; * Employee Usage: READ-ONLY (for viewing ingredients in wastage dropdowns)
+&nbsp; * Manager Usage: Full CRUD (typically done on web)
+&nbsp; */
+&nbsp;interface IngredientApiService {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get all ingredients
+&nbsp;     * GET /api/ingredients
+&nbsp;     * Employee: Uses this to populate wastage &quot;Select Item&quot; dropdown
+&nbsp;     */
+&nbsp;    @GET(&quot;ingredients&quot;)
+&nbsp;    suspend fun getAll(): Response&lt;List&lt;IngredientDto&gt;&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get ingredient by ID
+&nbsp;     * GET /api/ingredients/{id}
+&nbsp;     */
+&nbsp;    @GET(&quot;ingredients/{id}&quot;)
+&nbsp;    suspend fun getById(@Path(&quot;id&quot;) id: String): Response&lt;IngredientDto&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Create new ingredient (Manager only - typically web-only)
+&nbsp;     * POST /api/ingredients
+&nbsp;     */
+&nbsp;    @POST(&quot;ingredients&quot;)
+&nbsp;    suspend fun create(@Body request: CreateIngredientRequest): Response&lt;IngredientDto&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Update existing ingredient (Manager only - typically web-only)
+&nbsp;     * PUT /api/ingredients/{id}
+&nbsp;     */
+&nbsp;    @PUT(&quot;ingredients/{id}&quot;)
+&nbsp;    suspend fun update(
+&nbsp;        @Path(&quot;id&quot;) id: String,
+&nbsp;        @Body request: UpdateIngredientRequest
+&nbsp;    ): Response&lt;IngredientDto&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Delete ingredient (Manager only - typically web-only)
+&nbsp;     * DELETE /api/ingredients/{id}
+&nbsp;     */
+&nbsp;    @DELETE(&quot;ingredients/{id}&quot;)
+&nbsp;    suspend fun delete(@Path(&quot;id&quot;) id: String): Response&lt;Unit&gt;
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Store API Service
+&nbsp; * Maps to: StoreController.cs
+&nbsp; * Base Route: /api/store
+&nbsp; *
+&nbsp; * Employee/Manager Usage: View store info (shown in top bar: &quot;Aunty May&#39;s Cafe | Orchard Central&quot;)
+&nbsp; * Manager Usage: Setup/update store (typically web-only)
+&nbsp; */
+&nbsp;interface StoreApiService {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get store information for current user
+&nbsp;     * GET /api/store
+&nbsp;     * Used to display store name in app header
+&nbsp;     */
+&nbsp;    @GET(&quot;store&quot;)
+&nbsp;    suspend fun getStore(): Response&lt;StoreDto&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Check if store setup is complete
+&nbsp;     * GET /api/store/status
+&nbsp;     * Used after login to check if onboarding needed
+&nbsp;     */
+&nbsp;    @GET(&quot;store/status&quot;)
+&nbsp;    suspend fun getStoreStatus(): Response&lt;Map&lt;String, Boolean&gt;&gt;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-02-09 11:59</div>
+</div>
+</body>
+</html>
