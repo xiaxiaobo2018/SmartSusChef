@@ -120,10 +120,13 @@ jobs:
           category: "/language:${{ matrix.language }}"
 
   # ==========================================
-  # STAGE 1b: Filesystem Vulnerability Scan
+  # STAGE 3b: Filesystem Vulnerability Scan (after Docker build)
   # ==========================================
   trivy-scan:
     name: "Trivy Filesystem Scan"
+    needs: [docker-build-push]
+    if: |
+      !cancelled() && !failure()
     runs-on: ubuntu-latest
     permissions:
       security-events: write
