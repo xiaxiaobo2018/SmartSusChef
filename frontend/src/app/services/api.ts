@@ -22,53 +22,66 @@ export const getAuthToken = (): string | null => {
   return authToken;
 };
 
+// Apdex metric logging
+const logApdexMetric = (endpoint: string, durationMs: number, options: RequestInit) => {
+  console.log(
+    `ApdexMetrics: Endpoint=${endpoint}, Method=${options.method || 'GET'}, DurationMs=${durationMs.toFixed(2)}`
+  );
+};
+
 // Generic fetch wrapper with auth
 async function fetchWithAuth<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const token = getAuthToken();
+  const startTime = performance.now();
+  try {
+    const token = getAuthToken();
 
-  const headers: HeadersInit = {
-    'Content-Type': 'application/json',
-    ...options.headers,
-  };
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    };
 
-  if (token) {
-    (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
-  }
-
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    ...options,
-    headers,
-  });
-
-  if (response.status === 401) {
-    // Token expired or invalid
-    setAuthToken(null);
-    throw new Error('Unauthorized');
-  }
-
-  if (response.status === 403) {
-    // Insufficient permissions
-    throw new Error('Forbidden: You do not have permission to perform this action');
-  }
-
-  if (response.status === 204) {
-    return {} as T;
-  }
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Request failed' }));
-    // Handle ASP.NET model validation errors ({ title, errors: { Field: ["msg"] } })
-    if (error.errors && typeof error.errors === 'object') {
-      const messages = Object.values(error.errors).flat().join(' ');
-      throw new Error(messages || error.title || `HTTP error ${response.status}`);
+    if (token) {
+      (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
     }
-    throw new Error(error.message || error.title || `HTTP error ${response.status}`);
-  }
 
-  return response.json();
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      ...options,
+      headers,
+    });
+
+    if (response.status === 401) {
+      // Token expired or invalid
+      setAuthToken(null);
+      throw new Error('Unauthorized');
+    }
+
+    if (response.status === 403) {
+      // Insufficient permissions
+      throw new Error('Forbidden: You do not have permission to perform this action');
+    }
+
+    if (response.status === 204) {
+      return {} as T;
+    }
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ message: 'Request failed' }));
+      // Handle ASP.NET model validation errors ({ title, errors: { Field: ["msg"] } })
+      if (error.errors && typeof error.errors === 'object') {
+        const messages = Object.values(error.errors).flat().join(' ');
+        throw new Error(messages || error.title || `HTTP error ${response.status}`);
+      }
+      throw new Error(error.message || error.title || `HTTP error ${response.status}`);
+    }
+
+    return response.json();
+  } finally {
+    const durationMs = performance.now() - startTime;
+    logApdexMetric(endpoint, durationMs, options);
+  }
 }
 
 // Generic fetch wrapper for blob responses
@@ -280,23 +293,32 @@ export const storeApi = {
 // ==========================================
 // INGREDIENTS API
 // ==========================================
+// --- API Types and DTOs for Ingredients Management ---
+// IngredientDto: now includes optional globalIngredientId for linking to a global ingredient
+// CreateIngredientRequest/UpdateIngredientRequest: support globalIngredientId for backend reference
+// GlobalIngredient: represents a global, immutable ingredient (name, unit, carbonFootprint, etc.)
+// All API calls and types are designed to support both global and custom ingredients seamlessly
+// If backend/global DTOs change, update these types accordingly
 export interface IngredientDto {
   id: string;
   name: string;
   unit: string;
   carbonFootprint: number;
+  globalIngredientId?: string;
 }
 
 export interface CreateIngredientRequest {
   name: string;
   unit: string;
   carbonFootprint: number;
+  globalIngredientId?: string;
 }
 
 export interface UpdateIngredientRequest {
   name: string;
   unit: string;
   carbonFootprint: number;
+  globalIngredientId?: string;
 }
 
 export const ingredientsApi = {
@@ -314,6 +336,26 @@ export const ingredientsApi = {
 
   delete: (id: string): Promise<void> =>
     fetchWithAuth(`/ingredients/${id}`, { method: 'DELETE' }),
+};
+
+// ==========================================
+// GLOBAL INGREDIENTS API
+// ==========================================
+export interface GlobalIngredientDto {
+  id: string;
+  name: string;
+  unit: string;
+  carbonFootprint: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export const globalIngredientsApi = {
+  getAll: (): Promise<GlobalIngredientDto[]> =>
+    fetchWithAuth('/globalingredients'),
+
+  getById: (id: string): Promise<GlobalIngredientDto> =>
+    fetchWithAuth(`/globalingredients/${id}`),
 };
 
 // ==========================================

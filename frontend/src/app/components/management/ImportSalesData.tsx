@@ -20,13 +20,14 @@ interface CSVRow {
 }
 
 export function ImportSalesData() {
-  const { recipes, salesData, addSalesData, importSalesData } = useApp();
+  const { recipes, salesData, refreshData } = useApp();
   const [isDragging, setIsDragging] = useState(false);
   const [csvData, setCsvData] = useState<CSVRow[]>([]);
   const [errors, setErrors] = useState<CSVValidationError[]>([]);
   const [showPreview, setShowPreview] = useState(false);
   const [duplicates, setDuplicates] = useState<{ date: string; dish: string; rows: number[] }[]>([]);
   const [isImporting, setIsImporting] = useState(false);
+  const [isOverwriteDialogSubmitting, setIsOverwriteDialogSubmitting] = useState(false);
   const [dateFormat, setDateFormat] = useState(DATE_FORMATS[0].value);
 
   // Add after the existing state declarations
@@ -73,6 +74,11 @@ export function ImportSalesData() {
       });
     });
 
+    console.log('[checkForExistingDuplicates] Existing data keys (first 5):',
+      Array.from(existingMap.keys()).slice(0, 5));
+    console.log('[checkForExistingDuplicates] Import data keys (first 5):',
+      importData.slice(0, 5).map(item => `${item.date}|${item.recipeId}`));
+
     // Check which records in the imported data will be overwritten
     importData.forEach(item => {
       const key = `${item.date}|${item.recipeId}`;
@@ -89,22 +95,27 @@ export function ImportSalesData() {
       }
     });
 
+    console.log('[checkForExistingDuplicates] Found duplicates:', duplicates.length);
     return duplicates;
   };
 
   const handleConfirmOverwrite = async () => {
+    setIsOverwriteDialogSubmitting(true);
     try {
-      const salesDataToImport: SalesData[] = overwriteConfirmData.importData.map((sale, index) => ({
-        id: `import-${Date.now()}-${index}`,
-        date: sale.date,
-        recipeId: sale.recipeId,
-        quantity: sale.quantity,
-        createdAt: new Date().toISOString(),
-        modifiedAt: new Date().toISOString(),
-        editHistory: []
+      // Use importByName API to handle the import with overwrite
+      const salesToImport = csvData.map(row => ({
+        date: row.Date,
+        dishName: row.Dish_Name.trim(),
+        quantity: parseInt(row.Quantity_Sold, 10),
       }));
-      await importSalesData(salesDataToImport);
-      toast.success(`Successfully imported ${overwriteConfirmData.importData.length} sales records`);
+
+      const result = await salesApi.importByName({ salesData: salesToImport, dateFormat });
+
+      let msg = `Successfully imported ${result.imported} sales records (${overwriteConfirmData.duplicates.length} overwritten)`;
+      if (result.newDishesCreated > 0) {
+        msg += `. Auto-created ${result.newDishesCreated} new dish(es): ${result.newDishes.join(', ')}`;
+      }
+      toast.success(msg);
 
       // Turn off all states
       setOverwriteConfirmData({
@@ -115,8 +126,14 @@ export function ImportSalesData() {
       setCsvData([]);
       setErrors([]);
       setShowPreview(false);
+
+      // Refresh data
+      await new Promise(resolve => setTimeout(resolve, 500));
+      await refreshData();
     } catch (error: any) {
-      toast.error('Failed to import sales data');
+      toast.error(`Failed to import sales data: ${error.message}`);
+    } finally {
+      setIsOverwriteDialogSubmitting(false);
     }
   };
 
@@ -187,22 +204,31 @@ export function ImportSalesData() {
         duplicates: [],
         importData: [],
       });
+      setCsvData([]);
+      setErrors([]);
+      setShowPreview(false);
       return;
     }
 
+    setIsOverwriteDialogSubmitting(true);
     try {
-      const salesDataToImport: SalesData[] = newRecords.map((record, index) => ({
-        id: `import-${Date.now()}-${index}`,
-        date: record.date,
-        recipeId: record.recipeId,
-        quantity: record.quantity,
-        createdAt: new Date().toISOString(),
-        modifiedAt: new Date().toISOString(),
-        editHistory: []
+      // Filter CSV data to only include new records (not duplicates)
+      const newRecordKeys = new Set(newRecords.map(r => `${r.date}|${r.recipeId}`));
+      const filteredCsvData = csvData.filter(row => {
+        const dishName = row.Dish_Name.trim();
+        const recipe = recipes.find(r => r.name.toLowerCase() === dishName.toLowerCase());
+        const key = `${row.Date}|${recipe?.id}`;
+        return newRecordKeys.has(key);
+      });
+
+      const salesToImport = filteredCsvData.map(row => ({
+        date: row.Date,
+        dishName: row.Dish_Name.trim(),
+        quantity: parseInt(row.Quantity_Sold, 10),
       }));
 
-      await importSalesData(salesDataToImport);
-      toast.success(`Successfully imported ${newRecords.length} new records (skipped ${overwriteConfirmData.duplicates.length} duplicates)`);
+      const result = await salesApi.importByName({ salesData: salesToImport, dateFormat });
+      toast.success(`Successfully imported ${result.imported} new records (skipped ${overwriteConfirmData.duplicates.length} duplicates)`);
 
       setOverwriteConfirmData({
         isOpen: false,
@@ -212,8 +238,14 @@ export function ImportSalesData() {
       setCsvData([]);
       setErrors([]);
       setShowPreview(false);
+
+      // Refresh data
+      await new Promise(resolve => setTimeout(resolve, 500));
+      await refreshData();
     } catch (error: any) {
-      toast.error('Failed to import sales data');
+      toast.error(`Failed to import sales data: ${error.message}`);
+    } finally {
+      setIsOverwriteDialogSubmitting(false);
     }
   };
 
@@ -352,6 +384,51 @@ export function ImportSalesData() {
       return;
     }
 
+    // Get the date parser for the selected format
+    const dateFormatOption = DATE_FORMATS.find(f => f.value === dateFormat) || DATE_FORMATS[0];
+
+    // Map dish names to recipe IDs and normalize dates
+    const importDataWithRecipeIds = csvData.map(row => {
+      const dishName = row.Dish_Name.trim();
+      const recipe = recipes.find(r => r.name.toLowerCase() === dishName.toLowerCase());
+
+      // Parse the date and convert to yyyy-MM-dd format
+      const parsedDate = dateFormatOption.parse(row.Date);
+      const normalizedDate = parsedDate ? format(parsedDate, 'yyyy-MM-dd') : row.Date;
+
+      return {
+        date: normalizedDate,
+        dishName: dishName,
+        recipeId: recipe?.id || null,
+        quantity: parseInt(row.Quantity_Sold, 10),
+      };
+    });
+
+    console.log('[ImportSalesData] Normalized dates for comparison:', importDataWithRecipeIds.slice(0, 3));
+
+    // Check for duplicates with existing database records
+    const importDataForCheck = importDataWithRecipeIds
+      .filter(item => item.recipeId !== null)
+      .map(item => ({
+        date: item.date,
+        recipeId: item.recipeId!,
+        quantity: item.quantity,
+      }));
+
+    const existingDuplicates = checkForExistingDuplicates(importDataForCheck);
+
+    // If there are duplicates with existing data, show confirmation dialog
+    if (existingDuplicates.length > 0) {
+      console.log('[ImportSalesData] Found duplicates with existing data:', existingDuplicates);
+      setOverwriteConfirmData({
+        isOpen: true,
+        duplicates: existingDuplicates,
+        importData: importDataForCheck,
+      });
+      return;
+    }
+
+    // No duplicates, proceed with direct import
     const salesToImport = csvData.map(row => ({
       date: row.Date,
       dishName: row.Dish_Name.trim(),
@@ -360,7 +437,9 @@ export function ImportSalesData() {
 
     setIsImporting(true);
     try {
+      console.log('[ImportSalesData] Starting import...', { recordCount: salesToImport.length });
       const result = await salesApi.importByName({ salesData: salesToImport, dateFormat });
+      console.log('[ImportSalesData] Import completed:', result);
 
       let msg = `Successfully imported ${result.imported} sales records`;
       if (result.newDishesCreated > 0) {
@@ -368,13 +447,24 @@ export function ImportSalesData() {
       }
       toast.success(msg);
 
-      // Refresh app data
+      // Clear form data
       setCsvData([]);
       setErrors([]);
       setShowPreview(false);
 
-      // Trigger a page reload to refresh recipes + sales data
-      window.location.reload();
+      // Wait a moment to ensure database transaction is committed
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      console.log('[ImportSalesData] Refreshing data...');
+      // Refresh all data to show imported sales and new recipes
+      try {
+        await refreshData();
+        console.log('[ImportSalesData] Data refreshed successfully. Current sales count:', salesData.length);
+        console.log('[ImportSalesData] Current recipes count:', recipes.length);
+      } catch (refreshError) {
+        console.error('[ImportSalesData] Failed to refresh data:', refreshError);
+        toast.warning('Data imported successfully, but failed to refresh. Please reload the page.');
+      }
     } catch (error: any) {
       if (error.message?.includes('duplicate')) {
         toast.error('Duplicate records detected. The system prevents duplicate entries for the same date and recipe.');
@@ -760,6 +850,7 @@ export function ImportSalesData() {
                 <Button
                   variant="outline"
                   onClick={handleCancelOverwrite}
+                  disabled={isOverwriteDialogSubmitting}
                   className="hover:bg-gray-100 w-full md:w-auto order-2 md:order-1 py-3 text-base"
                 >
                   Cancel Import
@@ -777,15 +868,17 @@ export function ImportSalesData() {
 
                       handleImportOnlyNew(newRecords);
                     }}
+                    disabled={isOverwriteDialogSubmitting}
                     className="text-blue-600 border-blue-300 hover:bg-blue-50 w-full sm:w-auto py-3 text-base"
                   >
-                    Import Only New
+                    {isOverwriteDialogSubmitting ? 'Importing...' : 'Import Only New'}
                   </Button>
                   <Button
                     onClick={handleConfirmOverwrite}
+                    disabled={isOverwriteDialogSubmitting}
                     className="bg-amber-600 hover:bg-amber-700 w-full sm:w-auto py-3 text-base"
                   >
-                    Overwrite & Import All
+                    {isOverwriteDialogSubmitting ? 'Importing...' : 'Overwrite & Import All'}
                   </Button>
                 </div>
               </div>
