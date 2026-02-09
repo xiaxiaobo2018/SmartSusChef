@@ -7,7 +7,6 @@ import { format, parseISO, isAfter, isBefore, addDays } from 'date-fns';
 export function CalendarWidget() {
   const { holidays, dataLoading } = useApp();
   const today = new Date();
-  const nextWeek = addDays(today, 7);
 
   const upcomingHolidays = holidays
     .filter((holiday) => {

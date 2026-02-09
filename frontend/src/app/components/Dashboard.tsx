@@ -32,7 +32,7 @@ export function Dashboard({
 }: DashboardProps) {
   const context = useApp();
   if (!context) return null;
-  const { user, storeSettings } = context;
+  const { user } = context;
   const isManager = user?.role === "manager";
 
   const [selectedSalesDate, setSelectedSalesDate] = useState<

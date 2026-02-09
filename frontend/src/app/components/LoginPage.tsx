@@ -34,7 +34,7 @@ export function LoginPage({ onNavigateToRegister, onLoginSuccess }: LoginPagePro
       } else {
         onLoginSuccess?.();
       }
-    } catch (err) {
+    } catch {
       setError('Failed to connect to the server. Please try again.');
     } finally {
       setIsLoading(false);
@@ -48,7 +48,7 @@ export function LoginPage({ onNavigateToRegister, onLoginSuccess }: LoginPagePro
       setResetMessage(response.message);
       setView('success');
       toast.success('Password reset request submitted');
-    } catch (err) {
+    } catch {
       toast.error('Failed to reset password. Please try again later.');
     }
   };

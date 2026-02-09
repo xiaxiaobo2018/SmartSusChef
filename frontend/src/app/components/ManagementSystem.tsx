@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '@/app/context/AppContext';
 import { Button } from '@/app/components/ui/button';
-import { ArrowLeft, LogOut, ChefHat, Package, Upload, Trash2, Download, DollarSign } from 'lucide-react';
+import { ArrowLeft, ChefHat, Package, Upload, Trash2, Download, DollarSign } from 'lucide-react';
 import { RecipeManagement } from '@/app/components/management/RecipeManagement';
 import { IngredientManagement } from '@/app/components/management/IngredientManagement';
 import { ImportSalesData } from '@/app/components/management/ImportSalesData';

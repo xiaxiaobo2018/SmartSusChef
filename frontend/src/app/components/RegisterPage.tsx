@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/app/components/ui/button';
 import { Input } from '@/app/components/ui/input';
 import { Label } from '@/app/components/ui/label';
@@ -15,7 +15,7 @@ function getPasswordRequirements(password: string) {
     { label: 'At least one uppercase letter (A-Z)', met: /[A-Z]/.test(password) },
     { label: 'At least one lowercase letter (a-z)', met: /[a-z]/.test(password) },
     { label: 'At least one number (0-9)', met: /\d/.test(password) },
-    { label: `At least one special character (${SPECIAL_CHARS})`, met: /[@$!%*?&#^()\-_=+\[\]{}|;:',.<>\/~`]/.test(password) },
+    { label: `At least one special character (${SPECIAL_CHARS})`, met: /[@$!%*?&#^()\-_=+[\]{}|;:',.<>/~`]/.test(password) },
   ];
 }
 

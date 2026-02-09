@@ -111,7 +111,7 @@ export function StoreSetupPage() {
         countryCode: countryCode || undefined,
       });
       toast.success('Store setup complete!');
-    } catch (err) {
+    } catch {
       toast.error('Failed to set up store.');
     } finally {
       setIsSubmitting(false);

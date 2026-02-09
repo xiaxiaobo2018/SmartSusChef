@@ -30,7 +30,7 @@ export function DishesForecast() {
   const chartData = useMemo(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Normalize to start of day
-    const data: any[] = [];
+    const data: Record<string, string | number>[] = [];
 
     console.log('[DishesForecast] Total forecast data:', forecastData.length);
     console.log('[DishesForecast] Main recipes:', mainRecipes.length);
@@ -55,12 +55,12 @@ export function DishesForecast() {
       dayForecasts.forEach((forecast) => {
         const recipe = mainRecipes.find(r => r.id === forecast.recipeId);
         if (recipe) {
-          const qty = forecast.quantity || (forecast as any).predictedQuantity || 0;
+          const qty = forecast.quantity || (forecast as unknown as Record<string, number>).predictedQuantity || 0;
           recipeForecasts[recipe.name] = (recipeForecasts[recipe.name] || 0) + qty;
         }
       });
 
-      const dayData: any = {
+      const dayData: Record<string, string | number> = {
         date: dateKey,
         displayDate: format(date, 'd MMM'),
         day: dayOfWeek,
