@@ -21,22 +21,11 @@ export interface StoreSettings {
   countryCode?: string;
 }
 
-export interface GlobalIngredient {
-  id: string;
-  name: string;
-  unit: string;
-  carbonFootprint: number;
-  isDefault: boolean;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
 export interface Ingredient {
   id: string;
   name: string;
   unit: string;
   carbonFootprint: number; // kg CO2 per unit
-  globalIngredientId?: string; // Reference to GlobalIngredient if using a standard ingredient
   supplierUnit?: string; // e.g., "10kg", "500ml"
   supplierUnitCost?: number; // Cost in S$ for the supplier unit
   totalUnitsInPackage?: number; // Total grams/ml in the package
