@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from contextlib import asynccontextmanager
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
@@ -9,9 +9,8 @@ from pydantic import BaseModel, Field
 from app.inference import ModelStore, create_store_from_env, predict_dish
 from app.store_manager import StoreModelManager
 
-
-store: Optional[ModelStore] = None
-manager: Optional[StoreModelManager] = None
+store: ModelStore | None = None
+manager: StoreModelManager | None = None
 
 
 @asynccontextmanager
@@ -38,14 +37,14 @@ app = FastAPI(
 
 class PredictRequest(BaseModel):
     dish: str = Field(..., description="Dish name that exists in champion_registry.pkl")
-    recent_sales: List[float] = Field(..., min_length=1, description="Recent daily sales history")
+    recent_sales: list[float] = Field(..., min_length=1, description="Recent daily sales history")
     horizon_days: int = Field(14, ge=1, le=30)
-    start_date: Optional[str] = Field(None, description="YYYY-MM-DD; default is tomorrow")
+    start_date: str | None = Field(None, description="YYYY-MM-DD; default is tomorrow")
     address: str = Field("Shanghai, China", description="Used when lat/lon are not provided")
-    latitude: Optional[float] = None
-    longitude: Optional[float] = None
-    country_code: Optional[str] = None
-    weather_rows: Optional[List[Dict[str, Any]]] = Field(
+    latitude: float | None = None
+    longitude: float | None = None
+    country_code: str | None = None
+    weather_rows: list[dict[str, Any]] | None = Field(
         None,
         description="Optional custom weather list for horizon dates",
     )
@@ -57,11 +56,11 @@ class PredictResponse(BaseModel):
     model_combo: str
     horizon_days: int
     start_date: str
-    predictions: List[Dict[str, Any]]
+    predictions: list[dict[str, Any]]
 
 
 @app.get("/health")
-def health() -> Dict[str, Any]:
+def health() -> dict[str, Any]:
     """Health check endpoint for ALB/ECS."""
     dishes_count = 0
     if store is not None:
@@ -74,14 +73,14 @@ def health() -> Dict[str, Any]:
 
 
 @app.get("/dishes")
-def dishes() -> Dict[str, List[str]]:
+def dishes() -> dict[str, list[str]]:
     if store is None:
         raise HTTPException(status_code=503, detail="Model store not initialized")
     return {"dishes": store.list_dishes()}
 
 
 @app.post("/predict", response_model=PredictResponse)
-def predict(req: PredictRequest) -> Dict[str, Any]:
+def predict(req: PredictRequest) -> dict[str, Any]:
     if store is None:
         raise HTTPException(status_code=503, detail="Model store not initialized")
 
@@ -113,38 +112,38 @@ def predict(req: PredictRequest) -> Dict[str, Any]:
 class StorePredictRequest(BaseModel):
     store_id: int = Field(..., description="Store ID from the .NET database")
     horizon_days: int = Field(14, ge=1, le=30)
-    address: Optional[str] = None
-    latitude: Optional[float] = None
-    longitude: Optional[float] = None
-    country_code: Optional[str] = None
+    address: str | None = None
+    latitude: float | None = None
+    longitude: float | None = None
+    country_code: str | None = None
 
 
 class StorePredictResponse(BaseModel):
     store_id: int
     status: str  # "ok" | "missing_models" | "error"
-    message: Optional[str] = None
-    days_available: Optional[int] = None
-    predictions: Optional[Dict[str, Any]] = None  # dish -> predictions
+    message: str | None = None
+    days_available: int | None = None
+    predictions: dict[str, Any] | None = None  # dish -> predictions
 
 
 class TrainingProgressResponse(BaseModel):
     trained: int
     failed: int
     total: int
-    current_dish: Optional[str] = None
+    current_dish: str | None = None
 
 
 class StoreStatusResponse(BaseModel):
     store_id: int
     has_models: bool
     is_training: bool
-    dishes: Optional[List[str]] = None
-    days_available: Optional[int] = None
-    training_progress: Optional[TrainingProgressResponse] = None
+    dishes: list[str] | None = None
+    days_available: int | None = None
+    training_progress: TrainingProgressResponse | None = None
 
 
 @app.get("/store/{store_id}/status", response_model=StoreStatusResponse)
-def store_status(store_id: int) -> Dict[str, Any]:
+def store_status(store_id: int) -> dict[str, Any]:
     """Check if models exist for a store, and how much data is available."""
     if manager is None:
         raise HTTPException(status_code=503, detail="Manager not initialized")
@@ -186,7 +185,7 @@ def store_status(store_id: int) -> Dict[str, Any]:
 
 
 @app.post("/store/{store_id}/predict", response_model=StorePredictResponse)
-def store_predict(store_id: int, req: StorePredictRequest) -> Dict[str, Any]:
+def store_predict(store_id: int, req: StorePredictRequest) -> dict[str, Any]:
     """
     Generate predictions for ALL dishes of a store.
     - If models exist → predict immediately
@@ -264,7 +263,7 @@ def store_predict(store_id: int, req: StorePredictRequest) -> Dict[str, Any]:
                 store_id, e,
             )
 
-    all_predictions: Dict[str, Any] = {}
+    all_predictions: dict[str, Any] = {}
 
     for dish in dishes:
         try:

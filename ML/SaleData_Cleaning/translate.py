@@ -43,7 +43,7 @@ def main():
     in_path, out_path = sys.argv[1], sys.argv[2]
 
     # utf-8-sig: handle BOM in the first header (e.g., "﻿date")
-    with open(in_path, "r", encoding="utf-8-sig", newline="") as f_in, \
+    with open(in_path, encoding="utf-8-sig", newline="") as f_in, \
          open(out_path, "w", encoding="utf-8", newline="") as f_out:
         reader = csv.reader(f_in)
         writer = csv.writer(f_out)

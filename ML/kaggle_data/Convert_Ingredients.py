@@ -1,5 +1,6 @@
-import pandas as pd
 from pathlib import Path
+
+import pandas as pd
 
 INPUT_FILE = "1kaggle_data.csv"
 OUTPUT_FILE = "1final_ingredients.csv"
@@ -20,19 +21,19 @@ def process_ingredients_data():
         return
 
     df = df[required_cols].dropna().copy()
-    
+
     df['key_ingredients_tags'] = df['key_ingredients_tags'].astype(str).str.split(',')
-    
+
     df_exploded = df.explode('key_ingredients_tags')
-    
+
     df_exploded['key_ingredients_tags'] = df_exploded['key_ingredients_tags'].str.strip()
     df_exploded = df_exploded[df_exploded['key_ingredients_tags'] != ""]
-    
+
     df_final = df_exploded.groupby(['date', 'key_ingredients_tags'])['quantity_sold'].sum().reset_index()
-    
+
     df_final = df_final.rename(columns={
         'date': 'date',
-        'key_ingredients_tags': 'dish_name', 
+        'key_ingredients_tags': 'dish_name',
         'quantity_sold': 'quantity'
     })
 
@@ -43,10 +44,10 @@ def process_ingredients_data():
         print(f"Warning: Date formatting issue. {e}")
 
     df_final.to_csv(OUTPUT_FILE, index=False, encoding="utf-8-sig")
-    
+
     print(f"Success! Exploded ingredient data saved to: {OUTPUT_FILE}")
     print(f"Total unique ingredients extracted: {df_final['dish_name'].nunique()}")
-    
+
     top_ingredients = df_final.groupby('dish_name')['quantity'].sum().nlargest(5)
     print("\nTop 5 Ingredients by Volume:")
     print(top_ingredients.to_string())

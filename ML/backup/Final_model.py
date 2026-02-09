@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Final Prophet + Tree Residual Stacking Pipeline (Optuna)
 
@@ -20,24 +19,26 @@ Final Prophet + Tree Residual Stacking Pipeline (Optuna)
 from __future__ import annotations
 
 import os
+
 # Must be set before cmdstanpy/prophet import
 os.environ.setdefault("CMDSTANPY_LOG_LEVEL", "WARNING")
 
 import logging
 import pickle
+import time
 import warnings
-from pathlib import Path
-from concurrent.futures import ProcessPoolExecutor, wait, FIRST_COMPLETED
+from concurrent.futures import FIRST_COMPLETED, ProcessPoolExecutor, wait
 from dataclasses import dataclass
-from typing import Any, Dict, Tuple, List
+from pathlib import Path
+from typing import Any
 
+import holidays
+import matplotlib.pyplot as plt
 import numpy as np
 import optuna
 import pandas as pd
-import time
 from sklearn.metrics import mean_absolute_error
-import matplotlib.pyplot as plt
-import holidays
+
 try:
     from requests import RequestsDependencyWarning
 except Exception:  # pragma: no cover
@@ -48,12 +49,12 @@ except Exception:  # pragma: no cover
     tqdm = None  # type: ignore
 
 from training_logic import (
-    PipelineConfig,
-    fetch_training_data,
-    add_local_context,
-    sanitize_sparse_data,
-    safe_filename,
     WEATHER_COLS,
+    PipelineConfig,
+    add_local_context,
+    fetch_training_data,
+    safe_filename,
+    sanitize_sparse_data,
 )
 
 try:
@@ -242,8 +243,8 @@ def _build_residual_features(df: pd.DataFrame, prophet_yhat: np.ndarray) -> pd.D
 
 def _eval_hybrid_mae(
     model_type: str,
-    fold_cache: List[Dict[str, Any]],
-    trial_params: Dict[str, Any],
+    fold_cache: list[dict[str, Any]],
+    trial_params: dict[str, Any],
 ) -> float:
     """
     给定模型类型和参数，基于已缓存的 fold 数据跑 CV 并返回平均 MAE。
@@ -305,10 +306,10 @@ def _prepare_cv_fold_cache(
     df_feat: pd.DataFrame,
     country_code: str,
     config: PipelineConfig,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """Pre-compute Prophet + residual training matrices once per fold."""
     feature_cols = TREE_FEATURES
-    fold_cache: List[Dict[str, Any]] = []
+    fold_cache: list[dict[str, Any]] = []
 
     for train, test in _generate_cv_folds(df_feat, config):
         pm = _fit_prophet(train, country_code)
@@ -337,7 +338,7 @@ def _prepare_cv_fold_cache(
     return fold_cache
 
 
-def _optimize_hybrid(model_type: str, fold_cache: List[Dict[str, Any]], config: PipelineConfig):
+def _optimize_hybrid(model_type: str, fold_cache: list[dict[str, Any]], config: PipelineConfig):
     """Optuna for hybrid residual stacking per model type."""
     def objective(trial: optuna.Trial) -> float:
         if model_type == "xgboost":
@@ -379,8 +380,8 @@ def _optimize_hybrid(model_type: str, fold_cache: List[Dict[str, Any]], config: 
 class DishResult:
     dish: str
     champion: str
-    mae: Dict[str, float]
-    best_params: Dict[str, Dict[str, Any]]
+    mae: dict[str, float]
+    best_params: dict[str, dict[str, Any]]
 
 
 @dataclass(frozen=True)
@@ -402,7 +403,7 @@ def _save_models(dish: str, prophet_model: Prophet, tree_model: Any, config: Pip
         pickle.dump(tree_model, f)
 
 
-def _load_models(dish: str, config: PipelineConfig, champion: str) -> Tuple[Prophet, Any]:
+def _load_models(dish: str, config: PipelineConfig, champion: str) -> tuple[Prophet, Any]:
     safe_name = safe_filename(dish)
     model_dir = Path(config.model_dir)
     with open(model_dir / f"prophet_{safe_name}.pkl", "rb") as f:
@@ -426,8 +427,8 @@ def process_dish(dish_name: str, dish_data: pd.DataFrame, country_code: str, con
         raise RuntimeError(f"{dish_name}: CV folds unavailable after feature dropna.")
 
     # Optuna per model
-    mae_map: Dict[str, float] = {}
-    params_map: Dict[str, Dict[str, Any]] = {}
+    mae_map: dict[str, float] = {}
+    params_map: dict[str, dict[str, Any]] = {}
 
     for model_type in ["xgboost", "catboost", "lightgbm"]:
         best_mae, best_params = _optimize_hybrid(model_type, fold_cache, config)
@@ -475,8 +476,8 @@ def process_dish(dish_name: str, dish_data: pd.DataFrame, country_code: str, con
     )
 
 
-def _compute_lag_features_from_history(sales_history: list[float]) -> Dict[str, float]:
-    features: Dict[str, float] = {}
+def _compute_lag_features_from_history(sales_history: list[float]) -> dict[str, float]:
+    features: dict[str, float] = {}
     fallback = float(sales_history[-1]) if sales_history else 0.0
     for lag in LAGS:
         features[f"y_lag_{lag}"] = (
@@ -625,7 +626,7 @@ def _predict_future(
                     for f in feats:
                         feat_to_group[f] = g
 
-                group_shap: Dict[str, float] = {}
+                group_shap: dict[str, float] = {}
                 for j, feat_name in enumerate(TREE_FEATURES):
                     group = feat_to_group.get(feat_name, "Other")
                     group_shap[group] = group_shap.get(group, 0.0) + float(sv[j])
@@ -755,7 +756,7 @@ def main() -> None:
         return
 
     # 保存注册表
-    champion_map: Dict[str, Dict[str, Any]] = {}
+    champion_map: dict[str, dict[str, Any]] = {}
     for r in results:
         champion_map[r.dish] = {
             "model": r.champion,

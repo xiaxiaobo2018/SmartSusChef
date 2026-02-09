@@ -1,11 +1,12 @@
 import os
 import sys
-import unittest
-from unittest.mock import patch, MagicMock
 import tempfile
-import pandas as pd
-import numpy as np
+import unittest
+from unittest.mock import patch
+
 import joblib
+import numpy as np
+import pandas as pd
 
 # Add ML root to sys.path
 ML_ROOT = os.path.dirname(os.path.dirname(__file__))
@@ -13,7 +14,7 @@ if ML_ROOT not in sys.path:
     sys.path.insert(0, ML_ROOT)
 
 import Final_model_v2 as fm
-from training_logic_v2 import PipelineConfig, WEATHER_COLS
+from training_logic_v2 import WEATHER_COLS, PipelineConfig
 
 
 class FinalModelV2Tests(unittest.TestCase):
