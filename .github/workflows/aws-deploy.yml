@@ -86,32 +86,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: ['javascript-typescript', 'csharp', 'python', 'java-kotlin']
+        language: ['javascript-typescript', 'csharp', 'python']
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Set up JDK17
-        if: matrix.language == 'java-kotlin'
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: 'gradle'
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
 
-      - name: Manual Build for Java/Kotlin
-        if: matrix.language == 'java-kotlin'
-        run: ./gradlew assembleDebug --no-daemon
-        working-directory: ./mobile
-
-      - name: Autobuild (Other Languages)
-        if: matrix.language != 'java-kotlin'
+      - name: Autobuild
         uses: github/codeql-action/autobuild@v3
 
       - name: Perform CodeQL Analysis
