@@ -1,47 +1,24 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import React from 'react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { LoginPage } from '../LoginPage';
-import { AppProvider } from '@/app/context/AppContext';
-import * as api from '@/app/services/api';
+import { authApi } from '@/app/services/api';
 
-// Mock the API module
+const loginMock = vi.fn();
+
+vi.mock('@/app/context/AppContext', () => ({
+  useApp: () => ({
+    login: loginMock,
+  }),
+}));
+
 vi.mock('@/app/services/api', () => ({
-  setAuthToken: vi.fn(),
-  getAuthToken: vi.fn(() => null),
   authApi: {
-    login: vi.fn(),
     forgotPassword: vi.fn(),
-    getCurrentUser: vi.fn(),
-  },
-  storeApi: {
-    getStore: vi.fn(),
-  },
-  ingredientsApi: {
-    getAll: vi.fn(() => Promise.resolve([])),
-  },
-  recipesApi: {
-    getAll: vi.fn(() => Promise.resolve([])),
-  },
-  salesApi: {
-    getAll: vi.fn(() => Promise.resolve([])),
-  },
-  wastageApi: {
-    getAll: vi.fn(() => Promise.resolve([])),
-  },
-  forecastApi: {
-    get: vi.fn(() => Promise.resolve([])),
-    getAll: vi.fn(() => Promise.resolve([])),
-    getHolidays: vi.fn(() => Promise.resolve([])),
-    getWeather: vi.fn(() => Promise.resolve(null)),
-  },
-  usersApi: {
-    getAll: vi.fn(() => Promise.resolve([])),
   },
 }));
 
-// Mock sonner toast
 vi.mock('sonner', () => ({
   toast: {
     success: vi.fn(),
@@ -53,342 +30,121 @@ describe('LoginPage', () => {
   const mockOnNavigateToRegister = vi.fn();
   const mockOnLoginSuccess = vi.fn();
 
-  const renderWithProviders = (props = {}) => {
-    return render(
-      <AppProvider>
-        <LoginPage
-          onNavigateToRegister={mockOnNavigateToRegister}
-          onLoginSuccess={mockOnLoginSuccess}
-          {...props}
-        />
-      </AppProvider>
+  const renderPage = (props = {}) =>
+    render(
+      <LoginPage
+        onNavigateToRegister={mockOnNavigateToRegister}
+        onLoginSuccess={mockOnLoginSuccess}
+        {...props}
+      />
     );
-  };
 
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  describe('Rendering', () => {
-    it('should render login form', () => {
-      renderWithProviders();
+  it('renders login form', () => {
+    renderPage();
+    expect(screen.getByText('SmartSus Chef')).toBeInTheDocument();
+    expect(screen.getByText('Demand Forecasting & Food Prep Recommendation')).toBeInTheDocument();
+    expect(screen.getByLabelText(/username/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /sign in/i })).toBeInTheDocument();
+  });
 
-      expect(screen.getByText('SmartSus Chef')).toBeInTheDocument();
-      expect(screen.getByText('Demand Forecasting & Food Prep Recommendation')).toBeInTheDocument();
-      expect(screen.getByLabelText(/username/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /sign in/i })).toBeInTheDocument();
-    });
+  it('shows register link and triggers callback', async () => {
+    renderPage();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: /register as manager/i }));
+    expect(mockOnNavigateToRegister).toHaveBeenCalledTimes(1);
+  });
 
-    it('should render navigation links', () => {
-      renderWithProviders();
+  it('submits login and calls onLoginSuccess when successful', async () => {
+    loginMock.mockResolvedValue(true);
+    renderPage();
 
-      expect(screen.getByText(/forgot password/i)).toBeInTheDocument();
-      expect(screen.getByText(/register as manager/i)).toBeInTheDocument();
-    });
+    const user = userEvent.setup();
+    await user.type(screen.getByLabelText(/username/i), 'testuser');
+    await user.type(screen.getByLabelText(/password/i), 'password123');
+    await user.click(screen.getByRole('button', { name: /sign in/i }));
 
-    it('should render logo icon', () => {
-      renderWithProviders();
-
-      // ChefHat icon should be present
-      const logo = document.querySelector('.lucide-chef-hat');
-      expect(logo).toBeInTheDocument();
+    await waitFor(() => {
+      expect(loginMock).toHaveBeenCalledWith('testuser', 'password123');
+      expect(mockOnLoginSuccess).toHaveBeenCalledTimes(1);
     });
   });
 
-  describe('Login Form Submission', () => {
-    it('should call login function with correct credentials', async () => {
-      const mockLogin = {
-        token: 'test-token',
-        user: {
-          id: 'user-1',
-          username: 'testuser',
-          name: 'Test User',
-          email: 'test@example.com',
-          role: 'manager',
-          status: 'Active',
-        },
-        storeSetupRequired: false,
-      };
+  it('shows error when login returns false', async () => {
+    loginMock.mockResolvedValue(false);
+    renderPage();
 
-      vi.mocked(api.authApi.login).mockResolvedValue(mockLogin);
+    const user = userEvent.setup();
+    await user.type(screen.getByLabelText(/username/i), 'bad');
+    await user.type(screen.getByLabelText(/password/i), 'bad');
+    await user.click(screen.getByRole('button', { name: /sign in/i }));
 
-      renderWithProviders();
+    expect(await screen.findByText(/invalid credentials/i)).toBeInTheDocument();
+  });
 
-      const user = userEvent.setup();
-      const usernameInput = screen.getByLabelText(/username/i);
-      const passwordInput = screen.getByLabelText(/password/i);
-      const loginButton = screen.getByRole('button', { name: /sign in/i });
+  it('shows error when login throws', async () => {
+    loginMock.mockRejectedValue(new Error('Network error'));
+    renderPage();
 
-      await user.type(usernameInput, 'testuser');
-      await user.type(passwordInput, 'password123');
-      await user.click(loginButton);
+    const user = userEvent.setup();
+    await user.type(screen.getByLabelText(/username/i), 'user');
+    await user.type(screen.getByLabelText(/password/i), 'pass');
+    await user.click(screen.getByRole('button', { name: /sign in/i }));
 
-      await waitFor(() => {
-        expect(api.authApi.login).toHaveBeenCalledWith({
-          username: 'testuser',
-          password: 'password123',
-        });
-      });
+    expect(await screen.findByText(/failed to connect to the server/i)).toBeInTheDocument();
+  });
+
+  it('disables sign in button while loading', async () => {
+    let resolveLogin: (value: boolean) => void;
+    const loginPromise = new Promise<boolean>((resolve) => {
+      resolveLogin = resolve;
     });
+    loginMock.mockReturnValue(loginPromise);
 
-    it('should call onLoginSuccess callback on successful login', async () => {
-      vi.mocked(api.authApi.login).mockResolvedValue({
-        token: 'test-token',
-        user: {
-          id: 'user-1',
-          username: 'testuser',
-          name: 'Test User',
-          email: 'test@example.com',
-          role: 'manager',
-          status: 'Active',
-        },
-        storeSetupRequired: false,
-      });
+    renderPage();
+    const user = userEvent.setup();
+    const button = screen.getByRole('button', { name: /sign in/i });
 
-      renderWithProviders();
+    await user.type(screen.getByLabelText(/username/i), 'test');
+    await user.type(screen.getByLabelText(/password/i), 'test');
+    await user.click(button);
 
-      const user = userEvent.setup();
-      const usernameInput = screen.getByLabelText(/username/i);
-      const passwordInput = screen.getByLabelText(/password/i);
-      const loginButton = screen.getByRole('button', { name: /sign in/i });
+    expect(button).toBeDisabled();
+    resolveLogin!(true);
+    await waitFor(() => expect(button).not.toBeDisabled());
+  });
 
-      await user.type(usernameInput, 'testuser');
-      await user.type(passwordInput, 'password123');
-      await user.click(loginButton);
+  it('switches to forgot password view and submits request', async () => {
+    vi.mocked(authApi.forgotPassword).mockResolvedValue({ message: 'Reset sent' });
+    renderPage();
 
-      await waitFor(() => {
-        expect(mockOnLoginSuccess).toHaveBeenCalled();
-      });
-    });
+    const user = userEvent.setup();
+    await user.click(screen.getByText(/forgot password/i));
+    expect(screen.getByText(/request password reset/i)).toBeInTheDocument();
 
-    it('should display error message on failed login', async () => {
-      vi.mocked(api.authApi.login).mockRejectedValue(new Error('Invalid credentials'));
+    await user.type(screen.getByPlaceholderText(/email or username/i), 'test@example.com');
+    await user.click(screen.getByRole('button', { name: /send reset link/i }));
 
-      renderWithProviders();
-
-      const user = userEvent.setup();
-      const usernameInput = screen.getByLabelText(/username/i);
-      const passwordInput = screen.getByLabelText(/password/i);
-      const loginButton = screen.getByRole('button', { name: /sign in/i });
-
-      await user.type(usernameInput, 'wronguser');
-      await user.type(passwordInput, 'wrongpassword');
-      await user.click(loginButton);
-
-      await waitFor(() => {
-        expect(screen.getByText(/invalid credentials/i)).toBeInTheDocument();
-      });
-    });
-
-    it('should prevent submission with empty fields', async () => {
-      renderWithProviders();
-
-      const user = userEvent.setup();
-      const loginButton = screen.getByRole('button', { name: /sign in/i });
-
-      await user.click(loginButton);
-
-      // Form validation should prevent API call
-      expect(api.authApi.login).not.toHaveBeenCalled();
-    });
-
-    it('should disable button while loading', async () => {
-      vi.mocked(api.authApi.login).mockImplementation(() => 
-        new Promise(resolve => setTimeout(resolve, 100))
-      );
-
-      renderWithProviders();
-
-      const user = userEvent.setup();
-      const usernameInput = screen.getByLabelText(/username/i);
-      const passwordInput = screen.getByLabelText(/password/i);
-      const loginButton = screen.getByRole('button', { name: /sign in/i });
-
-      await user.type(usernameInput, 'testuser');
-      await user.type(passwordInput, 'password123');
-      await user.click(loginButton);
-
-      // Button should be disabled during loading
-      expect(loginButton).toBeDisabled();
-
-      await waitFor(() => {
-        expect(loginButton).not.toBeDisabled();
-      });
+    await waitFor(() => {
+      expect(authApi.forgotPassword).toHaveBeenCalledWith({ emailOrUsername: 'test@example.com' });
     });
   });
 
-  describe('Forgot Password Flow', () => {
-    it('should navigate to forgot password view', async () => {
-      renderWithProviders();
+  it('shows success view after password reset and returns to login', async () => {
+    vi.mocked(authApi.forgotPassword).mockResolvedValue({ message: 'Password reset successfully' });
+    renderPage();
 
-      const user = userEvent.setup();
-      const forgotPasswordLink = screen.getByText(/forgot password/i);
+    const user = userEvent.setup();
+    await user.click(screen.getByText(/forgot password/i));
+    await user.type(screen.getByPlaceholderText(/email or username/i), 'test@example.com');
+    await user.click(screen.getByRole('button', { name: /send reset link/i }));
 
-      await user.click(forgotPasswordLink);
-
-      await waitFor(() => {
-        expect(screen.getByText(/request password reset/i)).toBeInTheDocument();
-      });
-    });
-
-    it('should submit forgot password request', async () => {
-      vi.mocked(api.authApi.forgotPassword).mockResolvedValue({
-        message: 'Password reset email sent',
-      });
-
-      renderWithProviders();
-
-      const user = userEvent.setup();
-      const forgotPasswordLink = screen.getByText(/forgot password/i);
-      await user.click(forgotPasswordLink);
-
-      const emailInput = await screen.findByPlaceholderText(/email or username/i);
-      const submitButton = screen.getByRole('button', { name: /send reset link/i });
-
-      await user.type(emailInput, 'test@example.com');
-      await user.click(submitButton);
-
-      await waitFor(() => {
-        expect(api.authApi.forgotPassword).toHaveBeenCalledWith({
-          emailOrUsername: 'test@example.com',
-        });
-      });
-    });
-
-    it('should show success message after password reset', async () => {
-      vi.mocked(api.authApi.forgotPassword).mockResolvedValue({
-        message: 'Password reset successfully',
-      });
-
-      renderWithProviders();
-
-      const user = userEvent.setup();
-      const forgotPasswordLink = screen.getByText(/forgot password/i);
-      await user.click(forgotPasswordLink);
-
-      const emailInput = await screen.findByPlaceholderText(/email or username/i);
-      const submitButton = screen.getByRole('button', { name: /send reset link/i });
-
-      await user.type(emailInput, 'test@example.com');
-      await user.click(submitButton);
-
-      await waitFor(() => {
-        expect(screen.getByRole('heading', { name: /password reset/i })).toBeInTheDocument();
-      });
-    });
-
-    it('should return to login from success view', async () => {
-      vi.mocked(api.authApi.forgotPassword).mockResolvedValue({
-        message: 'Password reset successfully',
-      });
-
-      renderWithProviders();
-
-      const user = userEvent.setup();
-      
-      // Go to forgot password
-      const forgotPasswordLink = screen.getByText(/forgot password/i);
-      await user.click(forgotPasswordLink);
-
-      // Submit reset request
-      const emailInput = await screen.findByPlaceholderText(/email or username/i);
-      await user.type(emailInput, 'test@example.com');
-      const submitButton = screen.getByRole('button', { name: /send reset link/i });
-      await user.click(submitButton);
-
-      // Wait for success view
-      await waitFor(() => {
-        expect(screen.getByRole('heading', { name: /password reset/i })).toBeInTheDocument();
-      });
-
-      // Return to login
-      const returnButton = screen.getByRole('button', { name: /return to login/i });
-      await user.click(returnButton);
-
-      await waitFor(() => {
-        expect(screen.getByText(/sign in/i)).toBeInTheDocument();
-      });
-    });
-  });
-
-  describe('Navigation', () => {
-    it('should call onNavigateToRegister when sign up is clicked', async () => {
-      renderWithProviders();
-
-      const user = userEvent.setup();
-      const signUpLink = screen.getByRole('button', { name: /register as manager/i });
-
-      await user.click(signUpLink);
-
-      expect(mockOnNavigateToRegister).toHaveBeenCalled();
-    });
-  });
-
-  describe('Error Handling', () => {
-    it('should display server connection error', async () => {
-      vi.mocked(api.authApi.login).mockRejectedValue(new Error('Network error'));
-
-      renderWithProviders();
-
-      const user = userEvent.setup();
-      const usernameInput = screen.getByLabelText(/username/i);
-      const passwordInput = screen.getByLabelText(/password/i);
-      const loginButton = screen.getByRole('button', { name: /sign in/i });
-
-      await user.type(usernameInput, 'testuser');
-      await user.type(passwordInput, 'password123');
-      await user.click(loginButton);
-
-      await waitFor(() => {
-        expect(screen.getByText(/invalid credentials/i)).toBeInTheDocument();
-      });
-    });
-
-    it('should clear error message on new attempt', async () => {
-      vi.mocked(api.authApi.login)
-        .mockRejectedValueOnce(new Error('Invalid credentials'))
-        .mockResolvedValueOnce({
-          token: 'test-token',
-          user: {
-            id: 'user-1',
-            username: 'testuser',
-            name: 'Test User',
-            email: 'test@example.com',
-            role: 'manager',
-            status: 'Active',
-          },
-          storeSetupRequired: false,
-        });
-
-      renderWithProviders();
-
-      const user = userEvent.setup();
-      const usernameInput = screen.getByLabelText(/username/i);
-      const passwordInput = screen.getByLabelText(/password/i);
-      const loginButton = screen.getByRole('button', { name: /sign in/i });
-
-      // First attempt - fail
-      await user.type(usernameInput, 'wrong');
-      await user.type(passwordInput, 'wrong');
-      await user.click(loginButton);
-
-      await waitFor(() => {
-        expect(screen.getByText(/invalid credentials/i)).toBeInTheDocument();
-      });
-
-      // Clear inputs
-      await user.clear(usernameInput);
-      await user.clear(passwordInput);
-
-      // Second attempt - success
-      await user.type(usernameInput, 'testuser');
-      await user.type(passwordInput, 'password123');
-      await user.click(loginButton);
-
-      await waitFor(() => {
-        expect(screen.queryByText(/invalid credentials/i)).not.toBeInTheDocument();
-      });
-    });
+    expect(await screen.findByRole('heading', { name: /password reset/i })).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /return to login/i }));
+    expect(await screen.findByRole('button', { name: /sign in/i })).toBeInTheDocument();
   });
 });

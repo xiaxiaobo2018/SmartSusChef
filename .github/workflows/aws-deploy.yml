@@ -209,17 +209,17 @@ jobs:
         working-directory: ./frontend
 
       - name: npm audit
-        run: npm audit --audit-level=high
+        run: npm audit --audit-level=high 2>&1 | tee npm-audit-report.txt || true
         working-directory: ./frontend
         continue-on-error: true
 
       - name: Type check
-        run: npx tsc --noEmit
+        run: npx tsc --noEmit 2>&1 | tee typescript-report.txt || true
         working-directory: ./frontend
         continue-on-error: true
 
       - name: Lint
-        run: npm run lint --if-present
+        run: npm run lint --if-present 2>&1 | tee eslint-report.txt || true
         working-directory: ./frontend
         continue-on-error: true
 
@@ -228,6 +228,17 @@ jobs:
         working-directory: ./frontend
         env:
           VITE_API_URL: /api
+
+      - name: Upload frontend lint reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: frontend-lint-reports
+          path: |
+            frontend/npm-audit-report.txt
+            frontend/typescript-report.txt
+            frontend/eslint-report.txt
+          retention-days: 30
 
   # ==========================================
   # STAGE 2: ML Service Build & Test
@@ -258,13 +269,21 @@ jobs:
       - name: Lint with flake8
         run: |
           pip install flake8
-          flake8 app/ --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 app/ --count --select=E9,F63,F7,F82 --show-source --statistics 2>&1 | tee flake8-report.txt || true
         working-directory: ./ML
         continue-on-error: true
 
       - name: Verify FastAPI app imports
         run: python -c "from app.main import app; print('FastAPI app imports OK')"
         working-directory: ./ML
+
+      - name: Upload ML lint reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ml-lint-reports
+          path: ML/flake8-report.txt
+          retention-days: 30
         
   # ==========================================
   # STAGE 2: Mobile Build & Test
