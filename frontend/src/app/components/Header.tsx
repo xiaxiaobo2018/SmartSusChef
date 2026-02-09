@@ -48,7 +48,7 @@ export function Header({ onNavigateToSettings, showSettingsLink = true }: Header
         {storeSettings && (
           <div className="hidden sm:flex items-center border-r pr-4 mr-2 border-gray-200 h-8">
             <span className="text-sm font-bold text-[#1A1C18]">
-              {storeSettings.storeName} | {storeSettings.outletLocation}
+              {storeSettings.storeName} | {storeSettings.companyName || 'No Company Name'}
             </span>
           </div>
         )}

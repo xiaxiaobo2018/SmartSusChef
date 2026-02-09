@@ -204,34 +204,14 @@ export function RecipeManagement() {
   const handleDeleteConfirm = async () => {
     if (!deletingRecipe) return;
 
-    const { salesCount, wastageCount } = deletingRecipe;
-    const hasRelatedData = salesCount > 0 || wastageCount > 0;
-
-    // If no related data, just delete
-    if (!hasRelatedData) {
-      setIsDeleting(true);
-      try {
-        await deleteRecipe(deletingRecipe.id, false);
-        toast.success('Recipe deleted successfully');
-        setIsDeleteDialogOpen(false);
-        setDeletingRecipe(null);
-      } catch (error) {
-        toast.error('Failed to delete recipe');
-      } finally {
-        setIsDeleting(false);
-      }
-      return;
-    }
-
-    // If related data exists, delete with cascade
     setIsDeleting(true);
     try {
-      await deleteRecipe(deletingRecipe.id, true);
-      toast.success(`Recipe and ${salesCount + wastageCount} related records deleted successfully`);
+      await deleteRecipe(deletingRecipe.id);
+      toast.success('Recipe deleted successfully');
       setIsDeleteDialogOpen(false);
       setDeletingRecipe(null);
     } catch (error) {
-      toast.error('Failed to delete recipe and related data');
+      toast.error('Failed to delete recipe');
     } finally {
       setIsDeleting(false);
     }

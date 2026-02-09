@@ -28,8 +28,6 @@ import {
   wastageApi,
   forecastApi,
   exportApi,
-  setAuthToken,
-  getAuthToken,
   UserDto,
   StoreDto,
   IngredientDto,
@@ -41,17 +39,15 @@ import {
   WeatherDto,
 } from "@/app/services/api";
 
+import { useAuth } from './AuthContext';
+
 // --- Types for Context ---
 interface AppContextType {
   user: User | null;
   loading: boolean;
   dataLoading: boolean;
   storeSetupRequired: boolean;
-  login: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
-  register: (username: string, password: string, name: string, email: string) => Promise<{ success: boolean; storeSetupRequired: boolean; error?: string }>;
-  updateProfile: (data: { name?: string; email?: string }) => Promise<void>;
-  changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
   setupStore: (settings: Partial<StoreSettings>) => Promise<void>;
   storeSettings: StoreSettings;
   updateStoreSettings: (settings: Partial<StoreSettings>) => Promise<void>;
@@ -66,10 +62,10 @@ interface AppContextType {
   forecastData: ForecastData[];
   addIngredient: (ingredient: Omit<Ingredient, "id">) => Promise<void>;
   updateIngredient: (id: string, ingredient: Partial<Ingredient>) => Promise<void>;
-  deleteIngredient: (id: string, cascadeDelete?: boolean) => Promise<void>;
+  deleteIngredient: (id: string) => Promise<void>;
   addRecipe: (recipe: Omit<Recipe, "id">) => Promise<void>;
   updateRecipe: (id: string, recipe: Partial<Recipe>) => Promise<void>;
-  deleteRecipe: (id: string, cascadeDelete?: boolean) => Promise<void>;
+  deleteRecipe: (id: string) => Promise<void>;
   addSalesData: (data: Omit<SalesData, "id">) => Promise<void>;
   updateSalesData: (id: string, data: Partial<SalesData>) => Promise<void>;
   deleteSalesData: (id: string) => Promise<void>;
@@ -190,8 +186,7 @@ const defaultStoreSettings: StoreSettings = {
 // PROVIDER COMPONENT
 // ==========================================
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { user, loading, logout: authLogout } = useAuth();
   const [dataLoading, setDataLoading] = useState(false);
   const [storeSetupRequired, setStoreSetupRequired] = useState(false);
   const [storeSettings, setStoreSettings] = useState<StoreSettings>(defaultStoreSettings);
@@ -270,96 +265,34 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, [user?.role]);
 
-  // ==========================================
-  // INITIALIZE APP
-  // ==========================================
-  useEffect(() => {
-    const initializeApp = async () => {
-      const token = getAuthToken();
-      if (token) {
-        try {
-          const userData = await authApi.getCurrentUser();
-          setUser(mapUserDto(userData));
-        } catch (error) {
-          console.error('Failed to get current user:', error);
-          setAuthToken(null);
-        }
-      }
-      setLoading(false);
-    };
-
-    initializeApp();
-  }, []);
-
-  // Load data when user logs in
+  // Load data when user logs in, clear when logged out
   useEffect(() => {
     if (user) {
       loadAllData();
+      // Check store setup status
+      authApi.checkStoreSetupRequired()
+        .then(({ storeSetupRequired: required }) => setStoreSetupRequired(required))
+        .catch(() => setStoreSetupRequired(false));
+    } else {
+      // Clear all app data on logout
+      setStoreSetupRequired(false);
+      setStoreSettings(defaultStoreSettings);
+      setStoreUsers([]);
+      setIngredients([]);
+      setRecipes([]);
+      setSalesData([]);
+      setWastageData([]);
+      setForecastData([]);
+      setHolidays([]);
+      setWeather(null);
     }
   }, [user, loadAllData]);
 
   // ==========================================
-  // AUTH FUNCTIONS
+  // LOGOUT (delegates to auth + clears app data)
   // ==========================================
-  const login = async (username: string, password: string): Promise<boolean> => {
-    try {
-      const response = await authApi.login({ username, password });
-      setAuthToken(response.token);
-      setUser(mapUserDto(response.user));
-      setStoreSetupRequired(response.storeSetupRequired);
-      return true;
-    } catch (error) {
-      console.error('Login failed:', error);
-      return false;
-    }
-  };
-
   const logout = () => {
-    setUser(null);
-    setAuthToken(null);
-    setStoreSetupRequired(false);
-    setStoreSettings(defaultStoreSettings);
-    setStoreUsers([]);
-    setIngredients([]);
-    setRecipes([]);
-    setSalesData([]);
-    setWastageData([]);
-    setForecastData([]);
-    setHolidays([]);
-    setWeather(null);
-  };
-
-  const register = async (username: string, password: string, name: string, email: string): Promise<{ success: boolean; storeSetupRequired: boolean; error?: string }> => {
-    try {
-      const response = await authApi.register({ username, password, name, email });
-      setAuthToken(response.token);
-      setUser(mapUserDto(response.user));
-      setStoreSetupRequired(response.storeSetupRequired);
-      return { success: true, storeSetupRequired: response.storeSetupRequired };
-    } catch (error) {
-      console.error('Registration failed:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Registration failed';
-      return { success: false, storeSetupRequired: false, error: errorMessage };
-    }
-  };
-
-  const updateProfile = async (data: { name?: string; email?: string }) => {
-    try {
-      const updated = await authApi.updateProfile(data);
-      setUser(mapUserDto(updated));
-    } catch (error) {
-      console.error('Failed to update profile:', error);
-      throw error;
-    }
-  };
-
-  const changePassword = async (currentPassword: string, newPassword: string) => {
-    try {
-      await authApi.changePassword({ currentPassword, newPassword });
-    } catch (error) {
-      console.error('Failed to change password:', error);
-      throw error;
-    }
+    authLogout();
   };
 
   // ==========================================
@@ -489,18 +422,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const deleteIngredient = async (id: string, cascadeDelete: boolean = false) => {
+  const deleteIngredient = async (id: string) => {
     try {
-      // If cascade delete is enabled, first delete all related wastage data
-      if (cascadeDelete) {
-        const relatedWastageData = wastageData.filter(w => w.ingredientId === id);
-        await Promise.all(
-          relatedWastageData.map(waste => wastageApi.delete(waste.id))
-        );
-        setWastageData(prev => prev.filter(w => w.ingredientId !== id));
-      }
-
-      // Then delete the ingredient
       await ingredientsApi.delete(id);
       setIngredients(prev => prev.filter(i => i.id !== id));
     } catch (error) {
@@ -553,23 +476,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const deleteRecipe = async (id: string, cascadeDelete: boolean = false) => {
+  const deleteRecipe = async (id: string) => {
     try {
-      // If cascade delete is enabled, first delete all related sales and wastage data
-      if (cascadeDelete) {
-        const relatedSalesData = salesData.filter(s => s.recipeId === id);
-        const relatedWastageData = wastageData.filter(w => w.recipeId === id);
-
-        await Promise.all([
-          ...relatedSalesData.map(sale => salesApi.delete(sale.id)),
-          ...relatedWastageData.map(waste => wastageApi.delete(waste.id)),
-        ]);
-
-        setSalesData(prev => prev.filter(s => s.recipeId !== id));
-        setWastageData(prev => prev.filter(w => w.recipeId !== id));
-      }
-
-      // Then delete the recipe
       await recipesApi.delete(id);
       setRecipes(prev => prev.filter(r => r.id !== id));
     } catch (error) {
@@ -739,11 +647,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     loading,
     dataLoading,
     storeSetupRequired,
-    login,
     logout,
-    register,
-    updateProfile,
-    changePassword,
     setupStore,
     storeSettings,
     updateStoreSettings,
