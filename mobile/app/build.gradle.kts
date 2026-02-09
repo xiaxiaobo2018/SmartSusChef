@@ -103,7 +103,7 @@ dependencies {
     testImplementation(libs.core.testing)
     testImplementation(libs.datastore.preferences)
     testImplementation(libs.datastore.preferences.core)
-    testImplementation("io.mockk:mockk:1.13.17")
+    testImplementation(libs.mockk)
     testImplementation(libs.truth)
     testImplementation(libs.robolectric)
     androidTestImplementation(libs.androidx.junit)
@@ -122,19 +122,19 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     // Add Hilt testing dependencies
-    testImplementation("com.google.dagger:hilt-android-testing:2.51.1")
-    androidTestImplementation("com.google.dagger:hilt-android-testing:2.51.1")
+    testImplementation(libs.hilt.android.testing)
+    androidTestImplementation(libs.hilt.android.testing)
     // Use kspTest and kspAndroidTest for the Hilt compiler for test sources
-    kspTest("com.google.dagger:hilt-android-compiler:2.51.1")
-    kspAndroidTest("com.google.dagger:hilt-android-compiler:2.51.1")
+    kspTest(libs.hilt.compiler)
+    kspAndroidTest(libs.hilt.compiler)
     // Storage (For TokenManager)
     implementation(libs.datastore.preferences)
-    implementation("androidx.security:security-crypto:1.1.0-alpha06")
+    implementation(libs.androidx.security.crypto)
     // UI Components (For charts)
     implementation(libs.mp.android.chart)
     // MultiDex
-    implementation("androidx.multidex:multidex:2.0.1")
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+    implementation(libs.androidx.multidex)
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
 }
 
 detekt {
