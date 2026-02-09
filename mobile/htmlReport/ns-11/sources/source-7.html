@@ -1,0 +1,108 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Constants</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.smartsuschef.mobile.util</a>
+</div>
+
+<h1>Coverage Summary for Class: Constants (com.smartsuschef.mobile.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">Constants</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.smartsuschef.mobile.util
+&nbsp;
+&nbsp;object Constants {
+&nbsp;    // API Configuration
+&nbsp;    // const val BASE_URL = &quot;http://oversea.zyh111.icu:234/api/&quot;
+&nbsp;
+&nbsp;    // For local development (uncomment when testing locally)
+&nbsp;    // const val BASE_URL = &quot;http://192.168.1.100:5000/api/&quot;
+&nbsp;
+&nbsp;    // For Android Emulator
+&nbsp;    const val BASE_URL = &quot;http://10.0.2.2:5000/api/&quot;
+&nbsp;
+&nbsp;    // Network Timeouts (seconds)
+&nbsp;    const val CONNECT_TIMEOUT = 30L
+&nbsp;    const val READ_TIMEOUT = 30L
+&nbsp;    const val WRITE_TIMEOUT = 30L
+&nbsp;
+&nbsp;    // DataStore Keys
+&nbsp;    const val SHARED_PREFS_FILE_NAME = &quot;smartsuschef_prefs&quot;
+&nbsp;    const val KEY_AUTH_TOKEN = &quot;auth_token&quot;
+&nbsp;    const val KEY_USERNAME = &quot;username&quot;
+&nbsp;    const val KEY_USER_ROLE = &quot;user_role&quot;
+&nbsp;    const val KEY_TOKEN_EXPIRY = &quot;token_expiry&quot;
+&nbsp;
+&nbsp;    // User Roles
+&nbsp;    const val ROLE_EMPLOYEE = &quot;Employee&quot;
+&nbsp;    const val ROLE_MANAGER = &quot;Manager&quot;
+&nbsp;
+&nbsp;    // Date Formats
+&nbsp;    const val DATE_FORMAT_API = &quot;yyyy-MM-dd&quot;              // For API: 2026-01-28
+&nbsp;    const val DATE_FORMAT_DISPLAY = &quot;dd MMM yyyy&quot;         // For UI: 28 Jan 2026
+&nbsp;    const val DATETIME_FORMAT_API = &quot;yyyy-MM-dd&#39;T&#39;HH:mm:ss&quot; // For API timestamps
+&nbsp;
+&nbsp;    // Data Restrictions (Employee vs Manager)
+&nbsp;    const val EMPLOYEE_DATA_DAYS = 7    // Employee can only see last 7 days
+&nbsp;    const val MANAGER_DATA_DAYS = 30    // Manager can see last 30 days
+&nbsp;
+&nbsp;    // Session Timeout (minutes)
+&nbsp;    const val SESSION_TIMEOUT_MINUTES = 30
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-02-09 11:59</div>
+</div>
+</body>
+</html>

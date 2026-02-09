@@ -1,0 +1,356 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DashboardActivity</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.smartsuschef.mobile.ui.dashboard</a>
+</div>
+
+<h1>Coverage Summary for Class: DashboardActivity (com.smartsuschef.mobile.ui.dashboard)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DashboardActivity</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/52)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/62)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DashboardActivity$sam$androidx_lifecycle_Observer$0</td>
+  </tr>
+  <tr>
+    <td class="name">DashboardActivity$special$$inlined$viewModels$default$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DashboardActivity$special$$inlined$viewModels$default$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DashboardActivity$special$$inlined$viewModels$default$3</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/56)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/65)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.smartsuschef.mobile.ui.dashboard
+&nbsp;
+&nbsp;import android.os.Bundle
+&nbsp;import android.view.Menu
+&nbsp;import android.view.MenuItem
+&nbsp;import androidx.activity.viewModels
+&nbsp;import android.content.Intent
+&nbsp;import androidx.appcompat.app.AppCompatActivity
+&nbsp;import android.view.View
+&nbsp;import android.text.TextUtils
+&nbsp;
+&nbsp;import com.smartsuschef.mobile.R
+&nbsp;import com.smartsuschef.mobile.databinding.ActivityDashboardBinding
+&nbsp;import com.smartsuschef.mobile.ui.auth.LoginActivity
+&nbsp;import com.smartsuschef.mobile.ui.settings.SettingsActivity
+&nbsp;import com.smartsuschef.mobile.util.visible
+&nbsp;import com.smartsuschef.mobile.util.gone
+&nbsp;import com.smartsuschef.mobile.util.showToast
+&nbsp;
+&nbsp;import dagger.hilt.android.AndroidEntryPoint
+&nbsp;import androidx.navigation.NavController
+&nbsp;import androidx.navigation.fragment.NavHostFragment
+&nbsp;import androidx.navigation.ui.setupWithNavController
+&nbsp;
+&nbsp;@AndroidEntryPoint
+<b class="nc">&nbsp;class DashboardActivity : AppCompatActivity() {</b>
+&nbsp;    private lateinit var binding: ActivityDashboardBinding
+<b class="nc">&nbsp;    private val viewModel: DashboardViewModel by viewModels()</b>
+&nbsp;    private lateinit var navController: NavController
+&nbsp;
+&nbsp;    override fun onCreate(savedInstanceState: Bundle?) {
+<b class="nc">&nbsp;        super.onCreate(savedInstanceState)</b>
+<b class="nc">&nbsp;        binding = ActivityDashboardBinding.inflate(layoutInflater)</b>
+<b class="nc">&nbsp;        setContentView(binding.root)</b>
+&nbsp;
+<b class="nc">&nbsp;        setSupportActionBar(binding.toolbar)</b>
+<b class="nc">&nbsp;        setupNavigation()</b>
+<b class="nc">&nbsp;        observeUserInfo()</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun setupNavigation() {
+<b class="nc">&nbsp;        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment</b>
+<b class="nc">&nbsp;        navController = navHostFragment.navController</b>
+<b class="nc">&nbsp;        binding.bottomNav.setupWithNavController(navController)</b>
+&nbsp;
+&nbsp;        // links the toolbar to NavController so the title changes and back arrow appears automatically
+<b class="nc">&nbsp;        androidx.navigation.ui.NavigationUI.setupActionBarWithNavController(this, navController)</b>
+&nbsp;
+<b class="nc">&nbsp;        navController.addOnDestinationChangedListener { _, destination, _ -&gt;</b>
+&nbsp;            // Define main fragments (tabs in bottom navigation)
+<b class="nc">&nbsp;            val mainFragments = setOf(</b>
+<b class="nc">&nbsp;                R.id.nav_sales,</b>
+<b class="nc">&nbsp;                R.id.nav_forecast,</b>
+<b class="nc">&nbsp;                R.id.nav_wastage,</b>
+<b class="nc">&nbsp;                R.id.nav_input</b>
+&nbsp;            )
+&nbsp;
+&nbsp;            // When we are on the main tabs, show the store info and hide back arrow
+<b class="nc">&nbsp;            if (destination.id in mainFragments) {</b>
+&nbsp;                // Hide back arrow on main fragments
+<b class="nc">&nbsp;                supportActionBar?.setDisplayHomeAsUpEnabled(false)</b>
+&nbsp;
+<b class="nc">&nbsp;                val name = viewModel.username.value ?: &quot;User&quot;</b>
+<b class="nc">&nbsp;                val role = viewModel.userRole.value ?: &quot;Employee&quot;</b>
+<b class="nc">&nbsp;                supportActionBar?.subtitle = &quot;$name | ${role.lowercase().replaceFirstChar { it.uppercase() }}&quot;</b>
+&nbsp;
+<b class="nc">&nbsp;                val storeName = viewModel.storeName.value ?: &quot;SmartSus Chef&quot;</b>
+<b class="nc">&nbsp;                val location = viewModel.outletLocation.value ?: &quot;&quot;</b>
+<b class="nc">&nbsp;                supportActionBar?.title = if (location.isNotEmpty()) &quot;$storeName | $location&quot; else storeName</b>
+&nbsp;
+&nbsp;                // Apply text styling for better fit
+<b class="nc">&nbsp;                applyToolbarTextStyling()</b>
+&nbsp;            } else {
+&nbsp;                // Show back arrow on detail fragments
+<b class="nc">&nbsp;                supportActionBar?.setDisplayHomeAsUpEnabled(true)</b>
+&nbsp;
+&nbsp;                // Remove the subtitle on detail fragments so the title looks clean
+<b class="nc">&nbsp;                supportActionBar?.subtitle = null</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Apply text styling to toolbar to prevent truncation
+<b class="nc">&nbsp;     * - Smaller text size for title and subtitle</b>
+&nbsp;     * - Enable ellipsize with marquee effect
+<b class="nc">&nbsp;     */</b>
+&nbsp;    private fun applyToolbarTextStyling() {
+<b class="nc">&nbsp;        binding.toolbar.apply {</b>
+&nbsp;            // Reduce title text size to 16sp (default is 20sp)
+<b class="nc">&nbsp;            setTitleTextAppearance(context, R.style.ToolbarTitleTextAppearance)</b>
+&nbsp;
+&nbsp;            // Reduce subtitle text size to 12sp (default is 14sp)
+<b class="nc">&nbsp;            setSubtitleTextAppearance(context, R.style.ToolbarSubtitleTextAppearance)</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun onSupportNavigateUp(): Boolean {
+<b class="nc">&nbsp;        return navController.navigateUp() || super.onSupportNavigateUp()</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun observeUserInfo() {
+&nbsp;        // Observe loading state to show/hide progress bar
+<b class="nc">&nbsp;        viewModel.isLoading.observe(this) { loading -&gt;</b>
+<b class="nc">&nbsp;            if (loading) binding.progressBar.visible() else binding.progressBar.gone()</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Observe user details
+<b class="nc">&nbsp;        viewModel.username.observe(this) { name -&gt;</b>
+<b class="nc">&nbsp;            val role = viewModel.userRole.value ?: &quot;Employee&quot;</b>
+<b class="nc">&nbsp;            supportActionBar?.subtitle = &quot;$name | ${role.lowercase().replaceFirstChar { it.uppercase() }}&quot;</b>
+<b class="nc">&nbsp;            applyToolbarTextStyling()</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Observe store details
+<b class="nc">&nbsp;        viewModel.storeName.observe(this) { sName -&gt;</b>
+<b class="nc">&nbsp;            val location = viewModel.outletLocation.value ?: &quot;&quot;</b>
+<b class="nc">&nbsp;            supportActionBar?.title = if (location.isNotEmpty()) &quot;$sName | $location&quot; else sName</b>
+<b class="nc">&nbsp;            applyToolbarTextStyling()</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+<b class="nc">&nbsp;        menuInflater.inflate(R.menu.dashboard_menu, menu)</b>
+<b class="nc">&nbsp;        return true</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+<b class="nc">&nbsp;        return when (item.itemId) {</b>
+<b class="nc">&nbsp;            R.id.action_logout -&gt; {</b>
+<b class="nc">&nbsp;                performLogout()</b>
+<b class="nc">&nbsp;                true</b>
+&nbsp;            }
+<b class="nc">&nbsp;            R.id.action_settings -&gt; {</b>
+<b class="nc">&nbsp;                navigateToSettings()</b>
+<b class="nc">&nbsp;                true</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            else -&gt; super.onOptionsItemSelected(item)</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun performLogout() {
+<b class="nc">&nbsp;        viewModel.logout()</b>
+&nbsp;        // Navigate back to Login and clear all previous screens
+<b class="nc">&nbsp;        val intent = Intent(this, LoginActivity::class.java).apply {</b>
+<b class="nc">&nbsp;            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        startActivity(intent)</b>
+<b class="nc">&nbsp;        finish()</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun navigateToSettings() {
+<b class="nc">&nbsp;        val intent = Intent(this, SettingsActivity::class.java)</b>
+<b class="nc">&nbsp;        startActivity(intent)</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-02-09 11:59</div>
+</div>
+</body>
+</html>

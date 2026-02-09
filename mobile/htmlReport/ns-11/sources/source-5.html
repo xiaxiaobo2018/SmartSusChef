@@ -1,0 +1,249 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PasswordValidator</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.smartsuschef.mobile.util</a>
+</div>
+
+<h1>Coverage Summary for Class: PasswordValidator (com.smartsuschef.mobile.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PasswordValidator</td>
+<td class="coverageStat">
+  <span class="percent">
+    20%
+  </span>
+  <span class="absValue">
+    (1/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    88.5%
+  </span>
+  <span class="absValue">
+    (23/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    62.5%
+  </span>
+  <span class="absValue">
+    (25/40)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">PasswordValidator$ValidationResult</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (2/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    88.5%
+  </span>
+  <span class="absValue">
+    (23/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    68.8%
+  </span>
+  <span class="absValue">
+    (33/48)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.smartsuschef.mobile.util
+&nbsp;
+&nbsp;/**
+&nbsp; * Password Validator
+&nbsp; * Validates passwords according to backend security requirements.
+&nbsp; *
+&nbsp; * Current Requirements (Update as needed):
+&nbsp; * - Minimum 12 characters
+&nbsp; * - At least 1 uppercase letter
+&nbsp; * - At least 1 lowercase letter
+&nbsp; * - At least 1 number
+&nbsp; * - At least 1 special character (@$!%*?&amp;)
+&nbsp; */
+&nbsp;object PasswordValidator {
+&nbsp;
+&nbsp;    // Password validation configuration
+&nbsp;    private const val MIN_LENGTH = 12
+&nbsp;    private const val MAX_LENGTH = 36
+&nbsp;    private const val SPECIAL_CHARS = &quot;@$!%*?&amp;#^()-_=+[]{}|;:&#39;,.&lt;&gt;/~`&quot;
+&nbsp;
+&nbsp;    // Result of password validation
+&nbsp;    data class ValidationResult(
+<b class="fc">&nbsp;        val isValid: Boolean,</b>
+<b class="fc">&nbsp;        val hasMinLength: Boolean = true,</b>
+<b class="fc">&nbsp;        val hasMaxLength: Boolean = true,</b>
+<b class="fc">&nbsp;        val hasUpperCase: Boolean = true,</b>
+<b class="fc">&nbsp;        val hasLowerCase: Boolean = true,</b>
+<b class="fc">&nbsp;        val hasNumber: Boolean = true,</b>
+<b class="fc">&nbsp;        val hasSpecialChar: Boolean = true,</b>
+<b class="fc">&nbsp;        val errorMessage: String? = null</b>
+&nbsp;    )
+&nbsp;
+&nbsp;    // Validates a password and returns detailed results
+&nbsp;    fun validate(password: String): ValidationResult {
+<b class="fc">&nbsp;        val hasMinLength = password.length &gt;= MIN_LENGTH</b>
+<b class="pc">&nbsp;        val hasMaxLength = password.length &lt;= MAX_LENGTH</b>
+<b class="fc">&nbsp;        val hasUpperCase = password.any { it.isUpperCase() }</b>
+<b class="fc">&nbsp;        val hasLowerCase = password.any { it.isLowerCase() }</b>
+<b class="fc">&nbsp;        val hasNumber = password.any { it.isDigit() }</b>
+<b class="fc">&nbsp;        val hasSpecialChar = password.any { SPECIAL_CHARS.contains(it) }</b>
+&nbsp;
+<b class="pc">&nbsp;        val isValid = hasMinLength &amp;&amp; hasMaxLength &amp;&amp; hasUpperCase &amp;&amp;</b>
+<b class="fc">&nbsp;                hasLowerCase &amp;&amp; hasNumber &amp;&amp; hasSpecialChar</b>
+&nbsp;
+<b class="fc">&nbsp;        val errorMessage = when {</b>
+<b class="fc">&nbsp;            !hasMinLength -&gt; &quot;Password must be at least $MIN_LENGTH characters&quot;</b>
+<b class="pc">&nbsp;            !hasMaxLength -&gt; &quot;Password must not exceed $MAX_LENGTH characters&quot;</b>
+<b class="fc">&nbsp;            !hasUpperCase -&gt; &quot;Password must contain at least one uppercase letter&quot;</b>
+<b class="fc">&nbsp;            !hasLowerCase -&gt; &quot;Password must contain at least one lowercase letter&quot;</b>
+<b class="fc">&nbsp;            !hasNumber -&gt; &quot;Password must contain at least one number&quot;</b>
+<b class="fc">&nbsp;            !hasSpecialChar -&gt; &quot;Password must contain at least one special character ($SPECIAL_CHARS)&quot;</b>
+<b class="fc">&nbsp;            else -&gt; null</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return ValidationResult(</b>
+<b class="fc">&nbsp;            isValid = isValid,</b>
+<b class="fc">&nbsp;            hasMinLength = hasMinLength,</b>
+<b class="fc">&nbsp;            hasMaxLength = hasMaxLength,</b>
+<b class="fc">&nbsp;            hasUpperCase = hasUpperCase,</b>
+<b class="fc">&nbsp;            hasLowerCase = hasLowerCase,</b>
+<b class="fc">&nbsp;            hasNumber = hasNumber,</b>
+<b class="fc">&nbsp;            hasSpecialChar = hasSpecialChar,</b>
+<b class="fc">&nbsp;            errorMessage = errorMessage</b>
+&nbsp;        )
+&nbsp;    }
+&nbsp;
+&nbsp;    // Quick validation - returns true if password is valid
+&nbsp;    fun isValid(password: String): Boolean {
+<b class="nc">&nbsp;        return validate(password).isValid</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Gets the first error message for a password
+&nbsp;    fun getErrorMessage(password: String): String? {
+<b class="nc">&nbsp;        return validate(password).errorMessage</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Gets all password requirements as a list of strings
+&nbsp;    fun getRequirements(): List&lt;String&gt; {
+<b class="nc">&nbsp;        return listOf(</b>
+<b class="nc">&nbsp;            &quot;At least $MIN_LENGTH characters&quot;,</b>
+<b class="nc">&nbsp;            &quot;At least one uppercase letter (A-Z)&quot;,</b>
+<b class="nc">&nbsp;            &quot;At least one lowercase letter (a-z)&quot;,</b>
+<b class="nc">&nbsp;            &quot;At least one number (0-9)&quot;,</b>
+<b class="nc">&nbsp;            &quot;At least one special character ($SPECIAL_CHARS)&quot;</b>
+&nbsp;        )
+&nbsp;    }
+&nbsp;
+&nbsp;    // Gets requirements with check status for a given password, for real-time UI validation
+&nbsp;    fun getRequirementsWithStatus(password: String): List&lt;Pair&lt;String, Boolean&gt;&gt; {
+<b class="nc">&nbsp;        val result = validate(password)</b>
+<b class="nc">&nbsp;        return listOf(</b>
+<b class="nc">&nbsp;            &quot;At least $MIN_LENGTH characters&quot; to result.hasMinLength,</b>
+<b class="nc">&nbsp;            &quot;At least one uppercase letter (A-Z)&quot; to result.hasUpperCase,</b>
+<b class="nc">&nbsp;            &quot;At least one lowercase letter (a-z)&quot; to result.hasLowerCase,</b>
+<b class="nc">&nbsp;            &quot;At least one number (0-9)&quot; to result.hasNumber,</b>
+<b class="nc">&nbsp;            &quot;At least one special character&quot; to result.hasSpecialChar</b>
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-02-09 11:59</div>
+</div>
+</body>
+</html>
