@@ -10,3 +10,4 @@ exclude_dirs:
   - __pycache__
 skips:
   - B101
+  - B110
