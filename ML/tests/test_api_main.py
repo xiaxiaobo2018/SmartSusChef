@@ -1,18 +1,17 @@
-from typing import Any, Dict, List
+from typing import Any
 
 import pandas as pd
-import pytest
 from fastapi.testclient import TestClient
 
 import app.main as main
 
 
 class DummyStore:
-    def __init__(self, dishes: List[str], model_dir: str = "models") -> None:
+    def __init__(self, dishes: list[str], model_dir: str = "models") -> None:
         self._dishes = dishes
         self.model_dir = model_dir
 
-    def list_dishes(self) -> List[str]:
+    def list_dishes(self) -> list[str]:
         return self._dishes
 
 
@@ -162,7 +161,7 @@ def test_store_predict_ok(monkeypatch, tmp_path):
     import joblib
     joblib.dump(recent_df, recent_path)
 
-    def _predict(**kwargs) -> Dict[str, Any]:
+    def _predict(**kwargs) -> dict[str, Any]:
         return {
             "dish": kwargs["dish"],
             "model": "xgboost",
