@@ -20,8 +20,8 @@ using var context = new ApplicationDbContext(optionsBuilder.Options);
 
 try
 {
-    var list = await context.GlobalIngredients.OrderBy(g => g.Name).Take(10).ToListAsync();
-    Console.WriteLine($"Found {list.Count} global ingredients (showing up to 10):\n");
+    var list = await context.Ingredients.OrderBy(i => i.Name).Take(10).ToListAsync();
+    Console.WriteLine($"Found {list.Count} ingredients (showing up to 10):\n");
     foreach (var g in list)
     {
         Console.WriteLine($"{g.Id} | {g.Name} | {g.Unit} | {g.CarbonFootprint}");
@@ -30,6 +30,6 @@ try
 }
 catch (Exception ex)
 {
-    Console.WriteLine("Error querying GlobalIngredients: " + ex.Message);
+    Console.WriteLine("Error querying Ingredients: " + ex.Message);
     return 2;
 }

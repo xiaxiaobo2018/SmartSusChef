@@ -4,19 +4,20 @@ name: Mobile CI/CD
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main, develop, feature/mobile-*]
     paths:
       - 'mobile/**'
   pull_request:
-    branches: [main, develop]
+    branches: [main, develop, feature/mobile-*]
     paths:
       - 'mobile/**'
-  workflow_dispatch: # Allows manual trigger
+  workflow_dispatch:
 
 jobs:
-  build-test:
-    name: Build and Test Mobile App
+  build-test-analyze:
+    name: Build, Test & Analyze Mobile App
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     steps:
       - name: Checkout code
@@ -33,12 +34,77 @@ jobs:
         run: chmod +x gradlew
         working-directory: ./mobile
 
-      - name: Build with Gradle
-        run: ./gradlew build
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug
         working-directory: ./mobile
-        continue-on-error: true
 
-      - name: Test with Gradle
-        run: ./gradlew test
+      # --- Code Quality & Static Analysis ---
+      - name: Run Android Lint
+        run: ./gradlew lintDebug
         working-directory: ./mobile
-        continue-on-error: true
+
+      - name: Run Detekt Static Analysis
+        run: ./gradlew detekt
+        working-directory: ./mobile
+
+      - name: Run ktlint Code Style Check
+        run: ./gradlew ktlintCheck
+        working-directory: ./mobile
+
+      # --- Unit Tests ---
+      - name: Run Unit Tests (JVM)
+        run: ./gradlew testDebugUnitTest --info
+        working-directory: ./mobile
+
+      - name: Generate Jacoco Code Coverage Report
+        run: ./gradlew jacocoTestReportDebug --info
+        working-directory: ./mobile
+
+      # --- Instrumented UI Tests ---
+      - name: Run Instrumented UI Tests (Espresso)
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 33
+          target: google_apis
+          arch: x86_64
+          profile: Nexus 6
+          script: cd mobile && ./gradlew connectedCheck
+        # connectedCheck will fail the build if any instrumented tests fail
+
+      # --- Upload Reports as Artifacts ---
+      - name: Upload Build Artifacts (APK)
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mobile-debug-apk
+          path: mobile/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 7
+
+      - name: Upload Test Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mobile-test-reports
+          path: |
+            mobile/app/build/reports/tests/**
+            mobile/app/build/reports/androidTests/**
+          retention-days: 30
+
+      - name: Upload Code Quality Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mobile-code-quality-reports
+          path: |
+            mobile/app/build/reports/lint-results-debug.html
+            mobile/app/build/reports/detekt/**
+            mobile/app/build/reports/ktlint/**
+          retention-days: 30
+
+      - name: Upload Code Coverage Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mobile-coverage-reports
+          path: mobile/app/build/reports/jacoco/**
+          retention-days: 30
