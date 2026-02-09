@@ -264,7 +264,7 @@ export interface UpdateStoreRequest {
 }
 
 export const storeApi = {
-  get: (): Promise<StoreDto> =>
+  get: (): Promise<StoreDto | null> =>
     fetchWithAuth('/store'),
 
   getStatus: (): Promise<{ isSetupComplete: boolean; storeSetupRequired: boolean }> =>
