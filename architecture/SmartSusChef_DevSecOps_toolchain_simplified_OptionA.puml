@@ -1,0 +1,127 @@
+@startuml SmartSusChef_DevSecOps_Toolchain
+
+title SmartSusChef - DevSecOps Toolchain Architecture
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam roundCorner 6
+
+skinparam rectangle {
+    BackgroundColor<<dev>> #E8F5E9
+    BorderColor<<dev>> #4CAF50
+    BackgroundColor<<sec>> #FFEBEE
+    BorderColor<<sec>> #E53935
+    BackgroundColor<<build>> #E3F2FD
+    BorderColor<<build>> #1E88E5
+    BackgroundColor<<container>> #EDE7F6
+    BorderColor<<container>> #5E35B1
+    BackgroundColor<<deploy>> #F3E5F5
+    BorderColor<<deploy>> #8E24AA
+    BackgroundColor<<monitor>> #FFF8E1
+    BorderColor<<monitor>> #F9A825
+}
+
+' DEVELOPMENT
+rectangle "PLAN & CODE" <<dev>> {
+    [Developer] as dev
+    [GitHub\nRepository] as github
+    [Local Dev\n(.NET, React, FastAPI)] as localdev
+}
+
+' CHANGE DETECTION
+rectangle "CHANGE DETECTION" <<build>> {
+    [Path Filter\nbackend/frontend/ML/mobile] as pathfilter
+}
+
+' SECURITY
+rectangle "SECURITY SCANNING" <<sec>> {
+    [CodeQL SAST\n(C#, TS, Python, Java)] as codeql
+    [Trivy Filesystem\n(CVE, Secrets)] as trivy_fs
+    [Security Dashboard] as sec_dash
+}
+
+' BUILD & TEST
+rectangle "BUILD & TEST" <<build>> {
+    [Backend\n.NET 8] as build_be
+    [Frontend\nNode 20] as build_fe
+    [ML Service\nPython 3.11] as build_ml
+    [Mobile\nKotlin] as build_mob
+}
+
+' CONTAINER
+rectangle "CONTAINER BUILD & SCAN" <<container>> {
+    [Docker Buildx] as buildx
+    [Amazon ECR\n(backend, frontend, ML)] as ecr
+    [Trivy Image Scan\n(CRITICAL, HIGH)] as trivy_img
+}
+
+' DEPLOYMENT
+rectangle "DEPLOYMENT" <<deploy>> {
+    rectangle "UAT Environment" {
+        [ECS Fargate UAT\n(3 services)] as uat_ecs
+        [RDS UAT] as uat_db
+        [Smoke Tests] as smoke
+    }
+    rectangle "Production" {
+        [ECS Fargate Prod\n(3 services)] as prod_ecs
+        [RDS Prod] as prod_db
+        [ALB + HTTPS] as alb
+    }
+    [GitHub Secrets\n(DB, JWT, AWS)] as secrets
+}
+
+' MONITORING
+rectangle "MONITORING" <<monitor>> {
+    [CloudWatch\n(Logs, Metrics)] as cw
+    [Health Endpoints] as health
+}
+
+' FLOW
+dev --> github : git push
+github --> pathfilter : trigger CI/CD
+
+pathfilter --> codeql : scan code
+pathfilter --> trivy_fs : scan dependencies
+codeql --> sec_dash
+trivy_fs --> sec_dash
+
+pathfilter --> build_be : if changed
+pathfilter --> build_fe : if changed
+pathfilter --> build_ml : if changed
+pathfilter --> build_mob : if changed
+
+build_be --> buildx
+build_fe --> buildx
+build_ml --> buildx
+
+buildx --> ecr : push images
+ecr --> trivy_img : scan
+trivy_img --> uat_ecs : deploy
+secrets --> uat_ecs
+uat_ecs --> uat_db
+smoke --> prod_ecs : after UAT
+secrets --> prod_ecs
+prod_ecs --> prod_db
+alb --> prod_ecs
+
+prod_ecs --> cw
+prod_ecs --> health
+
+legend right
+|= Color |= Phase |
+| <#E8F5E9> | Development |
+| <#FFEBEE> | Security |
+| <#E3F2FD> | Build |
+| <#EDE7F6> | Container |
+| <#F3E5F5> | Deployment |
+| <#FFF8E1> | Monitoring |
+
+**Key Practices:**
+• Shift-left: CodeQL SAST
+• Trivy CVE scanning
+• Selective CI/CD
+• Parallel deployment
+• GitHub Secrets
+end legend
+
+@enduml
