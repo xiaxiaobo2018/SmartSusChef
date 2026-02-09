@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Plus, Edit, Trash2, Package, AlertTriangle, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
 import { Ingredient, GlobalIngredient } from '@/app/types';
+import { globalIngredientsApi, type GlobalIngredientDto } from '@/app/services/api';
 
 interface IngredientManagementProps {
   onNavigateToRecipes?: () => void;
@@ -31,27 +32,22 @@ export function IngredientManagement({ onNavigateToRecipes }: IngredientManageme
   const [isDeleting, setIsDeleting] = useState(false);
   const [isRecipeUsageDialogOpen, setIsRecipeUsageDialogOpen] = useState(false);
   const [ingredientInUse, setIngredientInUse] = useState<{ id: string; name: string; usedInRecipes: string[] } | null>(null);
-  
+
   // Load global ingredients from API
   useEffect(() => {
     const loadGlobalIngredients = async () => {
       setIsLoadingGlobalIngredients(true);
       try {
-        const response = await fetch('http://localhost:5001/api/globalingredients');
-        if (response.ok) {
-          const data = await response.json();
-          setGlobalIngredients(data);
-        } else {
-          toast.error('Failed to load global ingredients');
-        }
+        const data = await globalIngredientsApi.getAll();
+        setGlobalIngredients(data as unknown as GlobalIngredient[]);
       } catch (error) {
         console.error('Error loading global ingredients:', error);
-        toast.error('Failed to connect to global ingredients API');
+        toast.error('Failed to load global ingredients. Please try again later.');
       } finally {
         setIsLoadingGlobalIngredients(false);
       }
     };
-    
+
     loadGlobalIngredients();
   }, []);
 
