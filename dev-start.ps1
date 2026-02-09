@@ -29,18 +29,19 @@ if (Test-Path $envFile) {
             }
         }
     }
-} else {
+}
+else {
     Write-Host "[WARN] No .env file found. Copy .env.example to .env and fill in your values." -ForegroundColor Yellow
     Write-Host "       Run: Copy-Item .env.example .env" -ForegroundColor Yellow
     exit 1
 }
 
 # Apply: CLI params override .env, .env overrides empty
-if (-not $DbServer)   { $DbServer   = $env:DB_SERVER }
-if (-not $DbPort)     { $DbPort     = [int]$env:DB_PORT }
-if (-not $DbUser)     { $DbUser     = $env:DB_USER }
+if (-not $DbServer) { $DbServer = $env:DB_SERVER }
+if (-not $DbPort) { $DbPort = [int]$env:DB_PORT }
+if (-not $DbUser) { $DbUser = $env:DB_USER }
 if (-not $DbPassword) { $DbPassword = $env:DB_PASSWORD }
-if (-not $DbName)     { $DbName     = $env:DB_NAME }
+if (-not $DbName) { $DbName = $env:DB_NAME }
 
 Write-Host ""
 Write-Host "==========================================" -ForegroundColor Green
@@ -92,8 +93,9 @@ Write-Host "[2/3] Starting Backend (port 5000)..." -ForegroundColor Cyan
 Start-Process powershell -ArgumentList "-NoExit", "-Command", @"
     `$Host.UI.RawUI.WindowTitle = 'SmartSusChef - Backend (5000)'
     Set-Location '$Root\backend\SmartSusChef.Api'
+    `$env:ASPNETCORE_ENVIRONMENT = 'Development'
     `$env:ConnectionStrings__DefaultConnection = '$connStr'
-    Write-Host 'Backend starting...' -ForegroundColor Green
+    Write-Host 'Backend starting (Development)...' -ForegroundColor Green
     dotnet run
 "@
 

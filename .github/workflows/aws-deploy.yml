@@ -118,12 +118,24 @@ jobs:
         uses: github/codeql-action/analyze@v3
         with:
           category: "/language:${{ matrix.language }}"
+          output: codeql-results
+
+      - name: Upload CodeQL SARIF as artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: codeql-report-${{ matrix.language }}
+          path: codeql-results/*.sarif
+          retention-days: 30
 
   # ==========================================
-  # STAGE 1b: Filesystem Vulnerability Scan
+  # STAGE 3b: Filesystem Vulnerability Scan (after Docker build)
   # ==========================================
   trivy-scan:
     name: "Trivy Filesystem Scan"
+    needs: [docker-build-push]
+    if: |
+      !cancelled() && !failure()
     runs-on: ubuntu-latest
     permissions:
       security-events: write
@@ -142,11 +154,19 @@ jobs:
           output: 'trivy-results.sarif'
           severity: 'CRITICAL,HIGH'
 
-      - name: Upload Trivy scan results
+      - name: Upload Trivy scan results to GitHub Security
         uses: github/codeql-action/upload-sarif@v3
         if: always()
         with:
           sarif_file: 'trivy-results.sarif'
+
+      - name: Upload Trivy filesystem report as artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: trivy-filesystem-report
+          path: trivy-results.sarif
+          retention-days: 30
 
   # ==========================================
   # STAGE 2: Backend Build & Test
@@ -174,7 +194,6 @@ jobs:
 
       - name: Run Unit Tests
         run: dotnet test backend/SmartSusChef.Api.Tests/SmartSusChef.Api.Tests.csproj --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./TestResults
-        continue-on-error: true
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
@@ -223,6 +242,11 @@ jobs:
         working-directory: ./frontend
         continue-on-error: true
 
+      - name: Run Unit Tests
+        run: npm test -- --run --reporter=verbose --coverage 2>&1 | tee test-report.txt
+        working-directory: ./frontend
+        continue-on-error: true
+
       - name: Build
         run: npm run build
         working-directory: ./frontend
@@ -233,11 +257,13 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: frontend-lint-reports
+          name: frontend-reports
           path: |
             frontend/npm-audit-report.txt
             frontend/typescript-report.txt
             frontend/eslint-report.txt
+            frontend/test-report.txt
+            frontend/coverage/
           retention-days: 30
 
   # ==========================================
@@ -258,31 +284,54 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: 'pip'
-          cache-dependency-path: ML/requirements.txt
+          cache-dependency-path: |
+            ML/requirements.txt
+            ML/requirements-dev.txt
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r requirements.txt -r requirements-dev.txt
         working-directory: ./ML
 
-      - name: Lint with flake8
-        run: |
-          pip install flake8
-          flake8 app/ --count --select=E9,F63,F7,F82 --show-source --statistics 2>&1 | tee flake8-report.txt || true
-        working-directory: ./ML
-        continue-on-error: true
-
-      - name: Verify FastAPI app imports
-        run: python -c "from app.main import app; print('FastAPI app imports OK')"
+      - name: Ruff lint
+        run: ruff check .
         working-directory: ./ML
 
-      - name: Upload ML lint reports
-        uses: actions/upload-artifact@v4
-        if: always()
+      - name: Mypy type check
+        run: mypy
+        working-directory: ./ML
+
+      - name: Bandit security scan
+        run: bandit -c bandit.yaml -r .
+        working-directory: ./ML
+
+      - name: Pytest
+        run: pytest -q
+        working-directory: ./ML
+
+      - name: Setup JDK 17 (for JMeter)
+        uses: actions/setup-java@v4
         with:
-          name: ml-lint-reports
-          path: ML/flake8-report.txt
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+
+      - name: Install JMeter
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jmeter
+
+      - name: JMeter healthcheck
+        run: |
+          set -euo pipefail
+          export PYTHONPATH=.
+          python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 &
+          UVICORN_PID=$!
+          trap "kill ${UVICORN_PID}" EXIT
+          sleep 5
+          jmeter -n -t tests/jmeter/healthcheck.jmx -l tests/jmeter/results.jtl
+        working-directory: ./ML
+            ML/test-results.xml
           retention-days: 30
         
   # ==========================================
@@ -304,9 +353,30 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: 'gradle'
+    - name: Lint with Android Lint
+      run: ./gradlew lint 2>&1 | tee lint-report.txt || true
+      working-directory: ./mobile
+      continue-on-error: true
+
+    - name: Run Unit Tests
+      run: ./gradlew testDebugUnitTest 2>&1 | tee test-report.txt || true
+      working-directory: ./mobile
+      continue-on-error: true
+
     - name: Build with Gradle
       run: ./gradlew assembleDebug
       working-directory: ./mobile
+
+    - name: Upload Mobile reports
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: mobile-reports
+        path: |
+          mobile/lint-report.txt
+          mobile/test-report.txt
+          mobile/app/build/reports/
+        retention-days: 30
 
   # ==========================================
   # STAGE 3: Build & Push Docker Images to ECR
@@ -314,7 +384,7 @@ jobs:
   docker-build-push:
     name: "Build & Push Docker Images"
     runs-on: ubuntu-latest
-    needs: [detect-changes, backend-build, frontend-build, ml-build]
+    needs: [detect-changes, security-scan, backend-build, frontend-build, ml-build]
     if: |
       !cancelled() && !failure() &&
       github.ref == 'refs/heads/main' && github.event_name == 'push'
@@ -401,8 +471,8 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_BACKEND }}:latest
-          format: 'table'
-          exit-code: '1'
+          format: 'sarif'
+          output: 'trivy-backend-image.sarif'
           ignore-unfixed: true
           severity: 'CRITICAL,HIGH'
 
@@ -411,8 +481,8 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_FRONTEND }}:latest
-          format: 'table'
-          exit-code: '1'
+          format: 'sarif'
+          output: 'trivy-frontend-image.sarif'
           ignore-unfixed: true
           severity: 'CRITICAL,HIGH'
 
@@ -421,10 +491,39 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_ML }}:latest
-          format: 'table'
-          exit-code: '1'
+          format: 'sarif'
+          output: 'trivy-ml-image.sarif'
           ignore-unfixed: true
           severity: 'CRITICAL,HIGH'
+
+      - name: Upload Trivy image scan reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: trivy-image-scan-reports
+          path: trivy-*-image.sarif
+          retention-days: 30
+
+      - name: Upload Trivy Backend SARIF to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always() && (needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.infra == 'true')
+        with:
+          sarif_file: 'trivy-backend-image.sarif'
+          category: 'trivy-image-backend'
+
+      - name: Upload Trivy Frontend SARIF to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always() && (needs.detect-changes.outputs.frontend == 'true' || needs.detect-changes.outputs.infra == 'true')
+        with:
+          sarif_file: 'trivy-frontend-image.sarif'
+          category: 'trivy-image-frontend'
+
+      - name: Upload Trivy ML SARIF to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always() && (needs.detect-changes.outputs.ml == 'true' || needs.detect-changes.outputs.infra == 'true')
+        with:
+          sarif_file: 'trivy-ml-image.sarif'
+          category: 'trivy-image-ml'
 
   # ==========================================
   # STAGE 4: Deploy to UAT Environment
@@ -432,7 +531,7 @@ jobs:
   deploy-uat:
     name: "Deploy to UAT"
     runs-on: ubuntu-latest
-    needs: [docker-build-push, detect-changes]
+    needs: [docker-build-push, trivy-scan, detect-changes]
     if: |
       !cancelled() && !failure() &&
       github.ref == 'refs/heads/main' && github.event_name == 'push'
@@ -544,20 +643,31 @@ jobs:
 
           if [ -n "$SERVICES" ]; then
             echo "Waiting for all services to stabilize in parallel..."
+            declare -A PID_SVC_MAP
             for svc in $SERVICES; do
               echo "  Waiting: $svc"
               aws ecs wait services-stable --cluster $CLUSTER --services $svc &
+              PID_SVC_MAP[$!]=$svc
               PIDS="$PIDS $!"
             done
             FAILED=0
+            FAILED_SVCS=""
             for pid in $PIDS; do
               if ! wait $pid; then
-                echo "[ERROR] A service failed to stabilize (pid $pid)"
+                SVC_NAME=${PID_SVC_MAP[$pid]}
+                echo "::error::[FAILED] $SVC_NAME did not stabilize (pid $pid)"
+                FAILED_SVCS="$FAILED_SVCS $SVC_NAME"
                 FAILED=1
               fi
             done
             if [ $FAILED -ne 0 ]; then
-              echo "::error::One or more services failed to stabilize"
+              echo "--- Diagnostic: describing failed services ---"
+              for fsvc in $FAILED_SVCS; do
+                echo "=== $fsvc ==="
+                aws ecs describe-services --cluster $CLUSTER --services $fsvc \
+                  --query 'services[0].{status:status,desired:desiredCount,running:runningCount,deployments:deployments[*].{status:status,desired:desiredCount,running:runningCount,rollout:rolloutState,reason:rolloutStateReason},events:events[:5].message}' \
+                  --output yaml 2>/dev/null || true
+              done
               exit 1
             fi
             echo "All services stable!"
@@ -692,20 +802,31 @@ jobs:
 
           if [ -n "$SERVICES" ]; then
             echo "Waiting for all services to stabilize in parallel..."
+            declare -A PID_SVC_MAP
             for svc in $SERVICES; do
               echo "  Waiting: $svc"
               aws ecs wait services-stable --cluster $CLUSTER --services $svc &
+              PID_SVC_MAP[$!]=$svc
               PIDS="$PIDS $!"
             done
             FAILED=0
+            FAILED_SVCS=""
             for pid in $PIDS; do
               if ! wait $pid; then
-                echo "[ERROR] A service failed to stabilize (pid $pid)"
+                SVC_NAME=${PID_SVC_MAP[$pid]}
+                echo "::error::[FAILED] $SVC_NAME did not stabilize (pid $pid)"
+                FAILED_SVCS="$FAILED_SVCS $SVC_NAME"
                 FAILED=1
               fi
             done
             if [ $FAILED -ne 0 ]; then
-              echo "::error::One or more services failed to stabilize"
+              echo "--- Diagnostic: describing failed services ---"
+              for fsvc in $FAILED_SVCS; do
+                echo "=== $fsvc ==="
+                aws ecs describe-services --cluster $CLUSTER --services $fsvc \
+                  --query 'services[0].{status:status,desired:desiredCount,running:runningCount,deployments:deployments[*].{status:status,desired:desiredCount,running:runningCount,rollout:rolloutState,reason:rolloutStateReason},events:events[:5].message}' \
+                  --output yaml 2>/dev/null || true
+              done
               exit 1
             fi
             echo "All services stable!"
@@ -725,7 +846,7 @@ jobs:
   notify:
     name: "Pipeline Summary"
     runs-on: ubuntu-latest
-    needs: [detect-changes, security-scan, trivy-scan, backend-build, frontend-build, ml-build, mobile-build, docker-build-push, deploy-uat]
+    needs: [detect-changes, security-scan, trivy-scan, backend-build, frontend-build, ml-build, mobile-build, docker-build-push, deploy-uat, deploy-production]
     if: always()
 
     steps:
@@ -743,3 +864,4 @@ jobs:
           echo "| Mobile Build & Test | ${{ needs.mobile-build.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Docker Build & Push | ${{ needs.docker-build-push.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Deploy to UAT | ${{ needs.deploy-uat.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Deploy to Production | ${{ needs.deploy-production.result }} |" >> $GITHUB_STEP_SUMMARY

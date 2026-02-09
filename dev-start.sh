@@ -76,6 +76,7 @@ sleep 3
 echo "[2/3] Starting Backend (port 5000)..."
 (
     cd "$ROOT/backend/SmartSusChef.Api"
+    export ASPNETCORE_ENVIRONMENT=Development
     export ConnectionStrings__DefaultConnection="$CONN_STR"
     dotnet run
 ) &
