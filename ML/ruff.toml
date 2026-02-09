@@ -4,6 +4,15 @@ line-length = 100
 select = ["E", "F", "W", "I", "B", "UP"]
 ignore = ["E501"]
 
+[lint.per-file-ignores]
+"Final_model_v2.py" = ["E402", "F841", "E701", "B007"]
+"training_logic_v2.py" = ["E402", "B904"]
+"training_logic.py" = ["E402", "F841", "E701", "B007"]
+"train_offline.py" = ["E402"]
+"tests/*" = ["E402"]
+"app/store_manager.py" = ["B007"]
+"backup/*" = ["E402", "F841", "E701", "B007", "B904"]
+
 [lint.isort]
 known-first-party = ["app"]
 

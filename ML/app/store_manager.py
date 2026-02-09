@@ -10,11 +10,11 @@ This module handles:
 
 from __future__ import annotations
 
-import os
 import logging
+import os
 import threading
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import pandas as pd
 from sqlalchemy import create_engine, text
@@ -32,10 +32,10 @@ class StoreModelManager:
     def __init__(self, base_model_dir: str = "models") -> None:
         self.base_model_dir = Path(base_model_dir)
         self.base_model_dir.mkdir(parents=True, exist_ok=True)
-        self._stores: Dict[int, ModelStore] = {}
+        self._stores: dict[int, ModelStore] = {}
         self._training_lock = threading.Lock()
-        self._training_in_progress: Dict[int, bool] = {}
-        self._training_progress: Dict[int, Dict[str, Any]] = {}  # {store_id: {trained, failed, total, current_dish}}
+        self._training_in_progress: dict[int, bool] = {}
+        self._training_progress: dict[int, dict[str, Any]] = {}  # {store_id: {trained, failed, total, current_dish}}
         self._engine = None  # Cached SQLAlchemy engine
 
     # ------------------------------------------------------------------
@@ -53,11 +53,11 @@ class StoreModelManager:
     def is_training(self, store_id: int) -> bool:
         return self._training_in_progress.get(store_id, False)
 
-    def get_training_progress(self, store_id: int) -> Optional[Dict[str, Any]]:
+    def get_training_progress(self, store_id: int) -> dict[str, Any] | None:
         """Return current training progress for a store, or None if not training."""
         return self._training_progress.get(store_id)
 
-    def get_store(self, store_id: int) -> Optional[ModelStore]:
+    def get_store(self, store_id: int) -> ModelStore | None:
         """Return a loaded ModelStore for the given store, or None."""
         if store_id in self._stores:
             return self._stores[store_id]
@@ -70,7 +70,7 @@ class StoreModelManager:
         self._stores[store_id] = store
         return store
 
-    def reload_store(self, store_id: int) -> Optional[ModelStore]:
+    def reload_store(self, store_id: int) -> ModelStore | None:
         """Force-reload models for a store (e.g. after training)."""
         self._stores.pop(store_id, None)
         return self.get_store(store_id)
@@ -80,7 +80,7 @@ class StoreModelManager:
     # ------------------------------------------------------------------
 
     @staticmethod
-    def _get_db_url() -> Optional[str]:
+    def _get_db_url() -> str | None:
         return os.getenv("DATABASE_URL")
 
     def _get_engine(self):
@@ -101,7 +101,7 @@ class StoreModelManager:
 
     def fetch_store_sales(
         self, store_id: int
-    ) -> Tuple[Optional[pd.DataFrame], int]:
+    ) -> tuple[pd.DataFrame | None, int]:
         """
         Fetch sales data for a specific store from the database.
         Returns (dataframe_or_none, total_unique_days).
@@ -141,7 +141,7 @@ class StoreModelManager:
             logger.error("Failed to fetch sales for store %d: %s", store_id, e)
             return None, 0
 
-    def fetch_store_location(self, store_id: int) -> Tuple[Optional[float], Optional[float], Optional[str]]:
+    def fetch_store_location(self, store_id: int) -> tuple[float | None, float | None, str | None]:
         """Fetch store lat/lon/country_code from the database."""
         engine = self._get_engine()
         if not engine:
@@ -168,7 +168,7 @@ class StoreModelManager:
     # Training
     # ------------------------------------------------------------------
 
-    def train_store_models(self, store_id: int) -> Dict[str, Any]:
+    def train_store_models(self, store_id: int) -> dict[str, Any]:
         """
         Train ML models for a given store.
         This is a BLOCKING call — run it in a background thread.
@@ -196,12 +196,13 @@ class StoreModelManager:
             lat, lon, country_code = self.fetch_store_location(store_id)
 
             # Import training logic (heavy — only when needed)
+            import joblib
+
             from training_logic_v2 import (
                 PipelineConfig,
-                process_dish,
                 add_local_context,
+                process_dish,
             )
-            import joblib
 
             config = PipelineConfig()
             model_dir = str(self.store_model_dir(store_id))
@@ -219,7 +220,7 @@ class StoreModelManager:
             dishes = enriched_df["dish"].unique().tolist()
             dish_frames = {d: g.copy() for d, g in enriched_df.groupby("dish", sort=False)}
 
-            champion_map: Dict[str, Dict[str, Any]] = {}
+            champion_map: dict[str, dict[str, Any]] = {}
             trained = 0
             failed = 0
             total = len(dishes)

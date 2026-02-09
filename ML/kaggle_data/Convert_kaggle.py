@@ -1,5 +1,6 @@
-import pandas as pd
 from pathlib import Path
+
+import pandas as pd
 
 INPUT_FILE = "3kaggle_data.csv"
 OUTPUT_FILE = "3final_kaggle.csv"
@@ -22,14 +23,14 @@ def convert_data():
 
     df.columns = df.columns.str.strip()
     cols = df.columns.tolist()
-    
+
     rename_map = {}
 
     if "menu_item_name" in cols and "quantity_sold" in cols:
         print("Detected Format: Sales Data (using menu_item_name)")
         rename_map = {
             "date": "date",
-            "menu_item_name": "dish_name", 
+            "menu_item_name": "dish_name",
             "quantity_sold": "quantity"
         }
 
@@ -48,7 +49,7 @@ def convert_data():
             "menu_item": "dish_name",
             "quantity": "quantity"
         }
-    
+
     else:
         print("Error: Unknown file format.")
         print(f"Columns found: {cols}")

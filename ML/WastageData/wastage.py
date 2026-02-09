@@ -1,6 +1,7 @@
-import pandas as pd
-from pathlib import Path
 import warnings
+from pathlib import Path
+
+import pandas as pd
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
@@ -43,27 +44,27 @@ def process_wastage():
 
             mask_type = df['Transaction Type'].astype(str).str.contains("Stocktake", case=False, na=False)
             mask_loss = df['Qty Change'] < 0
-            
+
             subset = df[mask_type & mask_loss].copy()
 
             if subset.empty:
                 continue
 
             subset['date'] = pd.to_datetime(subset['Audit Time']).dt.date
-            
+
             subset['dish_name'] = subset[name_col]
             subset['wastage_qty'] = subset['Qty Change'].abs()
 
             final_subset = subset[['date', 'dish_name', 'wastage_qty']]
             merged_data.append(final_subset)
-            
+
         except Exception as e:
             print(f"Error processing {f.name}: {e}")
 
     if merged_data:
         final_df = pd.concat(merged_data, ignore_index=True)
         final_df = final_df.sort_values('date')
-        
+
         final_df.to_csv(OUTPUT_FILE, index=False, encoding='utf-8-sig')
         print(f"\nSuccess! Merged {len(final_df)} records.")
         print(f"Saved to: {OUTPUT_FILE}")
