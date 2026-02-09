@@ -1,11 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Button } from '@/app/components/ui/button';
 import { Input } from '@/app/components/ui/input';
 import { Label } from '@/app/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/app/components/ui/card';
-import { ChefHat, AlertCircle, ArrowLeft, UserPlus } from 'lucide-react';
+import { ChefHat, AlertCircle, ArrowLeft, UserPlus, Check, X } from 'lucide-react';
 import { useApp } from '@/app/context/AppContext';
 import { toast } from 'sonner';
+
+const SPECIAL_CHARS = "@$!%*?&#^()-_=+[]{}|;:',.<>/~`";
+
+function getPasswordRequirements(password: string) {
+  return [
+    { label: 'Between 12 and 36 characters', met: password.length >= 12 && password.length <= 36 },
+    { label: 'At least one uppercase letter (A-Z)', met: /[A-Z]/.test(password) },
+    { label: 'At least one lowercase letter (a-z)', met: /[a-z]/.test(password) },
+    { label: 'At least one number (0-9)', met: /\d/.test(password) },
+    { label: `At least one special character (${SPECIAL_CHARS})`, met: /[@$!%*?&#^()\-_=+\[\]{}|;:',.<>\/~`]/.test(password) },
+  ];
+}
 
 interface RegisterPageProps {
   onBackToLogin: () => void;
@@ -39,8 +51,10 @@ export function RegisterPage({ onBackToLogin, onRegisterSuccess }: RegisterPageP
       return;
     }
 
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters');
+    const reqs = getPasswordRequirements(formData.password);
+    const unmet = reqs.find(r => !r.met);
+    if (unmet) {
+      setError(`Password requirement not met: ${unmet.label}`);
       return;
     }
 
@@ -126,12 +140,23 @@ export function RegisterPage({ onBackToLogin, onRegisterSuccess }: RegisterPageP
               <Input
                 id="password"
                 type="password"
-                placeholder="Create a password (min 6 characters)"
+                placeholder="Create a password (12-36 characters)"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 required
                 className="rounded-[8px]"
+                maxLength={36}
               />
+              {formData.password && (
+                <ul className="space-y-1 mt-2">
+                  {getPasswordRequirements(formData.password).map((req) => (
+                    <li key={req.label} className={`flex items-center gap-1.5 text-xs ${req.met ? 'text-green-600' : 'text-gray-400'}`}>
+                      {req.met ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                      {req.label}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
 
             <div className="space-y-2">

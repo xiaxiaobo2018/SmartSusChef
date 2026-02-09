@@ -54,7 +54,7 @@ public class UsersControllerTests
     public async Task CreateUser_ShouldReturnCreatedAtAction_WhenSuccessful()
     {
         // Arrange
-        var request = new CreateUserRequest("test", "password", "test", "test", "test");
+        var request = new CreateUserRequest("test", "ValidPass1@xyz", "test", "test", "test");
         var user = new UserListDto(Guid.NewGuid().ToString(), "test", "test", "test", "test", "test", DateTime.UtcNow, DateTime.UtcNow);
         _mockAuthService.Setup(s => s.CreateUserAsync(request, 1)).ReturnsAsync(user);
 
@@ -82,8 +82,73 @@ public class UsersControllerTests
     [Fact]
     public async Task CreateUser_ShouldReturnBadRequest_WhenPasswordIsTooShort()
     {
+        // Arrange — 11 chars, meets complexity but too short
+        var request = new CreateUserRequest("test", "Abcdefgh1@!", "test", "test", "test");
+
+        // Act
+        var result = await _controller.CreateUser(request);
+
+        // Assert
+        var actionResult = Assert.IsType<BadRequestObjectResult>(result.Result);
+    }
+
+    [Fact]
+    public async Task CreateUser_ShouldReturnBadRequest_WhenPasswordIsTooLong()
+    {
+        // Arrange — 37 chars, exceeds max of 36
+        var request = new CreateUserRequest("test", "Abcdefghijklmnopqrstuvwxyz12345@!!!!!", "test", "test", "test");
+
+        // Act
+        var result = await _controller.CreateUser(request);
+
+        // Assert
+        var actionResult = Assert.IsType<BadRequestObjectResult>(result.Result);
+    }
+
+    [Fact]
+    public async Task CreateUser_ShouldReturnBadRequest_WhenPasswordMissingUppercase()
+    {
         // Arrange
-        var request = new CreateUserRequest("test", "123", "test", "test", "test");
+        var request = new CreateUserRequest("test", "abcdefgh123@", "test", "test", "test");
+
+        // Act
+        var result = await _controller.CreateUser(request);
+
+        // Assert
+        var actionResult = Assert.IsType<BadRequestObjectResult>(result.Result);
+    }
+
+    [Fact]
+    public async Task CreateUser_ShouldReturnBadRequest_WhenPasswordMissingLowercase()
+    {
+        // Arrange
+        var request = new CreateUserRequest("test", "ABCDEFGH123@", "test", "test", "test");
+
+        // Act
+        var result = await _controller.CreateUser(request);
+
+        // Assert
+        var actionResult = Assert.IsType<BadRequestObjectResult>(result.Result);
+    }
+
+    [Fact]
+    public async Task CreateUser_ShouldReturnBadRequest_WhenPasswordMissingNumber()
+    {
+        // Arrange
+        var request = new CreateUserRequest("test", "Abcdefghijk@", "test", "test", "test");
+
+        // Act
+        var result = await _controller.CreateUser(request);
+
+        // Assert
+        var actionResult = Assert.IsType<BadRequestObjectResult>(result.Result);
+    }
+
+    [Fact]
+    public async Task CreateUser_ShouldReturnBadRequest_WhenPasswordMissingSpecialChar()
+    {
+        // Arrange
+        var request = new CreateUserRequest("test", "Abcdefghij12", "test", "test", "test");
 
         // Act
         var result = await _controller.CreateUser(request);
@@ -96,7 +161,7 @@ public class UsersControllerTests
     public async Task CreateUser_ShouldReturnConflict_WhenUsernameExists()
     {
         // Arrange
-        var request = new CreateUserRequest("test", "password", "test", "test", "test");
+        var request = new CreateUserRequest("test", "ValidPass1@xyz", "test", "test", "test");
         _mockAuthService.Setup(s => s.CreateUserAsync(request, 1)).ReturnsAsync((UserListDto?)null);
 
         // Act
