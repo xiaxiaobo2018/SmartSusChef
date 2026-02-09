@@ -37,10 +37,28 @@ import {
   Pencil,
   Trash2,
   MapPin,
-  Phone
+  Phone,
+  Check,
+  X
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { User } from '@/app/types';
+
+const SPECIAL_CHARS = "@$!%*?&#^()-_=+[]{}|;:',.<>/~`";
+
+function getPasswordRequirements(password: string) {
+  return [
+    { label: 'Between 12 and 36 characters', met: password.length >= 12 && password.length <= 36 },
+    { label: 'At least one uppercase letter (A-Z)', met: /[A-Z]/.test(password) },
+    { label: 'At least one lowercase letter (a-z)', met: /[a-z]/.test(password) },
+    { label: 'At least one number (0-9)', met: /\d/.test(password) },
+    { label: `At least one special character (${SPECIAL_CHARS})`, met: /[@$!%*?&#^()\-_=+\[\]{}|;:',.<>\/~`]/.test(password) },
+  ];
+}
+
+function isPasswordValid(password: string): boolean {
+  return getPasswordRequirements(password).every(r => r.met);
+}
 
 interface StoreSettingsProps {
   onBack?: () => void;
@@ -138,11 +156,21 @@ export function StoreSettings({ onBack }: StoreSettingsProps) {
 
     try {
       if (editingUser) {
+        if (userForm.password && !isPasswordValid(userForm.password)) {
+          const unmet = getPasswordRequirements(userForm.password).find(r => !r.met);
+          toast.error(`Password requirement not met: ${unmet?.label}`);
+          return;
+        }
         await updateUser(editingUser.id, userForm.password ? userForm : { ...userForm, password: undefined });
         toast.success('User updated successfully');
       } else {
         if (!userForm.password) {
           toast.error('Please set a password for the new user');
+          return;
+        }
+        if (!isPasswordValid(userForm.password)) {
+          const unmet = getPasswordRequirements(userForm.password).find(r => !r.met);
+          toast.error(`Password requirement not met: ${unmet?.label}`);
           return;
         }
         await addUser(userForm);
@@ -183,6 +211,11 @@ export function StoreSettings({ onBack }: StoreSettingsProps) {
     }
     if (passwordForm.currentPassword === passwordForm.newPassword) {
       toast.error('New password must be different');
+      return;
+    }
+    if (!isPasswordValid(passwordForm.newPassword)) {
+      const unmet = getPasswordRequirements(passwordForm.newPassword).find(r => !r.met);
+      toast.error(`Password requirement not met: ${unmet?.label}`);
       return;
     }
     try {
@@ -464,7 +497,18 @@ export function StoreSettings({ onBack }: StoreSettingsProps) {
                     value={passwordForm.newPassword}
                     onChange={(e) => setPasswordForm(prev => ({ ...prev, newPassword: e.target.value }))}
                     className="rounded-[8px] border-gray-200"
+                    maxLength={36}
                   />
+                  {passwordForm.newPassword && (
+                    <ul className="space-y-1 mt-1">
+                      {getPasswordRequirements(passwordForm.newPassword).map((req) => (
+                        <li key={req.label} className={`flex items-center gap-1.5 text-xs ${req.met ? 'text-green-600' : 'text-gray-400'}`}>
+                          {req.met ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                          {req.label}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
                 <Button
                   onClick={handleUpdatePassword}
@@ -558,12 +602,23 @@ export function StoreSettings({ onBack }: StoreSettingsProps) {
               <Input
                 id="password"
                 type="password"
-                placeholder={editingUser ? "Leave blank to keep current password" : "Set a temporary password"}
+                placeholder={editingUser ? "Leave blank to keep current password" : "Set a temporary password (12-36 chars)"}
                 value={userForm.password}
                 onChange={(e) => setUserForm({ ...userForm, password: e.target.value })}
                 className="rounded-[8px]"
                 required={!editingUser}
+                maxLength={36}
               />
+              {userForm.password && (
+                <ul className="space-y-1 mt-1">
+                  {getPasswordRequirements(userForm.password).map((req) => (
+                    <li key={req.label} className={`flex items-center gap-1.5 text-xs ${req.met ? 'text-green-600' : 'text-gray-400'}`}>
+                      {req.met ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                      {req.label}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
 
             <div className="space-y-2">

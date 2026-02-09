@@ -47,10 +47,28 @@ public class UsersController : ControllerBase
             return BadRequest(new { message = "Initial password is required for new users." });
         }
 
-        // 2. Validate password length 
-        if (request.Password.Length < 6)
+        // 2. Validate password length
+        if (request.Password.Length < 12 || request.Password.Length > 36)
         {
-            return BadRequest(new { message = "Password must be at least 6 characters long." });
+            return BadRequest(new { message = "Password must be between 12 and 36 characters long." });
+        }
+
+        // 3. Validate password complexity
+        if (!System.Text.RegularExpressions.Regex.IsMatch(request.Password, @"[A-Z]"))
+        {
+            return BadRequest(new { message = "Password must contain at least one uppercase letter." });
+        }
+        if (!System.Text.RegularExpressions.Regex.IsMatch(request.Password, @"[a-z]"))
+        {
+            return BadRequest(new { message = "Password must contain at least one lowercase letter." });
+        }
+        if (!System.Text.RegularExpressions.Regex.IsMatch(request.Password, @"\d"))
+        {
+            return BadRequest(new { message = "Password must contain at least one number." });
+        }
+        if (!System.Text.RegularExpressions.Regex.IsMatch(request.Password, @"[@$!%*?&#\^()\-_=+\[\]{}|;:',.<>\/~`]"))
+        {
+            return BadRequest(new { message = "Password must contain at least one special character." });
         }
 
         var storeId = GetStoreIdFromClaims();
