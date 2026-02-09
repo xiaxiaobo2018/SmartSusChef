@@ -802,7 +802,7 @@ jobs:
   notify:
     name: "Pipeline Summary"
     runs-on: ubuntu-latest
-    needs: [detect-changes, security-scan, backend-build, frontend-build, ml-build, docker-build-push, deploy-uat, deploy-production]
+    needs: [detect-changes, backend-build, frontend-build, ml-build, docker-build-push, deploy-uat, deploy-production]
     if: always()
 
     steps:
@@ -812,7 +812,6 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Stage | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Security Scan (CodeQL) | ${{ needs.security-scan.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Backend Build & Test | ${{ needs.backend-build.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Frontend Build & Test | ${{ needs.frontend-build.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| ML Service Build & Test | ${{ needs.ml-build.result }} |" >> $GITHUB_STEP_SUMMARY

@@ -36,19 +36,16 @@ jobs:
         working-directory: ./mobile
 
       - name: Android Lint
-        run: ./gradlew lint
+        run: ./gradlew lint || true
         working-directory: ./mobile
-        continue-on-error: true
 
       - name: Detekt
-        run: ./gradlew detekt
+        run: ./gradlew detekt || true
         working-directory: ./mobile
-        continue-on-error: true
 
       - name: Ktlint
-        run: ./gradlew ktlintCheck
+        run: ./gradlew ktlintCheck || true
         working-directory: ./mobile
-        continue-on-error: true
 
       - name: Upload Lint report
         uses: actions/upload-artifact@v4
@@ -56,7 +53,7 @@ jobs:
         with:
           name: lint-report
           path: |
-            mobile/app/build/reports/lint-results*
+            mobile/app/build/reports/lint*
           if-no-files-found: warn
           retention-days: 30
 

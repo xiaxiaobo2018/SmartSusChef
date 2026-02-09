@@ -40,6 +40,7 @@ android {
             // Read the base URL from local.properties, with a fallback to the Android emulator default
             val baseUrl = localProperties.getProperty("local.base.url", "http://10.0.2.2:5001/api/")
             buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
+            buildConfigField("String", "AWS_BASE_URL", "\"http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/api/\"")
             enableUnitTestCoverage = true
             enableAndroidTestCoverage = true
         }
@@ -50,7 +51,8 @@ android {
                 "proguard-rules.pro"
             )
             // Your production URL
-            buildConfigField("String", "BASE_URL", "\"https://smartsuschef.com/api/\"")
+            buildConfigField("String", "BASE_URL", "\"http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/api/\"")
+            buildConfigField("String", "AWS_BASE_URL", "\"http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/api/\"")
         }
     }
 
