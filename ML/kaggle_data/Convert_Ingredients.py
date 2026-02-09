@@ -1,8 +1,8 @@
 import pandas as pd
 from pathlib import Path
 
-INPUT_FILE = "1datasetkaggle_data.csv"
-OUTPUT_FILE = "1food_sales_ingredients.csv"
+INPUT_FILE = "1kaggle_data.csv"
+OUTPUT_FILE = "1final_ingredients.csv"
 
 def process_ingredients_data():
     input_path = Path(INPUT_FILE)

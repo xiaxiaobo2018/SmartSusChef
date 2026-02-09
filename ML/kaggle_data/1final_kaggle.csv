@@ -1,0 +1,4188 @@
+﻿date,dish_name,quantity
+2024-01-01,Beef Rendang,36
+2024-01-01,Teh Tarik,412
+2024-01-01,Tandoori Chicken,586
+2024-01-01,Spaghetti Carbonara,823
+2024-01-01,Roti Canai,1350
+2024-01-01,Mushroom Soup,73
+2024-01-01,Laksa,361
+2024-01-01,Nasi Lemak,315
+2024-01-01,Iced Lemon Tea,1363
+2024-01-01,Chicken Rice,344
+2024-01-01,Chicken Chop,270
+2024-01-01,Char Kway Teow,236
+2024-01-01,Cendol,687
+2024-01-01,Kaya Toast Set,1623
+2024-01-02,Nasi Lemak,847
+2024-01-02,Teh Tarik,770
+2024-01-02,Tandoori Chicken,318
+2024-01-02,Spaghetti Carbonara,12
+2024-01-02,Roti Canai,1536
+2024-01-02,Mushroom Soup,197
+2024-01-02,Beef Rendang,368
+2024-01-02,Kaya Toast Set,1455
+2024-01-02,Iced Lemon Tea,357
+2024-01-02,Chicken Chop,473
+2024-01-02,Cendol,1241
+2024-01-02,Laksa,73
+2024-01-03,Spaghetti Carbonara,240
+2024-01-03,Teh Tarik,496
+2024-01-03,Tandoori Chicken,280
+2024-01-03,Nasi Lemak,503
+2024-01-03,Roti Canai,912
+2024-01-03,Laksa,455
+2024-01-03,Mushroom Soup,210
+2024-01-03,Kaya Toast Set,232
+2024-01-03,Cendol,457
+2024-01-03,Beef Rendang,387
+2024-01-04,Teh Tarik,1580
+2024-01-04,Tandoori Chicken,354
+2024-01-04,Roti Canai,435
+2024-01-04,Nasi Lemak,1082
+2024-01-04,Mushroom Soup,73
+2024-01-04,Laksa,448
+2024-01-04,Iced Lemon Tea,367
+2024-01-04,Chicken Chop,191
+2024-01-04,Char Kway Teow,207
+2024-01-04,Cendol,1704
+2024-01-04,Beef Rendang,194
+2024-01-04,Kaya Toast Set,957
+2024-01-05,Mushroom Soup,92
+2024-01-05,Teh Tarik,2440
+2024-01-05,Tandoori Chicken,59
+2024-01-05,Spaghetti Carbonara,516
+2024-01-05,Roti Canai,721
+2024-01-05,Laksa,53
+2024-01-05,Beef Rendang,153
+2024-01-05,Iced Lemon Tea,340
+2024-01-05,Chicken Chop,40
+2024-01-05,Char Kway Teow,42
+2024-01-05,Cendol,323
+2024-01-05,Kaya Toast Set,1933
+2024-01-06,Nasi Lemak,407
+2024-01-06,Teh Tarik,2283
+2024-01-06,Tandoori Chicken,490
+2024-01-06,Spaghetti Carbonara,106
+2024-01-06,Roti Canai,1017
+2024-01-06,Laksa,68
+2024-01-06,Beef Rendang,243
+2024-01-06,Iced Lemon Tea,751
+2024-01-06,Chicken Rice,230
+2024-01-06,Chicken Chop,176
+2024-01-06,Char Kway Teow,401
+2024-01-06,Cendol,1475
+2024-01-06,Kaya Toast Set,1856
+2024-01-07,Teh Tarik,1381
+2024-01-07,Tandoori Chicken,300
+2024-01-07,Roti Canai,1338
+2024-01-07,Nasi Lemak,1741
+2024-01-07,Mushroom Soup,199
+2024-01-07,Spaghetti Carbonara,312
+2024-01-07,Iced Lemon Tea,918
+2024-01-07,Chicken Chop,781
+2024-01-07,Char Kway Teow,517
+2024-01-07,Cendol,509
+2024-01-07,Beef Rendang,348
+2024-01-07,Kaya Toast Set,2111
+2024-01-08,Teh Tarik,2242
+2024-01-08,Tandoori Chicken,207
+2024-01-08,Spaghetti Carbonara,162
+2024-01-08,Roti Canai,649
+2024-01-08,Laksa,142
+2024-01-08,Chicken Chop,156
+2024-01-08,Cendol,528
+2024-01-08,Kaya Toast Set,1803
+2024-01-09,Mushroom Soup,198
+2024-01-09,Teh Tarik,195
+2024-01-09,Spaghetti Carbonara,75
+2024-01-09,Nasi Lemak,109
+2024-01-09,Kaya Toast Set,1002
+2024-01-09,Beef Rendang,60
+2024-01-09,Chicken Chop,562
+2024-01-09,Char Kway Teow,135
+2024-01-09,Cendol,917
+2024-01-09,Iced Lemon Tea,881
+2024-01-10,Teh Tarik,2596
+2024-01-10,Tandoori Chicken,0
+2024-01-10,Roti Canai,353
+2024-01-10,Nasi Lemak,149
+2024-01-10,Mushroom Soup,0
+2024-01-10,Laksa,368
+2024-01-10,Kaya Toast Set,1993
+2024-01-10,Chicken Rice,18
+2024-01-10,Chicken Chop,763
+2024-01-10,Char Kway Teow,257
+2024-01-10,Cendol,888
+2024-01-10,Beef Rendang,231
+2024-01-10,Iced Lemon Tea,174
+2024-01-11,Nasi Lemak,1295
+2024-01-11,Tandoori Chicken,178
+2024-01-11,Spaghetti Carbonara,154
+2024-01-11,Roti Canai,1156
+2024-01-11,Mushroom Soup,184
+2024-01-11,Teh Tarik,4110
+2024-01-11,Iced Lemon Tea,315
+2024-01-11,Beef Rendang,320
+2024-01-11,Cendol,417
+2024-01-11,Laksa,4
+2024-01-11,Chicken Rice,166
+2024-01-11,Char Kway Teow,3
+2024-01-12,Teh Tarik,947
+2024-01-12,Spaghetti Carbonara,181
+2024-01-12,Nasi Lemak,380
+2024-01-12,Laksa,874
+2024-01-12,Mushroom Soup,0
+2024-01-12,Chicken Rice,680
+2024-01-12,Chicken Chop,249
+2024-01-12,Cendol,638
+2024-01-12,Beef Rendang,211
+2024-01-12,Iced Lemon Tea,398
+2024-01-13,Nasi Lemak,502
+2024-01-13,Tandoori Chicken,236
+2024-01-13,Spaghetti Carbonara,356
+2024-01-13,Teh Tarik,2737
+2024-01-13,Roti Canai,1418
+2024-01-13,Mushroom Soup,195
+2024-01-13,Char Kway Teow,125
+2024-01-13,Iced Lemon Tea,921
+2024-01-13,Chicken Rice,479
+2024-01-13,Chicken Chop,170
+2024-01-13,Cendol,756
+2024-01-13,Kaya Toast Set,1601
+2024-01-13,Beef Rendang,371
+2024-01-14,Kaya Toast Set,1628
+2024-01-14,Teh Tarik,1788
+2024-01-14,Tandoori Chicken,149
+2024-01-14,Spaghetti Carbonara,289
+2024-01-14,Mushroom Soup,100
+2024-01-14,Iced Lemon Tea,1789
+2024-01-14,Chicken Chop,134
+2024-01-14,Cendol,2031
+2024-01-14,Beef Rendang,162
+2024-01-14,Chicken Rice,588
+2024-01-15,Tandoori Chicken,178
+2024-01-15,Spaghetti Carbonara,516
+2024-01-15,Roti Canai,1505
+2024-01-15,Nasi Lemak,1407
+2024-01-15,Mushroom Soup,108
+2024-01-15,Laksa,294
+2024-01-15,Teh Tarik,2561
+2024-01-15,Iced Lemon Tea,2205
+2024-01-15,Chicken Rice,353
+2024-01-15,Chicken Chop,207
+2024-01-15,Char Kway Teow,362
+2024-01-15,Cendol,649
+2024-01-15,Kaya Toast Set,3371
+2024-01-16,Teh Tarik,3956
+2024-01-16,Tandoori Chicken,368
+2024-01-16,Spaghetti Carbonara,405
+2024-01-16,Roti Canai,2153
+2024-01-16,Mushroom Soup,0
+2024-01-16,Chicken Rice,515
+2024-01-16,Chicken Chop,635
+2024-01-16,Char Kway Teow,279
+2024-01-16,Cendol,218
+2024-01-16,Beef Rendang,611
+2024-01-16,Kaya Toast Set,1269
+2024-01-17,Teh Tarik,560
+2024-01-17,Tandoori Chicken,0
+2024-01-17,Spaghetti Carbonara,191
+2024-01-17,Roti Canai,596
+2024-01-17,Nasi Lemak,1264
+2024-01-17,Chicken Rice,690
+2024-01-17,Char Kway Teow,0
+2024-01-17,Beef Rendang,107
+2024-01-17,Mushroom Soup,171
+2024-01-17,Cendol,478
+2024-01-18,Roti Canai,126
+2024-01-18,Beef Rendang,384
+2024-01-18,Cendol,772
+2024-01-18,Chicken Chop,0
+2024-01-18,Iced Lemon Tea,121
+2024-01-18,Kaya Toast Set,862
+2024-01-18,Laksa,396
+2024-01-18,Mushroom Soup,239
+2024-01-18,Nasi Lemak,1560
+2024-01-18,Spaghetti Carbonara,254
+2024-01-18,Tandoori Chicken,181
+2024-01-18,Teh Tarik,2026
+2024-01-19,Roti Canai,869
+2024-01-19,Spaghetti Carbonara,730
+2024-01-19,Char Kway Teow,330
+2024-01-19,Nasi Lemak,1069
+2024-01-19,Teh Tarik,1590
+2024-01-19,Mushroom Soup,538
+2024-01-19,Cendol,229
+2024-01-19,Kaya Toast Set,2283
+2024-01-19,Iced Lemon Tea,2247
+2024-01-19,Chicken Rice,111
+2024-01-19,Chicken Chop,329
+2024-01-19,Laksa,134
+2024-01-20,Nasi Lemak,674
+2024-01-20,Tandoori Chicken,424
+2024-01-20,Spaghetti Carbonara,1088
+2024-01-20,Roti Canai,1546
+2024-01-20,Teh Tarik,1868
+2024-01-20,Laksa,660
+2024-01-20,Kaya Toast Set,1742
+2024-01-20,Chicken Chop,358
+2024-01-20,Char Kway Teow,396
+2024-01-20,Cendol,635
+2024-01-20,Mushroom Soup,579
+2024-01-21,Tandoori Chicken,510
+2024-01-21,Spaghetti Carbonara,158
+2024-01-21,Roti Canai,506
+2024-01-21,Nasi Lemak,1350
+2024-01-21,Mushroom Soup,0
+2024-01-21,Teh Tarik,1570
+2024-01-21,Chicken Rice,836
+2024-01-21,Chicken Chop,669
+2024-01-21,Cendol,1614
+2024-01-21,Beef Rendang,155
+2024-01-21,Iced Lemon Tea,524
+2024-01-22,Teh Tarik,270
+2024-01-22,Tandoori Chicken,376
+2024-01-22,Spaghetti Carbonara,289
+2024-01-22,Nasi Lemak,1160
+2024-01-22,Mushroom Soup,0
+2024-01-22,Iced Lemon Tea,118
+2024-01-22,Chicken Chop,350
+2024-01-22,Char Kway Teow,45
+2024-01-22,Cendol,260
+2024-01-22,Beef Rendang,821
+2024-01-22,Kaya Toast Set,1987
+2024-01-23,Roti Canai,933
+2024-01-23,Teh Tarik,932
+2024-01-23,Tandoori Chicken,190
+2024-01-23,Nasi Lemak,187
+2024-01-23,Spaghetti Carbonara,127
+2024-01-23,Kaya Toast Set,423
+2024-01-23,Chicken Rice,372
+2024-01-23,Mushroom Soup,62
+2024-01-23,Chicken Chop,544
+2024-01-23,Cendol,273
+2024-01-24,Teh Tarik,1158
+2024-01-24,Tandoori Chicken,576
+2024-01-24,Spaghetti Carbonara,278
+2024-01-24,Roti Canai,358
+2024-01-24,Nasi Lemak,750
+2024-01-24,Mushroom Soup,115
+2024-01-24,Laksa,239
+2024-01-24,Kaya Toast Set,1170
+2024-01-24,Iced Lemon Tea,384
+2024-01-24,Chicken Chop,260
+2024-01-24,Cendol,303
+2024-01-24,Beef Rendang,12
+2024-01-25,Tandoori Chicken,123
+2024-01-25,Spaghetti Carbonara,470
+2024-01-25,Roti Canai,1524
+2024-01-25,Mushroom Soup,306
+2024-01-25,Kaya Toast Set,1669
+2024-01-25,Teh Tarik,573
+2024-01-25,Chicken Rice,409
+2024-01-25,Chicken Chop,1044
+2024-01-25,Char Kway Teow,613
+2024-01-25,Cendol,1491
+2024-01-25,Beef Rendang,220
+2024-01-25,Iced Lemon Tea,520
+2024-01-26,Teh Tarik,722
+2024-01-26,Roti Canai,735
+2024-01-26,Nasi Lemak,146
+2024-01-26,Mushroom Soup,266
+2024-01-26,Laksa,35
+2024-01-26,Spaghetti Carbonara,158
+2024-01-26,Iced Lemon Tea,1268
+2024-01-26,Chicken Rice,157
+2024-01-26,Char Kway Teow,424
+2024-01-26,Cendol,1184
+2024-01-26,Beef Rendang,408
+2024-01-26,Kaya Toast Set,1656
+2024-01-27,Teh Tarik,438
+2024-01-27,Tandoori Chicken,246
+2024-01-27,Nasi Lemak,714
+2024-01-27,Mushroom Soup,188
+2024-01-27,Kaya Toast Set,1147
+2024-01-27,Chicken Rice,396
+2024-01-27,Chicken Chop,592
+2024-01-27,Char Kway Teow,822
+2024-01-27,Cendol,900
+2024-01-27,Beef Rendang,459
+2024-01-27,Iced Lemon Tea,762
+2024-01-28,Nasi Lemak,474
+2024-01-28,Tandoori Chicken,276
+2024-01-28,Spaghetti Carbonara,63
+2024-01-28,Roti Canai,1030
+2024-01-28,Mushroom Soup,108
+2024-01-28,Teh Tarik,3795
+2024-01-28,Chicken Chop,87
+2024-01-28,Char Kway Teow,259
+2024-01-28,Cendol,2262
+2024-01-28,Beef Rendang,217
+2024-01-28,Kaya Toast Set,2270
+2024-01-29,Teh Tarik,402
+2024-01-29,Spaghetti Carbonara,431
+2024-01-29,Roti Canai,247
+2024-01-29,Nasi Lemak,1635
+2024-01-29,Mushroom Soup,453
+2024-01-29,Kaya Toast Set,932
+2024-01-29,Iced Lemon Tea,1009
+2024-01-29,Chicken Rice,231
+2024-01-29,Beef Rendang,353
+2024-01-30,Tandoori Chicken,195
+2024-01-30,Teh Tarik,1474
+2024-01-30,Spaghetti Carbonara,110
+2024-01-30,Roti Canai,312
+2024-01-30,Nasi Lemak,548
+2024-01-30,Mushroom Soup,215
+2024-01-30,Cendol,751
+2024-01-30,Iced Lemon Tea,893
+2024-01-30,Chicken Chop,76
+2024-01-30,Char Kway Teow,105
+2024-01-30,Beef Rendang,1185
+2024-01-30,Kaya Toast Set,1175
+2024-01-31,Teh Tarik,1354
+2024-01-31,Tandoori Chicken,253
+2024-01-31,Roti Canai,411
+2024-01-31,Nasi Lemak,699
+2024-01-31,Mushroom Soup,408
+2024-01-31,Kaya Toast Set,1440
+2024-01-31,Laksa,96
+2024-01-31,Chicken Rice,416
+2024-01-31,Chicken Chop,456
+2024-01-31,Char Kway Teow,295
+2024-01-31,Cendol,489
+2024-01-31,Beef Rendang,217
+2024-01-31,Iced Lemon Tea,1544
+2024-02-01,Teh Tarik,762
+2024-02-01,Spaghetti Carbonara,551
+2024-02-01,Roti Canai,355
+2024-02-01,Nasi Lemak,981
+2024-02-01,Mushroom Soup,236
+2024-02-01,Laksa,305
+2024-02-01,Tandoori Chicken,686
+2024-02-01,Iced Lemon Tea,1336
+2024-02-01,Chicken Rice,1377
+2024-02-01,Chicken Chop,307
+2024-02-01,Cendol,1745
+2024-02-01,Beef Rendang,239
+2024-02-01,Kaya Toast Set,2423
+2024-02-02,Teh Tarik,1290
+2024-02-02,Tandoori Chicken,25
+2024-02-02,Spaghetti Carbonara,95
+2024-02-02,Roti Canai,976
+2024-02-02,Nasi Lemak,89
+2024-02-02,Mushroom Soup,157
+2024-02-02,Iced Lemon Tea,299
+2024-02-02,Cendol,417
+2024-02-02,Beef Rendang,174
+2024-02-02,Kaya Toast Set,806
+2024-02-03,Mushroom Soup,138
+2024-02-03,Tandoori Chicken,243
+2024-02-03,Teh Tarik,2521
+2024-02-03,Roti Canai,283
+2024-02-03,Nasi Lemak,832
+2024-02-03,Laksa,245
+2024-02-03,Spaghetti Carbonara,489
+2024-02-03,Iced Lemon Tea,1815
+2024-02-03,Chicken Rice,569
+2024-02-03,Chicken Chop,48
+2024-02-03,Char Kway Teow,100
+2024-02-03,Cendol,1969
+2024-02-03,Kaya Toast Set,1419
+2024-02-04,Tandoori Chicken,516
+2024-02-04,Spaghetti Carbonara,118
+2024-02-04,Roti Canai,661
+2024-02-04,Nasi Lemak,1536
+2024-02-04,Iced Lemon Tea,1344
+2024-02-04,Teh Tarik,3171
+2024-02-04,Chicken Chop,753
+2024-02-04,Char Kway Teow,421
+2024-02-04,Cendol,925
+2024-02-04,Beef Rendang,346
+2024-02-04,Chicken Rice,187
+2024-02-05,Teh Tarik,1927
+2024-02-05,Spaghetti Carbonara,272
+2024-02-05,Roti Canai,1125
+2024-02-05,Nasi Lemak,680
+2024-02-05,Mushroom Soup,132
+2024-02-05,Laksa,91
+2024-02-05,Iced Lemon Tea,1009
+2024-02-05,Chicken Chop,326
+2024-02-05,Cendol,703
+2024-02-05,Beef Rendang,218
+2024-02-05,Kaya Toast Set,1185
+2024-02-06,Roti Canai,566
+2024-02-06,Teh Tarik,1787
+2024-02-06,Tandoori Chicken,385
+2024-02-06,Spaghetti Carbonara,121
+2024-02-06,Nasi Lemak,430
+2024-02-06,Iced Lemon Tea,704
+2024-02-06,Chicken Rice,453
+2024-02-06,Chicken Chop,310
+2024-02-06,Char Kway Teow,342
+2024-02-06,Cendol,1241
+2024-02-06,Kaya Toast Set,453
+2024-02-07,Tandoori Chicken,335
+2024-02-07,Spaghetti Carbonara,201
+2024-02-07,Nasi Lemak,1380
+2024-02-07,Mushroom Soup,185
+2024-02-07,Laksa,251
+2024-02-07,Roti Canai,2012
+2024-02-07,Iced Lemon Tea,309
+2024-02-07,Chicken Chop,288
+2024-02-07,Cendol,289
+2024-02-07,Beef Rendang,413
+2024-02-07,Kaya Toast Set,1346
+2024-02-08,Teh Tarik,2180
+2024-02-08,Beef Rendang,131
+2024-02-08,Cendol,1450
+2024-02-08,Chicken Chop,817
+2024-02-08,Iced Lemon Tea,513
+2024-02-08,Kaya Toast Set,2448
+2024-02-08,Mushroom Soup,100
+2024-02-08,Roti Canai,1108
+2024-02-08,Spaghetti Carbonara,122
+2024-02-08,Tandoori Chicken,132
+2024-02-09,Teh Tarik,313
+2024-02-09,Nasi Lemak,467
+2024-02-09,Tandoori Chicken,72
+2024-02-09,Spaghetti Carbonara,165
+2024-02-09,Mushroom Soup,14
+2024-02-09,Roti Canai,753
+2024-02-09,Iced Lemon Tea,166
+2024-02-09,Beef Rendang,533
+2024-02-09,Kaya Toast Set,1266
+2024-02-09,Chicken Chop,397
+2024-02-09,Cendol,88
+2024-02-10,Teh Tarik,2755
+2024-02-10,Tandoori Chicken,534
+2024-02-10,Spaghetti Carbonara,350
+2024-02-10,Roti Canai,1874
+2024-02-10,Mushroom Soup,490
+2024-02-10,Nasi Lemak,345
+2024-02-10,Iced Lemon Tea,1297
+2024-02-10,Chicken Chop,106
+2024-02-10,Char Kway Teow,174
+2024-02-10,Cendol,751
+2024-02-10,Beef Rendang,633
+2024-02-10,Kaya Toast Set,2535
+2024-02-11,Nasi Lemak,1047
+2024-02-11,Tandoori Chicken,746
+2024-02-11,Teh Tarik,2059
+2024-02-11,Spaghetti Carbonara,389
+2024-02-11,Roti Canai,780
+2024-02-11,Mushroom Soup,225
+2024-02-11,Cendol,1072
+2024-02-11,Iced Lemon Tea,365
+2024-02-11,Chicken Chop,768
+2024-02-11,Char Kway Teow,225
+2024-02-11,Kaya Toast Set,465
+2024-02-11,Beef Rendang,82
+2024-02-12,Mushroom Soup,117
+2024-02-12,Teh Tarik,2322
+2024-02-12,Tandoori Chicken,25
+2024-02-12,Spaghetti Carbonara,373
+2024-02-12,Roti Canai,361
+2024-02-12,Nasi Lemak,290
+2024-02-12,Kaya Toast Set,1171
+2024-02-12,Chicken Rice,363
+2024-02-12,Chicken Chop,494
+2024-02-12,Cendol,1277
+2024-02-12,Beef Rendang,240
+2024-02-12,Iced Lemon Tea,152
+2024-02-13,Tandoori Chicken,290
+2024-02-13,Spaghetti Carbonara,75
+2024-02-13,Roti Canai,349
+2024-02-13,Nasi Lemak,538
+2024-02-13,Mushroom Soup,100
+2024-02-13,Teh Tarik,1600
+2024-02-13,Chicken Rice,562
+2024-02-13,Chicken Chop,173
+2024-02-13,Char Kway Teow,268
+2024-02-13,Cendol,1241
+2024-02-13,Beef Rendang,0
+2024-02-13,Kaya Toast Set,1638
+2024-02-14,Tandoori Chicken,25
+2024-02-14,Spaghetti Carbonara,166
+2024-02-14,Roti Canai,1299
+2024-02-14,Nasi Lemak,1801
+2024-02-14,Mushroom Soup,471
+2024-02-14,Iced Lemon Tea,800
+2024-02-14,Chicken Chop,155
+2024-02-14,Char Kway Teow,397
+2024-02-14,Cendol,1365
+2024-02-14,Beef Rendang,132
+2024-02-14,Kaya Toast Set,1716
+2024-02-15,Roti Canai,711
+2024-02-15,Teh Tarik,2188
+2024-02-15,Tandoori Chicken,88
+2024-02-15,Spaghetti Carbonara,447
+2024-02-15,Mushroom Soup,172
+2024-02-15,Nasi Lemak,94
+2024-02-15,Kaya Toast Set,3246
+2024-02-15,Iced Lemon Tea,3036
+2024-02-15,Chicken Rice,700
+2024-02-15,Chicken Chop,844
+2024-02-15,Cendol,1301
+2024-02-16,Tandoori Chicken,0
+2024-02-16,Roti Canai,707
+2024-02-16,Nasi Lemak,926
+2024-02-16,Mushroom Soup,246
+2024-02-16,Laksa,417
+2024-02-16,Kaya Toast Set,644
+2024-02-16,Teh Tarik,3780
+2024-02-16,Chicken Rice,222
+2024-02-16,Chicken Chop,415
+2024-02-16,Char Kway Teow,99
+2024-02-16,Cendol,113
+2024-02-16,Beef Rendang,40
+2024-02-16,Iced Lemon Tea,241
+2024-02-17,Teh Tarik,2103
+2024-02-17,Tandoori Chicken,137
+2024-02-17,Roti Canai,999
+2024-02-17,Nasi Lemak,2132
+2024-02-17,Mushroom Soup,334
+2024-02-17,Laksa,430
+2024-02-17,Iced Lemon Tea,848
+2024-02-17,Chicken Chop,109
+2024-02-17,Cendol,1420
+2024-02-17,Beef Rendang,43
+2024-02-17,Kaya Toast Set,3512
+2024-02-18,Nasi Lemak,887
+2024-02-18,Teh Tarik,699
+2024-02-18,Tandoori Chicken,249
+2024-02-18,Spaghetti Carbonara,284
+2024-02-18,Roti Canai,373
+2024-02-18,Mushroom Soup,554
+2024-02-18,Cendol,715
+2024-02-18,Kaya Toast Set,3524
+2024-02-18,Iced Lemon Tea,627
+2024-02-18,Chicken Rice,908
+2024-02-18,Chicken Chop,385
+2024-02-18,Char Kway Teow,425
+2024-02-18,Laksa,207
+2024-02-19,Teh Tarik,732
+2024-02-19,Tandoori Chicken,280
+2024-02-19,Spaghetti Carbonara,41
+2024-02-19,Roti Canai,1220
+2024-02-19,Nasi Lemak,1778
+2024-02-19,Mushroom Soup,36
+2024-02-19,Laksa,6
+2024-02-19,Iced Lemon Tea,390
+2024-02-19,Chicken Chop,557
+2024-02-19,Cendol,1658
+2024-02-19,Beef Rendang,215
+2024-02-19,Kaya Toast Set,401
+2024-02-20,Mushroom Soup,180
+2024-02-20,Teh Tarik,551
+2024-02-20,Spaghetti Carbonara,146
+2024-02-20,Roti Canai,736
+2024-02-20,Kaya Toast Set,1568
+2024-02-20,Tandoori Chicken,281
+2024-02-20,Chicken Rice,0
+2024-02-20,Chicken Chop,294
+2024-02-20,Char Kway Teow,554
+2024-02-20,Iced Lemon Tea,318
+2024-02-20,Cendol,1328
+2024-02-21,Teh Tarik,1927
+2024-02-21,Roti Canai,581
+2024-02-21,Nasi Lemak,422
+2024-02-21,Mushroom Soup,258
+2024-02-21,Laksa,175
+2024-02-21,Kaya Toast Set,2566
+2024-02-21,Beef Rendang,61
+2024-02-21,Chicken Rice,434
+2024-02-21,Chicken Chop,306
+2024-02-21,Char Kway Teow,264
+2024-02-21,Cendol,619
+2024-02-21,Iced Lemon Tea,1099
+2024-02-22,Teh Tarik,1149
+2024-02-22,Tandoori Chicken,255
+2024-02-22,Spaghetti Carbonara,103
+2024-02-22,Roti Canai,489
+2024-02-22,Nasi Lemak,1475
+2024-02-22,Mushroom Soup,0
+2024-02-22,Kaya Toast Set,236
+2024-02-22,Chicken Rice,176
+2024-02-22,Chicken Chop,92
+2024-02-22,Cendol,816
+2024-02-22,Beef Rendang,194
+2024-02-22,Laksa,279
+2024-02-23,Mushroom Soup,72
+2024-02-23,Tandoori Chicken,369
+2024-02-23,Teh Tarik,3007
+2024-02-23,Roti Canai,462
+2024-02-23,Nasi Lemak,877
+2024-02-23,Laksa,263
+2024-02-23,Spaghetti Carbonara,366
+2024-02-23,Iced Lemon Tea,620
+2024-02-23,Chicken Rice,24
+2024-02-23,Chicken Chop,233
+2024-02-23,Char Kway Teow,137
+2024-02-23,Cendol,1198
+2024-02-23,Kaya Toast Set,2765
+2024-02-24,Teh Tarik,2687
+2024-02-24,Spaghetti Carbonara,397
+2024-02-24,Roti Canai,450
+2024-02-24,Nasi Lemak,805
+2024-02-24,Mushroom Soup,170
+2024-02-24,Tandoori Chicken,246
+2024-02-24,Iced Lemon Tea,1270
+2024-02-24,Chicken Rice,641
+2024-02-24,Chicken Chop,493
+2024-02-24,Cendol,1203
+2024-02-24,Kaya Toast Set,2647
+2024-02-25,Tandoori Chicken,285
+2024-02-25,Spaghetti Carbonara,326
+2024-02-25,Roti Canai,732
+2024-02-25,Nasi Lemak,1910
+2024-02-25,Mushroom Soup,343
+2024-02-25,Kaya Toast Set,4751
+2024-02-25,Chicken Rice,1068
+2024-02-25,Chicken Chop,247
+2024-02-25,Char Kway Teow,517
+2024-02-25,Cendol,2502
+2024-02-25,Beef Rendang,172
+2024-02-25,Iced Lemon Tea,577
+2024-02-25,Teh Tarik,2743
+2024-02-26,Spaghetti Carbonara,106
+2024-02-26,Chicken Chop,774
+2024-02-26,Teh Tarik,173
+2024-02-26,Roti Canai,2590
+2024-02-26,Tandoori Chicken,241
+2024-02-26,Mushroom Soup,325
+2024-02-26,Beef Rendang,0
+2024-02-26,Kaya Toast Set,1027
+2024-02-26,Iced Lemon Tea,683
+2024-02-26,Cendol,629
+2024-02-26,Laksa,377
+2024-02-27,Teh Tarik,379
+2024-02-27,Tandoori Chicken,191
+2024-02-27,Spaghetti Carbonara,525
+2024-02-27,Mushroom Soup,0
+2024-02-27,Nasi Lemak,548
+2024-02-27,Chicken Rice,241
+2024-02-27,Chicken Chop,0
+2024-02-27,Cendol,701
+2024-02-27,Kaya Toast Set,980
+2024-02-28,Nasi Lemak,762
+2024-02-28,Teh Tarik,1513
+2024-02-28,Tandoori Chicken,0
+2024-02-28,Spaghetti Carbonara,84
+2024-02-28,Roti Canai,700
+2024-02-28,Mushroom Soup,71
+2024-02-28,Chicken Chop,301
+2024-02-28,Kaya Toast Set,1192
+2024-02-28,Iced Lemon Tea,905
+2024-02-28,Chicken Rice,789
+2024-02-28,Char Kway Teow,155
+2024-02-28,Cendol,464
+2024-02-28,Laksa,164
+2024-02-29,Nasi Lemak,372
+2024-02-29,Teh Tarik,1172
+2024-02-29,Spaghetti Carbonara,451
+2024-02-29,Roti Canai,577
+2024-02-29,Mushroom Soup,207
+2024-02-29,Beef Rendang,132
+2024-02-29,Iced Lemon Tea,573
+2024-02-29,Chicken Rice,239
+2024-02-29,Chicken Chop,256
+2024-02-29,Cendol,878
+2024-02-29,Kaya Toast Set,518
+2024-03-01,Teh Tarik,4873
+2024-03-01,Tandoori Chicken,368
+2024-03-01,Roti Canai,367
+2024-03-01,Nasi Lemak,472
+2024-03-01,Mushroom Soup,244
+2024-03-01,Kaya Toast Set,4248
+2024-03-01,Iced Lemon Tea,1132
+2024-03-01,Chicken Chop,201
+2024-03-01,Char Kway Teow,478
+2024-03-01,Cendol,801
+2024-03-01,Beef Rendang,391
+2024-03-01,Chicken Rice,165
+2024-03-02,Mushroom Soup,213
+2024-03-02,Teh Tarik,2561
+2024-03-02,Spaghetti Carbonara,281
+2024-03-02,Nasi Lemak,240
+2024-03-02,Kaya Toast Set,1881
+2024-03-02,Tandoori Chicken,267
+2024-03-02,Chicken Rice,335
+2024-03-02,Chicken Chop,609
+2024-03-02,Char Kway Teow,448
+2024-03-02,Cendol,623
+2024-03-02,Beef Rendang,85
+2024-03-02,Iced Lemon Tea,2688
+2024-03-03,Tandoori Chicken,237
+2024-03-03,Spaghetti Carbonara,55
+2024-03-03,Nasi Lemak,965
+2024-03-03,Mushroom Soup,358
+2024-03-03,Kaya Toast Set,1911
+2024-03-03,Teh Tarik,1190
+2024-03-03,Chicken Rice,577
+2024-03-03,Chicken Chop,891
+2024-03-03,Char Kway Teow,166
+2024-03-03,Cendol,272
+2024-03-03,Beef Rendang,398
+2024-03-03,Iced Lemon Tea,823
+2024-03-04,Teh Tarik,2890
+2024-03-04,Tandoori Chicken,172
+2024-03-04,Spaghetti Carbonara,119
+2024-03-04,Roti Canai,495
+2024-03-04,Nasi Lemak,188
+2024-03-04,Mushroom Soup,116
+2024-03-04,Kaya Toast Set,985
+2024-03-04,Chicken Chop,251
+2024-03-04,Char Kway Teow,98
+2024-03-04,Cendol,891
+2024-03-04,Beef Rendang,218
+2024-03-04,Iced Lemon Tea,213
+2024-03-05,Roti Canai,273
+2024-03-05,Tandoori Chicken,339
+2024-03-05,Spaghetti Carbonara,99
+2024-03-05,Teh Tarik,1130
+2024-03-05,Nasi Lemak,598
+2024-03-05,Iced Lemon Tea,1202
+2024-03-05,Laksa,154
+2024-03-05,Kaya Toast Set,1019
+2024-03-05,Cendol,542
+2024-03-05,Beef Rendang,195
+2024-03-05,Mushroom Soup,125
+2024-03-06,Teh Tarik,3293
+2024-03-06,Tandoori Chicken,219
+2024-03-06,Roti Canai,651
+2024-03-06,Nasi Lemak,686
+2024-03-06,Laksa,221
+2024-03-06,Spaghetti Carbonara,164
+2024-03-06,Iced Lemon Tea,604
+2024-03-06,Chicken Chop,339
+2024-03-06,Char Kway Teow,186
+2024-03-06,Cendol,963
+2024-03-06,Beef Rendang,273
+2024-03-06,Kaya Toast Set,728
+2024-03-07,Tandoori Chicken,190
+2024-03-07,Roti Canai,649
+2024-03-07,Nasi Lemak,1235
+2024-03-07,Mushroom Soup,0
+2024-03-07,Kaya Toast Set,1515
+2024-03-07,Char Kway Teow,192
+2024-03-07,Chicken Chop,271
+2024-03-07,Cendol,120
+2024-03-07,Beef Rendang,125
+2024-03-07,Teh Tarik,689
+2024-03-07,Iced Lemon Tea,619
+2024-03-08,Tandoori Chicken,0
+2024-03-08,Spaghetti Carbonara,0
+2024-03-08,Mushroom Soup,186
+2024-03-08,Teh Tarik,1560
+2024-03-08,Kaya Toast Set,1714
+2024-03-08,Roti Canai,649
+2024-03-08,Chicken Chop,291
+2024-03-08,Beef Rendang,215
+2024-03-08,Cendol,311
+2024-03-08,Iced Lemon Tea,1151
+2024-03-08,Char Kway Teow,273
+2024-03-09,Teh Tarik,2654
+2024-03-09,Tandoori Chicken,208
+2024-03-09,Spaghetti Carbonara,281
+2024-03-09,Roti Canai,1203
+2024-03-09,Mushroom Soup,277
+2024-03-09,Laksa,123
+2024-03-09,Nasi Lemak,836
+2024-03-09,Iced Lemon Tea,3046
+2024-03-09,Chicken Rice,258
+2024-03-09,Char Kway Teow,436
+2024-03-09,Cendol,877
+2024-03-09,Beef Rendang,280
+2024-03-09,Kaya Toast Set,2987
+2024-03-10,Mushroom Soup,231
+2024-03-10,Tandoori Chicken,210
+2024-03-10,Roti Canai,1201
+2024-03-10,Nasi Lemak,601
+2024-03-10,Kaya Toast Set,2202
+2024-03-10,Cendol,751
+2024-03-10,Chicken Rice,545
+2024-03-10,Chicken Chop,310
+2024-03-10,Char Kway Teow,261
+2024-03-10,Beef Rendang,157
+2024-03-10,Teh Tarik,2052
+2024-03-10,Iced Lemon Tea,692
+2024-03-11,Spaghetti Carbonara,83
+2024-03-11,Roti Canai,578
+2024-03-11,Teh Tarik,2047
+2024-03-11,Tandoori Chicken,95
+2024-03-11,Nasi Lemak,1020
+2024-03-11,Laksa,258
+2024-03-11,Iced Lemon Tea,317
+2024-03-11,Chicken Chop,232
+2024-03-11,Cendol,441
+2024-03-11,Beef Rendang,101
+2024-03-12,Tandoori Chicken,486
+2024-03-12,Spaghetti Carbonara,474
+2024-03-12,Roti Canai,1585
+2024-03-12,Mushroom Soup,333
+2024-03-12,Kaya Toast Set,1554
+2024-03-12,Teh Tarik,1356
+2024-03-12,Chicken Chop,454
+2024-03-12,Char Kway Teow,104
+2024-03-12,Cendol,582
+2024-03-12,Beef Rendang,200
+2024-03-12,Iced Lemon Tea,564
+2024-03-13,Tandoori Chicken,796
+2024-03-13,Spaghetti Carbonara,22
+2024-03-13,Roti Canai,1177
+2024-03-13,Nasi Lemak,663
+2024-03-13,Mushroom Soup,108
+2024-03-13,Laksa,721
+2024-03-13,Iced Lemon Tea,549
+2024-03-13,Chicken Rice,153
+2024-03-13,Chicken Chop,481
+2024-03-13,Char Kway Teow,100
+2024-03-13,Cendol,573
+2024-03-13,Teh Tarik,1788
+2024-03-13,Kaya Toast Set,686
+2024-03-14,Spaghetti Carbonara,139
+2024-03-14,Chicken Rice,428
+2024-03-14,Teh Tarik,693
+2024-03-14,Roti Canai,896
+2024-03-14,Tandoori Chicken,548
+2024-03-14,Nasi Lemak,1000
+2024-03-14,Cendol,454
+2024-03-14,Kaya Toast Set,1089
+2024-03-14,Iced Lemon Tea,520
+2024-03-14,Chicken Chop,330
+2024-03-14,Mushroom Soup,103
+2024-03-14,Beef Rendang,377
+2024-03-15,Teh Tarik,420
+2024-03-15,Tandoori Chicken,385
+2024-03-15,Nasi Lemak,203
+2024-03-15,Mushroom Soup,159
+2024-03-15,Laksa,336
+2024-03-15,Kaya Toast Set,996
+2024-03-15,Chicken Rice,571
+2024-03-15,Chicken Chop,139
+2024-03-15,Char Kway Teow,262
+2024-03-15,Cendol,377
+2024-03-15,Beef Rendang,594
+2024-03-15,Iced Lemon Tea,340
+2024-03-16,Nasi Lemak,851
+2024-03-16,Teh Tarik,4829
+2024-03-16,Tandoori Chicken,100
+2024-03-16,Spaghetti Carbonara,342
+2024-03-16,Roti Canai,1806
+2024-03-16,Mushroom Soup,0
+2024-03-16,Beef Rendang,465
+2024-03-16,Kaya Toast Set,1790
+2024-03-16,Iced Lemon Tea,1217
+2024-03-16,Chicken Chop,648
+2024-03-16,Cendol,2412
+2024-03-16,Laksa,351
+2024-03-17,Mushroom Soup,665
+2024-03-17,Teh Tarik,3146
+2024-03-17,Tandoori Chicken,328
+2024-03-17,Spaghetti Carbonara,703
+2024-03-17,Roti Canai,263
+2024-03-17,Nasi Lemak,456
+2024-03-17,Laksa,178
+2024-03-17,Beef Rendang,443
+2024-03-17,Iced Lemon Tea,324
+2024-03-17,Chicken Rice,847
+2024-03-17,Chicken Chop,567
+2024-03-17,Char Kway Teow,217
+2024-03-17,Cendol,444
+2024-03-17,Kaya Toast Set,5179
+2024-03-18,Teh Tarik,1059
+2024-03-18,Roti Canai,1215
+2024-03-18,Nasi Lemak,621
+2024-03-18,Mushroom Soup,106
+2024-03-18,Laksa,318
+2024-03-18,Kaya Toast Set,1179
+2024-03-18,Chicken Rice,380
+2024-03-18,Chicken Chop,241
+2024-03-18,Cendol,199
+2024-03-18,Beef Rendang,471
+2024-03-18,Iced Lemon Tea,250
+2024-03-19,Mushroom Soup,227
+2024-03-19,Tandoori Chicken,0
+2024-03-19,Spaghetti Carbonara,305
+2024-03-19,Roti Canai,941
+2024-03-19,Nasi Lemak,171
+2024-03-19,Teh Tarik,372
+2024-03-19,Laksa,266
+2024-03-19,Iced Lemon Tea,675
+2024-03-19,Beef Rendang,113
+2024-03-19,Kaya Toast Set,301
+2024-03-19,Char Kway Teow,339
+2024-03-19,Cendol,903
+2024-03-20,Teh Tarik,3130
+2024-03-20,Tandoori Chicken,374
+2024-03-20,Spaghetti Carbonara,83
+2024-03-20,Roti Canai,84
+2024-03-20,Kaya Toast Set,1235
+2024-03-20,Nasi Lemak,304
+2024-03-20,Chicken Chop,484
+2024-03-20,Char Kway Teow,422
+2024-03-20,Cendol,463
+2024-03-20,Beef Rendang,116
+2024-03-20,Iced Lemon Tea,608
+2024-03-21,Roti Canai,530
+2024-03-21,Teh Tarik,2266
+2024-03-21,Tandoori Chicken,369
+2024-03-21,Spaghetti Carbonara,39
+2024-03-21,Nasi Lemak,341
+2024-03-21,Cendol,149
+2024-03-21,Kaya Toast Set,2455
+2024-03-21,Chicken Rice,139
+2024-03-21,Char Kway Teow,238
+2024-03-21,Laksa,30
+2024-03-22,Tandoori Chicken,0
+2024-03-22,Spaghetti Carbonara,365
+2024-03-22,Roti Canai,547
+2024-03-22,Kaya Toast Set,2078
+2024-03-22,Mushroom Soup,295
+2024-03-22,Chicken Chop,88
+2024-03-22,Iced Lemon Tea,1198
+2024-03-22,Beef Rendang,309
+2024-03-22,Laksa,269
+2024-03-22,Char Kway Teow,337
+2024-03-22,Cendol,282
+2024-03-23,Teh Tarik,1524
+2024-03-23,Spaghetti Carbonara,719
+2024-03-23,Roti Canai,2584
+2024-03-23,Nasi Lemak,398
+2024-03-23,Mushroom Soup,173
+2024-03-23,Tandoori Chicken,80
+2024-03-23,Iced Lemon Tea,369
+2024-03-23,Chicken Rice,675
+2024-03-23,Chicken Chop,243
+2024-03-23,Cendol,882
+2024-03-23,Beef Rendang,407
+2024-03-23,Laksa,518
+2024-03-24,Teh Tarik,1249
+2024-03-24,Tandoori Chicken,450
+2024-03-24,Spaghetti Carbonara,149
+2024-03-24,Mushroom Soup,205
+2024-03-24,Kaya Toast Set,2052
+2024-03-24,Iced Lemon Tea,336
+2024-03-24,Chicken Chop,615
+2024-03-24,Cendol,761
+2024-03-24,Chicken Rice,0
+2024-03-24,Beef Rendang,58
+2024-03-25,Teh Tarik,1845
+2024-03-25,Laksa,599
+2024-03-25,Tandoori Chicken,646
+2024-03-25,Roti Canai,1126
+2024-03-25,Nasi Lemak,663
+2024-03-25,Mushroom Soup,89
+2024-03-25,Kaya Toast Set,1381
+2024-03-25,Chicken Chop,394
+2024-03-25,Beef Rendang,155
+2024-03-25,Chicken Rice,651
+2024-03-25,Char Kway Teow,152
+2024-03-25,Cendol,453
+2024-03-26,Teh Tarik,967
+2024-03-26,Spaghetti Carbonara,266
+2024-03-26,Nasi Lemak,518
+2024-03-26,Kaya Toast Set,1298
+2024-03-26,Mushroom Soup,39
+2024-03-26,Chicken Chop,203
+2024-03-26,Char Kway Teow,340
+2024-03-26,Cendol,1120
+2024-03-26,Beef Rendang,206
+2024-03-26,Chicken Rice,96
+2024-03-27,Nasi Lemak,419
+2024-03-27,Tandoori Chicken,365
+2024-03-27,Teh Tarik,2569
+2024-03-27,Spaghetti Carbonara,106
+2024-03-27,Mushroom Soup,1034
+2024-03-27,Cendol,179
+2024-03-27,Chicken Rice,564
+2024-03-27,Chicken Chop,427
+2024-03-27,Kaya Toast Set,193
+2024-03-27,Beef Rendang,455
+2024-03-28,Mushroom Soup,258
+2024-03-28,Teh Tarik,633
+2024-03-28,Tandoori Chicken,0
+2024-03-28,Spaghetti Carbonara,209
+2024-03-28,Roti Canai,301
+2024-03-28,Nasi Lemak,262
+2024-03-28,Laksa,0
+2024-03-28,Iced Lemon Tea,1324
+2024-03-28,Chicken Rice,226
+2024-03-28,Chicken Chop,87
+2024-03-28,Cendol,1077
+2024-03-28,Beef Rendang,527
+2024-03-28,Kaya Toast Set,766
+2024-03-29,Teh Tarik,939
+2024-03-29,Tandoori Chicken,409
+2024-03-29,Spaghetti Carbonara,242
+2024-03-29,Mushroom Soup,225
+2024-03-29,Laksa,200
+2024-03-29,Kaya Toast Set,1737
+2024-03-29,Nasi Lemak,261
+2024-03-29,Chicken Rice,451
+2024-03-29,Chicken Chop,115
+2024-03-29,Char Kway Teow,197
+2024-03-29,Cendol,506
+2024-03-29,Beef Rendang,95
+2024-03-29,Iced Lemon Tea,390
+2024-03-30,Tandoori Chicken,365
+2024-03-30,Spaghetti Carbonara,321
+2024-03-30,Roti Canai,2217
+2024-03-30,Nasi Lemak,708
+2024-03-30,Mushroom Soup,179
+2024-03-30,Chicken Rice,265
+2024-03-30,Iced Lemon Tea,722
+2024-03-30,Char Kway Teow,89
+2024-03-30,Cendol,1058
+2024-03-30,Teh Tarik,2268
+2024-03-30,Kaya Toast Set,4435
+2024-03-31,Tandoori Chicken,157
+2024-03-31,Spaghetti Carbonara,287
+2024-03-31,Teh Tarik,1805
+2024-03-31,Nasi Lemak,742
+2024-03-31,Mushroom Soup,457
+2024-03-31,Kaya Toast Set,1654
+2024-03-31,Iced Lemon Tea,462
+2024-03-31,Chicken Chop,0
+2024-03-31,Char Kway Teow,224
+2024-03-31,Cendol,797
+2024-04-01,Teh Tarik,2079
+2024-04-01,Tandoori Chicken,191
+2024-04-01,Spaghetti Carbonara,241
+2024-04-01,Roti Canai,412
+2024-04-01,Nasi Lemak,712
+2024-04-01,Kaya Toast Set,686
+2024-04-01,Chicken Rice,279
+2024-04-01,Chicken Chop,236
+2024-04-01,Char Kway Teow,191
+2024-04-01,Cendol,860
+2024-04-01,Beef Rendang,9
+2024-04-01,Iced Lemon Tea,1333
+2024-04-02,Nasi Lemak,1193
+2024-04-02,Teh Tarik,4311
+2024-04-02,Tandoori Chicken,258
+2024-04-02,Spaghetti Carbonara,367
+2024-04-02,Roti Canai,976
+2024-04-02,Mushroom Soup,58
+2024-04-02,Beef Rendang,212
+2024-04-02,Iced Lemon Tea,269
+2024-04-02,Chicken Rice,744
+2024-04-02,Chicken Chop,624
+2024-04-02,Char Kway Teow,161
+2024-04-02,Cendol,867
+2024-04-02,Kaya Toast Set,1038
+2024-04-03,Nasi Lemak,921
+2024-04-03,Teh Tarik,2118
+2024-04-03,Tandoori Chicken,163
+2024-04-03,Spaghetti Carbonara,188
+2024-04-03,Roti Canai,149
+2024-04-03,Mushroom Soup,318
+2024-04-03,Iced Lemon Tea,246
+2024-04-03,Kaya Toast Set,1734
+2024-04-03,Laksa,635
+2024-04-03,Chicken Rice,224
+2024-04-03,Chicken Chop,488
+2024-04-03,Cendol,1044
+2024-04-03,Beef Rendang,91
+2024-04-04,Teh Tarik,3501
+2024-04-04,Spaghetti Carbonara,75
+2024-04-04,Roti Canai,542
+2024-04-04,Mushroom Soup,101
+2024-04-04,Kaya Toast Set,1044
+2024-04-04,Iced Lemon Tea,487
+2024-04-04,Chicken Rice,405
+2024-04-04,Char Kway Teow,115
+2024-04-04,Cendol,350
+2024-04-04,Beef Rendang,0
+2024-04-05,Teh Tarik,859
+2024-04-05,Tandoori Chicken,465
+2024-04-05,Spaghetti Carbonara,215
+2024-04-05,Roti Canai,2129
+2024-04-05,Nasi Lemak,578
+2024-04-05,Mushroom Soup,54
+2024-04-05,Beef Rendang,56
+2024-04-05,Kaya Toast Set,1061
+2024-04-05,Iced Lemon Tea,803
+2024-04-05,Chicken Rice,109
+2024-04-05,Cendol,974
+2024-04-05,Laksa,68
+2024-04-06,Nasi Lemak,603
+2024-04-06,Teh Tarik,633
+2024-04-06,Tandoori Chicken,700
+2024-04-06,Spaghetti Carbonara,623
+2024-04-06,Mushroom Soup,329
+2024-04-06,Cendol,1321
+2024-04-06,Iced Lemon Tea,1534
+2024-04-06,Chicken Rice,206
+2024-04-06,Chicken Chop,682
+2024-04-06,Char Kway Teow,381
+2024-04-06,Kaya Toast Set,1116
+2024-04-07,Teh Tarik,1958
+2024-04-07,Nasi Lemak,1015
+2024-04-07,Mushroom Soup,265
+2024-04-07,Laksa,319
+2024-04-07,Kaya Toast Set,1072
+2024-04-07,Iced Lemon Tea,433
+2024-04-07,Chicken Chop,384
+2024-04-07,Cendol,1211
+2024-04-08,Tandoori Chicken,180
+2024-04-08,Teh Tarik,1417
+2024-04-08,Roti Canai,311
+2024-04-08,Nasi Lemak,819
+2024-04-08,Mushroom Soup,0
+2024-04-08,Cendol,597
+2024-04-08,Chicken Rice,69
+2024-04-08,Chicken Chop,141
+2024-04-08,Char Kway Teow,344
+2024-04-08,Beef Rendang,136
+2024-04-08,Iced Lemon Tea,891
+2024-04-09,Teh Tarik,1879
+2024-04-09,Tandoori Chicken,503
+2024-04-09,Spaghetti Carbonara,63
+2024-04-09,Roti Canai,525
+2024-04-09,Mushroom Soup,394
+2024-04-09,Nasi Lemak,1337
+2024-04-09,Iced Lemon Tea,442
+2024-04-09,Chicken Chop,394
+2024-04-09,Char Kway Teow,290
+2024-04-09,Cendol,170
+2024-04-09,Kaya Toast Set,958
+2024-04-10,Teh Tarik,609
+2024-04-10,Spaghetti Carbonara,65
+2024-04-10,Roti Canai,354
+2024-04-10,Nasi Lemak,543
+2024-04-10,Mushroom Soup,358
+2024-04-10,Tandoori Chicken,451
+2024-04-10,Chicken Rice,291
+2024-04-10,Chicken Chop,432
+2024-04-10,Char Kway Teow,409
+2024-04-10,Cendol,946
+2024-04-10,Beef Rendang,0
+2024-04-10,Iced Lemon Tea,502
+2024-04-11,Teh Tarik,1547
+2024-04-11,Tandoori Chicken,231
+2024-04-11,Spaghetti Carbonara,408
+2024-04-11,Nasi Lemak,397
+2024-04-11,Kaya Toast Set,497
+2024-04-11,Iced Lemon Tea,731
+2024-04-11,Chicken Chop,110
+2024-04-11,Cendol,763
+2024-04-11,Laksa,185
+2024-04-12,Mushroom Soup,256
+2024-04-12,Teh Tarik,277
+2024-04-12,Spaghetti Carbonara,186
+2024-04-12,Roti Canai,596
+2024-04-12,Kaya Toast Set,1016
+2024-04-12,Beef Rendang,200
+2024-04-12,Chicken Rice,311
+2024-04-12,Chicken Chop,592
+2024-04-12,Char Kway Teow,345
+2024-04-12,Cendol,988
+2024-04-12,Iced Lemon Tea,602
+2024-04-13,Teh Tarik,3315
+2024-04-13,Tandoori Chicken,53
+2024-04-13,Spaghetti Carbonara,651
+2024-04-13,Roti Canai,1119
+2024-04-13,Nasi Lemak,683
+2024-04-13,Mushroom Soup,143
+2024-04-13,Laksa,157
+2024-04-13,Iced Lemon Tea,1028
+2024-04-13,Chicken Rice,554
+2024-04-13,Chicken Chop,257
+2024-04-13,Char Kway Teow,111
+2024-04-13,Cendol,1112
+2024-04-13,Beef Rendang,134
+2024-04-13,Kaya Toast Set,1418
+2024-04-14,Mushroom Soup,13
+2024-04-14,Tandoori Chicken,656
+2024-04-14,Spaghetti Carbonara,268
+2024-04-14,Roti Canai,779
+2024-04-14,Nasi Lemak,849
+2024-04-14,Laksa,264
+2024-04-14,Teh Tarik,4917
+2024-04-14,Iced Lemon Tea,1991
+2024-04-14,Chicken Chop,254
+2024-04-14,Char Kway Teow,395
+2024-04-14,Cendol,2434
+2024-04-14,Beef Rendang,0
+2024-04-14,Kaya Toast Set,3530
+2024-04-15,Teh Tarik,1563
+2024-04-15,Tandoori Chicken,44
+2024-04-15,Spaghetti Carbonara,23
+2024-04-15,Roti Canai,1138
+2024-04-15,Nasi Lemak,873
+2024-04-15,Kaya Toast Set,2061
+2024-04-15,Iced Lemon Tea,590
+2024-04-15,Chicken Rice,363
+2024-04-15,Chicken Chop,148
+2024-04-15,Char Kway Teow,258
+2024-04-15,Cendol,108
+2024-04-15,Beef Rendang,56
+2024-04-16,Teh Tarik,1198
+2024-04-16,Tandoori Chicken,0
+2024-04-16,Spaghetti Carbonara,264
+2024-04-16,Roti Canai,872
+2024-04-16,Nasi Lemak,755
+2024-04-16,Mushroom Soup,12
+2024-04-16,Beef Rendang,50
+2024-04-16,Kaya Toast Set,760
+2024-04-16,Iced Lemon Tea,750
+2024-04-16,Chicken Chop,399
+2024-04-16,Char Kway Teow,691
+2024-04-16,Cendol,318
+2024-04-16,Laksa,169
+2024-04-17,Teh Tarik,926
+2024-04-17,Tandoori Chicken,122
+2024-04-17,Spaghetti Carbonara,154
+2024-04-17,Roti Canai,1163
+2024-04-17,Nasi Lemak,639
+2024-04-17,Mushroom Soup,130
+2024-04-17,Chicken Rice,406
+2024-04-17,Iced Lemon Tea,880
+2024-04-17,Chicken Chop,827
+2024-04-17,Char Kway Teow,303
+2024-04-17,Cendol,1041
+2024-04-17,Beef Rendang,101
+2024-04-17,Kaya Toast Set,1482
+2024-04-18,Teh Tarik,2785
+2024-04-18,Tandoori Chicken,447
+2024-04-18,Roti Canai,2256
+2024-04-18,Nasi Lemak,1036
+2024-04-18,Mushroom Soup,170
+2024-04-18,Iced Lemon Tea,1387
+2024-04-18,Chicken Chop,303
+2024-04-18,Char Kway Teow,350
+2024-04-18,Cendol,1125
+2024-04-18,Beef Rendang,183
+2024-04-18,Kaya Toast Set,957
+2024-04-19,Roti Canai,996
+2024-04-19,Teh Tarik,1120
+2024-04-19,Tandoori Chicken,494
+2024-04-19,Spaghetti Carbonara,207
+2024-04-19,Nasi Lemak,775
+2024-04-19,Beef Rendang,129
+2024-04-19,Kaya Toast Set,1596
+2024-04-19,Iced Lemon Tea,162
+2024-04-19,Char Kway Teow,302
+2024-04-19,Cendol,131
+2024-04-19,Mushroom Soup,0
+2024-04-20,Mushroom Soup,278
+2024-04-20,Tandoori Chicken,69
+2024-04-20,Teh Tarik,1331
+2024-04-20,Spaghetti Carbonara,445
+2024-04-20,Roti Canai,984
+2024-04-20,Nasi Lemak,465
+2024-04-20,Laksa,192
+2024-04-20,Cendol,2480
+2024-04-20,Iced Lemon Tea,767
+2024-04-20,Chicken Rice,611
+2024-04-20,Chicken Chop,383
+2024-04-20,Char Kway Teow,409
+2024-04-20,Beef Rendang,342
+2024-04-20,Kaya Toast Set,5285
+2024-04-21,Teh Tarik,1223
+2024-04-21,Tandoori Chicken,241
+2024-04-21,Spaghetti Carbonara,448
+2024-04-21,Roti Canai,897
+2024-04-21,Nasi Lemak,370
+2024-04-21,Kaya Toast Set,1669
+2024-04-21,Chicken Chop,1118
+2024-04-21,Char Kway Teow,210
+2024-04-21,Cendol,587
+2024-04-21,Beef Rendang,185
+2024-04-21,Iced Lemon Tea,370
+2024-04-22,Mushroom Soup,196
+2024-04-22,Teh Tarik,2116
+2024-04-22,Tandoori Chicken,427
+2024-04-22,Spaghetti Carbonara,275
+2024-04-22,Roti Canai,457
+2024-04-22,Nasi Lemak,670
+2024-04-22,Iced Lemon Tea,675
+2024-04-22,Chicken Chop,507
+2024-04-22,Char Kway Teow,0
+2024-04-22,Cendol,738
+2024-04-22,Beef Rendang,550
+2024-04-22,Chicken Rice,469
+2024-04-23,Mushroom Soup,144
+2024-04-23,Teh Tarik,1262
+2024-04-23,Tandoori Chicken,236
+2024-04-23,Spaghetti Carbonara,122
+2024-04-23,Roti Canai,311
+2024-04-23,Nasi Lemak,459
+2024-04-23,Chicken Rice,157
+2024-04-23,Kaya Toast Set,355
+2024-04-23,Chicken Chop,318
+2024-04-23,Char Kway Teow,818
+2024-04-23,Cendol,865
+2024-04-23,Beef Rendang,261
+2024-04-23,Laksa,167
+2024-04-24,Nasi Lemak,490
+2024-04-24,Spaghetti Carbonara,196
+2024-04-24,Roti Canai,1319
+2024-04-24,Teh Tarik,2463
+2024-04-24,Mushroom Soup,258
+2024-04-24,Tandoori Chicken,706
+2024-04-24,Laksa,176
+2024-04-24,Beef Rendang,133
+2024-04-24,Iced Lemon Tea,1350
+2024-04-24,Chicken Rice,27
+2024-04-24,Chicken Chop,37
+2024-04-24,Char Kway Teow,129
+2024-04-24,Cendol,129
+2024-04-24,Kaya Toast Set,2842
+2024-04-25,Roti Canai,727
+2024-04-25,Teh Tarik,895
+2024-04-25,Tandoori Chicken,200
+2024-04-25,Spaghetti Carbonara,175
+2024-04-25,Kaya Toast Set,197
+2024-04-25,Chicken Chop,152
+2024-04-25,Chicken Rice,604
+2024-04-25,Char Kway Teow,61
+2024-04-25,Cendol,733
+2024-04-25,Iced Lemon Tea,184
+2024-04-26,Teh Tarik,1016
+2024-04-26,Spaghetti Carbonara,0
+2024-04-26,Roti Canai,506
+2024-04-26,Mushroom Soup,162
+2024-04-26,Laksa,160
+2024-04-26,Kaya Toast Set,1581
+2024-04-26,Chicken Chop,239
+2024-04-26,Char Kway Teow,391
+2024-04-26,Cendol,554
+2024-04-26,Beef Rendang,142
+2024-04-26,Iced Lemon Tea,1570
+2024-04-27,Teh Tarik,3996
+2024-04-27,Mushroom Soup,47
+2024-04-27,Spaghetti Carbonara,1327
+2024-04-27,Roti Canai,387
+2024-04-27,Kaya Toast Set,1773
+2024-04-27,Tandoori Chicken,130
+2024-04-27,Chicken Chop,372
+2024-04-27,Char Kway Teow,304
+2024-04-27,Cendol,1053
+2024-04-27,Beef Rendang,267
+2024-04-27,Iced Lemon Tea,1522
+2024-04-28,Roti Canai,595
+2024-04-28,Teh Tarik,1075
+2024-04-28,Tandoori Chicken,404
+2024-04-28,Spaghetti Carbonara,516
+2024-04-28,Mushroom Soup,117
+2024-04-28,Cendol,744
+2024-04-28,Iced Lemon Tea,369
+2024-04-28,Chicken Chop,642
+2024-04-28,Char Kway Teow,545
+2024-04-28,Kaya Toast Set,1113
+2024-04-28,Beef Rendang,128
+2024-04-29,Teh Tarik,1170
+2024-04-29,Tandoori Chicken,159
+2024-04-29,Spaghetti Carbonara,857
+2024-04-29,Roti Canai,692
+2024-04-29,Kaya Toast Set,2424
+2024-04-29,Chicken Chop,298
+2024-04-29,Cendol,912
+2024-04-29,Beef Rendang,56
+2024-04-30,Tandoori Chicken,303
+2024-04-30,Teh Tarik,3088
+2024-04-30,Spaghetti Carbonara,215
+2024-04-30,Roti Canai,406
+2024-04-30,Nasi Lemak,925
+2024-04-30,Char Kway Teow,0
+2024-04-30,Kaya Toast Set,855
+2024-04-30,Iced Lemon Tea,874
+2024-04-30,Chicken Chop,85
+2024-04-30,Cendol,934
+2024-04-30,Mushroom Soup,225
+2024-05-01,Teh Tarik,3286
+2024-05-01,Tandoori Chicken,407
+2024-05-01,Spaghetti Carbonara,216
+2024-05-01,Roti Canai,331
+2024-05-01,Nasi Lemak,962
+2024-05-01,Iced Lemon Tea,1085
+2024-05-01,Kaya Toast Set,555
+2024-05-01,Char Kway Teow,785
+2024-05-01,Cendol,1158
+2024-05-01,Beef Rendang,627
+2024-05-01,Mushroom Soup,231
+2024-05-02,Teh Tarik,1311
+2024-05-02,Tandoori Chicken,220
+2024-05-02,Roti Canai,555
+2024-05-02,Nasi Lemak,809
+2024-05-02,Spaghetti Carbonara,15
+2024-05-02,Kaya Toast Set,1008
+2024-05-02,Iced Lemon Tea,574
+2024-05-02,Char Kway Teow,348
+2024-05-02,Cendol,154
+2024-05-02,Mushroom Soup,457
+2024-05-03,Cendol,1359
+2024-05-03,Char Kway Teow,323
+2024-05-03,Chicken Rice,125
+2024-05-03,Iced Lemon Tea,552
+2024-05-03,Kaya Toast Set,1000
+2024-05-03,Laksa,22
+2024-05-03,Spaghetti Carbonara,475
+2024-05-03,Tandoori Chicken,344
+2024-05-03,Teh Tarik,1319
+2024-05-04,Roti Canai,1068
+2024-05-04,Spaghetti Carbonara,623
+2024-05-04,Chicken Chop,548
+2024-05-04,Teh Tarik,1671
+2024-05-04,Nasi Lemak,1107
+2024-05-04,Tandoori Chicken,607
+2024-05-04,Mushroom Soup,345
+2024-05-04,Char Kway Teow,193
+2024-05-04,Kaya Toast Set,2636
+2024-05-04,Iced Lemon Tea,810
+2024-05-04,Chicken Rice,673
+2024-05-04,Laksa,258
+2024-05-04,Cendol,317
+2024-05-04,Beef Rendang,441
+2024-05-05,Teh Tarik,1788
+2024-05-05,Tandoori Chicken,523
+2024-05-05,Spaghetti Carbonara,360
+2024-05-05,Roti Canai,1687
+2024-05-05,Mushroom Soup,281
+2024-05-05,Kaya Toast Set,2476
+2024-05-05,Iced Lemon Tea,812
+2024-05-05,Chicken Chop,410
+2024-05-05,Cendol,547
+2024-05-05,Beef Rendang,281
+2024-05-06,Tandoori Chicken,521
+2024-05-06,Spaghetti Carbonara,125
+2024-05-06,Roti Canai,1546
+2024-05-06,Nasi Lemak,197
+2024-05-06,Mushroom Soup,98
+2024-05-06,Teh Tarik,2324
+2024-05-06,Iced Lemon Tea,658
+2024-05-06,Chicken Chop,96
+2024-05-06,Cendol,514
+2024-05-06,Beef Rendang,231
+2024-05-06,Kaya Toast Set,874
+2024-05-07,Teh Tarik,455
+2024-05-07,Spaghetti Carbonara,36
+2024-05-07,Roti Canai,261
+2024-05-07,Nasi Lemak,266
+2024-05-07,Mushroom Soup,191
+2024-05-07,Tandoori Chicken,767
+2024-05-07,Iced Lemon Tea,303
+2024-05-07,Chicken Rice,166
+2024-05-07,Char Kway Teow,145
+2024-05-07,Cendol,789
+2024-05-07,Beef Rendang,457
+2024-05-07,Kaya Toast Set,1565
+2024-05-08,Spaghetti Carbonara,516
+2024-05-08,Roti Canai,1236
+2024-05-08,Mushroom Soup,165
+2024-05-08,Laksa,111
+2024-05-08,Kaya Toast Set,1946
+2024-05-08,Iced Lemon Tea,374
+2024-05-08,Chicken Chop,0
+2024-05-08,Char Kway Teow,61
+2024-05-08,Cendol,1609
+2024-05-08,Chicken Rice,54
+2024-05-09,Laksa,243
+2024-05-09,Tandoori Chicken,89
+2024-05-09,Nasi Lemak,404
+2024-05-09,Mushroom Soup,453
+2024-05-09,Kaya Toast Set,2398
+2024-05-09,Teh Tarik,1244
+2024-05-09,Chicken Rice,320
+2024-05-09,Chicken Chop,55
+2024-05-09,Char Kway Teow,669
+2024-05-09,Cendol,1467
+2024-05-09,Beef Rendang,130
+2024-05-09,Iced Lemon Tea,751
+2024-05-10,Teh Tarik,1244
+2024-05-10,Tandoori Chicken,298
+2024-05-10,Spaghetti Carbonara,87
+2024-05-10,Roti Canai,820
+2024-05-10,Nasi Lemak,611
+2024-05-10,Mushroom Soup,115
+2024-05-10,Kaya Toast Set,1044
+2024-05-10,Iced Lemon Tea,620
+2024-05-10,Chicken Chop,406
+2024-05-10,Char Kway Teow,461
+2024-05-10,Cendol,1007
+2024-05-10,Beef Rendang,160
+2024-05-11,Teh Tarik,769
+2024-05-11,Tandoori Chicken,190
+2024-05-11,Spaghetti Carbonara,230
+2024-05-11,Nasi Lemak,234
+2024-05-11,Mushroom Soup,507
+2024-05-11,Laksa,1170
+2024-05-11,Beef Rendang,730
+2024-05-11,Iced Lemon Tea,352
+2024-05-11,Chicken Rice,385
+2024-05-11,Chicken Chop,488
+2024-05-11,Char Kway Teow,536
+2024-05-11,Cendol,455
+2024-05-11,Kaya Toast Set,538
+2024-05-12,Nasi Lemak,769
+2024-05-12,Tandoori Chicken,457
+2024-05-12,Teh Tarik,1956
+2024-05-12,Spaghetti Carbonara,603
+2024-05-12,Roti Canai,376
+2024-05-12,Mushroom Soup,268
+2024-05-12,Char Kway Teow,342
+2024-05-12,Kaya Toast Set,1818
+2024-05-12,Iced Lemon Tea,766
+2024-05-12,Chicken Chop,389
+2024-05-12,Cendol,388
+2024-05-12,Laksa,324
+2024-05-13,Teh Tarik,2502
+2024-05-13,Tandoori Chicken,284
+2024-05-13,Nasi Lemak,119
+2024-05-13,Laksa,163
+2024-05-13,Kaya Toast Set,1498
+2024-05-13,Spaghetti Carbonara,146
+2024-05-13,Chicken Rice,221
+2024-05-13,Chicken Chop,118
+2024-05-13,Cendol,309
+2024-05-13,Beef Rendang,149
+2024-05-13,Iced Lemon Tea,347
+2024-05-14,Spaghetti Carbonara,136
+2024-05-14,Roti Canai,734
+2024-05-14,Nasi Lemak,761
+2024-05-14,Mushroom Soup,171
+2024-05-14,Laksa,270
+2024-05-14,Chicken Chop,729
+2024-05-14,Char Kway Teow,74
+2024-05-14,Cendol,453
+2024-05-14,Beef Rendang,242
+2024-05-14,Tandoori Chicken,68
+2024-05-14,Kaya Toast Set,577
+2024-05-14,Teh Tarik,2696
+2024-05-15,Nasi Lemak,394
+2024-05-15,Roti Canai,830
+2024-05-15,Teh Tarik,1936
+2024-05-15,Mushroom Soup,167
+2024-05-15,Tandoori Chicken,622
+2024-05-15,Laksa,924
+2024-05-15,Spaghetti Carbonara,470
+2024-05-15,Iced Lemon Tea,987
+2024-05-15,Beef Rendang,662
+2024-05-15,Cendol,619
+2024-05-15,Kaya Toast Set,619
+2024-05-15,Chicken Chop,98
+2024-05-15,Chicken Rice,1109
+2024-05-16,Teh Tarik,1696
+2024-05-16,Tandoori Chicken,692
+2024-05-16,Spaghetti Carbonara,146
+2024-05-16,Roti Canai,201
+2024-05-16,Laksa,120
+2024-05-16,Nasi Lemak,574
+2024-05-16,Iced Lemon Tea,638
+2024-05-16,Chicken Rice,189
+2024-05-16,Chicken Chop,0
+2024-05-16,Cendol,1341
+2024-05-16,Beef Rendang,201
+2024-05-16,Kaya Toast Set,325
+2024-05-17,Nasi Lemak,833
+2024-05-17,Teh Tarik,2562
+2024-05-17,Tandoori Chicken,269
+2024-05-17,Spaghetti Carbonara,193
+2024-05-17,Roti Canai,737
+2024-05-17,Mushroom Soup,391
+2024-05-17,Cendol,242
+2024-05-17,Kaya Toast Set,1695
+2024-05-17,Chicken Rice,296
+2024-05-17,Chicken Chop,316
+2024-05-17,Beef Rendang,189
+2024-05-17,Laksa,403
+2024-05-18,Nasi Lemak,1367
+2024-05-18,Teh Tarik,5833
+2024-05-18,Tandoori Chicken,724
+2024-05-18,Roti Canai,278
+2024-05-18,Kaya Toast Set,1509
+2024-05-18,Cendol,912
+2024-05-18,Chicken Chop,526
+2024-05-18,Char Kway Teow,68
+2024-05-18,Beef Rendang,148
+2024-05-18,Iced Lemon Tea,233
+2024-05-19,Teh Tarik,1223
+2024-05-19,Tandoori Chicken,71
+2024-05-19,Spaghetti Carbonara,336
+2024-05-19,Roti Canai,1019
+2024-05-19,Nasi Lemak,224
+2024-05-19,Laksa,313
+2024-05-19,Mushroom Soup,238
+2024-05-19,Iced Lemon Tea,274
+2024-05-19,Chicken Rice,495
+2024-05-19,Chicken Chop,327
+2024-05-19,Cendol,1282
+2024-05-19,Beef Rendang,238
+2024-05-19,Kaya Toast Set,1857
+2024-05-20,Laksa,533
+2024-05-20,Tandoori Chicken,107
+2024-05-20,Spaghetti Carbonara,507
+2024-05-20,Roti Canai,201
+2024-05-20,Mushroom Soup,331
+2024-05-20,Kaya Toast Set,566
+2024-05-20,Teh Tarik,348
+2024-05-20,Chicken Rice,95
+2024-05-20,Chicken Chop,684
+2024-05-20,Char Kway Teow,480
+2024-05-20,Cendol,2195
+2024-05-20,Beef Rendang,85
+2024-05-20,Iced Lemon Tea,404
+2024-05-21,Spaghetti Carbonara,408
+2024-05-21,Roti Canai,906
+2024-05-21,Mushroom Soup,56
+2024-05-21,Laksa,257
+2024-05-21,Kaya Toast Set,524
+2024-05-21,Teh Tarik,780
+2024-05-21,Chicken Rice,624
+2024-05-21,Chicken Chop,89
+2024-05-21,Char Kway Teow,75
+2024-05-21,Cendol,446
+2024-05-21,Beef Rendang,172
+2024-05-21,Iced Lemon Tea,425
+2024-05-22,Teh Tarik,808
+2024-05-22,Spaghetti Carbonara,48
+2024-05-22,Roti Canai,1266
+2024-05-22,Mushroom Soup,117
+2024-05-22,Laksa,557
+2024-05-22,Kaya Toast Set,575
+2024-05-22,Chicken Chop,246
+2024-05-22,Char Kway Teow,494
+2024-05-22,Cendol,1670
+2024-05-22,Beef Rendang,241
+2024-05-22,Iced Lemon Tea,420
+2024-05-23,Teh Tarik,808
+2024-05-23,Tandoori Chicken,192
+2024-05-23,Roti Canai,491
+2024-05-23,Nasi Lemak,527
+2024-05-23,Mushroom Soup,101
+2024-05-23,Kaya Toast Set,744
+2024-05-23,Chicken Rice,367
+2024-05-23,Chicken Chop,0
+2024-05-23,Char Kway Teow,192
+2024-05-23,Cendol,686
+2024-05-23,Beef Rendang,203
+2024-05-23,Iced Lemon Tea,494
+2024-05-24,Teh Tarik,207
+2024-05-24,Tandoori Chicken,0
+2024-05-24,Spaghetti Carbonara,351
+2024-05-24,Nasi Lemak,185
+2024-05-24,Mushroom Soup,351
+2024-05-24,Laksa,274
+2024-05-24,Roti Canai,860
+2024-05-24,Iced Lemon Tea,374
+2024-05-24,Chicken Rice,552
+2024-05-24,Chicken Chop,97
+2024-05-24,Char Kway Teow,160
+2024-05-24,Cendol,539
+2024-05-24,Beef Rendang,487
+2024-05-24,Kaya Toast Set,2010
+2024-05-25,Teh Tarik,1245
+2024-05-25,Tandoori Chicken,1241
+2024-05-25,Roti Canai,1439
+2024-05-25,Mushroom Soup,592
+2024-05-25,Chicken Chop,498
+2024-05-25,Kaya Toast Set,3150
+2024-05-25,Char Kway Teow,263
+2024-05-25,Cendol,2117
+2024-05-25,Laksa,368
+2024-05-26,Mushroom Soup,577
+2024-05-26,Teh Tarik,3213
+2024-05-26,Spaghetti Carbonara,24
+2024-05-26,Kaya Toast Set,499
+2024-05-26,Tandoori Chicken,355
+2024-05-26,Chicken Rice,617
+2024-05-26,Iced Lemon Tea,662
+2024-05-26,Beef Rendang,445
+2024-05-26,Nasi Lemak,349
+2024-05-26,Cendol,751
+2024-05-26,Chicken Chop,100
+2024-05-27,Teh Tarik,540
+2024-05-27,Tandoori Chicken,655
+2024-05-27,Roti Canai,242
+2024-05-27,Nasi Lemak,882
+2024-05-27,Mushroom Soup,549
+2024-05-27,Laksa,296
+2024-05-27,Spaghetti Carbonara,125
+2024-05-27,Iced Lemon Tea,619
+2024-05-27,Chicken Rice,459
+2024-05-27,Chicken Chop,253
+2024-05-27,Char Kway Teow,392
+2024-05-27,Cendol,879
+2024-05-27,Beef Rendang,318
+2024-05-27,Kaya Toast Set,624
+2024-05-28,Teh Tarik,1197
+2024-05-28,Tandoori Chicken,594
+2024-05-28,Roti Canai,957
+2024-05-28,Nasi Lemak,591
+2024-05-28,Laksa,302
+2024-05-28,Char Kway Teow,177
+2024-05-28,Iced Lemon Tea,284
+2024-05-28,Cendol,266
+2024-05-28,Beef Rendang,0
+2024-05-28,Kaya Toast Set,1950
+2024-05-29,Nasi Lemak,332
+2024-05-29,Roti Canai,687
+2024-05-29,Laksa,193
+2024-05-29,Tandoori Chicken,226
+2024-05-29,Spaghetti Carbonara,431
+2024-05-29,Kaya Toast Set,348
+2024-05-29,Cendol,199
+2024-05-29,Chicken Rice,650
+2024-05-29,Chicken Chop,447
+2024-05-29,Char Kway Teow,208
+2024-05-29,Beef Rendang,60
+2024-05-29,Iced Lemon Tea,830
+2024-05-30,Teh Tarik,1694
+2024-05-30,Tandoori Chicken,166
+2024-05-30,Spaghetti Carbonara,604
+2024-05-30,Roti Canai,2258
+2024-05-30,Nasi Lemak,819
+2024-05-30,Mushroom Soup,202
+2024-05-30,Laksa,76
+2024-05-30,Chicken Rice,38
+2024-05-30,Chicken Chop,157
+2024-05-30,Char Kway Teow,229
+2024-05-30,Cendol,634
+2024-05-30,Beef Rendang,451
+2024-05-30,Kaya Toast Set,936
+2024-05-31,Nasi Lemak,761
+2024-05-31,Tandoori Chicken,314
+2024-05-31,Spaghetti Carbonara,407
+2024-05-31,Roti Canai,304
+2024-05-31,Laksa,243
+2024-05-31,Teh Tarik,726
+2024-05-31,Iced Lemon Tea,403
+2024-05-31,Chicken Rice,429
+2024-05-31,Chicken Chop,269
+2024-05-31,Cendol,821
+2024-05-31,Beef Rendang,0
+2024-05-31,Kaya Toast Set,2184
+2024-06-01,Nasi Lemak,984
+2024-06-01,Spaghetti Carbonara,0
+2024-06-01,Teh Tarik,1658
+2024-06-01,Roti Canai,852
+2024-06-01,Mushroom Soup,555
+2024-06-01,Cendol,2743
+2024-06-01,Iced Lemon Tea,621
+2024-06-01,Chicken Chop,1059
+2024-06-01,Beef Rendang,367
+2024-06-01,Kaya Toast Set,1165
+2024-06-02,Cendol,1101
+2024-06-02,Chicken Rice,265
+2024-06-02,Iced Lemon Tea,525
+2024-06-02,Kaya Toast Set,1717
+2024-06-02,Nasi Lemak,1316
+2024-06-02,Roti Canai,621
+2024-06-02,Tandoori Chicken,173
+2024-06-03,Teh Tarik,2669
+2024-06-03,Tandoori Chicken,166
+2024-06-03,Roti Canai,718
+2024-06-03,Laksa,74
+2024-06-03,Kaya Toast Set,1026
+2024-06-03,Cendol,948
+2024-06-03,Chicken Chop,496
+2024-06-03,Char Kway Teow,108
+2024-06-03,Beef Rendang,83
+2024-06-03,Iced Lemon Tea,2175
+2024-06-04,Nasi Lemak,385
+2024-06-04,Spaghetti Carbonara,299
+2024-06-04,Roti Canai,498
+2024-06-04,Laksa,218
+2024-06-04,Tandoori Chicken,573
+2024-06-04,Iced Lemon Tea,28
+2024-06-04,Chicken Chop,153
+2024-06-04,Cendol,240
+2024-06-04,Beef Rendang,622
+2024-06-04,Kaya Toast Set,1347
+2024-06-05,Teh Tarik,488
+2024-06-05,Tandoori Chicken,237
+2024-06-05,Spaghetti Carbonara,198
+2024-06-05,Roti Canai,1361
+2024-06-05,Nasi Lemak,216
+2024-06-05,Mushroom Soup,121
+2024-06-05,Laksa,327
+2024-06-05,Kaya Toast Set,2789
+2024-06-05,Iced Lemon Tea,323
+2024-06-05,Chicken Chop,331
+2024-06-05,Char Kway Teow,341
+2024-06-05,Cendol,325
+2024-06-06,Teh Tarik,1400
+2024-06-06,Tandoori Chicken,0
+2024-06-06,Spaghetti Carbonara,308
+2024-06-06,Roti Canai,158
+2024-06-06,Laksa,318
+2024-06-06,Beef Rendang,270
+2024-06-06,Iced Lemon Tea,808
+2024-06-06,Chicken Rice,348
+2024-06-06,Chicken Chop,189
+2024-06-06,Cendol,842
+2024-06-06,Kaya Toast Set,1180
+2024-06-07,Laksa,132
+2024-06-07,Tandoori Chicken,466
+2024-06-07,Spaghetti Carbonara,218
+2024-06-07,Roti Canai,922
+2024-06-07,Nasi Lemak,536
+2024-06-07,Mushroom Soup,95
+2024-06-07,Teh Tarik,2561
+2024-06-07,Kaya Toast Set,2605
+2024-06-07,Chicken Rice,621
+2024-06-07,Chicken Chop,448
+2024-06-07,Char Kway Teow,142
+2024-06-07,Cendol,688
+2024-06-07,Beef Rendang,211
+2024-06-07,Iced Lemon Tea,1326
+2024-06-08,Teh Tarik,1896
+2024-06-08,Spaghetti Carbonara,561
+2024-06-08,Nasi Lemak,1108
+2024-06-08,Mushroom Soup,734
+2024-06-08,Laksa,133
+2024-06-08,Tandoori Chicken,777
+2024-06-08,Iced Lemon Tea,237
+2024-06-08,Char Kway Teow,569
+2024-06-08,Cendol,644
+2024-06-08,Beef Rendang,226
+2024-06-08,Kaya Toast Set,2012
+2024-06-09,Teh Tarik,1451
+2024-06-09,Spaghetti Carbonara,616
+2024-06-09,Roti Canai,2750
+2024-06-09,Mushroom Soup,23
+2024-06-09,Kaya Toast Set,2059
+2024-06-09,Chicken Chop,153
+2024-06-09,Cendol,965
+2024-06-09,Beef Rendang,428
+2024-06-09,Iced Lemon Tea,452
+2024-06-10,Nasi Lemak,1052
+2024-06-10,Teh Tarik,5427
+2024-06-10,Tandoori Chicken,392
+2024-06-10,Spaghetti Carbonara,107
+2024-06-10,Roti Canai,502
+2024-06-10,Mushroom Soup,590
+2024-06-10,Laksa,401
+2024-06-10,Iced Lemon Tea,775
+2024-06-10,Chicken Rice,0
+2024-06-10,Chicken Chop,233
+2024-06-10,Char Kway Teow,286
+2024-06-10,Cendol,260
+2024-06-10,Beef Rendang,359
+2024-06-10,Kaya Toast Set,2522
+2024-06-11,Teh Tarik,889
+2024-06-11,Spaghetti Carbonara,0
+2024-06-11,Mushroom Soup,0
+2024-06-11,Kaya Toast Set,404
+2024-06-11,Nasi Lemak,373
+2024-06-11,Chicken Rice,506
+2024-06-11,Chicken Chop,416
+2024-06-11,Char Kway Teow,214
+2024-06-11,Cendol,899
+2024-06-11,Iced Lemon Tea,281
+2024-06-12,Teh Tarik,561
+2024-06-12,Tandoori Chicken,399
+2024-06-12,Spaghetti Carbonara,387
+2024-06-12,Roti Canai,290
+2024-06-12,Nasi Lemak,188
+2024-06-12,Chicken Chop,249
+2024-06-12,Chicken Rice,167
+2024-06-12,Char Kway Teow,240
+2024-06-12,Cendol,1190
+2024-06-12,Beef Rendang,226
+2024-06-12,Kaya Toast Set,2650
+2024-06-13,Roti Canai,271
+2024-06-13,Spaghetti Carbonara,101
+2024-06-13,Mushroom Soup,0
+2024-06-13,Teh Tarik,2475
+2024-06-13,Tandoori Chicken,176
+2024-06-13,Laksa,126
+2024-06-13,Char Kway Teow,83
+2024-06-13,Chicken Rice,376
+2024-06-13,Beef Rendang,0
+2024-06-13,Cendol,660
+2024-06-13,Kaya Toast Set,1166
+2024-06-13,Chicken Chop,138
+2024-06-14,Teh Tarik,225
+2024-06-14,Spaghetti Carbonara,108
+2024-06-14,Nasi Lemak,413
+2024-06-14,Kaya Toast Set,853
+2024-06-14,Iced Lemon Tea,289
+2024-06-14,Tandoori Chicken,255
+2024-06-14,Chicken Chop,573
+2024-06-14,Chicken Rice,45
+2024-06-14,Beef Rendang,17
+2024-06-14,Roti Canai,557
+2024-06-14,Char Kway Teow,342
+2024-06-14,Cendol,676
+2024-06-15,Cendol,650
+2024-06-15,Chicken Chop,917
+2024-06-15,Laksa,499
+2024-06-15,Nasi Lemak,738
+2024-06-15,Roti Canai,534
+2024-06-15,Spaghetti Carbonara,417
+2024-06-15,Teh Tarik,641
+2024-06-15,Kaya Toast Set,2058
+2024-06-16,Teh Tarik,2062
+2024-06-16,Nasi Lemak,1540
+2024-06-16,Roti Canai,1769
+2024-06-16,Mushroom Soup,103
+2024-06-16,Chicken Rice,354
+2024-06-16,Chicken Chop,256
+2024-06-16,Cendol,1204
+2024-06-16,Kaya Toast Set,1540
+2024-06-17,Teh Tarik,1053
+2024-06-17,Spaghetti Carbonara,263
+2024-06-17,Roti Canai,1032
+2024-06-17,Nasi Lemak,228
+2024-06-17,Mushroom Soup,441
+2024-06-17,Kaya Toast Set,554
+2024-06-17,Tandoori Chicken,0
+2024-06-17,Chicken Rice,533
+2024-06-17,Chicken Chop,203
+2024-06-17,Char Kway Teow,0
+2024-06-17,Cendol,926
+2024-06-17,Beef Rendang,162
+2024-06-17,Iced Lemon Tea,627
+2024-06-18,Tandoori Chicken,81
+2024-06-18,Spaghetti Carbonara,313
+2024-06-18,Roti Canai,915
+2024-06-18,Nasi Lemak,789
+2024-06-18,Kaya Toast Set,851
+2024-06-18,Chicken Chop,251
+2024-06-18,Cendol,1069
+2024-06-18,Beef Rendang,126
+2024-06-18,Mushroom Soup,75
+2024-06-19,Mushroom Soup,200
+2024-06-19,Spaghetti Carbonara,282
+2024-06-19,Roti Canai,537
+2024-06-19,Teh Tarik,2138
+2024-06-19,Kaya Toast Set,806
+2024-06-19,Nasi Lemak,666
+2024-06-19,Chicken Rice,145
+2024-06-19,Chicken Chop,8
+2024-06-19,Cendol,718
+2024-06-19,Beef Rendang,282
+2024-06-19,Iced Lemon Tea,557
+2024-06-20,Tandoori Chicken,117
+2024-06-20,Spaghetti Carbonara,326
+2024-06-20,Roti Canai,786
+2024-06-20,Nasi Lemak,306
+2024-06-20,Mushroom Soup,183
+2024-06-20,Laksa,442
+2024-06-20,Teh Tarik,548
+2024-06-20,Iced Lemon Tea,364
+2024-06-20,Chicken Chop,447
+2024-06-20,Char Kway Teow,305
+2024-06-20,Cendol,1133
+2024-06-20,Beef Rendang,4
+2024-06-20,Kaya Toast Set,576
+2024-06-21,Teh Tarik,561
+2024-06-21,Tandoori Chicken,154
+2024-06-21,Spaghetti Carbonara,706
+2024-06-21,Roti Canai,662
+2024-06-21,Nasi Lemak,295
+2024-06-21,Mushroom Soup,21
+2024-06-21,Kaya Toast Set,368
+2024-06-21,Chicken Rice,0
+2024-06-21,Chicken Chop,380
+2024-06-21,Cendol,843
+2024-06-21,Beef Rendang,152
+2024-06-21,Iced Lemon Tea,824
+2024-06-22,Nasi Lemak,1209
+2024-06-22,Teh Tarik,1230
+2024-06-22,Tandoori Chicken,133
+2024-06-22,Spaghetti Carbonara,393
+2024-06-22,Roti Canai,1675
+2024-06-22,Mushroom Soup,430
+2024-06-22,Beef Rendang,319
+2024-06-22,Kaya Toast Set,2433
+2024-06-22,Iced Lemon Tea,463
+2024-06-22,Chicken Rice,687
+2024-06-22,Char Kway Teow,687
+2024-06-22,Cendol,944
+2024-06-22,Laksa,551
+2024-06-23,Teh Tarik,2438
+2024-06-23,Tandoori Chicken,0
+2024-06-23,Spaghetti Carbonara,372
+2024-06-23,Roti Canai,956
+2024-06-23,Mushroom Soup,638
+2024-06-23,Laksa,245
+2024-06-23,Kaya Toast Set,1946
+2024-06-23,Chicken Rice,153
+2024-06-23,Char Kway Teow,166
+2024-06-23,Cendol,872
+2024-06-23,Beef Rendang,578
+2024-06-23,Iced Lemon Tea,2035
+2024-06-24,Laksa,168
+2024-06-24,Tandoori Chicken,0
+2024-06-24,Teh Tarik,320
+2024-06-24,Nasi Lemak,459
+2024-06-24,Mushroom Soup,63
+2024-06-24,Kaya Toast Set,1468
+2024-06-24,Spaghetti Carbonara,75
+2024-06-24,Chicken Rice,413
+2024-06-24,Chicken Chop,262
+2024-06-24,Char Kway Teow,587
+2024-06-24,Cendol,519
+2024-06-24,Beef Rendang,466
+2024-06-24,Iced Lemon Tea,961
+2024-06-25,Spaghetti Carbonara,459
+2024-06-25,Roti Canai,719
+2024-06-25,Nasi Lemak,496
+2024-06-25,Laksa,307
+2024-06-25,Teh Tarik,1399
+2024-06-25,Iced Lemon Tea,700
+2024-06-25,Cendol,28
+2024-06-25,Beef Rendang,0
+2024-06-25,Kaya Toast Set,811
+2024-06-26,Teh Tarik,402
+2024-06-26,Tandoori Chicken,150
+2024-06-26,Spaghetti Carbonara,0
+2024-06-26,Nasi Lemak,540
+2024-06-26,Mushroom Soup,147
+2024-06-26,Laksa,383
+2024-06-26,Iced Lemon Tea,1073
+2024-06-26,Chicken Chop,523
+2024-06-26,Char Kway Teow,97
+2024-06-26,Cendol,839
+2024-06-26,Kaya Toast Set,1502
+2024-06-27,Nasi Lemak,273
+2024-06-27,Teh Tarik,2645
+2024-06-27,Roti Canai,600
+2024-06-27,Mushroom Soup,297
+2024-06-27,Tandoori Chicken,723
+2024-06-27,Iced Lemon Tea,312
+2024-06-27,Chicken Rice,314
+2024-06-27,Cendol,590
+2024-06-27,Beef Rendang,164
+2024-06-27,Kaya Toast Set,874
+2024-06-28,Teh Tarik,1125
+2024-06-28,Tandoori Chicken,154
+2024-06-28,Spaghetti Carbonara,64
+2024-06-28,Roti Canai,515
+2024-06-28,Laksa,298
+2024-06-28,Kaya Toast Set,967
+2024-06-28,Chicken Chop,245
+2024-06-28,Char Kway Teow,226
+2024-06-28,Cendol,226
+2024-06-28,Beef Rendang,0
+2024-06-28,Iced Lemon Tea,676
+2024-06-29,Teh Tarik,2805
+2024-06-29,Tandoori Chicken,410
+2024-06-29,Spaghetti Carbonara,998
+2024-06-29,Roti Canai,1321
+2024-06-29,Nasi Lemak,437
+2024-06-29,Kaya Toast Set,2056
+2024-06-29,Iced Lemon Tea,1850
+2024-06-29,Chicken Chop,305
+2024-06-29,Cendol,364
+2024-06-29,Mushroom Soup,834
+2024-06-30,Spaghetti Carbonara,276
+2024-06-30,Roti Canai,691
+2024-06-30,Nasi Lemak,945
+2024-06-30,Mushroom Soup,19
+2024-06-30,Laksa,753
+2024-06-30,Iced Lemon Tea,985
+2024-06-30,Chicken Rice,479
+2024-06-30,Chicken Chop,362
+2024-06-30,Cendol,160
+2024-06-30,Beef Rendang,322
+2024-06-30,Tandoori Chicken,730
+2024-06-30,Kaya Toast Set,2618
+2024-07-01,Roti Canai,2788
+2024-07-01,Nasi Lemak,222
+2024-07-01,Tandoori Chicken,450
+2024-07-01,Mushroom Soup,145
+2024-07-01,Teh Tarik,2000
+2024-07-01,Chicken Chop,137
+2024-07-01,Char Kway Teow,373
+2024-07-01,Cendol,433
+2024-07-01,Beef Rendang,186
+2024-07-01,Iced Lemon Tea,647
+2024-07-02,Teh Tarik,923
+2024-07-02,Tandoori Chicken,97
+2024-07-02,Spaghetti Carbonara,249
+2024-07-02,Roti Canai,1008
+2024-07-02,Mushroom Soup,61
+2024-07-02,Laksa,160
+2024-07-02,Iced Lemon Tea,196
+2024-07-02,Chicken Rice,63
+2024-07-02,Chicken Chop,37
+2024-07-02,Cendol,451
+2024-07-02,Beef Rendang,293
+2024-07-02,Kaya Toast Set,1246
+2024-07-03,Mushroom Soup,192
+2024-07-03,Tandoori Chicken,0
+2024-07-03,Spaghetti Carbonara,125
+2024-07-03,Roti Canai,385
+2024-07-03,Nasi Lemak,580
+2024-07-03,Laksa,152
+2024-07-03,Teh Tarik,2007
+2024-07-03,Iced Lemon Tea,1001
+2024-07-03,Chicken Chop,751
+2024-07-03,Char Kway Teow,282
+2024-07-03,Cendol,932
+2024-07-03,Beef Rendang,207
+2024-07-03,Kaya Toast Set,897
+2024-07-04,Teh Tarik,1974
+2024-07-04,Tandoori Chicken,235
+2024-07-04,Spaghetti Carbonara,46
+2024-07-04,Roti Canai,239
+2024-07-04,Nasi Lemak,212
+2024-07-04,Mushroom Soup,48
+2024-07-04,Kaya Toast Set,1358
+2024-07-04,Iced Lemon Tea,368
+2024-07-04,Chicken Rice,90
+2024-07-04,Chicken Chop,335
+2024-07-04,Cendol,678
+2024-07-05,Teh Tarik,1569
+2024-07-05,Tandoori Chicken,161
+2024-07-05,Spaghetti Carbonara,143
+2024-07-05,Roti Canai,1044
+2024-07-05,Nasi Lemak,1307
+2024-07-05,Mushroom Soup,306
+2024-07-05,Beef Rendang,0
+2024-07-05,Kaya Toast Set,1369
+2024-07-05,Iced Lemon Tea,148
+2024-07-05,Chicken Chop,96
+2024-07-05,Char Kway Teow,464
+2024-07-05,Cendol,1508
+2024-07-05,Laksa,0
+2024-07-06,Nasi Lemak,953
+2024-07-06,Teh Tarik,3293
+2024-07-06,Spaghetti Carbonara,269
+2024-07-06,Roti Canai,390
+2024-07-06,Mushroom Soup,547
+2024-07-06,Tandoori Chicken,361
+2024-07-06,Iced Lemon Tea,901
+2024-07-06,Chicken Chop,836
+2024-07-06,Char Kway Teow,293
+2024-07-06,Kaya Toast Set,1888
+2024-07-06,Cendol,695
+2024-07-07,Teh Tarik,1772
+2024-07-07,Tandoori Chicken,1040
+2024-07-07,Spaghetti Carbonara,176
+2024-07-07,Roti Canai,2323
+2024-07-07,Nasi Lemak,928
+2024-07-07,Mushroom Soup,234
+2024-07-07,Iced Lemon Tea,1772
+2024-07-07,Chicken Rice,118
+2024-07-07,Chicken Chop,482
+2024-07-07,Cendol,320
+2024-07-07,Beef Rendang,263
+2024-07-07,Kaya Toast Set,3204
+2024-07-08,Nasi Lemak,1033
+2024-07-08,Teh Tarik,1349
+2024-07-08,Tandoori Chicken,97
+2024-07-08,Spaghetti Carbonara,335
+2024-07-08,Roti Canai,705
+2024-07-08,Mushroom Soup,0
+2024-07-08,Beef Rendang,196
+2024-07-08,Iced Lemon Tea,623
+2024-07-08,Chicken Rice,541
+2024-07-08,Chicken Chop,411
+2024-07-08,Char Kway Teow,112
+2024-07-08,Cendol,936
+2024-07-08,Kaya Toast Set,2733
+2024-07-09,Teh Tarik,1165
+2024-07-09,Tandoori Chicken,236
+2024-07-09,Spaghetti Carbonara,28
+2024-07-09,Nasi Lemak,392
+2024-07-09,Mushroom Soup,125
+2024-07-09,Iced Lemon Tea,423
+2024-07-09,Kaya Toast Set,874
+2024-07-09,Chicken Rice,160
+2024-07-09,Cendol,823
+2024-07-09,Beef Rendang,92
+2024-07-09,Laksa,94
+2024-07-10,Teh Tarik,1528
+2024-07-10,Spaghetti Carbonara,249
+2024-07-10,Nasi Lemak,266
+2024-07-10,Mushroom Soup,308
+2024-07-10,Laksa,92
+2024-07-10,Kaya Toast Set,788
+2024-07-10,Roti Canai,787
+2024-07-10,Chicken Rice,542
+2024-07-10,Chicken Chop,589
+2024-07-10,Char Kway Teow,25
+2024-07-10,Cendol,968
+2024-07-10,Beef Rendang,155
+2024-07-10,Iced Lemon Tea,778
+2024-07-11,Teh Tarik,667
+2024-07-11,Roti Canai,289
+2024-07-11,Nasi Lemak,893
+2024-07-11,Mushroom Soup,135
+2024-07-11,Chicken Rice,544
+2024-07-11,Chicken Chop,35
+2024-07-11,Char Kway Teow,0
+2024-07-11,Cendol,1382
+2024-07-11,Kaya Toast Set,2112
+2024-07-12,Nasi Lemak,365
+2024-07-12,Teh Tarik,1032
+2024-07-12,Spaghetti Carbonara,312
+2024-07-12,Roti Canai,544
+2024-07-12,Mushroom Soup,115
+2024-07-12,Tandoori Chicken,131
+2024-07-12,Kaya Toast Set,355
+2024-07-12,Beef Rendang,776
+2024-07-12,Cendol,1100
+2024-07-12,Laksa,112
+2024-07-12,Iced Lemon Tea,744
+2024-07-12,Chicken Chop,62
+2024-07-13,Teh Tarik,4410
+2024-07-13,Tandoori Chicken,362
+2024-07-13,Roti Canai,1172
+2024-07-13,Nasi Lemak,1244
+2024-07-13,Laksa,168
+2024-07-13,Kaya Toast Set,2906
+2024-07-13,Mushroom Soup,263
+2024-07-13,Chicken Rice,323
+2024-07-13,Chicken Chop,428
+2024-07-13,Char Kway Teow,615
+2024-07-13,Cendol,1206
+2024-07-13,Beef Rendang,274
+2024-07-13,Iced Lemon Tea,1049
+2024-07-14,Nasi Lemak,456
+2024-07-14,Teh Tarik,3196
+2024-07-14,Tandoori Chicken,183
+2024-07-14,Spaghetti Carbonara,250
+2024-07-14,Roti Canai,469
+2024-07-14,Mushroom Soup,38
+2024-07-14,Cendol,393
+2024-07-14,Iced Lemon Tea,1221
+2024-07-14,Chicken Rice,537
+2024-07-14,Chicken Chop,317
+2024-07-14,Beef Rendang,145
+2024-07-14,Kaya Toast Set,521
+2024-07-15,Roti Canai,1571
+2024-07-15,Spaghetti Carbonara,396
+2024-07-15,Iced Lemon Tea,350
+2024-07-15,Teh Tarik,826
+2024-07-15,Tandoori Chicken,720
+2024-07-15,Nasi Lemak,1646
+2024-07-15,Chicken Chop,173
+2024-07-15,Kaya Toast Set,551
+2024-07-15,Chicken Rice,203
+2024-07-15,Mushroom Soup,249
+2024-07-15,Char Kway Teow,0
+2024-07-15,Cendol,711
+2024-07-16,Tandoori Chicken,0
+2024-07-16,Nasi Lemak,930
+2024-07-16,Mushroom Soup,186
+2024-07-16,Kaya Toast Set,1341
+2024-07-16,Teh Tarik,1932
+2024-07-16,Chicken Rice,148
+2024-07-16,Chicken Chop,179
+2024-07-16,Cendol,862
+2024-07-16,Beef Rendang,142
+2024-07-16,Iced Lemon Tea,350
+2024-07-17,Teh Tarik,1569
+2024-07-17,Tandoori Chicken,0
+2024-07-17,Spaghetti Carbonara,488
+2024-07-17,Roti Canai,388
+2024-07-17,Nasi Lemak,644
+2024-07-17,Chicken Chop,476
+2024-07-17,Cendol,356
+2024-07-17,Beef Rendang,143
+2024-07-17,Iced Lemon Tea,227
+2024-07-18,Mushroom Soup,554
+2024-07-18,Spaghetti Carbonara,145
+2024-07-18,Roti Canai,464
+2024-07-18,Nasi Lemak,804
+2024-07-18,Teh Tarik,2125
+2024-07-18,Kaya Toast Set,429
+2024-07-18,Chicken Rice,0
+2024-07-18,Beef Rendang,337
+2024-07-18,Cendol,1275
+2024-07-18,Iced Lemon Tea,246
+2024-07-18,Chicken Chop,139
+2024-07-18,Char Kway Teow,345
+2024-07-19,Teh Tarik,2002
+2024-07-19,Spaghetti Carbonara,676
+2024-07-19,Roti Canai,967
+2024-07-19,Nasi Lemak,253
+2024-07-19,Mushroom Soup,435
+2024-07-19,Tandoori Chicken,0
+2024-07-19,Kaya Toast Set,866
+2024-07-19,Iced Lemon Tea,378
+2024-07-19,Chicken Chop,0
+2024-07-19,Char Kway Teow,81
+2024-07-19,Cendol,552
+2024-07-19,Laksa,328
+2024-07-20,Teh Tarik,2614
+2024-07-20,Tandoori Chicken,681
+2024-07-20,Spaghetti Carbonara,132
+2024-07-20,Roti Canai,1775
+2024-07-20,Nasi Lemak,287
+2024-07-20,Kaya Toast Set,1828
+2024-07-20,Iced Lemon Tea,614
+2024-07-20,Chicken Chop,536
+2024-07-20,Cendol,1154
+2024-07-20,Mushroom Soup,268
+2024-07-20,Beef Rendang,514
+2024-07-21,Teh Tarik,812
+2024-07-21,Nasi Lemak,491
+2024-07-21,Tandoori Chicken,47
+2024-07-21,Spaghetti Carbonara,0
+2024-07-21,Roti Canai,731
+2024-07-21,Mushroom Soup,198
+2024-07-21,Iced Lemon Tea,1494
+2024-07-21,Chicken Rice,177
+2024-07-21,Cendol,425
+2024-07-21,Beef Rendang,143
+2024-07-21,Kaya Toast Set,2041
+2024-07-22,Teh Tarik,1226
+2024-07-22,Tandoori Chicken,0
+2024-07-22,Spaghetti Carbonara,444
+2024-07-22,Nasi Lemak,192
+2024-07-22,Mushroom Soup,262
+2024-07-22,Kaya Toast Set,813
+2024-07-22,Iced Lemon Tea,470
+2024-07-22,Chicken Chop,163
+2024-07-22,Char Kway Teow,99
+2024-07-22,Cendol,912
+2024-07-22,Beef Rendang,0
+2024-07-23,Tandoori Chicken,136
+2024-07-23,Teh Tarik,816
+2024-07-23,Spaghetti Carbonara,0
+2024-07-23,Roti Canai,1075
+2024-07-23,Nasi Lemak,1062
+2024-07-23,Mushroom Soup,81
+2024-07-23,Cendol,684
+2024-07-23,Kaya Toast Set,1502
+2024-07-23,Iced Lemon Tea,157
+2024-07-23,Chicken Rice,422
+2024-07-23,Chicken Chop,123
+2024-07-23,Beef Rendang,139
+2024-07-23,Laksa,544
+2024-07-24,Nasi Lemak,278
+2024-07-24,Teh Tarik,3317
+2024-07-24,Tandoori Chicken,498
+2024-07-24,Spaghetti Carbonara,406
+2024-07-24,Roti Canai,488
+2024-07-24,Mushroom Soup,26
+2024-07-24,Chicken Chop,129
+2024-07-24,Kaya Toast Set,95
+2024-07-24,Iced Lemon Tea,1044
+2024-07-24,Laksa,168
+2024-07-24,Cendol,1129
+2024-07-24,Beef Rendang,132
+2024-07-25,Tandoori Chicken,553
+2024-07-25,Spaghetti Carbonara,219
+2024-07-25,Roti Canai,630
+2024-07-25,Nasi Lemak,1027
+2024-07-25,Mushroom Soup,125
+2024-07-25,Kaya Toast Set,592
+2024-07-25,Teh Tarik,2105
+2024-07-25,Chicken Rice,79
+2024-07-25,Chicken Chop,489
+2024-07-25,Char Kway Teow,124
+2024-07-25,Cendol,176
+2024-07-25,Beef Rendang,407
+2024-07-25,Iced Lemon Tea,366
+2024-07-26,Teh Tarik,1566
+2024-07-26,Tandoori Chicken,416
+2024-07-26,Spaghetti Carbonara,157
+2024-07-26,Roti Canai,565
+2024-07-26,Nasi Lemak,947
+2024-07-26,Kaya Toast Set,967
+2024-07-26,Chicken Chop,180
+2024-07-26,Char Kway Teow,30
+2024-07-26,Cendol,529
+2024-07-26,Beef Rendang,431
+2024-07-26,Iced Lemon Tea,1026
+2024-07-27,Nasi Lemak,497
+2024-07-27,Teh Tarik,2482
+2024-07-27,Tandoori Chicken,90
+2024-07-27,Spaghetti Carbonara,47
+2024-07-27,Roti Canai,440
+2024-07-27,Mushroom Soup,471
+2024-07-27,Kaya Toast Set,3742
+2024-07-27,Iced Lemon Tea,2291
+2024-07-27,Chicken Chop,540
+2024-07-27,Char Kway Teow,182
+2024-07-27,Cendol,1453
+2024-07-27,Beef Rendang,388
+2024-07-28,Teh Tarik,1713
+2024-07-28,Tandoori Chicken,269
+2024-07-28,Roti Canai,1555
+2024-07-28,Nasi Lemak,1298
+2024-07-28,Kaya Toast Set,1308
+2024-07-28,Mushroom Soup,1042
+2024-07-28,Chicken Chop,56
+2024-07-28,Char Kway Teow,138
+2024-07-28,Cendol,1538
+2024-07-28,Beef Rendang,83
+2024-07-28,Iced Lemon Tea,1185
+2024-07-29,Mushroom Soup,85
+2024-07-29,Teh Tarik,662
+2024-07-29,Tandoori Chicken,486
+2024-07-29,Spaghetti Carbonara,258
+2024-07-29,Roti Canai,759
+2024-07-29,Nasi Lemak,231
+2024-07-29,Laksa,215
+2024-07-29,Beef Rendang,77
+2024-07-29,Iced Lemon Tea,355
+2024-07-29,Chicken Rice,211
+2024-07-29,Chicken Chop,274
+2024-07-29,Char Kway Teow,195
+2024-07-29,Cendol,504
+2024-07-29,Kaya Toast Set,436
+2024-07-30,Spaghetti Carbonara,0
+2024-07-30,Teh Tarik,387
+2024-07-30,Tandoori Chicken,238
+2024-07-30,Mushroom Soup,516
+2024-07-30,Beef Rendang,82
+2024-07-30,Iced Lemon Tea,674
+2024-07-30,Char Kway Teow,406
+2024-07-30,Kaya Toast Set,1237
+2024-07-30,Chicken Chop,520
+2024-07-31,Tandoori Chicken,204
+2024-07-31,Spaghetti Carbonara,89
+2024-07-31,Roti Canai,702
+2024-07-31,Nasi Lemak,430
+2024-07-31,Laksa,92
+2024-07-31,Mushroom Soup,0
+2024-07-31,Iced Lemon Tea,408
+2024-07-31,Chicken Rice,323
+2024-07-31,Char Kway Teow,375
+2024-07-31,Cendol,896
+2024-07-31,Beef Rendang,86
+2024-07-31,Kaya Toast Set,294
+2024-08-01,Roti Canai,2783
+2024-08-01,Teh Tarik,3379
+2024-08-01,Tandoori Chicken,113
+2024-08-01,Spaghetti Carbonara,469
+2024-08-01,Nasi Lemak,1142
+2024-08-01,Beef Rendang,279
+2024-08-01,Kaya Toast Set,1924
+2024-08-01,Iced Lemon Tea,1515
+2024-08-01,Chicken Chop,797
+2024-08-01,Cendol,575
+2024-08-01,Mushroom Soup,129
+2024-08-02,Laksa,117
+2024-08-02,Spaghetti Carbonara,176
+2024-08-02,Nasi Lemak,415
+2024-08-02,Tandoori Chicken,178
+2024-08-02,Kaya Toast Set,698
+2024-08-02,Chicken Chop,466
+2024-08-02,Cendol,1128
+2024-08-02,Beef Rendang,272
+2024-08-02,Iced Lemon Tea,262
+2024-08-03,Teh Tarik,666
+2024-08-03,Tandoori Chicken,166
+2024-08-03,Spaghetti Carbonara,489
+2024-08-03,Roti Canai,1183
+2024-08-03,Laksa,182
+2024-08-03,Kaya Toast Set,3407
+2024-08-03,Chicken Rice,273
+2024-08-03,Chicken Chop,616
+2024-08-03,Char Kway Teow,439
+2024-08-03,Cendol,632
+2024-08-03,Beef Rendang,197
+2024-08-04,Tandoori Chicken,395
+2024-08-04,Roti Canai,383
+2024-08-04,Nasi Lemak,1619
+2024-08-04,Mushroom Soup,239
+2024-08-04,Laksa,241
+2024-08-04,Beef Rendang,293
+2024-08-04,Iced Lemon Tea,1201
+2024-08-04,Chicken Chop,70
+2024-08-04,Cendol,1007
+2024-08-04,Kaya Toast Set,2014
+2024-08-05,Nasi Lemak,333
+2024-08-05,Tandoori Chicken,9
+2024-08-05,Teh Tarik,2186
+2024-08-05,Spaghetti Carbonara,156
+2024-08-05,Roti Canai,1986
+2024-08-05,Kaya Toast Set,370
+2024-08-05,Cendol,707
+2024-08-05,Chicken Rice,65
+2024-08-05,Chicken Chop,88
+2024-08-05,Char Kway Teow,123
+2024-08-05,Beef Rendang,426
+2024-08-05,Iced Lemon Tea,366
+2024-08-06,Spaghetti Carbonara,37
+2024-08-06,Roti Canai,774
+2024-08-06,Nasi Lemak,104
+2024-08-06,Mushroom Soup,377
+2024-08-06,Laksa,40
+2024-08-06,Teh Tarik,1730
+2024-08-06,Iced Lemon Tea,631
+2024-08-06,Chicken Rice,285
+2024-08-06,Chicken Chop,136
+2024-08-06,Cendol,722
+2024-08-06,Beef Rendang,230
+2024-08-06,Kaya Toast Set,1694
+2024-08-07,Teh Tarik,1530
+2024-08-07,Tandoori Chicken,107
+2024-08-07,Spaghetti Carbonara,465
+2024-08-07,Nasi Lemak,1663
+2024-08-07,Mushroom Soup,110
+2024-08-07,Iced Lemon Tea,416
+2024-08-07,Chicken Chop,659
+2024-08-07,Char Kway Teow,276
+2024-08-07,Cendol,446
+2024-08-07,Beef Rendang,420
+2024-08-07,Kaya Toast Set,1467
+2024-08-08,Roti Canai,1621
+2024-08-08,Teh Tarik,1951
+2024-08-08,Tandoori Chicken,334
+2024-08-08,Spaghetti Carbonara,243
+2024-08-08,Nasi Lemak,233
+2024-08-08,Laksa,497
+2024-08-08,Kaya Toast Set,533
+2024-08-08,Chicken Chop,101
+2024-08-08,Char Kway Teow,251
+2024-08-08,Cendol,1010
+2024-08-08,Mushroom Soup,17
+2024-08-09,Tandoori Chicken,542
+2024-08-09,Teh Tarik,2985
+2024-08-09,Spaghetti Carbonara,179
+2024-08-09,Roti Canai,296
+2024-08-09,Mushroom Soup,237
+2024-08-09,Kaya Toast Set,872
+2024-08-09,Iced Lemon Tea,465
+2024-08-09,Chicken Rice,76
+2024-08-09,Chicken Chop,95
+2024-08-09,Cendol,1279
+2024-08-10,Tandoori Chicken,0
+2024-08-10,Spaghetti Carbonara,514
+2024-08-10,Nasi Lemak,1745
+2024-08-10,Mushroom Soup,379
+2024-08-10,Kaya Toast Set,2221
+2024-08-10,Beef Rendang,174
+2024-08-10,Chicken Chop,779
+2024-08-10,Char Kway Teow,165
+2024-08-10,Cendol,394
+2024-08-10,Teh Tarik,3120
+2024-08-10,Iced Lemon Tea,704
+2024-08-11,Spaghetti Carbonara,326
+2024-08-11,Roti Canai,449
+2024-08-11,Tandoori Chicken,130
+2024-08-11,Teh Tarik,1336
+2024-08-11,Nasi Lemak,1109
+2024-08-11,Chicken Chop,541
+2024-08-11,Kaya Toast Set,2918
+2024-08-11,Iced Lemon Tea,528
+2024-08-11,Cendol,1219
+2024-08-11,Mushroom Soup,121
+2024-08-12,Teh Tarik,2294
+2024-08-12,Spaghetti Carbonara,1001
+2024-08-12,Roti Canai,903
+2024-08-12,Nasi Lemak,599
+2024-08-12,Mushroom Soup,199
+2024-08-12,Laksa,641
+2024-08-12,Iced Lemon Tea,1422
+2024-08-12,Chicken Chop,66
+2024-08-12,Char Kway Teow,179
+2024-08-12,Cendol,0
+2024-08-12,Beef Rendang,286
+2024-08-12,Kaya Toast Set,1555
+2024-08-13,Laksa,593
+2024-08-13,Tandoori Chicken,265
+2024-08-13,Spaghetti Carbonara,234
+2024-08-13,Roti Canai,1161
+2024-08-13,Mushroom Soup,173
+2024-08-13,Kaya Toast Set,633
+2024-08-13,Teh Tarik,3065
+2024-08-13,Chicken Rice,378
+2024-08-13,Chicken Chop,650
+2024-08-13,Char Kway Teow,159
+2024-08-13,Cendol,1405
+2024-08-13,Beef Rendang,277
+2024-08-13,Iced Lemon Tea,430
+2024-08-14,Spaghetti Carbonara,374
+2024-08-14,Roti Canai,1449
+2024-08-14,Nasi Lemak,463
+2024-08-14,Mushroom Soup,46
+2024-08-14,Kaya Toast Set,1256
+2024-08-14,Teh Tarik,3363
+2024-08-14,Chicken Rice,108
+2024-08-14,Chicken Chop,336
+2024-08-14,Char Kway Teow,221
+2024-08-14,Cendol,832
+2024-08-14,Beef Rendang,143
+2024-08-14,Iced Lemon Tea,377
+2024-08-15,Teh Tarik,1859
+2024-08-15,Tandoori Chicken,142
+2024-08-15,Spaghetti Carbonara,687
+2024-08-15,Roti Canai,1063
+2024-08-15,Nasi Lemak,1076
+2024-08-15,Mushroom Soup,207
+2024-08-15,Laksa,542
+2024-08-15,Chicken Chop,308
+2024-08-15,Char Kway Teow,446
+2024-08-15,Cendol,1184
+2024-08-15,Beef Rendang,454
+2024-08-15,Kaya Toast Set,1381
+2024-08-16,Nasi Lemak,666
+2024-08-16,Tandoori Chicken,0
+2024-08-16,Roti Canai,167
+2024-08-16,Teh Tarik,369
+2024-08-16,Mushroom Soup,348
+2024-08-16,Chicken Chop,191
+2024-08-16,Kaya Toast Set,661
+2024-08-16,Chicken Rice,87
+2024-08-16,Cendol,544
+2024-08-16,Beef Rendang,379
+2024-08-16,Laksa,374
+2024-08-17,Tandoori Chicken,268
+2024-08-17,Spaghetti Carbonara,114
+2024-08-17,Roti Canai,703
+2024-08-17,Nasi Lemak,209
+2024-08-17,Mushroom Soup,157
+2024-08-17,Laksa,349
+2024-08-17,Teh Tarik,1794
+2024-08-17,Iced Lemon Tea,1118
+2024-08-17,Chicken Chop,273
+2024-08-17,Char Kway Teow,176
+2024-08-17,Cendol,2433
+2024-08-17,Beef Rendang,216
+2024-08-17,Kaya Toast Set,1640
+2024-08-18,Teh Tarik,3388
+2024-08-18,Tandoori Chicken,106
+2024-08-18,Spaghetti Carbonara,511
+2024-08-18,Roti Canai,810
+2024-08-18,Nasi Lemak,340
+2024-08-18,Mushroom Soup,357
+2024-08-18,Kaya Toast Set,465
+2024-08-18,Chicken Chop,615
+2024-08-18,Char Kway Teow,833
+2024-08-18,Cendol,789
+2024-08-18,Beef Rendang,193
+2024-08-18,Iced Lemon Tea,1032
+2024-08-19,Nasi Lemak,429
+2024-08-19,Teh Tarik,2887
+2024-08-19,Tandoori Chicken,120
+2024-08-19,Spaghetti Carbonara,282
+2024-08-19,Roti Canai,1166
+2024-08-19,Mushroom Soup,110
+2024-08-19,Beef Rendang,130
+2024-08-19,Iced Lemon Tea,926
+2024-08-19,Chicken Rice,324
+2024-08-19,Chicken Chop,402
+2024-08-19,Char Kway Teow,157
+2024-08-19,Cendol,375
+2024-08-19,Kaya Toast Set,1740
+2024-08-20,Teh Tarik,1639
+2024-08-20,Tandoori Chicken,136
+2024-08-20,Spaghetti Carbonara,589
+2024-08-20,Roti Canai,1215
+2024-08-20,Nasi Lemak,871
+2024-08-20,Mushroom Soup,141
+2024-08-20,Kaya Toast Set,1276
+2024-08-20,Iced Lemon Tea,300
+2024-08-20,Chicken Rice,158
+2024-08-20,Chicken Chop,594
+2024-08-20,Cendol,597
+2024-08-20,Beef Rendang,41
+2024-08-20,Laksa,213
+2024-08-21,Nasi Lemak,299
+2024-08-21,Teh Tarik,1991
+2024-08-21,Spaghetti Carbonara,0
+2024-08-21,Roti Canai,1892
+2024-08-21,Kaya Toast Set,2068
+2024-08-21,Tandoori Chicken,215
+2024-08-21,Chicken Rice,330
+2024-08-21,Chicken Chop,413
+2024-08-21,Cendol,544
+2024-08-21,Iced Lemon Tea,500
+2024-08-21,Beef Rendang,17
+2024-08-22,Teh Tarik,1074
+2024-08-22,Tandoori Chicken,254
+2024-08-22,Spaghetti Carbonara,100
+2024-08-22,Roti Canai,1373
+2024-08-22,Nasi Lemak,1426
+2024-08-22,Mushroom Soup,277
+2024-08-22,Laksa,203
+2024-08-22,Kaya Toast Set,624
+2024-08-22,Char Kway Teow,161
+2024-08-22,Cendol,1430
+2024-08-23,Teh Tarik,891
+2024-08-23,Tandoori Chicken,845
+2024-08-23,Roti Canai,512
+2024-08-23,Nasi Lemak,1074
+2024-08-23,Mushroom Soup,151
+2024-08-23,Beef Rendang,116
+2024-08-23,Kaya Toast Set,1994
+2024-08-23,Iced Lemon Tea,565
+2024-08-23,Chicken Rice,453
+2024-08-23,Cendol,466
+2024-08-23,Laksa,316
+2024-08-24,Nasi Lemak,280
+2024-08-24,Tandoori Chicken,282
+2024-08-24,Spaghetti Carbonara,229
+2024-08-24,Teh Tarik,661
+2024-08-24,Mushroom Soup,288
+2024-08-24,Roti Canai,3682
+2024-08-24,Iced Lemon Tea,1353
+2024-08-24,Chicken Rice,605
+2024-08-24,Chicken Chop,401
+2024-08-24,Cendol,938
+2024-08-24,Beef Rendang,141
+2024-08-24,Kaya Toast Set,1598
+2024-08-25,Tandoori Chicken,377
+2024-08-25,Spaghetti Carbonara,309
+2024-08-25,Roti Canai,692
+2024-08-25,Nasi Lemak,1508
+2024-08-25,Mushroom Soup,247
+2024-08-25,Laksa,292
+2024-08-25,Teh Tarik,2125
+2024-08-25,Iced Lemon Tea,1047
+2024-08-25,Chicken Rice,346
+2024-08-25,Char Kway Teow,796
+2024-08-25,Cendol,935
+2024-08-25,Beef Rendang,542
+2024-08-25,Kaya Toast Set,3141
+2024-08-26,Teh Tarik,270
+2024-08-26,Tandoori Chicken,0
+2024-08-26,Spaghetti Carbonara,431
+2024-08-26,Nasi Lemak,802
+2024-08-26,Mushroom Soup,9
+2024-08-26,Laksa,0
+2024-08-26,Kaya Toast Set,223
+2024-08-26,Chicken Rice,140
+2024-08-26,Chicken Chop,395
+2024-08-26,Cendol,267
+2024-08-26,Beef Rendang,261
+2024-08-26,Iced Lemon Tea,248
+2024-08-27,Nasi Lemak,334
+2024-08-27,Teh Tarik,2589
+2024-08-27,Tandoori Chicken,137
+2024-08-27,Spaghetti Carbonara,335
+2024-08-27,Roti Canai,225
+2024-08-27,Laksa,266
+2024-08-27,Chicken Chop,551
+2024-08-27,Iced Lemon Tea,816
+2024-08-27,Chicken Rice,1309
+2024-08-27,Kaya Toast Set,865
+2024-08-27,Char Kway Teow,80
+2024-08-27,Cendol,882
+2024-08-27,Beef Rendang,326
+2024-08-28,Tandoori Chicken,698
+2024-08-28,Roti Canai,1842
+2024-08-28,Mushroom Soup,200
+2024-08-28,Laksa,195
+2024-08-28,Kaya Toast Set,2019
+2024-08-28,Teh Tarik,4000
+2024-08-28,Chicken Rice,480
+2024-08-28,Chicken Chop,593
+2024-08-28,Cendol,718
+2024-08-28,Beef Rendang,151
+2024-08-28,Iced Lemon Tea,998
+2024-08-29,Teh Tarik,2055
+2024-08-29,Tandoori Chicken,126
+2024-08-29,Spaghetti Carbonara,123
+2024-08-29,Roti Canai,332
+2024-08-29,Nasi Lemak,1920
+2024-08-29,Laksa,152
+2024-08-29,Kaya Toast Set,1220
+2024-08-29,Chicken Rice,185
+2024-08-29,Chicken Chop,197
+2024-08-29,Cendol,1173
+2024-08-29,Beef Rendang,216
+2024-08-29,Iced Lemon Tea,519
+2024-08-30,Teh Tarik,2331
+2024-08-30,Roti Canai,544
+2024-08-30,Nasi Lemak,1038
+2024-08-30,Mushroom Soup,77
+2024-08-30,Chicken Chop,833
+2024-08-30,Cendol,844
+2024-08-30,Beef Rendang,113
+2024-08-30,Kaya Toast Set,1273
+2024-08-31,Teh Tarik,1825
+2024-08-31,Tandoori Chicken,0
+2024-08-31,Spaghetti Carbonara,119
+2024-08-31,Nasi Lemak,684
+2024-08-31,Mushroom Soup,152
+2024-08-31,Iced Lemon Tea,655
+2024-08-31,Chicken Rice,276
+2024-08-31,Chicken Chop,540
+2024-08-31,Cendol,1255
+2024-08-31,Kaya Toast Set,3446
+2024-09-01,Roti Canai,843
+2024-09-01,Tandoori Chicken,306
+2024-09-01,Teh Tarik,1268
+2024-09-01,Spaghetti Carbonara,211
+2024-09-01,Nasi Lemak,1204
+2024-09-01,Cendol,1308
+2024-09-01,Kaya Toast Set,3385
+2024-09-01,Iced Lemon Tea,1127
+2024-09-01,Char Kway Teow,467
+2024-09-01,Beef Rendang,210
+2024-09-01,Mushroom Soup,424
+2024-09-02,Teh Tarik,1487
+2024-09-02,Tandoori Chicken,85
+2024-09-02,Spaghetti Carbonara,221
+2024-09-02,Roti Canai,1205
+2024-09-02,Nasi Lemak,3021
+2024-09-02,Mushroom Soup,147
+2024-09-02,Iced Lemon Tea,896
+2024-09-02,Chicken Rice,426
+2024-09-02,Beef Rendang,45
+2024-09-02,Kaya Toast Set,1644
+2024-09-02,Chicken Chop,264
+2024-09-02,Cendol,466
+2024-09-03,Tandoori Chicken,220
+2024-09-03,Spaghetti Carbonara,386
+2024-09-03,Roti Canai,508
+2024-09-03,Mushroom Soup,43
+2024-09-03,Teh Tarik,2746
+2024-09-03,Chicken Rice,64
+2024-09-03,Chicken Chop,159
+2024-09-03,Cendol,2078
+2024-09-03,Beef Rendang,314
+2024-09-03,Kaya Toast Set,1172
+2024-09-04,Teh Tarik,955
+2024-09-04,Tandoori Chicken,374
+2024-09-04,Spaghetti Carbonara,312
+2024-09-04,Roti Canai,1136
+2024-09-04,Nasi Lemak,290
+2024-09-04,Kaya Toast Set,993
+2024-09-04,Iced Lemon Tea,135
+2024-09-04,Chicken Chop,136
+2024-09-04,Beef Rendang,121
+2024-09-04,Mushroom Soup,611
+2024-09-04,Cendol,1322
+2024-09-05,Tandoori Chicken,46
+2024-09-05,Mushroom Soup,420
+2024-09-05,Spaghetti Carbonara,0
+2024-09-05,Nasi Lemak,189
+2024-09-05,Kaya Toast Set,347
+2024-09-05,Chicken Chop,671
+2024-09-05,Cendol,153
+2024-09-05,Beef Rendang,70
+2024-09-05,Iced Lemon Tea,499
+2024-09-06,Tandoori Chicken,51
+2024-09-06,Spaghetti Carbonara,102
+2024-09-06,Roti Canai,424
+2024-09-06,Mushroom Soup,0
+2024-09-06,Laksa,37
+2024-09-06,Teh Tarik,2641
+2024-09-06,Iced Lemon Tea,935
+2024-09-06,Chicken Chop,176
+2024-09-06,Cendol,690
+2024-09-06,Beef Rendang,553
+2024-09-06,Kaya Toast Set,365
+2024-09-07,Teh Tarik,3199
+2024-09-07,Spaghetti Carbonara,157
+2024-09-07,Roti Canai,569
+2024-09-07,Nasi Lemak,1117
+2024-09-07,Mushroom Soup,149
+2024-09-07,Laksa,145
+2024-09-07,Iced Lemon Tea,1195
+2024-09-07,Char Kway Teow,332
+2024-09-07,Cendol,914
+2024-09-07,Kaya Toast Set,2092
+2024-09-08,Laksa,263
+2024-09-08,Tandoori Chicken,24
+2024-09-08,Spaghetti Carbonara,209
+2024-09-08,Teh Tarik,3890
+2024-09-08,Kaya Toast Set,3258
+2024-09-08,Mushroom Soup,453
+2024-09-08,Chicken Rice,203
+2024-09-08,Beef Rendang,548
+2024-09-08,Iced Lemon Tea,1697
+2024-09-08,Chicken Chop,171
+2024-09-08,Cendol,2120
+2024-09-09,Beef Rendang,73
+2024-09-09,Teh Tarik,552
+2024-09-09,Tandoori Chicken,242
+2024-09-09,Spaghetti Carbonara,369
+2024-09-09,Roti Canai,1184
+2024-09-09,Mushroom Soup,235
+2024-09-09,Laksa,776
+2024-09-09,Nasi Lemak,317
+2024-09-09,Iced Lemon Tea,1114
+2024-09-09,Chicken Rice,156
+2024-09-09,Chicken Chop,477
+2024-09-09,Char Kway Teow,358
+2024-09-09,Cendol,1106
+2024-09-09,Kaya Toast Set,748
+2024-09-10,Roti Canai,849
+2024-09-10,Teh Tarik,823
+2024-09-10,Tandoori Chicken,466
+2024-09-10,Spaghetti Carbonara,565
+2024-09-10,Mushroom Soup,44
+2024-09-10,Beef Rendang,122
+2024-09-10,Iced Lemon Tea,0
+2024-09-10,Chicken Chop,0
+2024-09-10,Cendol,1478
+2024-09-10,Kaya Toast Set,1293
+2024-09-11,Roti Canai,641
+2024-09-11,Teh Tarik,2611
+2024-09-11,Tandoori Chicken,342
+2024-09-11,Spaghetti Carbonara,569
+2024-09-11,Nasi Lemak,263
+2024-09-11,Mushroom Soup,207
+2024-09-11,Kaya Toast Set,678
+2024-09-11,Iced Lemon Tea,365
+2024-09-11,Chicken Rice,289
+2024-09-11,Cendol,1869
+2024-09-11,Beef Rendang,186
+2024-09-12,Teh Tarik,1471
+2024-09-12,Tandoori Chicken,243
+2024-09-12,Nasi Lemak,313
+2024-09-12,Mushroom Soup,234
+2024-09-12,Laksa,251
+2024-09-12,Roti Canai,1180
+2024-09-12,Iced Lemon Tea,1031
+2024-09-12,Chicken Rice,144
+2024-09-12,Char Kway Teow,241
+2024-09-12,Cendol,436
+2024-09-12,Beef Rendang,288
+2024-09-12,Kaya Toast Set,450
+2024-09-13,Teh Tarik,334
+2024-09-13,Tandoori Chicken,96
+2024-09-13,Nasi Lemak,596
+2024-09-13,Mushroom Soup,487
+2024-09-13,Chicken Chop,221
+2024-09-13,Iced Lemon Tea,272
+2024-09-13,Cendol,1697
+2024-09-13,Beef Rendang,43
+2024-09-13,Kaya Toast Set,439
+2024-09-14,Teh Tarik,3807
+2024-09-14,Spaghetti Carbonara,152
+2024-09-14,Roti Canai,2494
+2024-09-14,Mushroom Soup,120
+2024-09-14,Kaya Toast Set,1715
+2024-09-14,Chicken Rice,217
+2024-09-14,Char Kway Teow,701
+2024-09-14,Cendol,412
+2024-09-14,Iced Lemon Tea,775
+2024-09-15,Tandoori Chicken,186
+2024-09-15,Roti Canai,2530
+2024-09-15,Nasi Lemak,1624
+2024-09-15,Mushroom Soup,269
+2024-09-15,Kaya Toast Set,1995
+2024-09-15,Teh Tarik,759
+2024-09-15,Chicken Rice,407
+2024-09-15,Chicken Chop,156
+2024-09-15,Char Kway Teow,575
+2024-09-15,Cendol,1986
+2024-09-15,Beef Rendang,104
+2024-09-15,Iced Lemon Tea,839
+2024-09-16,Teh Tarik,2815
+2024-09-16,Spaghetti Carbonara,93
+2024-09-16,Roti Canai,261
+2024-09-16,Mushroom Soup,86
+2024-09-16,Laksa,191
+2024-09-16,Kaya Toast Set,781
+2024-09-16,Chicken Rice,115
+2024-09-16,Chicken Chop,252
+2024-09-16,Cendol,394
+2024-09-16,Beef Rendang,155
+2024-09-16,Iced Lemon Tea,300
+2024-09-17,Teh Tarik,2053
+2024-09-17,Tandoori Chicken,325
+2024-09-17,Spaghetti Carbonara,352
+2024-09-17,Roti Canai,455
+2024-09-17,Nasi Lemak,675
+2024-09-17,Mushroom Soup,338
+2024-09-17,Chicken Rice,314
+2024-09-17,Iced Lemon Tea,365
+2024-09-17,Chicken Chop,184
+2024-09-17,Char Kway Teow,157
+2024-09-17,Cendol,841
+2024-09-17,Beef Rendang,0
+2024-09-17,Kaya Toast Set,322
+2024-09-18,Teh Tarik,1963
+2024-09-18,Tandoori Chicken,333
+2024-09-18,Roti Canai,1948
+2024-09-18,Nasi Lemak,217
+2024-09-18,Mushroom Soup,68
+2024-09-18,Spaghetti Carbonara,10
+2024-09-18,Chicken Rice,258
+2024-09-18,Chicken Chop,400
+2024-09-18,Char Kway Teow,231
+2024-09-18,Cendol,372
+2024-09-18,Beef Rendang,381
+2024-09-18,Kaya Toast Set,1775
+2024-09-19,Teh Tarik,1342
+2024-09-19,Tandoori Chicken,58
+2024-09-19,Roti Canai,1290
+2024-09-19,Nasi Lemak,387
+2024-09-19,Mushroom Soup,112
+2024-09-19,Chicken Chop,669
+2024-09-19,Cendol,614
+2024-09-19,Kaya Toast Set,844
+2024-09-20,Teh Tarik,919
+2024-09-20,Tandoori Chicken,523
+2024-09-20,Spaghetti Carbonara,203
+2024-09-20,Roti Canai,353
+2024-09-20,Nasi Lemak,555
+2024-09-20,Mushroom Soup,338
+2024-09-20,Kaya Toast Set,1659
+2024-09-20,Iced Lemon Tea,748
+2024-09-20,Chicken Chop,214
+2024-09-20,Cendol,586
+2024-09-20,Laksa,265
+2024-09-21,Teh Tarik,5114
+2024-09-21,Tandoori Chicken,500
+2024-09-21,Spaghetti Carbonara,155
+2024-09-21,Roti Canai,1474
+2024-09-21,Mushroom Soup,52
+2024-09-21,Kaya Toast Set,1293
+2024-09-21,Iced Lemon Tea,481
+2024-09-21,Chicken Rice,485
+2024-09-21,Chicken Chop,208
+2024-09-21,Cendol,254
+2024-09-21,Beef Rendang,271
+2024-09-22,Teh Tarik,2908
+2024-09-22,Tandoori Chicken,357
+2024-09-22,Spaghetti Carbonara,206
+2024-09-22,Roti Canai,875
+2024-09-22,Nasi Lemak,288
+2024-09-22,Mushroom Soup,135
+2024-09-22,Cendol,229
+2024-09-22,Iced Lemon Tea,731
+2024-09-22,Chicken Rice,260
+2024-09-22,Chicken Chop,505
+2024-09-22,Char Kway Teow,96
+2024-09-22,Beef Rendang,77
+2024-09-22,Kaya Toast Set,936
+2024-09-23,Mushroom Soup,345
+2024-09-23,Teh Tarik,3252
+2024-09-23,Tandoori Chicken,483
+2024-09-23,Spaghetti Carbonara,236
+2024-09-23,Roti Canai,877
+2024-09-23,Nasi Lemak,623
+2024-09-23,Laksa,147
+2024-09-23,Cendol,310
+2024-09-23,Iced Lemon Tea,247
+2024-09-23,Chicken Rice,0
+2024-09-23,Chicken Chop,309
+2024-09-23,Char Kway Teow,502
+2024-09-23,Beef Rendang,0
+2024-09-23,Kaya Toast Set,1787
+2024-09-24,Teh Tarik,951
+2024-09-24,Tandoori Chicken,165
+2024-09-24,Spaghetti Carbonara,89
+2024-09-24,Roti Canai,788
+2024-09-24,Nasi Lemak,398
+2024-09-24,Mushroom Soup,47
+2024-09-24,Iced Lemon Tea,671
+2024-09-24,Chicken Rice,229
+2024-09-24,Chicken Chop,311
+2024-09-24,Char Kway Teow,9
+2024-09-24,Cendol,217
+2024-09-24,Beef Rendang,142
+2024-09-24,Kaya Toast Set,597
+2024-09-25,Mushroom Soup,196
+2024-09-25,Teh Tarik,1278
+2024-09-25,Spaghetti Carbonara,220
+2024-09-25,Roti Canai,2180
+2024-09-25,Laksa,271
+2024-09-25,Tandoori Chicken,210
+2024-09-25,Chicken Chop,448
+2024-09-25,Char Kway Teow,79
+2024-09-25,Cendol,949
+2024-09-25,Beef Rendang,128
+2024-09-25,Kaya Toast Set,1478
+2024-09-26,Tandoori Chicken,93
+2024-09-26,Spaghetti Carbonara,154
+2024-09-26,Roti Canai,961
+2024-09-26,Nasi Lemak,883
+2024-09-26,Mushroom Soup,146
+2024-09-26,Kaya Toast Set,1071
+2024-09-26,Teh Tarik,397
+2024-09-26,Chicken Rice,387
+2024-09-26,Chicken Chop,158
+2024-09-26,Char Kway Teow,147
+2024-09-26,Cendol,606
+2024-09-26,Beef Rendang,28
+2024-09-26,Iced Lemon Tea,360
+2024-09-27,Teh Tarik,4222
+2024-09-27,Tandoori Chicken,510
+2024-09-27,Spaghetti Carbonara,115
+2024-09-27,Roti Canai,1025
+2024-09-27,Nasi Lemak,154
+2024-09-27,Mushroom Soup,71
+2024-09-27,Laksa,58
+2024-09-27,Iced Lemon Tea,211
+2024-09-27,Chicken Rice,192
+2024-09-27,Chicken Chop,302
+2024-09-27,Char Kway Teow,137
+2024-09-27,Cendol,1118
+2024-09-27,Beef Rendang,377
+2024-09-27,Kaya Toast Set,1353
+2024-09-28,Tandoori Chicken,185
+2024-09-28,Mushroom Soup,227
+2024-09-28,Laksa,123
+2024-09-28,Kaya Toast Set,640
+2024-09-28,Char Kway Teow,187
+2024-09-28,Chicken Rice,318
+2024-09-28,Cendol,1570
+2024-09-28,Beef Rendang,3
+2024-09-28,Iced Lemon Tea,1085
+2024-09-29,Tandoori Chicken,375
+2024-09-29,Spaghetti Carbonara,451
+2024-09-29,Roti Canai,1174
+2024-09-29,Nasi Lemak,1620
+2024-09-29,Mushroom Soup,214
+2024-09-29,Teh Tarik,1593
+2024-09-29,Kaya Toast Set,2989
+2024-09-29,Iced Lemon Tea,859
+2024-09-29,Chicken Rice,522
+2024-09-29,Char Kway Teow,705
+2024-09-29,Cendol,447
+2024-09-29,Laksa,232
+2024-09-30,Teh Tarik,1571
+2024-09-30,Tandoori Chicken,273
+2024-09-30,Spaghetti Carbonara,853
+2024-09-30,Nasi Lemak,660
+2024-09-30,Mushroom Soup,7
+2024-09-30,Kaya Toast Set,1614
+2024-09-30,Chicken Rice,143
+2024-09-30,Chicken Chop,240
+2024-09-30,Char Kway Teow,135
+2024-09-30,Cendol,831
+2024-09-30,Beef Rendang,50
+2024-09-30,Iced Lemon Tea,343
+2024-10-01,Teh Tarik,1386
+2024-10-01,Tandoori Chicken,447
+2024-10-01,Spaghetti Carbonara,142
+2024-10-01,Roti Canai,291
+2024-10-01,Chicken Chop,240
+2024-10-01,Kaya Toast Set,1064
+2024-10-01,Cendol,245
+2024-10-01,Beef Rendang,180
+2024-10-01,Nasi Lemak,489
+2024-10-02,Teh Tarik,1760
+2024-10-02,Spaghetti Carbonara,112
+2024-10-02,Roti Canai,2372
+2024-10-02,Mushroom Soup,88
+2024-10-02,Laksa,121
+2024-10-02,Kaya Toast Set,1133
+2024-10-02,Tandoori Chicken,135
+2024-10-02,Chicken Rice,660
+2024-10-02,Chicken Chop,274
+2024-10-02,Char Kway Teow,226
+2024-10-02,Cendol,963
+2024-10-02,Beef Rendang,164
+2024-10-02,Iced Lemon Tea,463
+2024-10-03,Teh Tarik,2229
+2024-10-03,Tandoori Chicken,172
+2024-10-03,Roti Canai,615
+2024-10-03,Nasi Lemak,938
+2024-10-03,Mushroom Soup,304
+2024-10-03,Iced Lemon Tea,347
+2024-10-03,Cendol,682
+2024-10-03,Kaya Toast Set,718
+2024-10-04,Mushroom Soup,241
+2024-10-04,Teh Tarik,1338
+2024-10-04,Tandoori Chicken,58
+2024-10-04,Spaghetti Carbonara,211
+2024-10-04,Roti Canai,883
+2024-10-04,Kaya Toast Set,388
+2024-10-04,Nasi Lemak,1113
+2024-10-04,Chicken Rice,268
+2024-10-04,Iced Lemon Tea,588
+2024-10-04,Chicken Chop,594
+2024-10-04,Char Kway Teow,439
+2024-10-04,Cendol,135
+2024-10-04,Beef Rendang,28
+2024-10-05,Tandoori Chicken,79
+2024-10-05,Spaghetti Carbonara,1049
+2024-10-05,Roti Canai,2242
+2024-10-05,Mushroom Soup,572
+2024-10-05,Laksa,185
+2024-10-05,Teh Tarik,2560
+2024-10-05,Iced Lemon Tea,457
+2024-10-05,Chicken Rice,119
+2024-10-05,Chicken Chop,1005
+2024-10-05,Char Kway Teow,193
+2024-10-05,Cendol,1184
+2024-10-05,Kaya Toast Set,1794
+2024-10-06,Tandoori Chicken,518
+2024-10-06,Spaghetti Carbonara,131
+2024-10-06,Roti Canai,2471
+2024-10-06,Nasi Lemak,316
+2024-10-06,Mushroom Soup,133
+2024-10-06,Laksa,344
+2024-10-06,Iced Lemon Tea,589
+2024-10-06,Chicken Chop,615
+2024-10-06,Char Kway Teow,436
+2024-10-06,Cendol,137
+2024-10-06,Beef Rendang,213
+2024-10-06,Chicken Rice,600
+2024-10-07,Nasi Lemak,644
+2024-10-07,Teh Tarik,4274
+2024-10-07,Tandoori Chicken,298
+2024-10-07,Spaghetti Carbonara,115
+2024-10-07,Roti Canai,146
+2024-10-07,Mushroom Soup,293
+2024-10-07,Cendol,462
+2024-10-07,Iced Lemon Tea,476
+2024-10-07,Chicken Rice,133
+2024-10-07,Chicken Chop,650
+2024-10-07,Char Kway Teow,693
+2024-10-07,Kaya Toast Set,899
+2024-10-07,Beef Rendang,427
+2024-10-08,Tandoori Chicken,62
+2024-10-08,Spaghetti Carbonara,62
+2024-10-08,Roti Canai,237
+2024-10-08,Nasi Lemak,784
+2024-10-08,Mushroom Soup,154
+2024-10-08,Teh Tarik,1980
+2024-10-08,Iced Lemon Tea,237
+2024-10-08,Chicken Rice,816
+2024-10-08,Chicken Chop,635
+2024-10-08,Char Kway Teow,305
+2024-10-08,Cendol,1060
+2024-10-08,Kaya Toast Set,2826
+2024-10-09,Teh Tarik,1729
+2024-10-09,Tandoori Chicken,406
+2024-10-09,Roti Canai,470
+2024-10-09,Nasi Lemak,51
+2024-10-09,Mushroom Soup,194
+2024-10-09,Kaya Toast Set,2402
+2024-10-09,Chicken Rice,91
+2024-10-09,Chicken Chop,564
+2024-10-09,Cendol,1244
+2024-10-09,Beef Rendang,110
+2024-10-09,Iced Lemon Tea,695
+2024-10-10,Mushroom Soup,270
+2024-10-10,Teh Tarik,186
+2024-10-10,Tandoori Chicken,484
+2024-10-10,Spaghetti Carbonara,0
+2024-10-10,Roti Canai,1422
+2024-10-10,Nasi Lemak,874
+2024-10-10,Laksa,134
+2024-10-10,Beef Rendang,141
+2024-10-10,Iced Lemon Tea,466
+2024-10-10,Chicken Rice,699
+2024-10-10,Chicken Chop,76
+2024-10-10,Char Kway Teow,267
+2024-10-10,Cendol,1322
+2024-10-10,Kaya Toast Set,3224
+2024-10-11,Tandoori Chicken,564
+2024-10-11,Spaghetti Carbonara,235
+2024-10-11,Roti Canai,288
+2024-10-11,Nasi Lemak,732
+2024-10-11,Mushroom Soup,148
+2024-10-11,Kaya Toast Set,583
+2024-10-11,Chicken Chop,76
+2024-10-11,Cendol,1330
+2024-10-11,Beef Rendang,285
+2024-10-11,Chicken Rice,18
+2024-10-12,Mushroom Soup,308
+2024-10-12,Teh Tarik,1622
+2024-10-12,Tandoori Chicken,456
+2024-10-12,Spaghetti Carbonara,438
+2024-10-12,Roti Canai,1069
+2024-10-12,Laksa,298
+2024-10-12,Nasi Lemak,386
+2024-10-12,Iced Lemon Tea,1251
+2024-10-12,Kaya Toast Set,1796
+2024-10-12,Chicken Chop,209
+2024-10-12,Char Kway Teow,228
+2024-10-12,Cendol,1026
+2024-10-12,Beef Rendang,37
+2024-10-13,Teh Tarik,319
+2024-10-13,Tandoori Chicken,108
+2024-10-13,Spaghetti Carbonara,142
+2024-10-13,Roti Canai,1167
+2024-10-13,Nasi Lemak,1378
+2024-10-13,Mushroom Soup,707
+2024-10-13,Kaya Toast Set,811
+2024-10-13,Iced Lemon Tea,805
+2024-10-13,Chicken Chop,434
+2024-10-13,Cendol,2714
+2024-10-13,Beef Rendang,16
+2024-10-14,Teh Tarik,1341
+2024-10-14,Tandoori Chicken,0
+2024-10-14,Spaghetti Carbonara,434
+2024-10-14,Roti Canai,300
+2024-10-14,Nasi Lemak,599
+2024-10-14,Mushroom Soup,294
+2024-10-14,Beef Rendang,46
+2024-10-14,Kaya Toast Set,3534
+2024-10-14,Iced Lemon Tea,418
+2024-10-14,Chicken Chop,0
+2024-10-14,Char Kway Teow,498
+2024-10-14,Cendol,1031
+2024-10-14,Laksa,71
+2024-10-15,Nasi Lemak,1049
+2024-10-15,Teh Tarik,2019
+2024-10-15,Tandoori Chicken,387
+2024-10-15,Spaghetti Carbonara,224
+2024-10-15,Roti Canai,1568
+2024-10-15,Mushroom Soup,74
+2024-10-15,Iced Lemon Tea,333
+2024-10-15,Kaya Toast Set,1907
+2024-10-15,Chicken Rice,407
+2024-10-15,Char Kway Teow,163
+2024-10-15,Cendol,643
+2024-10-15,Beef Rendang,203
+2024-10-15,Laksa,178
+2024-10-16,Teh Tarik,1993
+2024-10-16,Spaghetti Carbonara,47
+2024-10-16,Roti Canai,168
+2024-10-16,Nasi Lemak,338
+2024-10-16,Mushroom Soup,135
+2024-10-16,Tandoori Chicken,559
+2024-10-16,Iced Lemon Tea,693
+2024-10-16,Chicken Chop,218
+2024-10-16,Char Kway Teow,161
+2024-10-16,Cendol,935
+2024-10-16,Beef Rendang,182
+2024-10-16,Kaya Toast Set,316
+2024-10-17,Teh Tarik,1319
+2024-10-17,Spaghetti Carbonara,199
+2024-10-17,Nasi Lemak,192
+2024-10-17,Mushroom Soup,275
+2024-10-17,Laksa,104
+2024-10-17,Iced Lemon Tea,312
+2024-10-17,Chicken Rice,190
+2024-10-17,Chicken Chop,123
+2024-10-17,Char Kway Teow,607
+2024-10-17,Cendol,586
+2024-10-17,Kaya Toast Set,663
+2024-10-18,Spaghetti Carbonara,190
+2024-10-18,Teh Tarik,2987
+2024-10-18,Tandoori Chicken,97
+2024-10-18,Nasi Lemak,587
+2024-10-18,Beef Rendang,68
+2024-10-18,Kaya Toast Set,1807
+2024-10-18,Chicken Rice,597
+2024-10-18,Mushroom Soup,124
+2024-10-18,Iced Lemon Tea,677
+2024-10-19,Teh Tarik,6135
+2024-10-19,Tandoori Chicken,634
+2024-10-19,Spaghetti Carbonara,289
+2024-10-19,Nasi Lemak,443
+2024-10-19,Mushroom Soup,439
+2024-10-19,Roti Canai,1755
+2024-10-19,Iced Lemon Tea,679
+2024-10-19,Chicken Chop,322
+2024-10-19,Char Kway Teow,174
+2024-10-19,Cendol,2638
+2024-10-19,Kaya Toast Set,726
+2024-10-20,Roti Canai,887
+2024-10-20,Teh Tarik,2015
+2024-10-20,Tandoori Chicken,515
+2024-10-20,Spaghetti Carbonara,434
+2024-10-20,Nasi Lemak,1237
+2024-10-20,Cendol,533
+2024-10-20,Iced Lemon Tea,1053
+2024-10-20,Char Kway Teow,610
+2024-10-20,Beef Rendang,139
+2024-10-20,Kaya Toast Set,2056
+2024-10-21,Mushroom Soup,205
+2024-10-21,Spaghetti Carbonara,201
+2024-10-21,Roti Canai,465
+2024-10-21,Nasi Lemak,1927
+2024-10-21,Teh Tarik,1950
+2024-10-21,Laksa,200
+2024-10-21,Iced Lemon Tea,762
+2024-10-21,Chicken Rice,356
+2024-10-21,Char Kway Teow,204
+2024-10-21,Beef Rendang,261
+2024-10-21,Kaya Toast Set,1691
+2024-10-22,Tandoori Chicken,516
+2024-10-22,Spaghetti Carbonara,370
+2024-10-22,Roti Canai,473
+2024-10-22,Nasi Lemak,2057
+2024-10-22,Mushroom Soup,118
+2024-10-22,Teh Tarik,1403
+2024-10-22,Iced Lemon Tea,280
+2024-10-22,Chicken Chop,411
+2024-10-22,Char Kway Teow,404
+2024-10-22,Cendol,309
+2024-10-22,Kaya Toast Set,1760
+2024-10-23,Teh Tarik,1174
+2024-10-23,Spaghetti Carbonara,171
+2024-10-23,Roti Canai,2102
+2024-10-23,Nasi Lemak,359
+2024-10-23,Mushroom Soup,120
+2024-10-23,Kaya Toast Set,1196
+2024-10-23,Chicken Rice,296
+2024-10-23,Cendol,703
+2024-10-23,Beef Rendang,316
+2024-10-23,Iced Lemon Tea,380
+2024-10-24,Roti Canai,377
+2024-10-24,Teh Tarik,3407
+2024-10-24,Tandoori Chicken,261
+2024-10-24,Spaghetti Carbonara,473
+2024-10-24,Nasi Lemak,634
+2024-10-24,Char Kway Teow,221
+2024-10-24,Laksa,425
+2024-10-24,Kaya Toast Set,2458
+2024-10-24,Mushroom Soup,362
+2024-10-24,Cendol,682
+2024-10-24,Beef Rendang,26
+2024-10-25,Teh Tarik,2701
+2024-10-25,Tandoori Chicken,151
+2024-10-25,Roti Canai,1530
+2024-10-25,Mushroom Soup,573
+2024-10-25,Laksa,205
+2024-10-25,Iced Lemon Tea,276
+2024-10-25,Chicken Chop,82
+2024-10-25,Cendol,669
+2024-10-25,Beef Rendang,11
+2024-10-25,Kaya Toast Set,1353
+2024-10-26,Mushroom Soup,216
+2024-10-26,Tandoori Chicken,426
+2024-10-26,Spaghetti Carbonara,411
+2024-10-26,Roti Canai,823
+2024-10-26,Nasi Lemak,1158
+2024-10-26,Laksa,536
+2024-10-26,Teh Tarik,4840
+2024-10-26,Chicken Rice,287
+2024-10-26,Chicken Chop,265
+2024-10-26,Char Kway Teow,290
+2024-10-26,Cendol,732
+2024-10-26,Beef Rendang,87
+2024-10-26,Iced Lemon Tea,515
+2024-10-27,Tandoori Chicken,377
+2024-10-27,Spaghetti Carbonara,308
+2024-10-27,Roti Canai,1498
+2024-10-27,Nasi Lemak,928
+2024-10-27,Mushroom Soup,263
+2024-10-27,Teh Tarik,2621
+2024-10-27,Chicken Rice,186
+2024-10-27,Chicken Chop,303
+2024-10-27,Cendol,636
+2024-10-27,Beef Rendang,117
+2024-10-27,Kaya Toast Set,2208
+2024-10-28,Teh Tarik,1266
+2024-10-28,Tandoori Chicken,0
+2024-10-28,Roti Canai,393
+2024-10-28,Nasi Lemak,413
+2024-10-28,Mushroom Soup,137
+2024-10-28,Kaya Toast Set,2034
+2024-10-28,Chicken Rice,486
+2024-10-28,Chicken Chop,256
+2024-10-28,Char Kway Teow,152
+2024-10-28,Cendol,137
+2024-10-28,Iced Lemon Tea,889
+2024-10-29,Mushroom Soup,273
+2024-10-29,Spaghetti Carbonara,671
+2024-10-29,Roti Canai,712
+2024-10-29,Nasi Lemak,272
+2024-10-29,Kaya Toast Set,698
+2024-10-29,Teh Tarik,897
+2024-10-29,Chicken Rice,536
+2024-10-29,Chicken Chop,502
+2024-10-29,Char Kway Teow,223
+2024-10-29,Cendol,131
+2024-10-29,Beef Rendang,123
+2024-10-29,Iced Lemon Tea,1527
+2024-10-30,Tandoori Chicken,0
+2024-10-30,Spaghetti Carbonara,409
+2024-10-30,Roti Canai,398
+2024-10-30,Nasi Lemak,268
+2024-10-30,Mushroom Soup,93
+2024-10-30,Teh Tarik,312
+2024-10-30,Kaya Toast Set,2132
+2024-10-30,Iced Lemon Tea,299
+2024-10-30,Chicken Chop,353
+2024-10-30,Cendol,650
+2024-10-30,Beef Rendang,120
+2024-10-30,Laksa,416
+2024-10-31,Teh Tarik,2644
+2024-10-31,Spaghetti Carbonara,239
+2024-10-31,Roti Canai,785
+2024-10-31,Nasi Lemak,966
+2024-10-31,Mushroom Soup,120
+2024-10-31,Laksa,124
+2024-10-31,Iced Lemon Tea,349
+2024-10-31,Chicken Rice,517
+2024-10-31,Cendol,545
+2024-10-31,Beef Rendang,139
+2024-10-31,Kaya Toast Set,2480
+2024-11-01,Teh Tarik,2754
+2024-11-01,Tandoori Chicken,152
+2024-11-01,Spaghetti Carbonara,159
+2024-11-01,Roti Canai,421
+2024-11-01,Nasi Lemak,305
+2024-11-01,Mushroom Soup,15
+2024-11-01,Iced Lemon Tea,387
+2024-11-01,Kaya Toast Set,1357
+2024-11-01,Chicken Rice,340
+2024-11-01,Chicken Chop,403
+2024-11-01,Cendol,216
+2024-11-01,Beef Rendang,91
+2024-11-01,Laksa,318
+2024-11-02,Spaghetti Carbonara,260
+2024-11-02,Roti Canai,2604
+2024-11-02,Nasi Lemak,1085
+2024-11-02,Laksa,234
+2024-11-02,Teh Tarik,3116
+2024-11-02,Chicken Rice,658
+2024-11-02,Chicken Chop,171
+2024-11-02,Cendol,2226
+2024-11-02,Beef Rendang,217
+2024-11-02,Kaya Toast Set,1913
+2024-11-03,Teh Tarik,1143
+2024-11-03,Tandoori Chicken,277
+2024-11-03,Spaghetti Carbonara,210
+2024-11-03,Roti Canai,907
+2024-11-03,Nasi Lemak,1652
+2024-11-03,Mushroom Soup,373
+2024-11-03,Iced Lemon Tea,502
+2024-11-03,Chicken Chop,748
+2024-11-03,Cendol,1735
+2024-11-03,Beef Rendang,77
+2024-11-03,Kaya Toast Set,546
+2024-11-04,Mushroom Soup,305
+2024-11-04,Tandoori Chicken,530
+2024-11-04,Teh Tarik,2999
+2024-11-04,Nasi Lemak,224
+2024-11-04,Kaya Toast Set,2028
+2024-11-04,Spaghetti Carbonara,43
+2024-11-04,Chicken Rice,398
+2024-11-04,Chicken Chop,275
+2024-11-04,Char Kway Teow,792
+2024-11-04,Cendol,324
+2024-11-04,Beef Rendang,295
+2024-11-04,Iced Lemon Tea,182
+2024-11-05,Teh Tarik,1279
+2024-11-05,Tandoori Chicken,555
+2024-11-05,Roti Canai,409
+2024-11-05,Nasi Lemak,300
+2024-11-05,Mushroom Soup,78
+2024-11-05,Spaghetti Carbonara,567
+2024-11-05,Iced Lemon Tea,140
+2024-11-05,Chicken Rice,130
+2024-11-05,Chicken Chop,443
+2024-11-05,Cendol,624
+2024-11-05,Beef Rendang,82
+2024-11-05,Kaya Toast Set,3161
+2024-11-06,Teh Tarik,3939
+2024-11-06,Spaghetti Carbonara,448
+2024-11-06,Roti Canai,142
+2024-11-06,Nasi Lemak,413
+2024-11-06,Mushroom Soup,254
+2024-11-06,Iced Lemon Tea,580
+2024-11-06,Chicken Chop,285
+2024-11-06,Cendol,1637
+2024-11-06,Beef Rendang,148
+2024-11-06,Kaya Toast Set,1659
+2024-11-07,Teh Tarik,1447
+2024-11-07,Spaghetti Carbonara,82
+2024-11-07,Roti Canai,654
+2024-11-07,Kaya Toast Set,1049
+2024-11-07,Nasi Lemak,373
+2024-11-07,Chicken Chop,294
+2024-11-07,Cendol,1221
+2024-11-07,Beef Rendang,0
+2024-11-07,Iced Lemon Tea,630
+2024-11-08,Teh Tarik,1595
+2024-11-08,Tandoori Chicken,722
+2024-11-08,Spaghetti Carbonara,493
+2024-11-08,Roti Canai,690
+2024-11-08,Nasi Lemak,963
+2024-11-08,Mushroom Soup,36
+2024-11-08,Kaya Toast Set,1618
+2024-11-08,Iced Lemon Tea,363
+2024-11-08,Chicken Chop,243
+2024-11-08,Char Kway Teow,330
+2024-11-08,Cendol,522
+2024-11-08,Laksa,180
+2024-11-09,Nasi Lemak,2009
+2024-11-09,Teh Tarik,2526
+2024-11-09,Tandoori Chicken,381
+2024-11-09,Spaghetti Carbonara,675
+2024-11-09,Roti Canai,476
+2024-11-09,Mushroom Soup,113
+2024-11-09,Beef Rendang,290
+2024-11-09,Iced Lemon Tea,651
+2024-11-09,Chicken Rice,111
+2024-11-09,Chicken Chop,346
+2024-11-09,Char Kway Teow,342
+2024-11-09,Cendol,1940
+2024-11-09,Kaya Toast Set,1903
+2024-11-10,Teh Tarik,714
+2024-11-10,Tandoori Chicken,205
+2024-11-10,Spaghetti Carbonara,239
+2024-11-10,Roti Canai,142
+2024-11-10,Mushroom Soup,434
+2024-11-10,Chicken Rice,205
+2024-11-10,Iced Lemon Tea,1224
+2024-11-10,Beef Rendang,464
+2024-11-10,Kaya Toast Set,581
+2024-11-10,Chicken Chop,887
+2024-11-10,Cendol,1982
+2024-11-11,Spaghetti Carbonara,65
+2024-11-11,Roti Canai,706
+2024-11-11,Nasi Lemak,877
+2024-11-11,Mushroom Soup,66
+2024-11-11,Laksa,149
+2024-11-11,Teh Tarik,1543
+2024-11-11,Iced Lemon Tea,1515
+2024-11-11,Chicken Rice,82
+2024-11-11,Cendol,594
+2024-11-11,Beef Rendang,163
+2024-11-11,Kaya Toast Set,1419
+2024-11-12,Teh Tarik,2227
+2024-11-12,Tandoori Chicken,326
+2024-11-12,Spaghetti Carbonara,678
+2024-11-12,Nasi Lemak,849
+2024-11-12,Mushroom Soup,173
+2024-11-12,Iced Lemon Tea,1176
+2024-11-12,Chicken Chop,344
+2024-11-12,Char Kway Teow,238
+2024-11-12,Cendol,951
+2024-11-12,Kaya Toast Set,2143
+2024-11-12,Beef Rendang,311
+2024-11-13,Teh Tarik,1065
+2024-11-13,Mushroom Soup,81
+2024-11-13,Tandoori Chicken,198
+2024-11-13,Spaghetti Carbonara,165
+2024-11-13,Kaya Toast Set,1559
+2024-11-13,Chicken Chop,328
+2024-11-13,Cendol,1695
+2024-11-13,Beef Rendang,22
+2024-11-13,Iced Lemon Tea,1010
+2024-11-14,Teh Tarik,1160
+2024-11-14,Tandoori Chicken,180
+2024-11-14,Roti Canai,171
+2024-11-14,Nasi Lemak,404
+2024-11-14,Mushroom Soup,186
+2024-11-14,Laksa,118
+2024-11-14,Spaghetti Carbonara,172
+2024-11-14,Iced Lemon Tea,1609
+2024-11-14,Chicken Rice,710
+2024-11-14,Chicken Chop,658
+2024-11-14,Char Kway Teow,289
+2024-11-14,Cendol,408
+2024-11-14,Beef Rendang,97
+2024-11-14,Kaya Toast Set,2829
+2024-11-15,Teh Tarik,473
+2024-11-15,Tandoori Chicken,277
+2024-11-15,Roti Canai,497
+2024-11-15,Nasi Lemak,526
+2024-11-15,Mushroom Soup,0
+2024-11-15,Iced Lemon Tea,387
+2024-11-15,Chicken Chop,401
+2024-11-15,Cendol,1786
+2024-11-15,Beef Rendang,43
+2024-11-15,Kaya Toast Set,286
+2024-11-16,Kaya Toast Set,1431
+2024-11-16,Nasi Lemak,1489
+2024-11-16,Teh Tarik,1909
+2024-11-16,Iced Lemon Tea,701
+2024-11-16,Mushroom Soup,435
+2024-11-16,Chicken Chop,521
+2024-11-16,Char Kway Teow,176
+2024-11-16,Cendol,960
+2024-11-16,Beef Rendang,160
+2024-11-16,Chicken Rice,72
+2024-11-17,Teh Tarik,4325
+2024-11-17,Tandoori Chicken,349
+2024-11-17,Spaghetti Carbonara,326
+2024-11-17,Roti Canai,522
+2024-11-17,Nasi Lemak,863
+2024-11-17,Mushroom Soup,110
+2024-11-17,Kaya Toast Set,2223
+2024-11-17,Chicken Chop,195
+2024-11-17,Char Kway Teow,208
+2024-11-17,Cendol,243
+2024-11-17,Beef Rendang,280
+2024-11-18,Teh Tarik,1972
+2024-11-18,Tandoori Chicken,195
+2024-11-18,Spaghetti Carbonara,678
+2024-11-18,Roti Canai,131
+2024-11-18,Nasi Lemak,865
+2024-11-18,Cendol,616
+2024-11-18,Kaya Toast Set,952
+2024-11-18,Iced Lemon Tea,205
+2024-11-18,Chicken Rice,255
+2024-11-18,Char Kway Teow,61
+2024-11-18,Mushroom Soup,212
+2024-11-19,Laksa,246
+2024-11-19,Teh Tarik,552
+2024-11-19,Tandoori Chicken,0
+2024-11-19,Spaghetti Carbonara,99
+2024-11-19,Nasi Lemak,629
+2024-11-19,Kaya Toast Set,1608
+2024-11-19,Chicken Rice,207
+2024-11-19,Chicken Chop,258
+2024-11-19,Char Kway Teow,509
+2024-11-19,Cendol,476
+2024-11-19,Beef Rendang,74
+2024-11-19,Iced Lemon Tea,980
+2024-11-20,Nasi Lemak,353
+2024-11-20,Cendol,89
+2024-11-20,Chicken Chop,484
+2024-11-20,Iced Lemon Tea,738
+2024-11-20,Spaghetti Carbonara,259
+2024-11-20,Tandoori Chicken,246
+2024-11-20,Teh Tarik,1538
+2024-11-21,Roti Canai,206
+2024-11-21,Char Kway Teow,161
+2024-11-21,Tandoori Chicken,200
+2024-11-21,Mushroom Soup,284
+2024-11-21,Spaghetti Carbonara,200
+2024-11-21,Laksa,629
+2024-11-21,Beef Rendang,294
+2024-11-21,Iced Lemon Tea,606
+2024-11-21,Chicken Rice,647
+2024-11-21,Cendol,226
+2024-11-21,Teh Tarik,1860
+2024-11-21,Kaya Toast Set,1079
+2024-11-22,Spaghetti Carbonara,204
+2024-11-22,Roti Canai,378
+2024-11-22,Teh Tarik,485
+2024-11-22,Tandoori Chicken,112
+2024-11-22,Mushroom Soup,81
+2024-11-22,Nasi Lemak,774
+2024-11-22,Kaya Toast Set,2172
+2024-11-22,Laksa,281
+2024-11-22,Chicken Rice,168
+2024-11-22,Char Kway Teow,159
+2024-11-22,Cendol,136
+2024-11-22,Beef Rendang,4
+2024-11-23,Teh Tarik,3568
+2024-11-23,Spaghetti Carbonara,368
+2024-11-23,Roti Canai,544
+2024-11-23,Mushroom Soup,770
+2024-11-23,Laksa,415
+2024-11-23,Chicken Chop,476
+2024-11-23,Char Kway Teow,119
+2024-11-23,Cendol,347
+2024-11-23,Beef Rendang,350
+2024-11-23,Kaya Toast Set,2676
+2024-11-24,Mushroom Soup,294
+2024-11-24,Teh Tarik,1578
+2024-11-24,Tandoori Chicken,545
+2024-11-24,Spaghetti Carbonara,891
+2024-11-24,Roti Canai,1325
+2024-11-24,Nasi Lemak,636
+2024-11-24,Laksa,249
+2024-11-24,Cendol,2082
+2024-11-24,Iced Lemon Tea,503
+2024-11-24,Chicken Rice,278
+2024-11-24,Chicken Chop,688
+2024-11-24,Char Kway Teow,55
+2024-11-24,Beef Rendang,59
+2024-11-24,Kaya Toast Set,2594
+2024-11-25,Mushroom Soup,102
+2024-11-25,Spaghetti Carbonara,429
+2024-11-25,Roti Canai,1022
+2024-11-25,Nasi Lemak,848
+2024-11-25,Tandoori Chicken,253
+2024-11-25,Kaya Toast Set,2534
+2024-11-25,Chicken Chop,236
+2024-11-25,Chicken Rice,310
+2024-11-25,Char Kway Teow,164
+2024-11-25,Cendol,343
+2024-11-25,Beef Rendang,259
+2024-11-25,Iced Lemon Tea,337
+2024-11-26,Tandoori Chicken,485
+2024-11-26,Spaghetti Carbonara,197
+2024-11-26,Roti Canai,535
+2024-11-26,Nasi Lemak,226
+2024-11-26,Mushroom Soup,151
+2024-11-26,Teh Tarik,341
+2024-11-26,Iced Lemon Tea,845
+2024-11-26,Chicken Rice,571
+2024-11-26,Chicken Chop,211
+2024-11-26,Cendol,547
+2024-11-26,Kaya Toast Set,756
+2024-11-27,Teh Tarik,780
+2024-11-27,Tandoori Chicken,74
+2024-11-27,Spaghetti Carbonara,552
+2024-11-27,Roti Canai,1011
+2024-11-27,Nasi Lemak,285
+2024-11-27,Mushroom Soup,118
+2024-11-27,Iced Lemon Tea,967
+2024-11-27,Chicken Chop,109
+2024-11-27,Beef Rendang,118
+2024-11-27,Kaya Toast Set,837
+2024-11-28,Roti Canai,2059
+2024-11-28,Teh Tarik,2065
+2024-11-28,Tandoori Chicken,368
+2024-11-28,Spaghetti Carbonara,509
+2024-11-28,Mushroom Soup,136
+2024-11-28,Char Kway Teow,171
+2024-11-28,Iced Lemon Tea,264
+2024-11-28,Chicken Chop,218
+2024-11-28,Kaya Toast Set,2041
+2024-11-28,Cendol,681
+2024-11-28,Beef Rendang,152
+2024-11-29,Teh Tarik,1152
+2024-11-29,Tandoori Chicken,340
+2024-11-29,Nasi Lemak,442
+2024-11-29,Mushroom Soup,343
+2024-11-29,Laksa,209
+2024-11-29,Kaya Toast Set,1092
+2024-11-29,Spaghetti Carbonara,372
+2024-11-29,Chicken Rice,186
+2024-11-29,Chicken Chop,252
+2024-11-29,Char Kway Teow,189
+2024-11-29,Cendol,288
+2024-11-29,Beef Rendang,213
+2024-11-29,Iced Lemon Tea,471
+2024-11-30,Teh Tarik,2225
+2024-11-30,Spaghetti Carbonara,819
+2024-11-30,Roti Canai,880
+2024-11-30,Mushroom Soup,305
+2024-11-30,Chicken Rice,269
+2024-11-30,Chicken Chop,703
+2024-11-30,Cendol,218
+2024-11-30,Beef Rendang,96
+2024-11-30,Kaya Toast Set,2381
+2024-12-01,Roti Canai,905
+2024-12-01,Teh Tarik,4609
+2024-12-01,Tandoori Chicken,693
+2024-12-01,Spaghetti Carbonara,956
+2024-12-01,Mushroom Soup,235
+2024-12-01,Nasi Lemak,785
+2024-12-01,Iced Lemon Tea,725
+2024-12-01,Chicken Rice,504
+2024-12-01,Cendol,780
+2024-12-01,Beef Rendang,0
+2024-12-01,Kaya Toast Set,3445
+2024-12-02,Spaghetti Carbonara,415
+2024-12-02,Teh Tarik,644
+2024-12-02,Tandoori Chicken,557
+2024-12-02,Roti Canai,1088
+2024-12-02,Mushroom Soup,38
+2024-12-02,Laksa,34
+2024-12-02,Nasi Lemak,965
+2024-12-02,Iced Lemon Tea,553
+2024-12-02,Chicken Rice,126
+2024-12-02,Chicken Chop,12
+2024-12-02,Char Kway Teow,107
+2024-12-02,Cendol,297
+2024-12-02,Beef Rendang,195
+2024-12-02,Kaya Toast Set,297
+2024-12-03,Tandoori Chicken,261
+2024-12-03,Spaghetti Carbonara,208
+2024-12-03,Roti Canai,177
+2024-12-03,Nasi Lemak,180
+2024-12-03,Cendol,669
+2024-12-03,Laksa,0
+2024-12-03,Kaya Toast Set,1208
+2024-12-03,Beef Rendang,0
+2024-12-03,Teh Tarik,2820
+2024-12-03,Mushroom Soup,279
+2024-12-04,Roti Canai,625
+2024-12-04,Nasi Lemak,414
+2024-12-04,Teh Tarik,2153
+2024-12-04,Tandoori Chicken,50
+2024-12-04,Mushroom Soup,133
+2024-12-04,Beef Rendang,126
+2024-12-04,Iced Lemon Tea,544
+2024-12-04,Chicken Chop,170
+2024-12-04,Char Kway Teow,278
+2024-12-04,Cendol,667
+2024-12-04,Kaya Toast Set,1647
+2024-12-05,Teh Tarik,116
+2024-12-05,Tandoori Chicken,563
+2024-12-05,Spaghetti Carbonara,259
+2024-12-05,Roti Canai,1027
+2024-12-05,Nasi Lemak,502
+2024-12-05,Mushroom Soup,541
+2024-12-05,Kaya Toast Set,803
+2024-12-05,Iced Lemon Tea,1249
+2024-12-05,Chicken Chop,288
+2024-12-05,Char Kway Teow,2
+2024-12-05,Cendol,375
+2024-12-05,Beef Rendang,504
+2024-12-06,Spaghetti Carbonara,339
+2024-12-06,Roti Canai,1822
+2024-12-06,Nasi Lemak,815
+2024-12-06,Mushroom Soup,225
+2024-12-06,Kaya Toast Set,2236
+2024-12-06,Teh Tarik,2129
+2024-12-06,Chicken Rice,178
+2024-12-06,Chicken Chop,216
+2024-12-06,Char Kway Teow,307
+2024-12-06,Cendol,711
+2024-12-06,Beef Rendang,544
+2024-12-06,Iced Lemon Tea,1547
+2024-12-07,Spaghetti Carbonara,357
+2024-12-07,Roti Canai,397
+2024-12-07,Nasi Lemak,2878
+2024-12-07,Mushroom Soup,281
+2024-12-07,Kaya Toast Set,3649
+2024-12-07,Teh Tarik,980
+2024-12-07,Chicken Rice,441
+2024-12-07,Chicken Chop,191
+2024-12-07,Char Kway Teow,25
+2024-12-07,Cendol,1929
+2024-12-07,Beef Rendang,134
+2024-12-07,Iced Lemon Tea,271
+2024-12-08,Teh Tarik,4065
+2024-12-08,Spaghetti Carbonara,36
+2024-12-08,Roti Canai,1195
+2024-12-08,Nasi Lemak,985
+2024-12-08,Mushroom Soup,0
+2024-12-08,Kaya Toast Set,1630
+2024-12-08,Iced Lemon Tea,1128
+2024-12-08,Chicken Chop,552
+2024-12-08,Char Kway Teow,396
+2024-12-08,Cendol,1308
+2024-12-08,Beef Rendang,87
+2024-12-08,Chicken Rice,227
+2024-12-09,Nasi Lemak,809
+2024-12-09,Tandoori Chicken,15
+2024-12-09,Spaghetti Carbonara,413
+2024-12-09,Teh Tarik,1741
+2024-12-09,Mushroom Soup,204
+2024-12-09,Roti Canai,411
+2024-12-09,Iced Lemon Tea,731
+2024-12-09,Chicken Rice,490
+2024-12-09,Chicken Chop,537
+2024-12-09,Char Kway Teow,27
+2024-12-09,Cendol,832
+2024-12-09,Kaya Toast Set,1707
+2024-12-10,Tandoori Chicken,598
+2024-12-10,Spaghetti Carbonara,288
+2024-12-10,Roti Canai,370
+2024-12-10,Nasi Lemak,386
+2024-12-10,Kaya Toast Set,269
+2024-12-10,Teh Tarik,604
+2024-12-10,Chicken Rice,526
+2024-12-10,Chicken Chop,135
+2024-12-10,Char Kway Teow,418
+2024-12-10,Cendol,269
+2024-12-10,Iced Lemon Tea,758
+2024-12-11,Teh Tarik,953
+2024-12-11,Tandoori Chicken,258
+2024-12-11,Spaghetti Carbonara,313
+2024-12-11,Roti Canai,218
+2024-12-11,Nasi Lemak,183
+2024-12-11,Mushroom Soup,121
+2024-12-11,Kaya Toast Set,1228
+2024-12-11,Chicken Chop,27
+2024-12-11,Char Kway Teow,132
+2024-12-11,Cendol,141
+2024-12-11,Beef Rendang,104
+2024-12-11,Iced Lemon Tea,379
+2024-12-12,Roti Canai,2389
+2024-12-12,Teh Tarik,1629
+2024-12-12,Tandoori Chicken,92
+2024-12-12,Spaghetti Carbonara,63
+2024-12-12,Nasi Lemak,203
+2024-12-12,Iced Lemon Tea,651
+2024-12-12,Chicken Rice,154
+2024-12-12,Chicken Chop,678
+2024-12-12,Cendol,163
+2024-12-12,Beef Rendang,165
+2024-12-12,Kaya Toast Set,2768
+2024-12-13,Teh Tarik,544
+2024-12-13,Tandoori Chicken,199
+2024-12-13,Nasi Lemak,665
+2024-12-13,Mushroom Soup,229
+2024-12-13,Kaya Toast Set,2727
+2024-12-13,Roti Canai,1792
+2024-12-13,Chicken Chop,765
+2024-12-13,Char Kway Teow,564
+2024-12-13,Cendol,850
+2024-12-13,Beef Rendang,98
+2024-12-13,Iced Lemon Tea,1378
+2024-12-14,Tandoori Chicken,366
+2024-12-14,Spaghetti Carbonara,443
+2024-12-14,Roti Canai,875
+2024-12-14,Nasi Lemak,541
+2024-12-14,Mushroom Soup,0
+2024-12-14,Iced Lemon Tea,1406
+2024-12-14,Chicken Rice,1030
+2024-12-14,Chicken Chop,106
+2024-12-14,Cendol,1101
+2024-12-14,Teh Tarik,4359
+2024-12-14,Kaya Toast Set,712
+2024-12-15,Teh Tarik,3499
+2024-12-15,Nasi Lemak,1262
+2024-12-15,Spaghetti Carbonara,540
+2024-12-15,Roti Canai,1463
+2024-12-15,Mushroom Soup,368
+2024-12-15,Chicken Rice,326
+2024-12-15,Kaya Toast Set,5930
+2024-12-15,Iced Lemon Tea,1683
+2024-12-15,Chicken Chop,567
+2024-12-15,Cendol,962
+2024-12-15,Laksa,481
+2024-12-16,Teh Tarik,420
+2024-12-16,Spaghetti Carbonara,567
+2024-12-16,Roti Canai,439
+2024-12-16,Nasi Lemak,825
+2024-12-16,Mushroom Soup,90
+2024-12-16,Laksa,216
+2024-12-16,Tandoori Chicken,653
+2024-12-16,Iced Lemon Tea,720
+2024-12-16,Chicken Chop,268
+2024-12-16,Char Kway Teow,154
+2024-12-16,Cendol,189
+2024-12-16,Beef Rendang,260
+2024-12-16,Kaya Toast Set,2574
+2024-12-17,Teh Tarik,1498
+2024-12-17,Tandoori Chicken,79
+2024-12-17,Spaghetti Carbonara,31
+2024-12-17,Roti Canai,348
+2024-12-17,Mushroom Soup,199
+2024-12-17,Iced Lemon Tea,465
+2024-12-17,Chicken Chop,569
+2024-12-17,Char Kway Teow,456
+2024-12-17,Cendol,301
+2024-12-17,Beef Rendang,26
+2024-12-17,Laksa,322
+2024-12-18,Roti Canai,284
+2024-12-18,Tandoori Chicken,251
+2024-12-18,Teh Tarik,478
+2024-12-18,Spaghetti Carbonara,313
+2024-12-18,Laksa,230
+2024-12-18,Cendol,547
+2024-12-18,Iced Lemon Tea,445
+2024-12-18,Chicken Rice,227
+2024-12-18,Beef Rendang,178
+2024-12-18,Kaya Toast Set,561
+2024-12-19,Teh Tarik,1550
+2024-12-19,Spaghetti Carbonara,352
+2024-12-19,Roti Canai,912
+2024-12-19,Nasi Lemak,1465
+2024-12-19,Kaya Toast Set,1364
+2024-12-19,Tandoori Chicken,498
+2024-12-19,Chicken Rice,141
+2024-12-19,Chicken Chop,301
+2024-12-19,Cendol,543
+2024-12-19,Beef Rendang,5
+2024-12-19,Iced Lemon Tea,580
+2024-12-20,Teh Tarik,1243
+2024-12-20,Spaghetti Carbonara,219
+2024-12-20,Roti Canai,359
+2024-12-20,Nasi Lemak,591
+2024-12-20,Mushroom Soup,3
+2024-12-20,Chicken Chop,442
+2024-12-20,Cendol,338
+2024-12-20,Kaya Toast Set,1553
+2024-12-21,Teh Tarik,1001
+2024-12-21,Tandoori Chicken,270
+2024-12-21,Roti Canai,2295
+2024-12-21,Mushroom Soup,358
+2024-12-21,Nasi Lemak,1319
+2024-12-21,Iced Lemon Tea,715
+2024-12-21,Beef Rendang,613
+2024-12-21,Kaya Toast Set,357
+2024-12-21,Chicken Chop,544
+2024-12-21,Cendol,1712
+2024-12-22,Beef Rendang,616
+2024-12-22,Cendol,299
+2024-12-22,Chicken Chop,18
+2024-12-22,Kaya Toast Set,2842
+2024-12-22,Mushroom Soup,0
+2024-12-22,Nasi Lemak,1465
+2024-12-22,Spaghetti Carbonara,255
+2024-12-22,Tandoori Chicken,622
+2024-12-22,Teh Tarik,3202
+2024-12-23,Teh Tarik,484
+2024-12-23,Tandoori Chicken,152
+2024-12-23,Spaghetti Carbonara,248
+2024-12-23,Roti Canai,1553
+2024-12-23,Nasi Lemak,240
+2024-12-23,Mushroom Soup,337
+2024-12-23,Iced Lemon Tea,188
+2024-12-23,Kaya Toast Set,2195
+2024-12-23,Char Kway Teow,186
+2024-12-23,Cendol,643
+2024-12-23,Beef Rendang,461
+2024-12-23,Laksa,173
+2024-12-23,Chicken Rice,241
+2024-12-24,Teh Tarik,439
+2024-12-24,Nasi Lemak,871
+2024-12-24,Tandoori Chicken,120
+2024-12-24,Spaghetti Carbonara,212
+2024-12-24,Roti Canai,589
+2024-12-24,Mushroom Soup,149
+2024-12-24,Kaya Toast Set,1104
+2024-12-24,Chicken Rice,751
+2024-12-24,Chicken Chop,0
+2024-12-24,Char Kway Teow,162
+2024-12-24,Cendol,941
+2024-12-24,Beef Rendang,244
+2024-12-24,Iced Lemon Tea,675
+2024-12-25,Teh Tarik,5360
+2024-12-25,Spaghetti Carbonara,493
+2024-12-25,Roti Canai,1194
+2024-12-25,Nasi Lemak,467
+2024-12-25,Mushroom Soup,464
+2024-12-25,Tandoori Chicken,215
+2024-12-25,Iced Lemon Tea,1740
+2024-12-25,Chicken Rice,326
+2024-12-25,Cendol,2140
+2024-12-25,Beef Rendang,185
+2024-12-25,Kaya Toast Set,3007
+2024-12-26,Teh Tarik,2659
+2024-12-26,Spaghetti Carbonara,290
+2024-12-26,Mushroom Soup,69
+2024-12-26,Laksa,618
+2024-12-26,Kaya Toast Set,1086
+2024-12-26,Chicken Chop,71
+2024-12-26,Char Kway Teow,547
+2024-12-26,Cendol,381
+2024-12-26,Beef Rendang,247
+2024-12-26,Iced Lemon Tea,583
+2024-12-27,Teh Tarik,2595
+2024-12-27,Tandoori Chicken,190
+2024-12-27,Spaghetti Carbonara,151
+2024-12-27,Roti Canai,947
+2024-12-27,Nasi Lemak,1779
+2024-12-27,Mushroom Soup,313
+2024-12-27,Laksa,95
+2024-12-27,Chicken Rice,496
+2024-12-27,Chicken Chop,1058
+2024-12-27,Char Kway Teow,1036
+2024-12-27,Cendol,1422
+2024-12-27,Beef Rendang,38
+2024-12-27,Kaya Toast Set,892
+2024-12-28,Tandoori Chicken,325
+2024-12-28,Spaghetti Carbonara,456
+2024-12-28,Roti Canai,1278
+2024-12-28,Nasi Lemak,793
+2024-12-28,Mushroom Soup,130
+2024-12-28,Teh Tarik,3223
+2024-12-28,Kaya Toast Set,2687
+2024-12-28,Iced Lemon Tea,1678
+2024-12-28,Chicken Chop,138
+2024-12-28,Cendol,1118
+2024-12-28,Beef Rendang,167
+2024-12-28,Laksa,139
+2024-12-29,Teh Tarik,1818
+2024-12-29,Tandoori Chicken,328
+2024-12-29,Roti Canai,697
+2024-12-29,Nasi Lemak,1960
+2024-12-29,Mushroom Soup,347
+2024-12-29,Laksa,281
+2024-12-29,Kaya Toast Set,2740
+2024-12-29,Chicken Rice,438
+2024-12-29,Chicken Chop,501
+2024-12-29,Cendol,331
+2024-12-29,Beef Rendang,373
+2024-12-29,Iced Lemon Tea,1455
+2024-12-30,Mushroom Soup,317
+2024-12-30,Tandoori Chicken,769
+2024-12-30,Spaghetti Carbonara,219
+2024-12-30,Roti Canai,870
+2024-12-30,Teh Tarik,1130
+2024-12-30,Laksa,196
+2024-12-30,Chicken Rice,116
+2024-12-30,Iced Lemon Tea,823
+2024-12-30,Char Kway Teow,382
+2024-12-30,Cendol,767
+2024-12-30,Beef Rendang,145
+2024-12-30,Kaya Toast Set,2292
+2024-12-31,Teh Tarik,2012
+2024-12-31,Spaghetti Carbonara,454
+2024-12-31,Roti Canai,114
+2024-12-31,Nasi Lemak,123
+2024-12-31,Mushroom Soup,247
+2024-12-31,Tandoori Chicken,141
+2024-12-31,Chicken Chop,458
+2024-12-31,Char Kway Teow,319
+2024-12-31,Cendol,780
+2024-12-31,Beef Rendang,579
+2024-12-31,Kaya Toast Set,633
+2025-01-01,Spaghetti Carbonara,688
+2025-01-01,Roti Canai,847
+2025-01-01,Nasi Lemak,690
+2025-01-01,Mushroom Soup,245
+2025-01-01,Laksa,357
+2025-01-01,Kaya Toast Set,1295
+2025-01-01,Chicken Rice,495
+2025-01-01,Chicken Chop,719
+2025-01-01,Char Kway Teow,593
+2025-01-01,Cendol,1955
+2025-01-01,Beef Rendang,60
+2025-01-01,Tandoori Chicken,442
+2025-01-01,Iced Lemon Tea,1425
+2025-01-01,Teh Tarik,1461
