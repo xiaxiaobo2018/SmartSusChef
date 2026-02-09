@@ -435,7 +435,7 @@ jobs:
   deploy-uat:
     name: "Deploy to UAT"
     runs-on: ubuntu-latest
-    needs: [docker-build-push, detect-changes]
+    needs: [docker-build-push, trivy-scan, detect-changes]
     if: |
       !cancelled() && !failure() &&
       github.ref == 'refs/heads/main' && github.event_name == 'push'
