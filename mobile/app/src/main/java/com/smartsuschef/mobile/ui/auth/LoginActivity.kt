@@ -1,6 +1,6 @@
 package com.smartsuschef.mobile.ui.auth
 
-import android.content.Intent
+import android.content.Intent 
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
