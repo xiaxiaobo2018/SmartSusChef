@@ -1,6 +1,7 @@
-import pandas as pd
-from pathlib import Path
 import warnings
+from pathlib import Path
+
+import pandas as pd
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
@@ -18,7 +19,7 @@ def main():
             return
 
         print(f"Loading files from {DATA_DIR}...")
-        
+
         df_sales = pd.read_csv(DATA_DIR / 'menuitem.csv')
         df_menu = pd.read_csv(DATA_DIR / 'menu_items.csv')
         df_rec_ingr = pd.read_csv(DATA_DIR / 'recipe_ingredient_assignments.csv')
@@ -46,7 +47,7 @@ def main():
 
         sub_usage_step1 = pd.merge(sales_with_recipe, df_rec_sub, on='RecipeId', how='inner')
         sub_usage_step2 = pd.merge(sub_usage_step1, df_sub_ingr, on='SubRecipeId', how='inner')
-        
+
         sub_usage_step2['total_usage'] = (
             sub_usage_step2['SalesQty'] * sub_usage_step2['Factor'] * sub_usage_step2['Quantity']
         )
@@ -67,7 +68,7 @@ def main():
         final_df = final_df[['date', 'dish_name', 'quantity']].sort_values('date')
 
         final_df.to_csv(OUTPUT_FILE, index=False, encoding='utf-8-sig')
-        
+
         print(f"Success! Data saved to: {OUTPUT_FILE}")
         print(final_df.head())
 

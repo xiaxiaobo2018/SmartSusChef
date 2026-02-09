@@ -8,6 +8,9 @@ plugins {
     alias(libs.plugins.ksp)
     id("androidx.navigation.safeargs.kotlin")
     id("kotlin-parcelize")
+    alias(libs.plugins.detekt)
+    alias(libs.plugins.ktlint)
+    id("jacoco")
 }
 
 // Load properties from local.properties file, if it exists
@@ -37,6 +40,9 @@ android {
             // Read the base URL from local.properties, with a fallback to the Android emulator default
             val baseUrl = localProperties.getProperty("local.base.url", "http://10.0.2.2:5001/api/")
             buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
+            buildConfigField("String", "AWS_BASE_URL", "\"http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/api/\"")
+            enableUnitTestCoverage = true
+            enableAndroidTestCoverage = true
         }
         release {
             isMinifyEnabled = false
@@ -45,7 +51,8 @@ android {
                 "proguard-rules.pro"
             )
             // Your production URL
-            buildConfigField("String", "BASE_URL", "\"https://smartsuschef.com/api/\"")
+            buildConfigField("String", "BASE_URL", "\"http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/api/\"")
+            buildConfigField("String", "AWS_BASE_URL", "\"http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/api/\"")
         }
     }
 
@@ -73,7 +80,11 @@ android {
     }
 
     testOptions {
-        unitTests.isIncludeAndroidResources = true
+        unitTests {
+            isIncludeAndroidResources = true
+            isReturnDefaultValues = true
+        }
+        animationsDisabled = true
     }
 }
 
@@ -94,10 +105,14 @@ dependencies {
     testImplementation(libs.core.testing)
     testImplementation(libs.datastore.preferences)
     testImplementation(libs.datastore.preferences.core)
-    testImplementation("io.mockk:mockk:1.13.17") // Added for Mockk
+    testImplementation(libs.mockk)
+    testImplementation(libs.truth)
+    testImplementation(libs.robolectric)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(libs.coroutines.test) // Add this for instrumentation coroutine testing
+    androidTestImplementation(libs.coroutines.test)
+    androidTestImplementation(libs.mockwebserver)
+    detektPlugins(libs.detekt.formatting)
     // Networking (For .NET Backend & Python ML)
     implementation(libs.retrofit.core)
     implementation(libs.retrofit.gson)
@@ -109,18 +124,77 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     // Add Hilt testing dependencies
-    testImplementation("com.google.dagger:hilt-android-testing:2.51.1")
-    androidTestImplementation("com.google.dagger:hilt-android-testing:2.51.1")
+    testImplementation(libs.hilt.android.testing)
+    androidTestImplementation(libs.hilt.android.testing)
     // Use kspTest and kspAndroidTest for the Hilt compiler for test sources
-    kspTest("com.google.dagger:hilt-android-compiler:2.51.1")
-    kspAndroidTest("com.google.dagger:hilt-android-compiler:2.51.1")
+    kspTest(libs.hilt.compiler)
+    kspAndroidTest(libs.hilt.compiler)
     // Storage (For TokenManager)
     implementation(libs.datastore.preferences)
-    implementation("androidx.security:security-crypto:1.1.0-alpha06")
+    implementation(libs.androidx.security.crypto)
     // UI Components (For charts)
     implementation(libs.mp.android.chart)
     // MultiDex
-    implementation("androidx.multidex:multidex:2.0.1")
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+    implementation(libs.androidx.multidex)
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
+}
 
+detekt {
+    buildUponDefaultConfig = true
+    allRules = false
+    config.setFrom("${rootProject.projectDir}/config/detekt/detekt.yml")
+    reports {
+        html.required.set(true)
+        xml.required.set(true)
+        txt.required.set(false)
+    }
+}
+
+ktlint {
+    android.set(true)
+    debug.set(true)
+    outputToConsole.set(true)
+    reporters {
+        reporter(org.jlleitschuh.gradle.ktlint.reporter.ReporterType.PLAIN)
+        reporter(org.jlleitschuh.gradle.ktlint.reporter.ReporterType.CHECKSTYLE)
+    }
+}
+
+jacoco {
+    toolVersion = "0.8.12"
+}
+
+tasks.withType<Test> {
+    configure<JacocoTaskExtension> {
+        excludes = listOf(
+            "**/R.class",
+            "**/R\$*.class",
+            "**/BuildConfig.*",
+            "**/Manifest*.*",
+            "**/*Test*.*",
+            "android/**/*.*",
+            "**/di/**"
+        )
+    }
+}
+
+tasks.register<JacocoReport>("jacocoTestReportDebug") {
+    dependsOn("testDebugUnitTest")
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+    val fileFilter = listOf(
+        "**/R.class", "**/R\$*.class", "**/BuildConfig.*",
+        "**/Manifest*.*", "**/*Test*.*", "android/**/*.*", "**/di/**"
+    )
+    val debugTree = fileTree("${layout.buildDirectory.get().asFile}/tmp/kotlin-classes/debug") {
+        exclude(fileFilter)
+    }
+    val mainSrc = "${project.projectDir}/src/main/java"
+    sourceDirectories.setFrom(files(mainSrc))
+    classDirectories.setFrom(files(debugTree))
+    executionData.setFrom(fileTree(layout.buildDirectory.get().asFile) {
+        include("jacoco/testDebugUnitTest.exec")
+    })
 }

@@ -1,6 +1,6 @@
 package com.smartsuschef.mobile.ui.auth
 
-import android.content.Intent
+import android.content.Intent 
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -12,7 +12,7 @@ import com.smartsuschef.mobile.util.showToast
 import com.smartsuschef.mobile.util.visible
 import com.smartsuschef.mobile.util.gone
 import dagger.hilt.android.AndroidEntryPoint
-
+ 
 @AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
 

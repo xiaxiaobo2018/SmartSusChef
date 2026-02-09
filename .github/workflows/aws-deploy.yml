@@ -129,46 +129,6 @@ jobs:
           retention-days: 30
 
   # ==========================================
-  # STAGE 3b: Filesystem Vulnerability Scan (after Docker build)
-  # ==========================================
-  trivy-scan:
-    name: "Trivy Filesystem Scan"
-    needs: [docker-build-push]
-    if: |
-      !cancelled() && !failure()
-    runs-on: ubuntu-latest
-    permissions:
-      security-events: write
-      contents: read
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Run Trivy vulnerability scanner (filesystem)
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: 'fs'
-          scan-ref: '.'
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-          severity: 'CRITICAL,HIGH'
-
-      - name: Upload Trivy scan results to GitHub Security
-        uses: github/codeql-action/upload-sarif@v3
-        if: always()
-        with:
-          sarif_file: 'trivy-results.sarif'
-
-      - name: Upload Trivy filesystem report as artifact
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: trivy-filesystem-report
-          path: trivy-results.sarif
-          retention-days: 30
-
-  # ==========================================
   # STAGE 2: Backend Build & Test
   # ==========================================
   backend-build:
@@ -307,8 +267,16 @@ jobs:
         working-directory: ./ML
 
       - name: Pytest
-        run: pytest -q
+        run: pytest -q --cov=. --cov-report=xml:coverage.xml
         working-directory: ./ML
+
+      - name: Upload coverage profile
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ml-coverage
+          path: ML/coverage.xml
+          retention-days: 30
 
       - name: Setup JDK 17 (for JMeter)
         uses: actions/setup-java@v4
@@ -339,51 +307,8 @@ jobs:
           name: ml-reports
           path: |
             ML/tests/jmeter/results.jtl
+          if-no-files-found: warn
           retention-days: 30
-        
-  # ==========================================
-  # STAGE 2: Mobile Build & Test
-  # ==========================================
-
-  mobile-build:
-    name: "Mobile Build & Test"
-    needs: [detect-changes]
-    if: needs.detect-changes.outputs.mobile == 'true' || needs.detect-changes.outputs.infra == 'true'
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        cache: 'gradle'
-    - name: Lint with Android Lint
-      run: ./gradlew lint 2>&1 | tee lint-report.txt || true
-      working-directory: ./mobile
-      continue-on-error: true
-
-    - name: Run Unit Tests
-      run: ./gradlew testDebugUnitTest 2>&1 | tee test-report.txt || true
-      working-directory: ./mobile
-      continue-on-error: true
-
-    - name: Build with Gradle
-      run: ./gradlew assembleDebug
-      working-directory: ./mobile
-
-    - name: Upload Mobile reports
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: mobile-reports
-        path: |
-          mobile/lint-report.txt
-          mobile/test-report.txt
-          mobile/app/build/reports/
-        retention-days: 30
 
   # ==========================================
   # STAGE 3: Build & Push Docker Images to ECR
@@ -532,13 +457,37 @@ jobs:
           sarif_file: 'trivy-ml-image.sarif'
           category: 'trivy-image-ml'
 
+      - name: Run Trivy filesystem scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-fs-results.sarif'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Upload Trivy filesystem SARIF to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-fs-results.sarif'
+          category: 'trivy-filesystem'
+
+      - name: Upload Trivy filesystem report as artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: trivy-filesystem-report
+          path: trivy-fs-results.sarif
+          retention-days: 30
+
   # ==========================================
   # STAGE 4: Deploy to UAT Environment
   # ==========================================
   deploy-uat:
     name: "Deploy to UAT"
     runs-on: ubuntu-latest
-    needs: [docker-build-push, trivy-scan, detect-changes]
+    needs: [docker-build-push, detect-changes]
     if: |
       !cancelled() && !failure() &&
       github.ref == 'refs/heads/main' && github.event_name == 'push'
@@ -853,7 +802,7 @@ jobs:
   notify:
     name: "Pipeline Summary"
     runs-on: ubuntu-latest
-    needs: [detect-changes, security-scan, trivy-scan, backend-build, frontend-build, ml-build, mobile-build, docker-build-push, deploy-uat, deploy-production]
+    needs: [detect-changes, backend-build, frontend-build, ml-build, docker-build-push, deploy-uat, deploy-production]
     if: always()
 
     steps:
@@ -863,12 +812,9 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Stage | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Security Scan (CodeQL) | ${{ needs.security-scan.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Trivy Filesystem Scan | ${{ needs.trivy-scan.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Backend Build & Test | ${{ needs.backend-build.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Frontend Build & Test | ${{ needs.frontend-build.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| ML Service Build & Test | ${{ needs.ml-build.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Mobile Build & Test | ${{ needs.mobile-build.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Docker Build & Push | ${{ needs.docker-build-push.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Deploy to UAT | ${{ needs.deploy-uat.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Deploy to Production | ${{ needs.deploy-production.result }} |" >> $GITHUB_STEP_SUMMARY

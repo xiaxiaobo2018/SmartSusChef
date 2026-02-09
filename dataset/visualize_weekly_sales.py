@@ -1,6 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-from datetime import datetime, timedelta
+from datetime import timedelta
 import random
 
 # 设置中文字体支持
@@ -72,7 +72,7 @@ plt.tight_layout()
 plt.show()
 
 # 打印统计信息
-print(f"\n一周销量统计:")
+print("\n一周销量统计:")
 print(f"日期范围: {random_start.strftime('%Y-%m-%d')} 至 {week_end.strftime('%Y-%m-%d')}")
 print(f"周总销量: {week_data['售出菜品总量'].sum()}")
 print(f"平均每日销量: {week_data['售出菜品总量'].mean():.2f}")

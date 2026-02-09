@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 批量菜品销量预测（Prophet + XGBoost 残差堆叠）。
 
@@ -39,7 +38,6 @@ except Exception:
     sns = None
 
 import matplotlib.pyplot as plt
-
 
 # ==========================
 # 可调参数（按需改这里）

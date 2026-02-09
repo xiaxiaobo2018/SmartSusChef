@@ -7,26 +7,23 @@ is safe to be used with `concurrent.futures.ProcessPoolExecutor` because it has
 no global side-effects on import. The main worker function is `process_dish`.
 """
 
-import pandas as pd
-import numpy as np
-import holidays
-import pickle
 import os
-import tempfile
-import shutil
-import logging
-import optuna
+import pickle
 import warnings
 from dataclasses import dataclass, field
-from typing import List, Dict
-from sqlalchemy import create_engine
+
+import holidays
 import lightgbm as lgb
-from catboost import CatBoostRegressor
-from xgboost import XGBRegressor
-from sklearn.metrics import mean_absolute_error
-from geopy.geocoders import Nominatim
+import numpy as np
 import openmeteo_requests
+import optuna
+import pandas as pd
+from catboost import CatBoostRegressor
+from geopy.geocoders import Nominatim
 from retry_requests import retry
+from sklearn.metrics import mean_absolute_error
+from sqlalchemy import create_engine
+from xgboost import XGBRegressor
 
 warnings.filterwarnings('ignore')
 
@@ -44,12 +41,12 @@ class PipelineConfig:
     min_train_days: int = 60
     min_ml_days: int = 90
     random_seed: int = 42
-    holiday_years: List[int] = field(default_factory=lambda: [2024, 2025, 2026])
+    holiday_years: list[int] = field(default_factory=lambda: [2024, 2025, 2026])
     forecast_horizon: int = 14
     n_optuna_trials: int = 30
     max_workers: int = 4
     model_dir: str = "models"
-    tree_features: List[str] = field(default_factory=lambda: [
+    tree_features: list[str] = field(default_factory=lambda: [
         'day_of_week', 'month', 'is_public_holiday',
         'temperature_2m_max', 'temperature_2m_min',
         'relative_humidity_2m_mean', 'precipitation_sum',
@@ -59,10 +56,10 @@ class PipelineConfig:
         'trend_ratio', 'expanding_mean',
         'lag_same_weekday_avg', 'lag_same_weekday_std'
     ])
-    tree_cat_features: List[str] = field(default_factory=lambda: [
+    tree_cat_features: list[str] = field(default_factory=lambda: [
         'day_of_week', 'month', 'is_public_holiday'
     ])
-    feature_groups: Dict[str, List[str]] = field(default_factory=lambda: {
+    feature_groups: dict[str, list[str]] = field(default_factory=lambda: {
         "Seasonality": ["day_of_week", "month"],
         "Holiday": ["is_public_holiday"],
         "Weather": ["temperature_2m_max", "temperature_2m_min",

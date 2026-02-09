@@ -223,7 +223,7 @@ def _train_lgbm_on_residuals(
     # Initialize and train LGBM
     model = LGBMRegressor(**LGBM_PARAMS)
     model.fit(df[feature_cols], df["resid"])
-    
+
     return model, feature_cols
 
 
@@ -238,7 +238,7 @@ def _recursive_hybrid_forecast(
     # Iterate through future days one by one
     for i, row in future_exog.sort_values("ds").reset_index(drop=True).iterrows():
         ds = pd.to_datetime(row["ds"])
-        
+
         # Build feature dictionary
         feat = {
             "is_holiday": int(row.get("is_holiday", 0)),
@@ -267,7 +267,7 @@ def _recursive_hybrid_forecast(
         # Predict residual
         X_one = pd.DataFrame([{k: feat.get(k, 0.0) for k in feature_cols}])
         resid_hat = float(model.predict(X_one)[0])
-        
+
         # Hybrid: Final = Prophet Trend + LGBM Residual
         yhat = float(feat["prophet_yhat"]) + resid_hat
         yhat = max(0.0, yhat) # Sales cannot be negative
@@ -280,12 +280,12 @@ def _recursive_hybrid_forecast(
 
 def _train_hybrid(df_feat: pd.DataFrame, holidays: pd.DataFrame):
     df_feat = df_feat.dropna().copy()
-    
+
     # Use full dataset if data is scarce
     if len(df_feat) < max(120, HORIZON_DAYS * 3):
         p_train, _ = _fit_prophet_and_predict(
-            df_feat[["ds", "y"] + REG_COLS], 
-            df_feat[["ds", "y"] + REG_COLS], 
+            df_feat[["ds", "y"] + REG_COLS],
+            df_feat[["ds", "y"] + REG_COLS],
             holidays
         )
         model, cols = _train_lgbm_on_residuals(df_feat, p_train)
@@ -301,7 +301,7 @@ def _train_hybrid(df_feat: pd.DataFrame, holidays: pd.DataFrame):
         val_df[["ds", "y"] + REG_COLS],
         holidays
     )
-    
+
     # Train LGBM on residuals
     model, cols = _train_lgbm_on_residuals(train_df, p_train)
 
@@ -329,7 +329,7 @@ def forecast_one_dish(df, weather, holidays, dish) -> DishForecast:
 
     # Step 2: Future Forecast Prep
     future_ds = pd.date_range(df_all["ds"].max() + pd.Timedelta(days=1), periods=HORIZON_DAYS, freq="D")
-    
+
     # Prepare future weather
     if DATA_WEATHER_FUTURE.exists():
         wf = pd.read_csv(DATA_WEATHER_FUTURE, encoding="utf-8-sig")
@@ -355,7 +355,7 @@ def forecast_one_dish(df, weather, holidays, dish) -> DishForecast:
     )
     # Step 4: Retrain LGBM on FULL data residuals
     model_full, cols = _train_lgbm_on_residuals(df_feat, p_full)
-    
+
     # Step 5: Generate Final Forecasts
     pred_future = _recursive_hybrid_forecast(
         hist_df=df_all[["ds", "y"]],
@@ -390,7 +390,7 @@ def plot_results(results, summary, top_n=TOP_N_PLOT):
     rows = int(np.ceil(n / cols))
     fig, axes = plt.subplots(rows, cols, figsize=(15, 4 * rows))
     axes = np.array(axes).reshape(-1)
-    
+
     by_dish = {r.dish: r for r in results}
     for i, dish in enumerate(top_dishes):
         ax = axes[i]
@@ -399,7 +399,7 @@ def plot_results(results, summary, top_n=TOP_N_PLOT):
         ax.plot(r.pred_future["ds"], r.pred_future["yhat"], 'r.-', label="Forecast(LGBM)")
         ax.set_title(dish)
         if i == 0: ax.legend()
-    
+
     plt.tight_layout()
     plt.savefig(OUT_DIR / f"forecast_top{len(top_dishes)}_lines.png", dpi=200)
     plt.close()
@@ -416,7 +416,7 @@ def main():
 
     results = []
     print(f"Starting Prophet + LightGBM training for {len(dishes)} dishes...")
-    
+
     for i, dish in enumerate(dishes, 1):
         try:
             r = forecast_one_dish(df, weather, holidays, dish)
@@ -440,11 +440,11 @@ def main():
                 "forecast_start": dates.min().strftime("%Y-%m-%d"),
                 "forecast_end": dates.max().strftime("%Y-%m-%d")
             })
-        
+
         summary = pd.DataFrame(summary_rows)
 
         summary = summary.sort_values("forecast_sum", ascending=False)
-        
+
         summary.to_csv(OUT_DIR / "summary.csv", index=False, encoding="utf-8-sig")
         plot_results(results, summary)
         print("All forecasts completed. Results saved to 'outputs_lgbm' directory.")
