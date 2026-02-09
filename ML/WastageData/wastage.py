@@ -5,8 +5,8 @@ import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 BASE_DIR = Path(".")
-RAW_DIR = BASE_DIR / "raw_files"
-OUTPUT_FILE = BASE_DIR / "final_wastage_merged.csv"
+RAW_DIR = BASE_DIR / "data"
+OUTPUT_FILE = BASE_DIR / "wastage_data.csv"
 
 def process_wastage():
     if not RAW_DIR.exists():
@@ -30,20 +30,17 @@ def process_wastage():
 
             df.columns = df.columns.str.strip()
 
-            # Dynamic Column Mapping
             name_col = None
             if 'Product Name' in df.columns:
                 name_col = 'Product Name'
             elif 'Item Name' in df.columns:
                 name_col = 'Item Name'
-            
-            # Check strictly required columns
+
             required_cols = ['Qty Change', 'Transaction Type', 'Audit Time']
             if not name_col or not all(col in df.columns for col in required_cols):
                 print(f"Skipping {f.name}: Missing required columns. Found: {list(df.columns)}")
                 continue
 
-            # Filter Logic
             mask_type = df['Transaction Type'].astype(str).str.contains("Stocktake", case=False, na=False)
             mask_loss = df['Qty Change'] < 0
             
@@ -52,7 +49,6 @@ def process_wastage():
             if subset.empty:
                 continue
 
-            # === MODIFIED HERE: Keep only Date (YYYY-MM-DD) ===
             subset['date'] = pd.to_datetime(subset['Audit Time']).dt.date
             
             subset['dish_name'] = subset[name_col]

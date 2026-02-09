@@ -23,9 +23,12 @@ public class ApdexMiddleware
             stopwatch.Stop();
             var elapsedMs = stopwatch.ElapsedMilliseconds;
 
+            // Sanitize user-provided path to prevent log forgery
+            var sanitizedPath = context.Request.Path.ToString().Replace('\n', '_').Replace('\r', '_');
+
             _logger.LogInformation(
                 "ApdexMetrics: Path={Path}, Method={Method}, StatusCode={StatusCode}, DurationMs={Duration}",
-                context.Request.Path,
+                sanitizedPath,
                 context.Request.Method,
                 context.Response.StatusCode,
                 elapsedMs);

@@ -1,19 +1,46 @@
 # SmartSusChef - Local Dev Quick Start (Windows PowerShell)
 # Launches ML / Backend / Frontend in 3 separate windows
-# Usage: .\dev-start.ps1 [-DbServer host] [-DbPort port] [-DbUser user] [-DbPassword pass] [-DbName db]
+# Usage: .\dev-start.ps1
+# Config: Create a .env file in the project root (see .env.example)
 
 param(
-    [string]$DbServer = "oversea.zyh111.icu",
-    [int]$DbPort = 33333,
-    [string]$DbUser = "grp4",
-    [string]$DbPassword = "grp4",
-    [string]$DbName = "smartsuschef"
+    [string]$DbServer,
+    [int]$DbPort,
+    [string]$DbUser,
+    [string]$DbPassword,
+    [string]$DbName
 )
 
 # Stop on first error
 $ErrorActionPreference = "Stop"
 # Get the directory where this script is located
 $Root = $PSScriptRoot
+
+# -- Load .env file ---------------------------------------------------------
+$envFile = Join-Path $Root ".env"
+if (Test-Path $envFile) {
+    Write-Host "[OK] Loading config from .env" -ForegroundColor Green
+    Get-Content $envFile | ForEach-Object {
+        $line = $_.Trim()
+        if ($line -and -not $line.StartsWith("#")) {
+            $parts = $line -split "=", 2
+            if ($parts.Count -eq 2) {
+                [System.Environment]::SetEnvironmentVariable($parts[0].Trim(), $parts[1].Trim(), "Process")
+            }
+        }
+    }
+} else {
+    Write-Host "[WARN] No .env file found. Copy .env.example to .env and fill in your values." -ForegroundColor Yellow
+    Write-Host "       Run: Copy-Item .env.example .env" -ForegroundColor Yellow
+    exit 1
+}
+
+# Apply: CLI params override .env, .env overrides empty
+if (-not $DbServer)   { $DbServer   = $env:DB_SERVER }
+if (-not $DbPort)     { $DbPort     = [int]$env:DB_PORT }
+if (-not $DbUser)     { $DbUser     = $env:DB_USER }
+if (-not $DbPassword) { $DbPassword = $env:DB_PASSWORD }
+if (-not $DbName)     { $DbName     = $env:DB_NAME }
 
 Write-Host ""
 Write-Host "==========================================" -ForegroundColor Green

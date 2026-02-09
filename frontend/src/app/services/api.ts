@@ -23,9 +23,9 @@ export const getAuthToken = (): string | null => {
 };
 
 // Apdex metric logging
-const logApdexMetric = (endpoint: string, durationMs: number, options: RequestInit) => {
+const logApdexMetric = (endpoint: string, durationMs: number, options: RequestInit, statusCode?: number) => {
   console.log(
-    `ApdexMetrics: Endpoint=${endpoint}, Method=${options.method || 'GET'}, DurationMs=${durationMs.toFixed(2)}`
+    `ApdexMetrics: Endpoint=${endpoint}, Method=${options.method || 'GET'}, StatusCode=${statusCode || 'N/A'}, DurationMs=${durationMs.toFixed(2)}`
   );
 };
 
@@ -35,6 +35,7 @@ async function fetchWithAuth<T>(
   options: RequestInit = {}
 ): Promise<T> {
   const startTime = performance.now();
+  let response: Response | undefined;
   try {
     const token = getAuthToken();
 
@@ -47,7 +48,7 @@ async function fetchWithAuth<T>(
       (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
     }
 
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    response = await fetch(`${API_BASE_URL}${endpoint}`, {
       ...options,
       headers,
     });
@@ -80,7 +81,7 @@ async function fetchWithAuth<T>(
     return response.json();
   } finally {
     const durationMs = performance.now() - startTime;
-    logApdexMetric(endpoint, durationMs, options);
+    logApdexMetric(endpoint, durationMs, options, response?.status);
   }
 }
 
@@ -277,7 +278,7 @@ export interface UpdateStoreRequest {
 }
 
 export const storeApi = {
-  get: (): Promise<StoreDto> =>
+  get: (): Promise<StoreDto | null> =>
     fetchWithAuth('/store'),
 
   getStatus: (): Promise<{ isSetupComplete: boolean; storeSetupRequired: boolean }> =>
