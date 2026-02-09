@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Parallel Prophet + LightGBM (V6.0 Optuna + Advanced Features)
 
@@ -20,7 +19,6 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 from sklearn.metrics import mean_absolute_error
-
 
 try:
     from lightgbm import LGBMRegressor
@@ -45,7 +43,6 @@ except Exception:
     sns = None
 
 import matplotlib.pyplot as plt
-
 
 plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei']
 plt.rcParams['axes.unicode_minus'] = False
@@ -176,11 +173,11 @@ def _add_lag_roll_features(df_all: pd.DataFrame) -> pd.DataFrame:
         out[f"y_roll_std_{w}"] = s.rolling(w).std()
         out[f"y_roll_max_{w}"] = s.rolling(w).max()
         out[f"y_roll_min_{w}"] = s.rolling(w).min()
-        
+
         # NEW FEATURE: Exponential Weighted Moving Average (EWMA)
         # Gives more weight to recent data
         out[f"y_ewma_{w}"] = s.ewm(span=w).mean()
-        
+
     return out
 
 def _fit_prophet_and_predict(train_df, val_df, holidays):
@@ -214,12 +211,12 @@ def _optimize_lgbm_params(df_train, feature_cols, target_col="y"):
             "reg_alpha": trial.suggest_float("reg_alpha", 1e-8, 10.0, log=True),
             "reg_lambda": trial.suggest_float("reg_lambda", 1e-8, 10.0, log=True),
         }
-        
+
         # Simple time-based validation split for optimization
         valid_size = max(7, int(len(df_train) * 0.2))
         train_sub = df_train.iloc[:-valid_size]
         valid_sub = df_train.iloc[-valid_size:]
-        
+
         model = LGBMRegressor(**param)
         model.fit(train_sub[feature_cols], train_sub[target_col])
         preds = model.predict(valid_sub[feature_cols])
@@ -233,26 +230,26 @@ def _optimize_lgbm_params(df_train, feature_cols, target_col="y"):
 def _train_lgbm_stacking_optuna(train_feat, prophet_yhat_train):
     df = train_feat.copy()
     df["prophet_yhat"] = prophet_yhat_train
-    
+
     feature_cols = [c for c in df.columns if c not in {"ds", "y", "prophet_yhat"}]
     feature_cols.append("prophet_yhat")
-    
+
     df = df.dropna(subset=feature_cols + ["y"]).copy()
-    
+
     # Run Optuna to find best params
     best_params = _optimize_lgbm_params(df, feature_cols, target_col="y")
-    
+
     # Train final model with best params
     model = LGBMRegressor(**best_params)
     model.fit(df[feature_cols], df["y"])
-    
+
     return model, feature_cols, best_params
 
 def _recursive_hybrid_forecast(hist_df, future_exog, prophet_yhat_future, model, feature_cols):
     hist_df = hist_df.sort_values("ds").copy()
     y_hist = hist_df["y"].tolist()
     rows = []
-    
+
     for i, row in future_exog.sort_values("ds").reset_index(drop=True).iterrows():
         ds = pd.to_datetime(row["ds"])
         feat = {
@@ -289,7 +286,7 @@ def _recursive_hybrid_forecast(hist_df, future_exog, prophet_yhat_future, model,
         X_one = pd.DataFrame([{k: feat.get(k, 0.0) for k in feature_cols}])
         yhat = float(model.predict(X_one)[0])
         yhat = max(0.0, yhat)
-        
+
         rows.append({"ds": ds, "yhat": yhat})
         y_hist.append(yhat)
 
@@ -319,7 +316,7 @@ def _train_hybrid(df_feat: pd.DataFrame, holidays: pd.DataFrame):
     p_train, p_val = _fit_prophet_and_predict(
         train_df[["ds", "y"] + REG_COLS], val_df[["ds", "y"] + REG_COLS], holidays
     )
-    
+
     # Train stacking model WITH OPTUNA
     model, cols, best_params = _train_lgbm_stacking_optuna(train_df, p_train)
 
@@ -331,7 +328,7 @@ def _train_hybrid(df_feat: pd.DataFrame, holidays: pd.DataFrame):
         model=model,
         feature_cols=cols,
     )
-    
+
     val_mae = mean_absolute_error(val_df["y"], pred_val_df["yhat"])
     return model, cols, val_mae, best_params
 
@@ -345,12 +342,12 @@ def forecast_one_dish(df, weather, holidays, dish) -> DishForecast:
     model, cols, val_mae, best_params = _train_hybrid(df_feat, holidays)
 
     future_ds = pd.date_range(df_all["ds"].max() + pd.Timedelta(days=1), periods=HORIZON_DAYS, freq="D")
-    
+
     if DATA_WEATHER_FUTURE.exists():
         wf = pd.read_csv(DATA_WEATHER_FUTURE, encoding="utf-8-sig")
         wf["ds"] = pd.to_datetime(wf["ds"])
         future_weather = wf[wf["ds"].isin(future_ds)][["ds"] + REG_COLS].copy()
-        if len(future_weather) < len(future_ds): pass 
+        if len(future_weather) < len(future_ds): pass
     else:
         last = weather.iloc[-1]
         future_weather = pd.DataFrame({"ds": future_ds})
@@ -364,14 +361,14 @@ def forecast_one_dish(df, weather, holidays, dish) -> DishForecast:
         future_exog[["ds"] + REG_COLS],
         holidays
     )
-    
+
     # Retrain final model with BEST PARAMS on FULL DATA
     df_full = df_feat.copy()
     df_full["prophet_yhat"] = p_full
     df_full = df_full.dropna(subset=cols + ["y"])
     model_full = LGBMRegressor(**best_params)
     model_full.fit(df_full[cols], df_full["y"])
-    
+
     pred_future = _recursive_hybrid_forecast(
         hist_df=df_all[["ds", "y"]],
         future_exog=future_exog,
@@ -402,7 +399,7 @@ def plot_results(results, summary, top_n=TOP_N_PLOT):
     rows = int(np.ceil(n / cols))
     fig, axes = plt.subplots(rows, cols, figsize=(15, 4 * rows))
     axes = np.array(axes).reshape(-1)
-    
+
     by_dish = {r.dish: r for r in results}
     for i, dish in enumerate(top_dishes):
         ax = axes[i]
@@ -411,7 +408,7 @@ def plot_results(results, summary, top_n=TOP_N_PLOT):
         ax.plot(r.pred_future["ds"], r.pred_future["yhat"], 'r.-', label="Forecast V6")
         ax.set_title(dish)
         if i == 0: ax.legend()
-    
+
     plt.tight_layout()
     plt.savefig(OUT_DIR / f"forecast_top{len(top_dishes)}_lines.png", dpi=200)
     plt.close()
@@ -427,7 +424,7 @@ def main():
     results = []
     print(f"Starting V6 (Optuna Auto-Tuning) for {len(dishes)} dishes...")
     print(f"Trials per dish: {OPTUNA_TRIALS} (This may take a while...)")
-    
+
     for i, dish in enumerate(dishes, 1):
         try:
             r = forecast_one_dish(df, weather, holidays, dish)
@@ -454,7 +451,7 @@ def main():
         summary = pd.DataFrame(summary_rows)
         summary = summary.sort_values("forecast_sum", ascending=False)
         summary.to_csv(OUT_DIR / "summary.csv", index=False, encoding="utf-8-sig")
-        
+
         plot_results(results, summary)
         print("Optimization Complete. Results saved to 'outputs_lgbm_v6_optuna'.")
 

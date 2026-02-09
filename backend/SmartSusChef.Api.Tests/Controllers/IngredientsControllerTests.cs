@@ -27,7 +27,7 @@ public class IngredientsControllerTests
     public async Task GetAll_ShouldReturnOk_WithListOfIngredients()
     {
         // Arrange
-        var ingredients = new List<IngredientDto> { new(Guid.NewGuid().ToString(), "Flour", "kg", 0.5m, null, DateTime.UtcNow, DateTime.UtcNow) };
+        var ingredients = new List<IngredientDto> { new(Guid.NewGuid().ToString(), "Flour", "kg", 0.5m, DateTime.UtcNow, DateTime.UtcNow) };
         _mockIngredientService.Setup(s => s.GetAllAsync()).ReturnsAsync(ingredients);
 
         // Act
@@ -44,7 +44,7 @@ public class IngredientsControllerTests
     {
         // Arrange
         var ingredientId = Guid.NewGuid();
-        var ingredient = new IngredientDto(ingredientId.ToString(), "Flour", "kg", 0.5m, null, DateTime.UtcNow, DateTime.UtcNow);
+        var ingredient = new IngredientDto(ingredientId.ToString(), "Flour", "kg", 0.5m, DateTime.UtcNow, DateTime.UtcNow);
         _mockIngredientService.Setup(s => s.GetByIdAsync(ingredientId)).ReturnsAsync(ingredient);
 
         // Act
@@ -76,7 +76,7 @@ public class IngredientsControllerTests
         // Arrange
         var request = new CreateIngredientRequest("Sugar", "kg", 0.8m);
         var ingredientId = Guid.NewGuid();
-        var ingredient = new IngredientDto(ingredientId.ToString(), "Sugar", "kg", 0.8m, null, DateTime.UtcNow, DateTime.UtcNow);
+        var ingredient = new IngredientDto(ingredientId.ToString(), "Sugar", "kg", 0.8m, DateTime.UtcNow, DateTime.UtcNow);
         _mockIngredientService.Setup(s => s.CreateAsync(request)).ReturnsAsync(ingredient);
 
         // Act
@@ -108,7 +108,7 @@ public class IngredientsControllerTests
         // Arrange
         var ingredientId = Guid.NewGuid();
         var request = new UpdateIngredientRequest("New Sugar", "g", 0.9m);
-        var ingredient = new IngredientDto(ingredientId.ToString(), "New Sugar", "g", 0.9m, null, DateTime.UtcNow, DateTime.UtcNow);
+        var ingredient = new IngredientDto(ingredientId.ToString(), "New Sugar", "g", 0.9m, DateTime.UtcNow, DateTime.UtcNow);
         _mockIngredientService.Setup(s => s.UpdateAsync(ingredientId, request)).ReturnsAsync(ingredient);
 
         // Act

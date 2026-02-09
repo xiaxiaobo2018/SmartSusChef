@@ -1,6 +1,5 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-from datetime import datetime
 
 # 设置中文字体支持
 plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei', 'Arial Unicode MS']
@@ -41,7 +40,7 @@ plt.tight_layout()
 plt.show()
 
 # 打印统计信息
-print(f"\n数据统计信息:")
+print("\n数据统计信息:")
 print(f"总天数: {len(daily_sales)}")
 print(f"日期范围: {daily_sales['日期'].min()} 至 {daily_sales['日期'].max()}")
 print(f"平均每日销量: {daily_sales['售出菜品总量'].mean():.2f}")

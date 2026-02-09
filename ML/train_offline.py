@@ -3,12 +3,11 @@ from __future__ import annotations
 import argparse
 import logging
 import os
-from typing import Iterable, List
+from collections.abc import Iterable
 
 import pandas as pd
 
 from app.store_manager import StoreModelManager
-
 
 logger = logging.getLogger("train_offline")
 
@@ -20,7 +19,7 @@ def _configure_logging() -> None:
     )
 
 
-def _fetch_store_ids(manager: StoreModelManager) -> List[int]:
+def _fetch_store_ids(manager: StoreModelManager) -> list[int]:
     engine = manager._get_engine()  # Reuse existing DB config/connection
     if engine is None:
         raise RuntimeError("DATABASE_URL not set or database unavailable.")

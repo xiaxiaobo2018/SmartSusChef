@@ -1,28 +1,28 @@
 from __future__ import annotations
 
 import os
-import joblib
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import holidays
+import joblib
 import numpy as np
 import pandas as pd
 
 from training_logic_v2 import (
-    PipelineConfig,
     WEATHER_COLS,
+    PipelineConfig,
     get_location_details,
     safe_filename,
 )
 
 try:
-    import openmeteo_requests  # type: ignore
-    from retry_requests import retry  # type: ignore
+    import openmeteo_requests
+    from retry_requests import retry
 except Exception:  # pragma: no cover
-    openmeteo_requests = None  # type: ignore
-    retry = None  # type: ignore
+    openmeteo_requests = None  # type: ignore[assignment]
+    retry = None
 
 
 TIME_FEATURES = ["day_of_week", "month", "day", "dayofyear", "is_weekend"]
@@ -53,8 +53,8 @@ class LoadedDishModel:
 class ModelStore:
     def __init__(self, model_dir: str = "models") -> None:
         self.model_dir = Path(model_dir)
-        self.registry: Dict[str, Dict[str, Any]] = {}
-        self._cache: Dict[str, LoadedDishModel] = {}
+        self.registry: dict[str, dict[str, Any]] = {}
+        self._cache: dict[str, LoadedDishModel] = {}
 
     def load_registry(self) -> None:
         registry_path = self.model_dir / "champion_registry.pkl"
@@ -62,7 +62,7 @@ class ModelStore:
             raise FileNotFoundError(f"Missing registry: {registry_path}")
         self.registry = joblib.load(str(registry_path))
 
-    def list_dishes(self) -> List[str]:
+    def list_dishes(self) -> list[str]:
         return sorted(self.registry.keys())
 
     def get_dish_model(self, dish: str) -> LoadedDishModel:
@@ -99,8 +99,8 @@ class ModelStore:
         return loaded
 
 
-def _compute_lag_features_from_history(sales_history: List[float]) -> Dict[str, float]:
-    features: Dict[str, float] = {}
+def _compute_lag_features_from_history(sales_history: list[float]) -> dict[str, float]:
+    features: dict[str, float] = {}
     fallback = float(sales_history[-1]) if sales_history else 0.0
 
     for lag in LAGS:
@@ -164,7 +164,7 @@ def _prepare_future_weather(
     horizon_days: int,
     latitude: float,
     longitude: float,
-    weather_rows: Optional[List[Dict[str, Any]]] = None,
+    weather_rows: list[dict[str, Any]] | None = None,
 ) -> pd.DataFrame:
     future_dates = pd.date_range(start=start_date, periods=horizon_days, freq="D")
 
@@ -213,15 +213,15 @@ def _prepare_future_weather(
 def predict_dish(
     store: ModelStore,
     dish: str,
-    recent_sales: List[float],
+    recent_sales: list[float],
     horizon_days: int,
-    start_date: Optional[str] = None,
+    start_date: str | None = None,
     address: str = "Shanghai, China",
-    latitude: Optional[float] = None,
-    longitude: Optional[float] = None,
-    country_code: Optional[str] = None,
-    weather_rows: Optional[List[Dict[str, Any]]] = None,
-) -> Dict[str, Any]:
+    latitude: float | None = None,
+    longitude: float | None = None,
+    country_code: str | None = None,
+    weather_rows: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
     if not recent_sales:
         raise ValueError("recent_sales cannot be empty")
 
@@ -259,10 +259,10 @@ def predict_dish(
     local_hols = holidays.country_holidays(cc, years=cfg.holiday_years) if cc else None
     sales_history = [float(x) for x in recent_sales]
 
-    rows: List[Dict[str, Any]] = []
+    rows: list[dict[str, Any]] = []
     for i, row in future_weather.iterrows():
         dt = pd.to_datetime(row["date"])
-        feat: Dict[str, float] = {
+        feat: dict[str, float] = {
             "day_of_week": float(dt.dayofweek),
             "month": float(dt.month),
             "day": float(dt.day),

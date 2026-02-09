@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import argparse
 import csv
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Iterable
 
 
 def _sniff_dialect(path: Path, encoding: str) -> csv.Dialect:

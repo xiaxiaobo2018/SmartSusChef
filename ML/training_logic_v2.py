@@ -16,6 +16,7 @@ no global side-effects on import. The main worker function is `process_dish`.
 from __future__ import annotations
 
 import os
+
 # Must be set before cmdstanpy/prophet import
 os.environ.setdefault("CMDSTANPY_LOG_LEVEL", "WARNING")
 
@@ -26,18 +27,19 @@ try:
 except ImportError:
     pass  # python-dotenv not installed, use system env vars
 
-import pandas as pd
-import numpy as np
-import holidays
-import joblib
 import logging
-import optuna
 import warnings
 from dataclasses import dataclass, field
-from typing import List, Dict, Any, Tuple
-from sqlalchemy import create_engine
-from sklearn.metrics import mean_absolute_error
+from typing import Any
+
+import holidays
+import joblib
+import numpy as np
+import optuna
+import pandas as pd
 from geopy.geocoders import Nominatim
+from sklearn.metrics import mean_absolute_error
+from sqlalchemy import create_engine
 
 try:
     import openmeteo_requests
@@ -101,7 +103,7 @@ _silence_logs()
 # ---------------------------------------------------------------------------
 # GPU Detection
 # ---------------------------------------------------------------------------
-def _detect_gpu() -> Dict[str, bool]:
+def _detect_gpu() -> dict[str, bool]:
     """Auto-detect available GPU support for each tree framework."""
     gpu = {"xgboost": False, "catboost": False, "lightgbm": False}
 
@@ -135,10 +137,10 @@ def _detect_gpu() -> Dict[str, bool]:
     return gpu
 
 
-_GPU_AVAILABLE: Dict[str, bool] | None = None
+_GPU_AVAILABLE: dict[str, bool] | None = None
 
 
-def get_gpu_flags() -> Dict[str, bool]:
+def get_gpu_flags() -> dict[str, bool]:
     """Return cached GPU detection results (runs once per process)."""
     global _GPU_AVAILABLE
     if _GPU_AVAILABLE is None:
@@ -158,7 +160,7 @@ class PipelineConfig:
     min_train_days: int = 60
     min_ml_days: int = 90
     random_seed: int = 42
-    holiday_years: List[int] = field(default_factory=lambda: [2024, 2025, 2026])
+    holiday_years: list[int] = field(default_factory=lambda: [2024, 2025, 2026])
     forecast_horizon: int = 14
     n_optuna_trials: int = 30
     max_workers: int = 4
@@ -172,7 +174,7 @@ class PipelineConfig:
     default_fallback_country: str = "CN"
 
     # Prophet parameters
-    prophet_params: Dict[str, Any] = field(default_factory=lambda: {
+    prophet_params: dict[str, Any] = field(default_factory=lambda: {
         "changepoint_prior_scale": 0.5,
         "daily_seasonality": False,
         "holidays_prior_scale": 10.0,
@@ -183,16 +185,16 @@ class PipelineConfig:
     })
 
     # Time-based features
-    time_features: List[str] = field(default_factory=lambda: [
+    time_features: list[str] = field(default_factory=lambda: [
         "day_of_week", "month", "day", "dayofyear", "is_weekend"
     ])
 
     # Lag and rolling window settings
-    lags: Tuple[int, ...] = field(default_factory=lambda: (1, 7, 14))
-    roll_windows: Tuple[int, ...] = field(default_factory=lambda: (7, 14, 28))
+    lags: tuple[int, ...] = field(default_factory=lambda: (1, 7, 14))
+    roll_windows: tuple[int, ...] = field(default_factory=lambda: (7, 14, 28))
 
     # Features for hybrid tree model (predicting residuals)
-    hybrid_tree_features: List[str] = field(default_factory=lambda: [
+    hybrid_tree_features: list[str] = field(default_factory=lambda: [
         "day_of_week", "month", "day", "dayofyear", "is_weekend",
         "is_public_holiday",
         "temperature_2m_max", "temperature_2m_min",
@@ -205,7 +207,7 @@ class PipelineConfig:
     ])
 
     # Feature groups for SHAP explanation
-    feature_groups: Dict[str, List[str]] = field(default_factory=lambda: {
+    feature_groups: dict[str, list[str]] = field(default_factory=lambda: {
         "Seasonality": ["day_of_week", "month", "day", "dayofyear", "is_weekend"],
         "Holiday": ["is_public_holiday"],
         "Weather": ["temperature_2m_max", "temperature_2m_min",
@@ -592,7 +594,7 @@ def _prepare_cv_fold_cache(
     df_feat: pd.DataFrame,
     country_code: str,
     config: PipelineConfig,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """
     Pre-compute Prophet + residual training matrices once per fold.
 
@@ -601,7 +603,7 @@ def _prepare_cv_fold_cache(
     """
     _silence_logs()
     feature_cols = config.hybrid_tree_features
-    fold_cache: List[Dict[str, Any]] = []
+    fold_cache: list[dict[str, Any]] = []
 
     for raw_train, raw_test in _generate_cv_folds(df_feat, config):
         # Apply sanitation to train and test sets SEPARATELY to prevent data leakage
@@ -641,8 +643,8 @@ def _prepare_cv_fold_cache(
 # ---------------------------------------------------------------------------
 def _eval_hybrid_mae(
     model_type: str,
-    fold_cache: List[Dict[str, Any]],
-    trial_params: Dict[str, Any],
+    fold_cache: list[dict[str, Any]],
+    trial_params: dict[str, Any],
     config: PipelineConfig,
 ) -> float:
     """
@@ -710,9 +712,9 @@ def _eval_hybrid_mae(
 
 def _optimize_hybrid(
     model_type: str,
-    fold_cache: List[Dict[str, Any]],
+    fold_cache: list[dict[str, Any]],
     config: PipelineConfig
-) -> Tuple[float, Dict[str, Any]]:
+) -> tuple[float, dict[str, Any]]:
     """Optuna optimization for hybrid residual stacking per model type."""
 
     def objective(trial: optuna.Trial) -> float:
@@ -770,7 +772,7 @@ def _save_hybrid_models(
     joblib.dump(tree_model, f"{model_dir}/{champion}_{safe_name}.pkl")
 
 
-def _load_hybrid_models(dish: str, champion: str, config: PipelineConfig) -> Tuple[Any, Any]:
+def _load_hybrid_models(dish: str, champion: str, config: PipelineConfig) -> tuple[Any, Any]:
     """Load both Prophet and tree models for a dish using joblib (safer than pickle)."""
     safe_name = safe_filename(dish)
     model_dir = config.model_dir
@@ -783,7 +785,7 @@ def _load_hybrid_models(dish: str, champion: str, config: PipelineConfig) -> Tup
 # ---------------------------------------------------------------------------
 # Per-Dish Processing (Hybrid Prophet + Tree)
 # ---------------------------------------------------------------------------
-def process_dish(dish_name: str, shared_df: pd.DataFrame, country_code: str, config: PipelineConfig) -> Dict[str, Any]:
+def process_dish(dish_name: str, shared_df: pd.DataFrame, country_code: str, config: PipelineConfig) -> dict[str, Any]:
     """
     Process a single dish using Prophet + Tree Residual Stacking:
     1. Sanitize data and add features
@@ -821,8 +823,8 @@ def process_dish(dish_name: str, shared_df: pd.DataFrame, country_code: str, con
         raise RuntimeError(f"{dish_name}: CV folds unavailable after feature processing.")
 
     # Optuna optimization for each model type
-    mae_map: Dict[str, float] = {}
-    params_map: Dict[str, Dict[str, Any]] = {}
+    mae_map: dict[str, float] = {}
+    params_map: dict[str, dict[str, Any]] = {}
 
     for model_type in ["xgboost", "catboost", "lightgbm"]:
         best_mae, best_params = _optimize_hybrid(model_type, fold_cache, config)
@@ -903,11 +905,11 @@ def process_dish(dish_name: str, shared_df: pd.DataFrame, country_code: str, con
 # Utility function for computing lag features at prediction time
 # ---------------------------------------------------------------------------
 def compute_lag_features_from_history(
-    sales_history: List[float],
+    sales_history: list[float],
     config: PipelineConfig = CFG
-) -> Dict[str, float]:
+) -> dict[str, float]:
     """Compute lag and rolling features from a sales history array."""
-    features: Dict[str, float] = {}
+    features: dict[str, float] = {}
 
     for lag in config.lags:
         if len(sales_history) >= lag:
