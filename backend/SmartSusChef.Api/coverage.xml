@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <CoverageSession>
-  <Summary numSequencePoints="3751" visitedSequencePoints="3194" numBranchPoints="1064" visitedBranchPoints="754" sequenceCoverage="85.15" branchCoverage="70.86" maxCyclomaticComplexity="1619" minCyclomaticComplexity="1619" visitedClasses="232" numClasses="247" visitedMethods="578" numMethods="684" />
+  <Summary numSequencePoints="3751" visitedSequencePoints="3194" numBranchPoints="1064" visitedBranchPoints="755" sequenceCoverage="85.15" branchCoverage="70.95" maxCyclomaticComplexity="1619" minCyclomaticComplexity="1619" visitedClasses="232" numClasses="247" visitedMethods="578" numMethods="684" />
   <Modules>
-    <Module hash="2EE90EEF-BFFF-470F-87B8-1B7E4B3AF890">
+    <Module hash="90B14778-8E74-4732-BECD-DDB3E8CC2CAB">
       <ModulePath>SmartSusChef.Api.dll</ModulePath>
-      <ModuleTime>2026-02-09T03:16:12</ModuleTime>
+      <ModuleTime>2026-02-09T03:31:53</ModuleTime>
       <ModuleName>SmartSusChef.Api</ModuleName>
       <Files>
         <File uid="1" fullPath="/Users/derek/Documents/GitHub/SmartSusChef/backend/SmartSusChef.Api/Program.cs" />
@@ -232,7 +232,7 @@
           </Methods>
         </Class>
         <Class>
-          <Summary numSequencePoints="31" visitedSequencePoints="31" numBranchPoints="2" visitedBranchPoints="1" sequenceCoverage="100" branchCoverage="50" maxCyclomaticComplexity="2" minCyclomaticComplexity="1" visitedClasses="1" numClasses="1" visitedMethods="3" numMethods="3" />
+          <Summary numSequencePoints="31" visitedSequencePoints="31" numBranchPoints="2" visitedBranchPoints="2" sequenceCoverage="100" branchCoverage="100" maxCyclomaticComplexity="2" minCyclomaticComplexity="1" visitedClasses="1" numClasses="1" visitedMethods="3" numMethods="3" />
           <FullName>SmartSusChef.Api.Services.AuthService</FullName>
           <Methods>
             <Method cyclomaticComplexity="1" nPathComplexity="1" sequenceCoverage="100" branchCoverage="100" isConstructor="False" isGetter="False" isSetter="False" isStatic="True">
@@ -264,8 +264,8 @@
               <BranchPoints />
               <MethodPoint vc="19" uspid="0" p8:type="SequencePoint" ordinal="0" offset="0" sc="0" sl="330" ec="1" el="351" bec="0" bev="0" fileid="2" xmlns:p8="xsi" />
             </Method>
-            <Method cyclomaticComplexity="2" nPathComplexity="2" sequenceCoverage="100" branchCoverage="50" isConstructor="False" isGetter="False" isSetter="False" isStatic="True">
-              <Summary numSequencePoints="7" visitedSequencePoints="7" numBranchPoints="2" visitedBranchPoints="1" sequenceCoverage="100" branchCoverage="50" maxCyclomaticComplexity="2" minCyclomaticComplexity="2" visitedClasses="0" numClasses="0" visitedMethods="1" numMethods="1" />
+            <Method cyclomaticComplexity="2" nPathComplexity="2" sequenceCoverage="100" branchCoverage="100" isConstructor="False" isGetter="False" isSetter="False" isStatic="True">
+              <Summary numSequencePoints="7" visitedSequencePoints="7" numBranchPoints="2" visitedBranchPoints="2" sequenceCoverage="100" branchCoverage="100" maxCyclomaticComplexity="2" minCyclomaticComplexity="2" visitedClasses="0" numClasses="0" visitedMethods="1" numMethods="1" />
               <MetadataToken />
               <Name>System.Int32 SmartSusChef.Api.Services.AuthService::GenerateUniqueStoreId()</Name>
               <FileRef uid="2" />
@@ -275,12 +275,12 @@
                 <SequencePoint vc="2" uspid="360" ordinal="2" sl="360" sc="1" el="360" ec="2" bec="0" bev="0" fileid="2" />
                 <SequencePoint vc="2" uspid="361" ordinal="3" sl="361" sc="1" el="361" ec="2" bec="0" bev="0" fileid="2" />
                 <SequencePoint vc="2" uspid="364" ordinal="4" sl="364" sc="1" el="364" ec="2" bec="0" bev="0" fileid="2" />
-                <SequencePoint vc="2" uspid="365" ordinal="5" sl="365" sc="1" el="365" ec="2" bec="2" bev="1" fileid="2" />
+                <SequencePoint vc="2" uspid="365" ordinal="5" sl="365" sc="1" el="365" ec="2" bec="2" bev="2" fileid="2" />
                 <SequencePoint vc="2" uspid="366" ordinal="6" sl="366" sc="1" el="366" ec="2" bec="0" bev="0" fileid="2" />
               </SequencePoints>
               <BranchPoints>
-                <BranchPoint vc="2" uspid="365" ordinal="0" path="0" offset="110" offsetend="112" sl="365" fileid="2" />
-                <BranchPoint vc="0" uspid="365" ordinal="1" path="1" offset="110" offsetend="115" sl="365" fileid="2" />
+                <BranchPoint vc="1" uspid="365" ordinal="0" path="0" offset="110" offsetend="112" sl="365" fileid="2" />
+                <BranchPoint vc="1" uspid="365" ordinal="1" path="1" offset="110" offsetend="115" sl="365" fileid="2" />
               </BranchPoints>
               <MethodPoint vc="7" uspid="0" p8:type="SequencePoint" ordinal="1" offset="1" sc="0" sl="357" ec="1" el="366" bec="0" bev="0" fileid="2" xmlns:p8="xsi" />
             </Method>
