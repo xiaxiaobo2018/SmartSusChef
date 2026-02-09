@@ -31,6 +31,3 @@
 - PR 验证: `.github/workflows/pr-validation.yml` 的 `ml-validate` job
 - AWS 流水线: `.github/workflows/aws-deploy.yml` 的 `ml-build` job
 
-## 备注
-- 你移动/替换的历史数据与脚本文件保持不变，未作处理
-- 若需要本地一键脚本，可另行补充
