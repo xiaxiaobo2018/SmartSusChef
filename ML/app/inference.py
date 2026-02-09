@@ -22,7 +22,7 @@ try:
     from retry_requests import retry
 except Exception:  # pragma: no cover
     openmeteo_requests = None  # type: ignore[assignment]
-    retry = None  # type: ignore[assignment]
+    retry = None
 
 
 TIME_FEATURES = ["day_of_week", "month", "day", "dayofyear", "is_weekend"]
