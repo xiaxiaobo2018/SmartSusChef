@@ -8,6 +8,8 @@ plugins {
     alias(libs.plugins.ksp)
     id("androidx.navigation.safeargs.kotlin")
     id("kotlin-parcelize")
+    id("io.gitlab.arturbosch.detekt")
+    id("org.jlleitschuh.gradle.ktlint")
 }
 
 // Load properties from local.properties file, if it exists
@@ -75,6 +77,9 @@ android {
     testOptions {
         unitTests.isIncludeAndroidResources = true
     }
+    lint {
+        abortOnError = true
+    }
 }
 
 dependencies {
@@ -123,4 +128,9 @@ dependencies {
     implementation("androidx.multidex:multidex:2.0.1")
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 
+}
+
+detekt {
+    config.setFrom(files("$rootDir/config/detekt/detekt.yml"))
+    buildUponDefaultConfig = true
 }
