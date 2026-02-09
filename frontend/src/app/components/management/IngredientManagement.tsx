@@ -3,40 +3,31 @@
  * ---------------------------------------------
  * Main Features:
  *   - Display, add, edit, and delete store-specific ingredients (Ingredients)
- *   - Integrates with GlobalIngredients: 20 standard ingredients selectable from dropdown, unit/carbonFootprint auto-filled and read-only
- *   - Supports "Others" for custom ingredients with all fields editable
+ *   - Simple input-based creation and editing of ingredients (name, unit, carbonFootprint)
  *   - User-friendly interactions: form validation, delete confirmation, prevent deletion if referenced by recipes
  *   - All data operations are managed via AppContext methods (addIngredient, updateIngredient, etc.)
  *
  * Design Overview:
- *   1. Global ingredients are loaded dynamically from API and stored in globalIngredients state
- *   2. In the add/edit dialog, ingredient name dropdown lists global ingredients, with "Others" as the last option
- *   3. When a global ingredient is selected, unit/carbonFootprint are auto-filled and disabled to prevent editing
- *   4. When "Others" is selected, all fields are editable for custom input
- *   5. On save, if a global ingredient is chosen, globalIngredientId is submitted and backend stores the reference
- *   6. Delete operations include confirmation; if the ingredient is referenced by recipes/wastage data, deletion is blocked or cascaded
+ *   1. Ingredient name, unit, and carbon footprint are entered directly
+ *   2. Delete operations include confirmation; if the ingredient is referenced by recipes/wastage data, deletion is blocked or cascaded
  *
  * Key State Variables:
- *   - globalIngredients: List of global ingredients (from API)
- *   - selectedGlobalIngredientId: Currently selected global ingredient ID (or null)
- *   - selectedName/otherName: Dropdown selection/custom ingredient name
+ *   - name: Ingredient name input
  *   - unit/carbonFootprint: Unit/carbon, auto-filled for global ingredients
  *   - isDialogOpen/isDeleteDialogOpen/etc.: Dialog controls
  *
  * Interaction Highlights:
  *   - Friendly form validation and clear error messages
- *   - Seamless switching between global and custom ingredients
  *   - Deletion checks for references to prevent accidental data loss
  *
  * Maintenance Tips:
- *   - If the GlobalIngredients table structure/fields change, update dropdown rendering and field mapping accordingly
  *   - If IngredientDto structure changes, update form data assembly and context method parameters
  *   - If API endpoints change, update fetch logic
  *
  * @author Copilot
  * @lastUpdate 2026-02-09
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useApp } from '@/app/context/AppContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/app/components/ui/card';
 import { Button } from '@/app/components/ui/button';
@@ -46,8 +37,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/app/components/ui/dialog';
 import { Plus, Edit, Trash2, Package, AlertTriangle, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
-import { Ingredient, GlobalIngredient } from '@/app/types';
-import { globalIngredientsApi, type GlobalIngredientDto } from '@/app/services/api';
+import { Ingredient } from '@/app/types';
 
 interface IngredientManagementProps {
   onNavigateToRecipes?: () => void;
@@ -57,14 +47,10 @@ export function IngredientManagement({ onNavigateToRecipes }: IngredientManageme
   const { ingredients, addIngredient, updateIngredient, deleteIngredient, wastageData, recipes } = useApp();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingIngredient, setEditingIngredient] = useState<Ingredient | null>(null);
-  const [selectedName, setSelectedName] = useState('');
-  const [otherName, setOtherName] = useState('');
+  const [name, setName] = useState('');
   const [unit, setUnit] = useState('');
   const [carbonFootprint, setCarbonFootprint] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [globalIngredients, setGlobalIngredients] = useState<GlobalIngredient[]>([]);
-  const [selectedGlobalIngredientId, setSelectedGlobalIngredientId] = useState<string | null>(null);
-  const [isLoadingGlobalIngredients, setIsLoadingGlobalIngredients] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [deletingIngredient, setDeletingIngredient] = useState<{ id: string; name: string; wastageCount: number } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -75,52 +61,16 @@ export function IngredientManagement({ onNavigateToRecipes }: IngredientManageme
   const [pendingUnit, setPendingUnit] = useState('');
   const [baselineUnit, setBaselineUnit] = useState('');
 
-  // Load global ingredients from API
-  useEffect(() => {
-    const loadGlobalIngredients = async () => {
-      setIsLoadingGlobalIngredients(true);
-      try {
-        const data = await globalIngredientsApi.getAll();
-        setGlobalIngredients(data as unknown as GlobalIngredient[]);
-      } catch (error) {
-        console.error('Error loading global ingredients:', error);
-        toast.error('Failed to load global ingredients. Please try again later.');
-      } finally {
-        setIsLoadingGlobalIngredients(false);
-      }
-    };
-
-    loadGlobalIngredients();
-  }, []);
-
   const handleOpenDialog = (ingredient?: Ingredient) => {
     if (ingredient) {
       setEditingIngredient(ingredient);
       setBaselineUnit(ingredient.unit);
-      // Check if ingredient is a global ingredient
-      if (ingredient.globalIngredientId) {
-        const globalIng = globalIngredients.find(g => g.id === ingredient.globalIngredientId);
-        if (globalIng) {
-          setSelectedName(globalIng.id);
-          setSelectedGlobalIngredientId(globalIng.id);
-          setUnit(globalIng.unit);
-          setBaselineUnit(globalIng.unit);
-          setCarbonFootprint(globalIng.carbonFootprint.toString());
-          setOtherName('');
-        }
-      } else {
-        // Custom ingredient
-        setSelectedName('others');
-        setSelectedGlobalIngredientId(null);
-        setOtherName(ingredient.name);
-        setUnit(ingredient.unit);
-        setCarbonFootprint(ingredient.carbonFootprint.toString());
-      }
+      setName(ingredient.name);
+      setUnit(ingredient.unit);
+      setCarbonFootprint(ingredient.carbonFootprint.toString());
     } else {
       setEditingIngredient(null);
-      setSelectedName('');
-      setSelectedGlobalIngredientId(null);
-      setOtherName('');
+      setName('');
       setUnit('');
       setCarbonFootprint('');
       setBaselineUnit('');
@@ -129,31 +79,10 @@ export function IngredientManagement({ onNavigateToRecipes }: IngredientManageme
     setIsDialogOpen(true);
   };
 
-  const handleSelectGlobalIngredient = (globalIngId: string | null) => {
-    if (globalIngId && globalIngId !== 'others') {
-      const globalIng = globalIngredients.find(g => g.id === globalIngId);
-      if (globalIng) {
-        setSelectedName(globalIngId);
-        setSelectedGlobalIngredientId(globalIngId);
-        setUnit(globalIng.unit);
-        setCarbonFootprint(globalIng.carbonFootprint.toString());
-        setOtherName('');
-      }
-    } else {
-      setSelectedName('others');
-      setSelectedGlobalIngredientId(null);
-      setOtherName('');
-      setUnit('');
-      setCarbonFootprint('');
-    }
-  };
-
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
     setEditingIngredient(null);
-    setSelectedName('');
-    setSelectedGlobalIngredientId(null);
-    setOtherName('');
+    setName('');
     setUnit('');
     setCarbonFootprint('');
     setBaselineUnit('');
@@ -163,7 +92,7 @@ export function IngredientManagement({ onNavigateToRecipes }: IngredientManageme
   };
 
   const handleUnitChange = (nextUnit: string) => {
-    if (selectedGlobalIngredientId !== null || !editingIngredient) {
+    if (!editingIngredient) {
       setUnit(nextUnit);
       if (!editingIngredient) {
         setBaselineUnit(nextUnit);
@@ -196,25 +125,8 @@ export function IngredientManagement({ onNavigateToRecipes }: IngredientManageme
   };
 
   const handleSubmit = async () => {
-    // Determine final ingredient name based on selection
-    // If "Others" is selected, use the custom input value; otherwise use the global ingredient name
-    let finalName = '';
-    if (selectedName === 'others') {
-      finalName = otherName;
-      if (!finalName || !finalName.trim()) {
-        toast.error('Please enter a custom ingredient name');
-        return;
-      }
-    } else if (selectedGlobalIngredientId) {
-      const globalIng = globalIngredients.find(g => g.id === selectedGlobalIngredientId);
-      if (globalIng) {
-        finalName = globalIng.name;
-      } else {
-        toast.error('Selected ingredient not found');
-        return;
-      }
-    } else {
-      toast.error('Please select an ingredient');
+    if (!name || !name.trim()) {
+      toast.error('Please enter an ingredient name');
       return;
     }
 
@@ -230,10 +142,9 @@ export function IngredientManagement({ onNavigateToRecipes }: IngredientManageme
     }
 
     const ingredientData = {
-      name: finalName.trim(),
+      name: name.trim(),
       unit: unit.trim(),
       carbonFootprint: carbon,
-      globalIngredientId: selectedGlobalIngredientId || undefined, // Include reference if selected
     };
 
     setIsSubmitting(true);
@@ -342,44 +253,21 @@ export function IngredientManagement({ onNavigateToRecipes }: IngredientManageme
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="ingredient-name">Ingredient Name</Label>
-                <select
+                <Input
                   id="ingredient-name"
-                  className="w-full border rounded-md p-2"
-                  value={selectedName}
-                  onChange={(e) => handleSelectGlobalIngredient(e.target.value || null)}
-                  disabled={isLoadingGlobalIngredients}
-                >
-                  <option value="">-- Select ingredient --</option>
-                  {/* Display global ingredients from API */}
-                  {globalIngredients.map(ing => (
-                    <option key={ing.id} value={ing.id}>{ing.name}</option>
-                  ))}
-                  {/* "Others" option allows users to enter custom ingredients not in the standard list */}
-                  <option value="others">Others (Enter custom ingredient)</option>
-                </select>
-
-                {/* Conditionally render custom input field when "Others" is selected */}
-                {selectedName === 'others' && (
-                  <Input
-                    id="ingredient-name-other"
-                    value={otherName}
-                    onChange={(e) => setOtherName(e.target.value)}
-                    placeholder="Please specify Ingredient Name"
-                  />
-                )}
-                {isLoadingGlobalIngredients && <p className="text-sm text-gray-500">Loading global ingredients...</p>}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="e.g., Chicken, Rice, Tomato"
+                />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="ingredient-unit">
-                  Unit {selectedGlobalIngredientId && <span className="text-xs text-gray-500">(Read-only)</span>}
-                </Label>
+                <Label htmlFor="ingredient-unit">Unit</Label>
                 <select
                   id="ingredient-unit"
                   value={unit}
                   onChange={(e) => handleUnitChange(e.target.value)}
-                  disabled={selectedGlobalIngredientId !== null}
-                  className={`w-full border rounded-md p-2 ${selectedGlobalIngredientId ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                  className="w-full border rounded-md p-2"
                 >
                   <option value="">-- Select unit --</option>
                   <option value="g">g (gram)</option>
@@ -390,9 +278,7 @@ export function IngredientManagement({ onNavigateToRecipes }: IngredientManageme
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="carbon-footprint">
-                  Carbon Footprint (kg CO₂ per unit) {selectedGlobalIngredientId && <span className="text-xs text-gray-500">(Read-only)</span>}
-                </Label>
+                <Label htmlFor="carbon-footprint">Carbon Footprint (kg CO₂ per unit)</Label>
                 <Input
                   id="carbon-footprint"
                   type="number"
@@ -401,8 +287,6 @@ export function IngredientManagement({ onNavigateToRecipes }: IngredientManageme
                   value={carbonFootprint}
                   onChange={(e) => setCarbonFootprint(e.target.value)}
                   placeholder="e.g., 6.9"
-                  disabled={selectedGlobalIngredientId !== null}
-                  className={selectedGlobalIngredientId ? 'bg-gray-100 cursor-not-allowed' : ''}
                 />
               </div>
 

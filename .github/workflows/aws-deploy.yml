@@ -331,7 +331,14 @@ jobs:
           sleep 5
           jmeter -n -t tests/jmeter/healthcheck.jmx -l tests/jmeter/results.jtl
         working-directory: ./ML
-            ML/test-results.xml
+
+      - name: Upload ML reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ml-reports
+          path: |
+            ML/tests/jmeter/results.jtl
           retention-days: 30
         
   # ==========================================

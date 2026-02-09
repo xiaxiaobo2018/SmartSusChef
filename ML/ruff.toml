@@ -1,3 +1,5 @@
+line-length = 100
+
 [lint]
 select = ["E", "F", "W", "I", "B", "UP"]
 ignore = ["E501"]
@@ -6,4 +8,3 @@ ignore = ["E501"]
 known-first-party = ["app"]
 
 [format]
-line-length = 100
