@@ -27,7 +27,7 @@
  * @author Copilot
  * @lastUpdate 2026-02-09
  */
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useApp } from '@/app/context/AppContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/app/components/ui/card';
 import { Button } from '@/app/components/ui/button';
@@ -157,7 +157,7 @@ export function IngredientManagement({ onNavigateToRecipes }: IngredientManageme
         toast.success('Ingredient added successfully');
       }
       handleCloseDialog();
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to save ingredient');
     } finally {
       setIsSubmitting(false);
@@ -197,7 +197,7 @@ export function IngredientManagement({ onNavigateToRecipes }: IngredientManageme
       toast.success('Ingredient deleted successfully');
       setIsDeleteDialogOpen(false);
       setDeletingIngredient(null);
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to delete ingredient');
     } finally {
       setIsDeleting(false);

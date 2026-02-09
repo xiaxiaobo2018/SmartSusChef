@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { useApp } from '@/app/context/AppContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/app/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/app/components/ui/table';
@@ -26,7 +26,7 @@ export function PredictionDetail() {
       const recipe = recipeMap.get(forecast.recipeId);
       if (!recipe) return;
 
-      const fQty = forecast.quantity || (forecast as any).predictedQuantity || 0;
+      const fQty = forecast.quantity || 0;
 
       // --- SUB-RECIPE EXPLOSION LOGIC ---
       recipe.ingredients.forEach((component) => {
@@ -90,7 +90,6 @@ export function PredictionDetail() {
         // 2. Convert all prediction values to the display unit
         const scaledPredictions: { [key: string]: number } = {};
         Object.entries(predictions).forEach(([date, val]) => {
-          const converted = convertUnit(val, ingredient.unit);
           // Ensure we use the same unit across the entire row
           if (ingredient.unit === 'g' && displayUnit === 'kg') {
             scaledPredictions[date] = val / 1000;

@@ -31,7 +31,7 @@ export function PredictionAccuracy() {
                 .reduce((sum, s) => sum + s.quantity, 0);
 
             const dayForecasts = forecastData.filter((f) => f.date === dateKey && mainRecipeIds.has(f.recipeId));
-            const predicted = dayForecasts.reduce((sum, f) => sum + (f.quantity || (f as any).predictedQuantity || 0), 0);
+            const predicted = dayForecasts.reduce((sum, f) => sum + (f.quantity || 0), 0);
 
             console.log(`[PredictionAccuracy] ${dateKey}: actual=${actualSales}, predicted=${predicted}, forecasts=${dayForecasts.length}`);
 

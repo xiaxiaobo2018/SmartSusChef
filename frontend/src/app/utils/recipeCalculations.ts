@@ -158,7 +158,7 @@ export function getRecipeIngredientBreakdown(
   recipeId: string,
   quantity: number,
   recipeMap: Map<string, Recipe>,
-  ingredientMap: Map<string, Ingredient>
+  _ingredientMap: Map<string, Ingredient>
 ): { [ingredientId: string]: number } {
   const recipe = recipeMap.get(recipeId);
   if (!recipe) return {};

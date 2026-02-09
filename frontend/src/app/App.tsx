@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { AppProvider, useApp } from '@/app/context/AppContext';
 import { AuthProvider } from '@/app/context/AuthContext';
 import { LoginPage } from '@/app/components/LoginPage';
@@ -16,6 +16,8 @@ type AuthView = 'login' | 'register';
 
 function MainContent() {
   const context = useApp();
+  const [currentView, setCurrentView] = useState<View>('dashboard');
+  const [authView, setAuthView] = useState<AuthView>('login');
 
   if (!context) {
     return (
@@ -28,8 +30,6 @@ function MainContent() {
   }
 
   const { user, loading, storeSetupRequired } = context;
-  const [currentView, setCurrentView] = useState<View>('dashboard');
-  const [authView, setAuthView] = useState<AuthView>('login');
 
   if (loading) {
     return (

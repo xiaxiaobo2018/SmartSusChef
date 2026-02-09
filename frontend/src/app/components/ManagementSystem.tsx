@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useApp } from '@/app/context/AppContext';
 import { Button } from '@/app/components/ui/button';
 import { ArrowLeft, ChefHat, Package, Upload, Trash2, Download, DollarSign } from 'lucide-react';

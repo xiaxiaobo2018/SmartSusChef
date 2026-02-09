@@ -1,4 +1,3 @@
-import React from 'react';
 import { useApp } from '@/app/context/AppContext';
 import { ChefHat, LogOut, Settings } from 'lucide-react';
 import { Button } from '@/app/components/ui/button';

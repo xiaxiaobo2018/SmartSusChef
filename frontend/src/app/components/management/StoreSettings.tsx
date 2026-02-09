@@ -216,7 +216,7 @@ export function StoreSettings({ onBack }: StoreSettingsProps) {
       });
       toast.success('Store settings updated successfully');
       setStoreErrors({});
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to update store settings');
     } finally {
       setIsSaving(false);
@@ -255,7 +255,7 @@ export function StoreSettings({ onBack }: StoreSettingsProps) {
 
       setIsUserDialogOpen(false);
       setEditingUser(null);
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to save user');
     }
   };
@@ -274,7 +274,7 @@ export function StoreSettings({ onBack }: StoreSettingsProps) {
       try {
         await deleteUser(id);
         toast.success("User deleted successfully");
-      } catch (error) {
+      } catch (_error) {
         toast.error("Failed to delete user");
       }
     }
@@ -298,7 +298,7 @@ export function StoreSettings({ onBack }: StoreSettingsProps) {
       await changePassword(passwordForm.currentPassword, passwordForm.newPassword);
       toast.success('Password updated successfully');
       setPasswordForm({ currentPassword: '', newPassword: '' });
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to update password');
     }
   };
@@ -311,7 +311,7 @@ export function StoreSettings({ onBack }: StoreSettingsProps) {
     try {
       await updateProfile({ name: profileForm.name, email: profileForm.email });
       toast.success('Profile updated successfully');
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to update profile');
     }
   };
@@ -761,7 +761,7 @@ export function StoreSettings({ onBack }: StoreSettingsProps) {
                 <Label className="text-sm font-bold">Role</Label>
                 <Select
                   value={userForm.role}
-                  onValueChange={(value: any) => setUserForm({ ...userForm, role: value })}
+                  onValueChange={(value: 'manager' | 'employee') => setUserForm({ ...userForm, role: value })}
                 >
                   <SelectTrigger className="rounded-[8px]">
                     <SelectValue placeholder="Select role" />
@@ -776,7 +776,7 @@ export function StoreSettings({ onBack }: StoreSettingsProps) {
                 <Label className="text-sm font-bold">Status</Label>
                 <Select
                   value={userForm.status}
-                  onValueChange={(value: any) => setUserForm({ ...userForm, status: value })}
+                  onValueChange={(value: 'Active' | 'Inactive') => setUserForm({ ...userForm, status: value })}
                 >
                   <SelectTrigger className="rounded-[8px]">
                     <SelectValue placeholder="Select status" />

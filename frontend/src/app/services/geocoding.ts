@@ -6,7 +6,7 @@ interface NominatimResult {
   display_name: string;
   address: {
     country_code?: string;
-    [key: string]: any;
+    [key: string]: string | undefined;
   };
 }
 

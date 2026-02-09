@@ -14,11 +14,18 @@ export interface CSVValidationError {
   suggestion?: string;
 }
 
+export interface ValidatedCSVRow {
+  date: string;
+  dishName: string;
+  recipeId?: string;
+  quantity: number;
+}
+
 export interface CSVValidationResult {
   isValid: boolean;
   errors: CSVValidationError[];
   warnings: CSVValidationError[];
-  validRows: any[];
+  validRows: ValidatedCSVRow[];
   totalRows: number;
 }
 

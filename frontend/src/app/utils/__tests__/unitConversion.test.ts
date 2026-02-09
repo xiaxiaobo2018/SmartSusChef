@@ -4,7 +4,6 @@ import {
     formatQuantity,
     getStandardizedQuantity,
     convertBetweenUnits,
-    ConvertedUnit,
 } from '../unitConversion';
 
 describe('unitConversion', () => {
