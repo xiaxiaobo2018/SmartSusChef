@@ -117,6 +117,7 @@ const mapIngredientDto = (dto: IngredientDto): Ingredient => ({
   name: dto.name,
   unit: dto.unit,
   carbonFootprint: dto.carbonFootprint,
+  globalIngredientId: dto.globalIngredientId,
 });
 
 const mapRecipeDto = (dto: RecipeDto): Recipe => ({
@@ -463,6 +464,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         name: ingredientData.name,
         unit: ingredientData.unit,
         carbonFootprint: ingredientData.carbonFootprint,
+        globalIngredientId: ingredientData.globalIngredientId,
       });
       setIngredients(prev => [...prev, mapIngredientDto(newIngredient)]);
     } catch (error) {
@@ -480,6 +482,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         name: ingredientData.name || current.name,
         unit: ingredientData.unit || current.unit,
         carbonFootprint: ingredientData.carbonFootprint ?? current.carbonFootprint,
+        globalIngredientId: ingredientData.globalIngredientId ?? current.globalIngredientId,
       });
       setIngredients(prev => prev.map(i => i.id === id ? mapIngredientDto(updated) : i));
     } catch (error) {

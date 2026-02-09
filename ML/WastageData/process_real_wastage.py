@@ -50,12 +50,12 @@ def process_wastage():
             subset = df[mask_type & mask_loss].copy()
 
             if subset.empty:
-                # It is normal if a file only contains Receipts (positive Qty) but no Loss
-                # print(f"File {f.name} processed but no Stocktake Loss found.")
                 continue
 
-            subset['date'] = pd.to_datetime(subset['Audit Time'])
-            subset['dish_name'] = subset[name_col] # Use the dynamically found name column
+            # === MODIFIED HERE: Keep only Date (YYYY-MM-DD) ===
+            subset['date'] = pd.to_datetime(subset['Audit Time']).dt.date
+            
+            subset['dish_name'] = subset[name_col]
             subset['wastage_qty'] = subset['Qty Change'].abs()
 
             final_subset = subset[['date', 'dish_name', 'wastage_qty']]

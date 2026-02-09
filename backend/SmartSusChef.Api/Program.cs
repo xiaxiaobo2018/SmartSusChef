@@ -111,6 +111,7 @@ builder.Services.AddHttpContextAccessor(); // Required for ICurrentUserService
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IIngredientService, IngredientService>();
+builder.Services.AddScoped<IGlobalIngredientService, GlobalIngredientService>();
 builder.Services.AddScoped<IRecipeService, RecipeService>();
 builder.Services.AddScoped<ISalesService, SalesService>();
 builder.Services.AddScoped<IWastageService, WastageService>();

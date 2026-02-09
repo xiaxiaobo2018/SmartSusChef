@@ -285,18 +285,21 @@ export interface IngredientDto {
   name: string;
   unit: string;
   carbonFootprint: number;
+  globalIngredientId?: string;
 }
 
 export interface CreateIngredientRequest {
   name: string;
   unit: string;
   carbonFootprint: number;
+  globalIngredientId?: string;
 }
 
 export interface UpdateIngredientRequest {
   name: string;
   unit: string;
   carbonFootprint: number;
+  globalIngredientId?: string;
 }
 
 export const ingredientsApi = {
