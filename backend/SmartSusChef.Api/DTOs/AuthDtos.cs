@@ -3,8 +3,8 @@ using System.ComponentModel.DataAnnotations;
 namespace SmartSusChef.Api.DTOs;
 
 public record LoginRequest(
-    [Required] string Username,
-    [Required] string Password
+    [property: Required] string Username,
+    [property: Required] string Password
 );
 
 public record LoginResponse(string Token, UserDto User, bool StoreSetupRequired);
@@ -22,14 +22,14 @@ public record UserDto(
 
 // Registration DTOs
 public record RegisterManagerRequest(
-    [Required][StringLength(50, MinimumLength = 3)] string Username,
-    [Required]
-    [StringLength(36, MinimumLength = 12, ErrorMessage = "Password must be between 12 and 36 characters long.")]
-    [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#\^()\-_=+\[\]{}|;:',.<>\/~`]).{12,36}$",
+    [property: Required][property: StringLength(50, MinimumLength = 3)] string Username,
+    [property: Required]
+    [property: StringLength(36, MinimumLength = 12, ErrorMessage = "Password must be between 12 and 36 characters long.")]
+    [property: RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#\^()\-_=+\[\]{}|;:',.<>\/~`]).{12,36}$",
         ErrorMessage = "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.")]
     string Password,
-    [Required][StringLength(100, MinimumLength = 2)][RegularExpression(@"^[\p{L}\p{M}\s\-\']+$", ErrorMessage = "Name can only contain letters, spaces, hyphens, and apostrophes.")] string Name,
-    [Required][EmailAddress][RegularExpression(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", ErrorMessage = "Invalid email format.")] string Email
+    [property: Required][property: StringLength(100, MinimumLength = 2)][property: RegularExpression(@"^[\p{L}\p{M}\s\-\']+$", ErrorMessage = "Name can only contain letters, spaces, hyphens, and apostrophes.")] string Name,
+    [property: Required][property: EmailAddress][property: RegularExpression(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", ErrorMessage = "Invalid email format.")] string Email
 );
 
 public record RegisterResponse(string Token, UserDto User, bool StoreSetupRequired);
@@ -46,45 +46,45 @@ public record RegisterResult(RegisterResponse? Response, RegisterErrorType Error
 
 // User management DTOs
 public record CreateUserRequest(
-    [Required][StringLength(50, MinimumLength = 3)] string Username,
-    [Required]
-    [StringLength(36, MinimumLength = 12, ErrorMessage = "Password must be between 12 and 36 characters long.")]
-    [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#\^()\-_=+\[\]{}|;:',.<>\/~`]).{12,36}$",
+    [property: Required][property: StringLength(50, MinimumLength = 3)] string Username,
+    [property: Required]
+    [property: StringLength(36, MinimumLength = 12, ErrorMessage = "Password must be between 12 and 36 characters long.")]
+    [property: RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#\^()\-_=+\[\]{}|;:',.<>\/~`]).{12,36}$",
         ErrorMessage = "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.")]
     string Password,
-    [Required][StringLength(100, MinimumLength = 2)][RegularExpression(@"^[\p{L}\p{M}\s\-\']+$", ErrorMessage = "Name can only contain letters, spaces, hyphens, and apostrophes.")] string Name,
-    [Required][EmailAddress][RegularExpression(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", ErrorMessage = "Invalid email format.")] string Email,
-    [Required] string Role // "manager" or "employee"
+    [property: Required][property: StringLength(100, MinimumLength = 2)][property: RegularExpression(@"^[\p{L}\p{M}\s\-\']+$", ErrorMessage = "Name can only contain letters, spaces, hyphens, and apostrophes.")] string Name,
+    [property: Required][property: EmailAddress][property: RegularExpression(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", ErrorMessage = "Invalid email format.")] string Email,
+    [property: Required] string Role // "manager" or "employee"
 );
 
 public record UpdateUserRequest(
-    [StringLength(50, MinimumLength = 3)] string? Username,
-    [StringLength(36, MinimumLength = 12, ErrorMessage = "Password must be between 12 and 36 characters long.")]
-    [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#\^()\-_=+\[\]{}|;:',.<>\/~`]).{12,36}$",
+    [property: StringLength(50, MinimumLength = 3)] string? Username,
+    [property: StringLength(36, MinimumLength = 12, ErrorMessage = "Password must be between 12 and 36 characters long.")]
+    [property: RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#\^()\-_=+\[\]{}|;:',.<>\/~`]).{12,36}$",
         ErrorMessage = "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.")]
     string? Password,
-    [StringLength(100, MinimumLength = 2)][RegularExpression(@"^[\p{L}\p{M}\s\-\']+$", ErrorMessage = "Name can only contain letters, spaces, hyphens, and apostrophes.")] string? Name,
-    [EmailAddress][RegularExpression(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", ErrorMessage = "Invalid email format.")] string? Email,
+    [property: StringLength(100, MinimumLength = 2)][property: RegularExpression(@"^[\p{L}\p{M}\s\-\']+$", ErrorMessage = "Name can only contain letters, spaces, hyphens, and apostrophes.")] string? Name,
+    [property: EmailAddress][property: RegularExpression(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", ErrorMessage = "Invalid email format.")] string? Email,
     string? Role,
     string? Status // "Active" or "Inactive"
 );
 
 public record UpdateProfileRequest(
-    [StringLength(100, MinimumLength = 2)][RegularExpression(@"^[\p{L}\p{M}\s\-\']+$", ErrorMessage = "Name can only contain letters, spaces, hyphens, and apostrophes.")] string? Name,
-    [EmailAddress][RegularExpression(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", ErrorMessage = "Invalid email format.")] string? Email
+    [property: StringLength(100, MinimumLength = 2)][property: RegularExpression(@"^[\p{L}\p{M}\s\-\']+$", ErrorMessage = "Name can only contain letters, spaces, hyphens, and apostrophes.")] string? Name,
+    [property: EmailAddress][property: RegularExpression(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", ErrorMessage = "Invalid email format.")] string? Email
 );
 
 public record ChangePasswordRequest(
-    [Required] string CurrentPassword,
-    [Required]
-    [StringLength(36, MinimumLength = 12, ErrorMessage = "Password must be between 12 and 36 characters long.")]
-    [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#\^()\-_=+\[\]{}|;:',.<>\/~`]).{12,36}$",
+    [property: Required] string CurrentPassword,
+    [property: Required]
+    [property: StringLength(36, MinimumLength = 12, ErrorMessage = "Password must be between 12 and 36 characters long.")]
+    [property: RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#\^()\-_=+\[\]{}|;:',.<>\/~`]).{12,36}$",
         ErrorMessage = "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.")]
     string NewPassword
 );
 
 public record ForgotPasswordRequest(
-    [Required] string EmailOrUsername
+    [property: Required] string EmailOrUsername
 );
 
 public record ForgotPasswordResponse(
