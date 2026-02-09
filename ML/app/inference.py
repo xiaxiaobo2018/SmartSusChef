@@ -10,7 +10,12 @@ import holidays
 import numpy as np
 import pandas as pd
 
-from training_logic import PipelineConfig, WEATHER_COLS, get_location_details, safe_filename
+from training_logic_v2 import (
+    PipelineConfig,
+    WEATHER_COLS,
+    get_location_details,
+    safe_filename,
+)
 
 try:
     import openmeteo_requests  # type: ignore
