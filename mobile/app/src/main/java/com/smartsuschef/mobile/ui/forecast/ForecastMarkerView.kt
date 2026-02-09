@@ -17,7 +17,6 @@ import com.smartsuschef.mobile.R
  * - Grouped bar comparison (Predicted vs Actual)
  */
 class ForecastMarkerView(context: Context, layoutResource: Int) : MarkerView(context, layoutResource) {
-
     private val tvDate: TextView = findViewById(R.id.tvMarkerDate)
     private val tvQuantity: TextView = findViewById(R.id.tvMarkerQuantity)
     private val tvDetails: TextView = findViewById(R.id.tvMarkerDetails)
@@ -32,12 +31,15 @@ class ForecastMarkerView(context: Context, layoutResource: Int) : MarkerView(con
     var chartType: ChartType = ChartType.SIMPLE
 
     enum class ChartType {
-        SIMPLE,           // Prediction Summary (single value)
-        STACKED,          // Dishes Forecast (breakdown)
-        COMPARISON        // Comparison chart (predicted vs actual)
+        SIMPLE, // Prediction Summary (single value)
+        STACKED, // Dishes Forecast (breakdown)
+        COMPARISON, // Comparison chart (predicted vs actual)
     }
 
-    override fun refreshContent(e: Entry?, highlight: Highlight?) {
+    override fun refreshContent(
+        e: Entry?,
+        highlight: Highlight?,
+    ) {
         if (e == null) return
 
         // Set date if available
@@ -104,6 +106,6 @@ class ForecastMarkerView(context: Context, layoutResource: Int) : MarkerView(con
      */
     data class ComparisonData(
         val predicted: Int,
-        val actual: Int
+        val actual: Int,
     )
 }

@@ -15,7 +15,10 @@ class ApdexInterceptor : Interceptor {
 
         Log.i(
             "ApdexMetrics",
-            "Endpoint=${request.url.encodedPath}, Method=${request.method}, StatusCode=${response.code}, DurationMs=${String.format("%.2f", durationMs)}"
+            "Endpoint=${request.url.encodedPath}, Method=${request.method}, StatusCode=${response.code}, DurationMs=${String.format(
+                "%.2f",
+                durationMs,
+            )}",
         )
 
         return response

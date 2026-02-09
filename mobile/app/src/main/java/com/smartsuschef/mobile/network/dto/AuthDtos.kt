@@ -9,9 +9,8 @@ import com.google.gson.annotations.SerializedName
 data class LoginRequest(
     @SerializedName("username")
     val username: String,
-
     @SerializedName("password")
-    val password: String
+    val password: String,
 )
 
 /**
@@ -21,12 +20,10 @@ data class LoginRequest(
 data class LoginResponse(
     @SerializedName("token")
     val token: String,
-
     @SerializedName("user")
     val user: UserDto,
-
     @SerializedName("storeSetupRequired")
-    val storeSetupRequired: Boolean
+    val storeSetupRequired: Boolean,
 )
 
 /**
@@ -36,27 +33,22 @@ data class LoginResponse(
 data class UserDto(
     @SerializedName("id")
     val id: String,
-
     @SerializedName("username")
     val username: String,
-
     @SerializedName("name")
     val name: String,
-
     @SerializedName("email")
     val email: String,
-
+    // "manager" or "employee"
     @SerializedName("role")
-    val role: String, // "manager" or "employee"
-
+    val role: String,
+    // "Active" or "Inactive"
     @SerializedName("status")
-    val status: String, // "Active" or "Inactive"
-
+    val status: String,
     @SerializedName("createdAt")
     val createdAt: String,
-
     @SerializedName("updatedAt")
-    val updatedAt: String
+    val updatedAt: String,
 )
 
 /**
@@ -67,9 +59,8 @@ data class UserDto(
 data class UpdateProfileRequest(
     @SerializedName("name")
     val name: String,
-
     @SerializedName("email")
-    val email: String
+    val email: String,
 )
 
 /**
@@ -79,9 +70,8 @@ data class UpdateProfileRequest(
 data class ChangePasswordRequest(
     @SerializedName("currentPassword")
     val currentPassword: String,
-
     @SerializedName("newPassword")
-    val newPassword: String
+    val newPassword: String,
 )
 
 /**
@@ -91,5 +81,5 @@ data class ChangePasswordRequest(
  */
 data class ForgotPasswordRequest(
     @SerializedName("emailOrUsername")
-    val emailOrUsername: String
+    val emailOrUsername: String,
 )

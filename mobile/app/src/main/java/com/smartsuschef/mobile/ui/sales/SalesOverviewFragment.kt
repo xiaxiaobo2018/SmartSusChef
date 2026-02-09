@@ -6,30 +6,40 @@ import android.view.View
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import androidx.fragment.app.viewModels
-import com.github.mikephil.charting.charts.*
-import com.github.mikephil.charting.components.*
-import com.github.mikephil.charting.data.*
-import com.github.mikephil.charting.formatter.*
-import com.github.mikephil.charting.highlight.*
-import com.github.mikephil.charting.listener.*
+import androidx.navigation.fragment.findNavController
+import com.github.mikephil.charting.charts.CombinedChart
+import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.data.CombinedData
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import com.github.mikephil.charting.highlight.Highlight
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.smartsuschef.mobile.R
 import com.smartsuschef.mobile.databinding.FragmentSalesOverviewBinding
-import com.smartsuschef.mobile.util.*
-import com.smartsuschef.mobile.ui.sales.SalesFilter
+import com.smartsuschef.mobile.util.Resource
+import com.smartsuschef.mobile.util.gone
+import com.smartsuschef.mobile.util.showToast
+import com.smartsuschef.mobile.util.visible
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 @AndroidEntryPoint
 class SalesOverviewFragment : Fragment(R.layout.fragment_sales_overview) {
-
     private var _binding: FragmentSalesOverviewBinding? = null
     private val binding get() = _binding!!
     private val viewModel: SalesViewModel by viewModels()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentSalesOverviewBinding.bind(view)
 
@@ -73,26 +83,36 @@ class SalesOverviewFragment : Fragment(R.layout.fragment_sales_overview) {
             axisRight.isEnabled = false // Disable right y-axis
             legend.isEnabled = true
 
-            setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
-                override fun onValueSelected(e: Entry?, h: Highlight?) {
-                    // Get the actual date label from the X-axis (e.g. "31 Jan")
-                    val selectedDateIndex = e?.x?.toInt() ?: return
+            setOnChartValueSelectedListener(
+                object : OnChartValueSelectedListener {
+                    override fun onValueSelected(
+                        e: Entry?,
+                        h: Highlight?,
+                    ) {
+                        // Get the actual date label from the X-axis (e.g. "31 Jan")
+                        val selectedDateIndex = e?.x?.toInt() ?: return
 
-                    // Find the original full date string from the ViewModel's salesTrend
-                    val fullDate = (viewModel.salesTrend.value as? Resource.Success)?.data?.getOrNull(selectedDateIndex)?.date
+                        // Find the original full date string from the ViewModel's salesTrend
+                        val fullDate = (viewModel.salesTrend.value as? Resource.Success)?.data?.getOrNull(selectedDateIndex)?.date
 
-                    if (fullDate != null) {
-                        val action = SalesOverviewFragmentDirections
-                            .actionNavSalesToSalesDetailFragment(date = fullDate)
-                        findNavController().navigate(action)
-                    } else {
-                        requireContext().showToast("Could not retrieve full date for selected entry.")
+                        if (fullDate != null) {
+                            val action =
+                                SalesOverviewFragmentDirections
+                                    .actionNavSalesToSalesDetailFragment(date = fullDate)
+                            findNavController().navigate(action)
+                        } else {
+                            requireContext().showToast("Could not retrieve full date for selected entry.")
+                        }
                     }
-                }
-                override fun onNothingSelected() {}
-            })
+
+                    override fun onNothingSelected() {
+                        // This is intentionally left empty because no action is needed when nothing is selected.
+                    }
+                },
+            )
         }
     }
+
     private fun observeViewModel() {
         viewModel.salesTrend.observe(viewLifecycleOwner) { result ->
             when (result) {
@@ -135,11 +155,13 @@ class SalesOverviewFragment : Fragment(R.layout.fragment_sales_overview) {
             lineEntries.add(Entry(index.toFloat(), item.sales.toFloat()))
 
             // Format date label
-            val formattedLabel = try {
-                inputFormat.parse(item.date)?.let { outputFormat.format(it) } ?: item.date
-            } catch (e: Exception) {
-                item.date
-            }
+            val formattedLabel =
+                try {
+                    inputFormat.parse(item.date)?.let { outputFormat.format(it) } ?: item.date
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    item.date
+                }
             labels.add(formattedLabel)
         }
 
@@ -157,17 +179,18 @@ class SalesOverviewFragment : Fragment(R.layout.fragment_sales_overview) {
         val combinedData = CombinedData()
 
         // Add bar chart data
-        val barDataSet = BarDataSet(barEntries, "Daily Sales").apply {
-            color = ContextCompat.getColor(requireContext(), R.color.primary)
-            setDrawValues(false)
-        }
+        val barDataSet =
+            BarDataSet(barEntries, "Daily Sales").apply {
+                color = ContextCompat.getColor(requireContext(), R.color.primary)
+                setDrawValues(false)
+            }
 
         val barData = BarData(barDataSet)
 
         // Adjust bar width based on number of data points
         if (salesData.size == 1) {
             // Make bar wider for single day view (takes up more space)
-            barData.barWidth = 0.5f  // Wider bar for "Today"
+            barData.barWidth = 0.5f
         } else {
             // Default bar width for multi-day view
             barData.barWidth = 0.8f
@@ -177,15 +200,16 @@ class SalesOverviewFragment : Fragment(R.layout.fragment_sales_overview) {
 
         // Add line chart data (only if more than 1 data point)
         if (salesData.size > 1) {
-            val lineDataSet = LineDataSet(lineEntries, "Trend").apply {
-                color = ContextCompat.getColor(requireContext(), R.color.destructive)
-                setCircleColor(Color.RED)
-                lineWidth = 2.5f
-                circleRadius = 4f
-                setDrawCircleHole(false)
-                mode = LineDataSet.Mode.CUBIC_BEZIER
-                setDrawValues(false)
-            }
+            val lineDataSet =
+                LineDataSet(lineEntries, "Trend").apply {
+                    color = ContextCompat.getColor(requireContext(), R.color.destructive)
+                    setCircleColor(Color.RED)
+                    lineWidth = 2.5f
+                    circleRadius = 4f
+                    setDrawCircleHole(false)
+                    mode = LineDataSet.Mode.CUBIC_BEZIER
+                    setDrawValues(false)
+                }
             combinedData.setData(LineData(lineDataSet))
         }
 
@@ -195,41 +219,41 @@ class SalesOverviewFragment : Fragment(R.layout.fragment_sales_overview) {
         binding.salesCombinedChart.invalidate()
     }
 
-
     private fun showFilterMenu(view: View) {
-            val popup = PopupMenu(requireContext(), view)
-            popup.menuInflater.inflate(R.menu.date_filter_menu, popup.menu)
+        val popup = PopupMenu(requireContext(), view)
+        popup.menuInflater.inflate(R.menu.date_filter_menu, popup.menu)
 
-            popup.setOnMenuItemClickListener { item ->
-                when (item.itemId) {
-                    R.id.filter_today -> {
-                        viewModel.setFilter(SalesFilter.TODAY)
-                        true
-                    }
-                    R.id.filter_7_days -> {
-                        viewModel.setFilter(SalesFilter.LAST_7_DAYS)
-                        true
-                    }
-                    else -> false
+        popup.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.filter_today -> {
+                    viewModel.setFilter(SalesFilter.TODAY)
+                    true
                 }
+                R.id.filter_7_days -> {
+                    viewModel.setFilter(SalesFilter.LAST_7_DAYS)
+                    true
+                }
+                else -> false
             }
-            popup.show()
         }
+        popup.show()
+    }
 
-        private fun observeFilter() {
-            viewModel.currentFilter.observe(viewLifecycleOwner) { filter ->
-                binding.tvDateContext.text = if (filter == SalesFilter.TODAY) "Today" else "Last 7 Days"
-            }
+    private fun observeFilter() {
+        viewModel.currentFilter.observe(viewLifecycleOwner) { filter ->
+            binding.tvDateContext.text = if (filter == SalesFilter.TODAY) "Today" else "Last 7 Days"
         }
+    }
 
     private fun setWeatherIcon(condition: String) {
-        val drawableRes = when (condition.lowercase()) {
-            "cloudy", "partly cloudy" -> R.drawable.cloud
-            "rain", "showers" -> R.drawable.cloud_rain
-            "storm" -> R.drawable.cloud_hail
-            "sunny" -> R.drawable.sun
-            else -> R.drawable.cloud // Default
-        }
+        val drawableRes =
+            when (condition.lowercase()) {
+                "cloudy", "partly cloudy" -> R.drawable.cloud
+                "rain", "showers" -> R.drawable.cloud_rain
+                "storm" -> R.drawable.cloud_hail
+                "sunny" -> R.drawable.sun
+                else -> R.drawable.cloud // Default
+            }
         binding.ivWeatherIcon.setImageResource(drawableRes)
     }
 

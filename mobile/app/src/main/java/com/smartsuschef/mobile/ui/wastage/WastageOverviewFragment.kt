@@ -6,30 +6,41 @@ import android.view.View
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import androidx.fragment.app.viewModels
-import com.github.mikephil.charting.charts.*
-import com.github.mikephil.charting.components.*
-import com.github.mikephil.charting.data.*
-import com.github.mikephil.charting.formatter.*
-import com.github.mikephil.charting.highlight.*
-import com.github.mikephil.charting.listener.*
+import androidx.navigation.fragment.findNavController
+import com.github.mikephil.charting.charts.CombinedChart
+import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.data.CombinedData
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import com.github.mikephil.charting.highlight.Highlight
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.smartsuschef.mobile.R
 import com.smartsuschef.mobile.databinding.FragmentWastageOverviewBinding
 import com.smartsuschef.mobile.network.dto.WastageTrendDto
-import com.smartsuschef.mobile.util.*
+import com.smartsuschef.mobile.util.Resource
+import com.smartsuschef.mobile.util.gone
+import com.smartsuschef.mobile.util.showToast
+import com.smartsuschef.mobile.util.visible
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 @AndroidEntryPoint
 class WastageOverviewFragment : Fragment(R.layout.fragment_wastage_overview) {
-
     private var _binding: FragmentWastageOverviewBinding? = null
     private val binding get() = _binding!!
     private val viewModel: WastageViewModel by viewModels()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentWastageOverviewBinding.bind(view)
 
@@ -70,23 +81,32 @@ class WastageOverviewFragment : Fragment(R.layout.fragment_wastage_overview) {
             axisRight.isEnabled = false
             legend.isEnabled = true
 
-            setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
-                override fun onValueSelected(e: Entry?, h: Highlight?) {
-                    val selectedDateIndex = e?.x?.toInt() ?: return
-                    val trendItem = (viewModel.wastageTrend.value as? Resource.Success)?.data?.getOrNull(selectedDateIndex)
+            setOnChartValueSelectedListener(
+                object : OnChartValueSelectedListener {
+                    override fun onValueSelected(
+                        e: Entry?,
+                        h: Highlight?,
+                    ) {
+                        val selectedDateIndex = e?.x?.toInt() ?: return
+                        val trendItem = (viewModel.wastageTrend.value as? Resource.Success)?.data?.getOrNull(selectedDateIndex)
 
-                    if (trendItem != null) {
-                        val action = WastageOverviewFragmentDirections.actionNavWastageToWastageDetailFragment(
-                            date = trendItem.date,
-                            itemBreakdown = trendItem.itemBreakdown.toTypedArray()
-                        )
-                        findNavController().navigate(action)
-                    } else {
-                        requireContext().showToast("Could not retrieve details for selected entry.")
+                        if (trendItem != null) {
+                            val action =
+                                WastageOverviewFragmentDirections.actionNavWastageToWastageDetailFragment(
+                                    date = trendItem.date,
+                                    itemBreakdown = trendItem.itemBreakdown.toTypedArray(),
+                                )
+                            findNavController().navigate(action)
+                        } else {
+                            requireContext().showToast("Could not retrieve details for selected entry.")
+                        }
                     }
-                }
-                override fun onNothingSelected() {}
-            })
+
+                    override fun onNothingSelected() {
+                        // This is intentionally left empty because no action is needed when nothing is selected.
+                    }
+                },
+            )
         }
     }
 
@@ -129,11 +149,13 @@ class WastageOverviewFragment : Fragment(R.layout.fragment_wastage_overview) {
             barEntries.add(BarEntry(index.toFloat(), item.totalQuantity.toFloat()))
             lineEntries.add(Entry(index.toFloat(), item.totalCarbonFootprint.toFloat()))
 
-            val formattedLabel = try {
-                inputFormat.parse(item.date)?.let { outputFormat.format(it) } ?: item.date
-            } catch (e: Exception) {
-                item.date
-            }
+            val formattedLabel =
+                try {
+                    inputFormat.parse(item.date)?.let { outputFormat.format(it) } ?: item.date
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    item.date
+                }
             labels.add(formattedLabel)
         }
 
@@ -146,25 +168,27 @@ class WastageOverviewFragment : Fragment(R.layout.fragment_wastage_overview) {
 
         val combinedData = CombinedData()
 
-        val barDataSet = BarDataSet(barEntries, "Daily Wastage (kg)").apply {
-            color = ContextCompat.getColor(requireContext(), R.color.destructive)
-            setDrawValues(false)
-        }
+        val barDataSet =
+            BarDataSet(barEntries, "Daily Wastage (kg)").apply {
+                color = ContextCompat.getColor(requireContext(), R.color.destructive)
+                setDrawValues(false)
+            }
 
         val barData = BarData(barDataSet)
         barData.barWidth = if (wastageData.size == 1) 0.5f else 0.8f
         combinedData.setData(barData)
 
         if (wastageData.size > 1) {
-            val lineDataSet = LineDataSet(lineEntries, "Carbon Footprint (kg CO2)").apply {
-                color = ContextCompat.getColor(requireContext(), R.color.primary)
-                setCircleColor(ContextCompat.getColor(requireContext(), R.color.primary))
-                lineWidth = 2.5f
-                circleRadius = 4f
-                setDrawCircleHole(false)
-                mode = LineDataSet.Mode.CUBIC_BEZIER
-                setDrawValues(false)
-            }
+            val lineDataSet =
+                LineDataSet(lineEntries, "Carbon Footprint (kg CO2)").apply {
+                    color = ContextCompat.getColor(requireContext(), R.color.primary)
+                    setCircleColor(ContextCompat.getColor(requireContext(), R.color.primary))
+                    lineWidth = 2.5f
+                    circleRadius = 4f
+                    setDrawCircleHole(false)
+                    mode = LineDataSet.Mode.CUBIC_BEZIER
+                    setDrawValues(false)
+                }
             combinedData.setData(LineData(lineDataSet))
         }
 

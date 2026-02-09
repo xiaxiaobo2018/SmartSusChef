@@ -14,10 +14,9 @@ import javax.inject.Singleton
 @Module
 @TestInstallIn(
     components = [SingletonComponent::class],
-    replaces = [CoreNetworkModule::class]
+    replaces = [CoreNetworkModule::class],
 )
 object TestCoreNetworkModule {
-
     @Provides
     @Singleton
     fun provideBaseUrl(): String = "http://localhost:5001/api/"
@@ -28,7 +27,9 @@ object TestCoreNetworkModule {
 
     @Provides
     @Singleton
-    fun provideTokenManager(@ApplicationContext context: Context): TokenManager {
+    fun provideTokenManager(
+        @ApplicationContext context: Context,
+    ): TokenManager {
         return mockk(relaxed = true) // Use MockK for testing
     }
 }

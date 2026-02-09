@@ -9,19 +9,25 @@ import com.smartsuschef.mobile.R
 
 class IngredientAdapter(private var ingredients: List<IngredientRequirement>) :
     RecyclerView.Adapter<IngredientAdapter.ViewHolder>() {
-
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val name: TextView = view.findViewById(R.id.tvIngredientName)
         val quantity: TextView = view.findViewById(R.id.tvQuantity)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_ingredient_row, parent, false)
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): ViewHolder {
+        val view =
+            LayoutInflater.from(parent.context)
+                .inflate(R.layout.item_ingredient_row, parent, false)
         return ViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: ViewHolder,
+        position: Int,
+    ) {
         val item = ingredients[position]
         holder.name.text = item.name
         holder.quantity.text = "${item.quantity} ${item.unit}"

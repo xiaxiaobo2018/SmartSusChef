@@ -1,5 +1,6 @@
 package com.smartsuschef.mobile.ui.forecast
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -10,10 +11,10 @@ import java.util.Locale
 
 class ForecastSummaryAdapter(
     private var items: List<IngredientForecast>,
-    private var dates: List<String>
+    private var dates: List<String>,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-
     companion object {
+        private const val TAG = "ForecastSummaryAdapter"
         private const val VIEW_TYPE_HEADER = 0
         private const val VIEW_TYPE_ITEM = 1
     }
@@ -28,21 +29,33 @@ class ForecastSummaryAdapter(
         return if (position == 0) VIEW_TYPE_HEADER else VIEW_TYPE_ITEM
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): RecyclerView.ViewHolder {
         return if (viewType == VIEW_TYPE_HEADER) {
-            val binding = ItemIngredientHeaderBinding.inflate(
-                LayoutInflater.from(parent.context), parent, false
-            )
+            val binding =
+                ItemIngredientHeaderBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                )
             HeaderViewHolder(binding)
         } else {
-            val binding = ItemIngredientForecastRowBinding.inflate(
-                LayoutInflater.from(parent.context), parent, false
-            )
+            val binding =
+                ItemIngredientForecastRowBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                )
             DataViewHolder(binding)
         }
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: RecyclerView.ViewHolder,
+        position: Int,
+    ) {
         if (holder is HeaderViewHolder) {
             bindHeader(holder)
         } else if (holder is DataViewHolder) {
@@ -62,7 +75,10 @@ class ForecastSummaryAdapter(
         }
     }
 
-    private fun bindData(holder: DataViewHolder, position: Int) {
+    private fun bindData(
+        holder: DataViewHolder,
+        position: Int,
+    ) {
         val item = items[position]
         holder.binding.apply {
             tvIngredientName.text = "${item.name} (${item.unit})"
@@ -79,7 +95,10 @@ class ForecastSummaryAdapter(
 
     override fun getItemCount() = items.size + 1 // +1 for header
 
-    fun updateData(newItems: List<IngredientForecast>, newDates: List<String>) {
+    fun updateData(
+        newItems: List<IngredientForecast>,
+        newDates: List<String>,
+    ) {
         items = newItems
         dates = newDates
         notifyDataSetChanged()
@@ -91,6 +110,7 @@ class ForecastSummaryAdapter(
             val formatter = SimpleDateFormat("d MMM", Locale.getDefault())
             parser.parse(dateStr)?.let { formatter.format(it) } ?: dateStr
         } catch (e: Exception) {
+            Log.e(TAG, "Error formatting date: $dateStr", e)
             dateStr
         }
     }

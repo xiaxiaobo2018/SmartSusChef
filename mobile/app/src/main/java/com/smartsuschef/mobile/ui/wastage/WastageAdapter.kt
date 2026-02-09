@@ -9,7 +9,6 @@ import com.smartsuschef.mobile.R
 
 class WastageAdapter(private var wastedItems: List<WastageBreakdownItem>) :
     RecyclerView.Adapter<WastageAdapter.ViewHolder>() {
-
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val name: TextView = view.findViewById(R.id.tvWastedItemName)
         val type: TextView = view.findViewById(R.id.tvWastedItemType)
@@ -17,13 +16,20 @@ class WastageAdapter(private var wastedItems: List<WastageBreakdownItem>) :
         val co2: TextView = view.findViewById(R.id.tvWastedCo2)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_wastage_row, parent, false)
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): ViewHolder {
+        val view =
+            LayoutInflater.from(parent.context)
+                .inflate(R.layout.item_wastage_row, parent, false)
         return ViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: ViewHolder,
+        position: Int,
+    ) {
         val item = wastedItems[position]
         holder.name.text = item.name
         holder.type.text = "Type: ${item.type}"

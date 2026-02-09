@@ -1,5 +1,6 @@
 package com.smartsuschef.mobile.data.repository
 
+import android.util.Log
 import com.smartsuschef.mobile.network.api.StoreApiService
 import com.smartsuschef.mobile.network.dto.StoreDto
 import com.smartsuschef.mobile.util.Resource
@@ -9,23 +10,30 @@ import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
 
-class StoreRepository @Inject constructor(
-    private val storeApiService: StoreApiService
-) {
-    suspend fun getStore(): Resource<StoreDto> {
-        return withContext(Dispatchers.IO) {
-            try {
-                val response = storeApiService.getStore()
-                if (response.isSuccessful) {
-                    Resource.Success(response.body()!!)
-                } else {
-                    Resource.Error("Failed to fetch store details: ${response.errorBody()?.string() ?: response.message()}")
+class StoreRepository
+    @Inject
+    constructor(
+        private val storeApiService: StoreApiService,
+    ) {
+        companion object {
+            private const val TAG = "StoreRepository"
+        }
+        suspend fun getStore(): Resource<StoreDto> {
+            return withContext(Dispatchers.IO) {
+                try {
+                    val response = storeApiService.getStore()
+                    if (response.isSuccessful) {
+                        Resource.Success(response.body()!!)
+                    } else {
+                        Resource.Error("Failed to fetch store details: ${response.errorBody()?.string() ?: response.message()}")
+                    }
+                } catch (e: HttpException) {
+                    Log.e(TAG, "HTTP error in getStore: ${e.message()}", e)
+                    Resource.Error("An unexpected error occurred: ${e.message()}")
+                } catch (e: IOException) {
+                    Log.e(TAG, "Network error in getStore: ${e.message}", e)
+                    Resource.Error("Couldn't reach the server. Check your internet connection.")
                 }
-            } catch (e: HttpException) {
-                Resource.Error("An unexpected error occurred: ${e.message()}")
-            } catch (e: IOException) {
-                Resource.Error("Couldn't reach the server. Check your internet connection.")
             }
         }
     }
-}

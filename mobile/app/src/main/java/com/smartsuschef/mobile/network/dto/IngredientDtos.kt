@@ -9,21 +9,16 @@ import com.google.gson.annotations.SerializedName
 data class IngredientDto(
     @SerializedName("id")
     val id: String,
-
     @SerializedName("name")
     val name: String,
-
     @SerializedName("unit")
     val unit: String,
-
     @SerializedName("carbonFootprint")
-    val carbonFootprint: Double, // decimal in C#
-
+    val carbonFootprint: Double,
     @SerializedName("createdAt")
     val createdAt: String,
-
     @SerializedName("updatedAt")
-    val updatedAt: String
+    val updatedAt: String,
 )
 
 /**
@@ -33,12 +28,10 @@ data class IngredientDto(
 data class CreateIngredientRequest(
     @SerializedName("name")
     val name: String,
-
     @SerializedName("unit")
     val unit: String,
-
     @SerializedName("carbonFootprint")
-    val carbonFootprint: Double // decimal in C#
+    val carbonFootprint: Double,
 )
 
 /**
@@ -48,10 +41,8 @@ data class CreateIngredientRequest(
 data class UpdateIngredientRequest(
     @SerializedName("name")
     val name: String,
-
     @SerializedName("unit")
     val unit: String,
-
     @SerializedName("carbonFootprint")
-    val carbonFootprint: Double // decimal in C#
+    val carbonFootprint: Double,
 )

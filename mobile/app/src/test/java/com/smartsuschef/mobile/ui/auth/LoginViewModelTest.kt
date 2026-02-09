@@ -31,7 +31,6 @@ import org.mockito.kotlin.whenever
 @ExperimentalCoroutinesApi
 @RunWith(MockitoJUnitRunner::class)
 class LoginViewModelTest {
-
     // This rule swaps the background executor used by the Architecture Components with a
     // different one which executes each task synchronously. Essential for LiveData testing.
     @get:Rule
@@ -62,52 +61,54 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun `login with valid credentials should return success`() = runTest {
-        // ARRANGE
-        // 1. Define the input for our test
-        val loginRequest = LoginRequest("test", "password")
+    fun `login with valid credentials should return success`() =
+        runTest {
+            // ARRANGE
+            // 1. Define the input for our test
+            val loginRequest = LoginRequest("test", "password")
 
-        // 2. Define the expected successful output from our mock repository
-        val mockUser = UserDto("id", "test", "Test User", "email", "employee", "Active", "2026-02-08T00:00:00", "2026-02-08T00:00:00")
-        val mockResponse = LoginResponse("fake-token", mockUser, storeSetupRequired = false)
-        val expectedResult = Resource.Success(mockResponse)
+            // 2. Define the expected successful output from our mock repository
+            val mockUser = UserDto("id", "test", "Test User", "email", "employee", "Active", "2026-02-08T00:00:00", "2026-02-08T00:00:00")
+            val mockResponse = LoginResponse("fake-token", mockUser, storeSetupRequired = false)
+            val expectedResult = Resource.Success(mockResponse)
 
-        // 3. Program the mock repository to return the expected result when `login` is called
-        whenever(mockAuthRepository.login(loginRequest)).thenReturn(expectedResult)
+            // 3. Program the mock repository to return the expected result when `login` is called
+            whenever(mockAuthRepository.login(loginRequest)).thenReturn(expectedResult)
 
-        // ACT
-        // 4. Call the function on the ViewModel that we want to test
-        viewModel.login(loginRequest)
+            // ACT
+            // 4. Call the function on the ViewModel that we want to test
+            viewModel.login(loginRequest)
 
-        // ASSERT
-        // 5. Check that the LiveData holds the expected successful result
-        val actualResult = viewModel.loginResponse.value
-        assertTrue(actualResult is Resource.Success)
-        assertEquals(expectedResult.data, (actualResult as Resource.Success).data)
-    }
+            // ASSERT
+            // 5. Check that the LiveData holds the expected successful result
+            val actualResult = viewModel.loginResponse.value
+            assertTrue(actualResult is Resource.Success)
+            assertEquals(expectedResult.data, (actualResult as Resource.Success).data)
+        }
 
     @Test
-    fun `login with invalid credentials should return error`() = runTest {
-        // ARRANGE
-        // 1. Define the input for our test
-        val loginRequest = LoginRequest("wrong", "user")
+    fun `login with invalid credentials should return error`() =
+        runTest {
+            // ARRANGE
+            // 1. Define the input for our test
+            val loginRequest = LoginRequest("wrong", "user")
 
-        // 2. Define the expected error output from our mock repository
-        val expectedResult = Resource.Error<LoginResponse>("Invalid credentials")
+            // 2. Define the expected error output from our mock repository
+            val expectedResult = Resource.Error<LoginResponse>("Invalid credentials")
 
-        // 3. Program the mock repository to return the expected error
-        whenever(mockAuthRepository.login(loginRequest)).thenReturn(expectedResult)
+            // 3. Program the mock repository to return the expected error
+            whenever(mockAuthRepository.login(loginRequest)).thenReturn(expectedResult)
 
-        // ACT
-        // 4. Call the function on the ViewModel
-        viewModel.login(loginRequest)
+            // ACT
+            // 4. Call the function on the ViewModel
+            viewModel.login(loginRequest)
 
-        // ASSERT
-        // 5. Check that the LiveData holds the expected error result
-        val actualResult = viewModel.loginResponse.value
-        assertTrue(actualResult is Resource.Error)
-        assertEquals(expectedResult.message, (actualResult as Resource.Error).message)
-    }
+            // ASSERT
+            // 5. Check that the LiveData holds the expected error result
+            val actualResult = viewModel.loginResponse.value
+            assertTrue(actualResult is Resource.Error)
+            assertEquals(expectedResult.message, (actualResult as Resource.Error).message)
+        }
 
     @Test
     fun `isUserLoggedIn should return true when repository indicates user is logged in`() {

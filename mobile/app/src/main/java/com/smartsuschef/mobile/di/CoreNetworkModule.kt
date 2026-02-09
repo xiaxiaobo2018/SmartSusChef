@@ -5,12 +5,12 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.smartsuschef.mobile.BuildConfig
 import com.smartsuschef.mobile.data.TokenManager
+import com.smartsuschef.mobile.util.ApdexInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import com.smartsuschef.mobile.util.ApdexInterceptor
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -22,7 +22,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object CoreNetworkModule {
-
     /**
      * Provides Gson instance for JSON serialization/deserialization
      */
@@ -40,7 +39,9 @@ object CoreNetworkModule {
      */
     @Provides
     @Singleton
-    fun provideTokenManager(@ApplicationContext context: Context): TokenManager {
+    fun provideTokenManager(
+        @ApplicationContext context: Context,
+    ): TokenManager {
         return TokenManager(context)
     }
 
@@ -52,11 +53,12 @@ object CoreNetworkModule {
     @Singleton
     fun provideLoggingInterceptor(): HttpLoggingInterceptor {
         return HttpLoggingInterceptor().apply {
-            level = if (BuildConfig.DEBUG) {
-                HttpLoggingInterceptor.Level.BODY
-            } else {
-                HttpLoggingInterceptor.Level.NONE
-            }
+            level =
+                if (BuildConfig.DEBUG) {
+                    HttpLoggingInterceptor.Level.BODY
+                } else {
+                    HttpLoggingInterceptor.Level.NONE
+                }
         }
     }
 
@@ -92,15 +94,15 @@ object CoreNetworkModule {
     @Singleton
     fun provideOkHttpClient(
         loggingInterceptor: HttpLoggingInterceptor,
-        authInterceptor: Interceptor
+        authInterceptor: Interceptor,
     ): OkHttpClient {
         return OkHttpClient.Builder()
-            .addInterceptor(authInterceptor)      // Add auth token to requests
-            .addInterceptor(ApdexInterceptor())   // Log Apdex performance metrics
-            .addInterceptor(loggingInterceptor)   // Log requests/responses
+            .addInterceptor(authInterceptor) // Add auth token to requests
+            .addInterceptor(ApdexInterceptor()) // Log Apdex performance metrics
+            .addInterceptor(loggingInterceptor) // Log requests/responses
             .connectTimeout(30, TimeUnit.SECONDS) // Connection timeout
-            .readTimeout(30, TimeUnit.SECONDS)    // Read timeout
-            .writeTimeout(30, TimeUnit.SECONDS)   // Write timeout
+            .readTimeout(30, TimeUnit.SECONDS) // Read timeout
+            .writeTimeout(30, TimeUnit.SECONDS) // Write timeout
             .build()
     }
 
@@ -111,7 +113,7 @@ object CoreNetworkModule {
     @Singleton
     fun provideRetrofit(
         okHttpClient: OkHttpClient,
-        gson: Gson
+        gson: Gson,
     ): Retrofit {
         return Retrofit.Builder()
             .baseUrl(BuildConfig.BASE_URL)

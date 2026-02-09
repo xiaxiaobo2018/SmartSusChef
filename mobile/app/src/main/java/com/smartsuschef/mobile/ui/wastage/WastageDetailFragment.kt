@@ -26,7 +26,10 @@ class WastageDetailFragment : Fragment(R.layout.fragment_wastage_detail) {
     private val args: WastageDetailFragmentArgs by navArgs()
     private lateinit var wastageAdapter: WastageAdapter
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentWastageDetailBinding.bind(view)
 
@@ -46,30 +49,35 @@ class WastageDetailFragment : Fragment(R.layout.fragment_wastage_detail) {
     }
 
     private fun setupPieChart(data: List<WastageBreakdownItem>) {
-        val breakdown = data.groupBy { it.type }
-            .mapValues { entry -> entry.value.sumOf { it.carbonFootprint } }
+        val breakdown =
+            data.groupBy { it.type }
+                .mapValues { entry -> entry.value.sumOf { it.carbonFootprint } }
 
-        val entries = breakdown.map { (type, carbonFootprint) ->
-            PieEntry(carbonFootprint.toFloat(), type)
-        }
+        val entries =
+            breakdown.map { (type, carbonFootprint) ->
+                PieEntry(carbonFootprint.toFloat(), type)
+            }
 
         // Calculate total carbon footprint for subtitle
         val totalCarbonFootprint = data.sumOf { it.carbonFootprint }
         binding.tvWastageSubtitle.text = "Total Carbon Footprint: %.2f kg CO2".format(totalCarbonFootprint)
 
-        val dataSet = PieDataSet(entries, "").apply {
-            colors = listOf(
-                ContextCompat.getColor(requireContext(), R.color.chart_1),
-                ContextCompat.getColor(requireContext(), R.color.chart_2),
-                ContextCompat.getColor(requireContext(), R.color.chart_3)
-            )
-            valueTextColor = Color.WHITE
-            valueTextSize = 12f
-        }
+        val dataSet =
+            PieDataSet(entries, "").apply {
+                colors =
+                    listOf(
+                        ContextCompat.getColor(requireContext(), R.color.chart_1),
+                        ContextCompat.getColor(requireContext(), R.color.chart_2),
+                        ContextCompat.getColor(requireContext(), R.color.chart_3),
+                    )
+                valueTextColor = Color.WHITE
+                valueTextSize = 12f
+            }
 
-        val pieData = PieData(dataSet).apply {
-            setValueFormatter(PercentFormatter(binding.pieChartWastageBreakdown))
-        }
+        val pieData =
+            PieData(dataSet).apply {
+                setValueFormatter(PercentFormatter(binding.pieChartWastageBreakdown))
+            }
 
         binding.pieChartWastageBreakdown.apply {
             this.data = pieData
