@@ -112,6 +112,7 @@ const mapStoreDto = (dto: StoreDto): StoreSettings => ({
   countryCode: dto.countryCode || '',
 });
 
+// --- Ingredient DTO Mapping and Global Ingredient Support ---
 const mapIngredientDto = (dto: IngredientDto): Ingredient => ({
   id: dto.id,
   name: dto.name,

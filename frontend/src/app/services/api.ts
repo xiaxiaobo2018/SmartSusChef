@@ -280,6 +280,12 @@ export const storeApi = {
 // ==========================================
 // INGREDIENTS API
 // ==========================================
+// --- API Types and DTOs for Ingredients Management ---
+// IngredientDto: now includes optional globalIngredientId for linking to a global ingredient
+// CreateIngredientRequest/UpdateIngredientRequest: support globalIngredientId for backend reference
+// GlobalIngredient: represents a global, immutable ingredient (name, unit, carbonFootprint, etc.)
+// All API calls and types are designed to support both global and custom ingredients seamlessly
+// If backend/global DTOs change, update these types accordingly
 export interface IngredientDto {
   id: string;
   name: string;

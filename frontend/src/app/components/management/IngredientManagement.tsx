@@ -1,3 +1,41 @@
+/**
+ * IngredientManagement Component
+ * ---------------------------------------------
+ * Main Features:
+ *   - Display, add, edit, and delete store-specific ingredients (Ingredients)
+ *   - Integrates with GlobalIngredients: 20 standard ingredients selectable from dropdown, unit/carbonFootprint auto-filled and read-only
+ *   - Supports "Others" for custom ingredients with all fields editable
+ *   - User-friendly interactions: form validation, delete confirmation, prevent deletion if referenced by recipes
+ *   - All data operations are managed via AppContext methods (addIngredient, updateIngredient, etc.)
+ *
+ * Design Overview:
+ *   1. Global ingredients are loaded dynamically from API and stored in globalIngredients state
+ *   2. In the add/edit dialog, ingredient name dropdown lists global ingredients, with "Others" as the last option
+ *   3. When a global ingredient is selected, unit/carbonFootprint are auto-filled and disabled to prevent editing
+ *   4. When "Others" is selected, all fields are editable for custom input
+ *   5. On save, if a global ingredient is chosen, globalIngredientId is submitted and backend stores the reference
+ *   6. Delete operations include confirmation; if the ingredient is referenced by recipes/wastage data, deletion is blocked or cascaded
+ *
+ * Key State Variables:
+ *   - globalIngredients: List of global ingredients (from API)
+ *   - selectedGlobalIngredientId: Currently selected global ingredient ID (or null)
+ *   - selectedName/otherName: Dropdown selection/custom ingredient name
+ *   - unit/carbonFootprint: Unit/carbon, auto-filled for global ingredients
+ *   - isDialogOpen/isDeleteDialogOpen/etc.: Dialog controls
+ *
+ * Interaction Highlights:
+ *   - Friendly form validation and clear error messages
+ *   - Seamless switching between global and custom ingredients
+ *   - Deletion checks for references to prevent accidental data loss
+ *
+ * Maintenance Tips:
+ *   - If the GlobalIngredients table structure/fields change, update dropdown rendering and field mapping accordingly
+ *   - If IngredientDto structure changes, update form data assembly and context method parameters
+ *   - If API endpoints change, update fetch logic
+ *
+ * @author Copilot
+ * @lastUpdate 2026-02-09
+ */
 import React, { useState, useEffect } from 'react';
 import { useApp } from '@/app/context/AppContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/app/components/ui/card';
@@ -291,14 +329,19 @@ export function IngredientManagement({ onNavigateToRecipes }: IngredientManageme
                 <Label htmlFor="ingredient-unit">
                   Unit {selectedGlobalIngredientId && <span className="text-xs text-gray-500">(Read-only)</span>}
                 </Label>
-                <Input
+                <select
                   id="ingredient-unit"
                   value={unit}
                   onChange={(e) => setUnit(e.target.value)}
-                  placeholder="e.g., kg, g, L, ml"
                   disabled={selectedGlobalIngredientId !== null}
-                  className={selectedGlobalIngredientId ? 'bg-gray-100 cursor-not-allowed' : ''}
-                />
+                  className={`w-full border rounded-md p-2 ${selectedGlobalIngredientId ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                >
+                  <option value="">-- Select unit --</option>
+                  <option value="g">g (gram)</option>
+                  <option value="kg">kg (kilogram)</option>
+                  <option value="ml">ml (milliliter)</option>
+                  <option value="L">L (liter)</option>
+                </select>
               </div>
 
               <div className="space-y-2">
