@@ -284,31 +284,53 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: 'pip'
-          cache-dependency-path: ML/requirements.txt
+          cache-dependency-path: |
+            ML/requirements.txt
+            ML/requirements-dev.txt
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r requirements.txt -r requirements-dev.txt
         working-directory: ./ML
 
-      - name: Lint with flake8
+      - name: Ruff lint
+        run: ruff check .
+        working-directory: ./ML
+
+      - name: Mypy type check
+        run: mypy
+        working-directory: ./ML
+
+      - name: Bandit security scan
+        run: bandit -c bandit.yaml -r .
+        working-directory: ./ML
+
+      - name: Pytest
+        run: pytest -q
+        working-directory: ./ML
+
+      - name: Setup JDK 17 (for JMeter)
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+
+      - name: Install JMeter
         run: |
-          pip install flake8
-          flake8 app/ --count --select=E9,F63,F7,F82 --show-source --statistics 2>&1 | tee flake8-report.txt || true
-        working-directory: ./ML
-        continue-on-error: true
+          sudo apt-get update
+          sudo apt-get install -y jmeter
 
-      - name: Verify FastAPI app imports
-        run: python -c "from app.main import app; print('FastAPI app imports OK')"
-        working-directory: ./ML
-
-      - name: Run Unit Tests
+      - name: JMeter healthcheck
         run: |
-          pip install pytest pytest-cov
-          python -m pytest tests/ -v --tb=short --junitxml=test-results.xml 2>&1 | tee pytest-report.txt || true
+          set -euo pipefail
+          export PYTHONPATH=.
+          python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 &
+          UVICORN_PID=$!
+          trap "kill ${UVICORN_PID}" EXIT
+          sleep 5
+          jmeter -n -t tests/jmeter/healthcheck.jmx -l tests/jmeter/results.jtl
         working-directory: ./ML
-        continue-on-error: true
 
       - name: Upload ML reports
         uses: actions/upload-artifact@v4
@@ -316,9 +338,7 @@ jobs:
         with:
           name: ml-reports
           path: |
-            ML/flake8-report.txt
-            ML/pytest-report.txt
-            ML/test-results.xml
+            ML/tests/jmeter/results.jtl
           retention-days: 30
         
   # ==========================================
@@ -491,12 +511,26 @@ jobs:
           path: trivy-*-image.sarif
           retention-days: 30
 
-      - name: Upload Trivy image results to GitHub Security
+      - name: Upload Trivy Backend SARIF to GitHub Security
         uses: github/codeql-action/upload-sarif@v3
-        if: always()
+        if: always() && (needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.infra == 'true')
         with:
-          sarif_file: '.'
-          category: 'trivy-image-scan'
+          sarif_file: 'trivy-backend-image.sarif'
+          category: 'trivy-image-backend'
+
+      - name: Upload Trivy Frontend SARIF to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always() && (needs.detect-changes.outputs.frontend == 'true' || needs.detect-changes.outputs.infra == 'true')
+        with:
+          sarif_file: 'trivy-frontend-image.sarif'
+          category: 'trivy-image-frontend'
+
+      - name: Upload Trivy ML SARIF to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always() && (needs.detect-changes.outputs.ml == 'true' || needs.detect-changes.outputs.infra == 'true')
+        with:
+          sarif_file: 'trivy-ml-image.sarif'
+          category: 'trivy-image-ml'
 
   # ==========================================
   # STAGE 4: Deploy to UAT Environment

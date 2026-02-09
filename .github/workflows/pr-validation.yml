@@ -14,6 +14,7 @@ env:
   DOTNET_VERSION: '8.0.x'
   NODE_VERSION: '20.x'
   JAVA_VERSION: '17'
+  PYTHON_VERSION: '3.11'
 
 jobs:
   # ==========================================
@@ -108,6 +109,71 @@ jobs:
           cd frontend
           npm run build
 
+  # ==========================================
+  # ML Validation
+  # ==========================================
+  ml-validate:
+    name: ML Validation
+    runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.changed_files, 'ML/') || github.event.pull_request.changed_files == ''
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+          cache-dependency-path: |
+            ML/requirements.txt
+            ML/requirements-dev.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -r requirements-dev.txt
+        working-directory: ./ML
+
+      - name: Ruff lint
+        run: ruff check .
+        working-directory: ./ML
+
+      - name: Mypy type check
+        run: mypy
+        working-directory: ./ML
+
+      - name: Bandit security scan
+        run: bandit -c bandit.yaml -r .
+        working-directory: ./ML
+
+      - name: Pytest
+        run: pytest -q
+        working-directory: ./ML
+
+      - name: Setup JDK 17 (for JMeter)
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+
+      - name: Install JMeter
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jmeter
+
+      - name: JMeter healthcheck
+        run: |
+          set -euo pipefail
+          export PYTHONPATH=.
+          python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 &
+          UVICORN_PID=$!
+          trap "kill ${UVICORN_PID}" EXIT
+          sleep 5
+          jmeter -n -t tests/jmeter/healthcheck.jmx -l tests/jmeter/results.jtl
+        working-directory: ./ML
+
 # ==========================================
 # Mobile Validation
 # ==========================================
@@ -177,7 +243,7 @@ jobs:
   comment:
     name: PR Status Comment
     runs-on: ubuntu-latest
-    needs: [validate, backend-validate, frontend-validate, mobile-validate, docker-test]
+    needs: [validate, backend-validate, frontend-validate, mobile-validate, ml-validate, docker-test]
     if: always()
     permissions:
       pull-requests: write
@@ -190,6 +256,7 @@ jobs:
             const backendStatus = '${{ needs.backend-validate.result }}' === 'success' ? 'True' : 'False';
             const frontendStatus = '${{ needs.frontend-validate.result }}' === 'success' ? 'True' : 'False';
             const mobileStatus = '${{ needs.mobile-validate.result }}' === 'success' ? 'True' : 'False';
+            const mlStatus = '${{ needs.ml-validate.result }}' === 'success' ? 'True' : 'False';
             const dockerStatus = '${{ needs.docker-test.result }}' === 'success' ? 'True' : 'False';
             
             const body = `## CI/CD Status Report
@@ -199,6 +266,7 @@ jobs:
             | Backend Build & Tests | ${backendStatus} |
             | Frontend Build | ${frontendStatus} |
             | Mobile Build & Tests | ${mobileStatus} |
+            | ML Lint/Type/Test/Sec | ${mlStatus} |
             | Docker Build | ${dockerStatus} |
             
             ---
