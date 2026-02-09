@@ -101,7 +101,9 @@ def main() -> int:
     args = parser.parse_args()
 
     directory = args.dir.resolve()
-    output_file = (directory / args.output).resolve() if not args.output.is_absolute() else args.output
+    output_file = (
+        (directory / args.output).resolve() if not args.output.is_absolute() else args.output
+    )
 
     input_files = _iter_csv_files(directory, args.pattern)
     input_files = [p for p in input_files if p.resolve() != output_file.resolve()]

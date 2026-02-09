@@ -51,13 +51,15 @@ class FinalModelV2Tests(unittest.TestCase):
         self.assertEqual(mock_geo.call_count, 1)
 
     def test_get_forecast_cached_calls_once(self):
-        df = pd.DataFrame({
-            "date": pd.to_datetime(["2024-01-01"]),
-            WEATHER_COLS[0]: [1.0],
-            WEATHER_COLS[1]: [2.0],
-            WEATHER_COLS[2]: [3.0],
-            WEATHER_COLS[3]: [4.0],
-        })
+        df = pd.DataFrame(
+            {
+                "date": pd.to_datetime(["2024-01-01"]),
+                WEATHER_COLS[0]: [1.0],
+                WEATHER_COLS[1]: [2.0],
+                WEATHER_COLS[2]: [3.0],
+                WEATHER_COLS[3]: [4.0],
+            }
+        )
         with patch.object(fm, "get_weather_forecast", return_value=df) as mock_weather:
             a = fm._get_forecast_cached(1.23456, 2.34567)
             b = fm._get_forecast_cached(1.23456, 2.34567)
@@ -72,22 +74,32 @@ class FinalModelV2Tests(unittest.TestCase):
             lags=(1,),
             roll_windows=(2,),
             hybrid_tree_features=[
-                "day_of_week", "month", "day", "dayofyear", "is_weekend",
+                "day_of_week",
+                "month",
+                "day",
+                "dayofyear",
+                "is_weekend",
                 "is_public_holiday",
-                "temperature_2m_max", "temperature_2m_min",
-                "relative_humidity_2m_mean", "precipitation_sum",
-                "y_lag_1", "y_roll_mean_2", "y_roll_std_2",
+                "temperature_2m_max",
+                "temperature_2m_min",
+                "relative_humidity_2m_mean",
+                "precipitation_sum",
+                "y_lag_1",
+                "y_roll_mean_2",
+                "y_roll_std_2",
                 "prophet_yhat",
             ],
         )
 
-        forecast_weather_df = pd.DataFrame({
-            "date": pd.to_datetime(["2024-01-01", "2024-01-02"]),
-            WEATHER_COLS[0]: [30.0, 31.0],
-            WEATHER_COLS[1]: [20.0, 21.0],
-            WEATHER_COLS[2]: [60.0, 61.0],
-            WEATHER_COLS[3]: [0.0, 1.0],
-        })
+        forecast_weather_df = pd.DataFrame(
+            {
+                "date": pd.to_datetime(["2024-01-01", "2024-01-02"]),
+                WEATHER_COLS[0]: [30.0, 31.0],
+                WEATHER_COLS[1]: [20.0, 21.0],
+                WEATHER_COLS[2]: [60.0, 61.0],
+                WEATHER_COLS[3]: [0.0, 1.0],
+            }
+        )
 
         recent_sales_df = pd.DataFrame({"date": pd.to_datetime(["2023-12-31"]), "sales": [10.0]})
 

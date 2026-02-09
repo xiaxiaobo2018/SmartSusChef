@@ -35,7 +35,9 @@ class StoreModelManager:
         self._stores: dict[int, ModelStore] = {}
         self._training_lock = threading.Lock()
         self._training_in_progress: dict[int, bool] = {}
-        self._training_progress: dict[int, dict[str, Any]] = {}  # {store_id: {trained, failed, total, current_dish}}
+        self._training_progress: dict[
+            int, dict[str, Any]
+        ] = {}  # {store_id: {trained, failed, total, current_dish}}
         self._engine = None  # Cached SQLAlchemy engine
 
     # ------------------------------------------------------------------
@@ -99,9 +101,7 @@ class StoreModelManager:
             )
         return self._engine
 
-    def fetch_store_sales(
-        self, store_id: int
-    ) -> tuple[pd.DataFrame | None, int]:
+    def fetch_store_sales(self, store_id: int) -> tuple[pd.DataFrame | None, int]:
         """
         Fetch sales data for a specific store from the database.
         Returns (dataframe_or_none, total_unique_days).
@@ -253,7 +253,10 @@ class StoreModelManager:
                     failed += 1
                 logger.info(
                     "Store %d training progress: %d/%d (failed: %d)",
-                    store_id, trained + failed, total, failed,
+                    store_id,
+                    trained + failed,
+                    total,
+                    failed,
                 )
 
             # Save registry
