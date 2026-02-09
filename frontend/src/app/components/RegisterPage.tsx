@@ -4,7 +4,7 @@ import { Input } from '@/app/components/ui/input';
 import { Label } from '@/app/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/app/components/ui/card';
 import { ChefHat, AlertCircle, ArrowLeft, UserPlus, Check, X } from 'lucide-react';
-import { useApp } from '@/app/context/AppContext';
+import { useAuth } from '@/app/context/AuthContext';
 import { toast } from 'sonner';
 
 const SPECIAL_CHARS = "@$!%*?&#^()-_=+[]{}|;:',.<>/~`";
@@ -25,7 +25,7 @@ interface RegisterPageProps {
 }
 
 export function RegisterPage({ onBackToLogin, onRegisterSuccess }: RegisterPageProps) {
-  const { register } = useApp();
+  const { register } = useAuth();
   const [formData, setFormData] = useState({
     username: '',
     password: '',

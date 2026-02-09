@@ -191,34 +191,14 @@ export function IngredientManagement({ onNavigateToRecipes }: IngredientManageme
   const handleDeleteConfirm = async () => {
     if (!deletingIngredient) return;
 
-    const { wastageCount } = deletingIngredient;
-    const hasRelatedData = wastageCount > 0;
-
-    // If no related data, just delete
-    if (!hasRelatedData) {
-      setIsDeleting(true);
-      try {
-        await deleteIngredient(deletingIngredient.id, false);
-        toast.success('Ingredient deleted successfully');
-        setIsDeleteDialogOpen(false);
-        setDeletingIngredient(null);
-      } catch (error) {
-        toast.error('Failed to delete ingredient');
-      } finally {
-        setIsDeleting(false);
-      }
-      return;
-    }
-
-    // If related data exists, delete with cascade
     setIsDeleting(true);
     try {
-      await deleteIngredient(deletingIngredient.id, true);
-      toast.success(`Ingredient and ${wastageCount} related wastage record${wastageCount > 1 ? 's' : ''} deleted successfully`);
+      await deleteIngredient(deletingIngredient.id);
+      toast.success('Ingredient deleted successfully');
       setIsDeleteDialogOpen(false);
       setDeletingIngredient(null);
     } catch (error) {
-      toast.error('Failed to delete ingredient and related data');
+      toast.error('Failed to delete ingredient');
     } finally {
       setIsDeleting(false);
     }

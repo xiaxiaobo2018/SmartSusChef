@@ -4,7 +4,7 @@ import { Input } from '@/app/components/ui/input';
 import { Label } from '@/app/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/app/components/ui/card';
 import { ChefHat, AlertCircle, ArrowLeft, MailCheck, UserPlus } from 'lucide-react';
-import { useApp } from '@/app/context/AppContext';
+import { useAuth } from '@/app/context/AuthContext';
 import { toast } from 'sonner';
 import { authApi } from '@/app/services/api';
 
@@ -14,9 +14,7 @@ interface LoginPageProps {
 }
 
 export function LoginPage({ onNavigateToRegister, onLoginSuccess }: LoginPageProps) {
-  const context = useApp();
-  if (!context) return null;
-  const { login } = context;
+  const { login } = useAuth();
   const [view, setView] = useState<'login' | 'forgot-password' | 'success'>('login');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
