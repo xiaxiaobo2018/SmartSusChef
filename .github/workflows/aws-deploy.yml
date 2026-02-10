@@ -345,7 +345,7 @@ jobs:
     needs: [detect-changes, security-scan, backend-build, frontend-build, ml-build]
     if: |
       !cancelled() && !failure() &&
-      github.ref == 'refs/heads/main' && github.event_name == 'push'
+      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop') && github.event_name == 'push'
 
     outputs:
       backend-image: ${{ steps.build-backend.outputs.image }}
@@ -516,7 +516,7 @@ jobs:
     needs: [docker-build-push, detect-changes]
     if: |
       !cancelled() && !failure() &&
-      github.ref == 'refs/heads/main' && github.event_name == 'push'
+      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop') && github.event_name == 'push'
     environment:
       name: uat
       url: http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com
