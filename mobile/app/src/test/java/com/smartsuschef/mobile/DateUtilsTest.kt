@@ -6,7 +6,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class DateUtilsTest {
-
     @Test
     fun testFormatDateForDisplaySuccess() { // Replaces the backtick name
         val apiDate = "2026-02-02"

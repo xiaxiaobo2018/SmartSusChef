@@ -10,43 +10,31 @@ import com.google.gson.annotations.SerializedName
 data class StoreDto(
     @SerializedName("id")
     val id: Int,
-
     @SerializedName("companyName")
     val companyName: String,
-
+    // Unique Entity Number (Singapore)
     @SerializedName("uen")
-    val uen: String, // Unique Entity Number (Singapore)
-
+    val uen: String,
     @SerializedName("storeName")
     val storeName: String,
-
     @SerializedName("outletLocation")
     val outletLocation: String,
-
     @SerializedName("contactNumber")
     val contactNumber: String,
-
     @SerializedName("openingDate")
     val openingDate: String,
-
     @SerializedName("latitude")
     val latitude: Double,
-
     @SerializedName("longitude")
     val longitude: Double,
-
     @SerializedName("countryCode")
     val countryCode: String? = null,
-
     @SerializedName("address")
     val address: String? = null,
-
     @SerializedName("isActive")
     val isActive: Boolean,
-
     @SerializedName("createdAt")
-    val createdAt: String, // DateTime as ISO string
-
+    val createdAt: String,
     @SerializedName("updatedAt")
-    val updatedAt: String // DateTime as ISO string
+    val updatedAt: String,
 )

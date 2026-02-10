@@ -1,9 +1,13 @@
 package com.smartsuschef.mobile.util
 
+import android.util.Log
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 object DateUtils {
+    private const val TAG = "DateUtils"
 
     // Get today's date in API format (yyyy-MM-dd)
     fun getTodayFormatted(): String {
@@ -35,6 +39,7 @@ object DateUtils {
             val date = apiFormatter.parse(apiDateString)
             displayFormatter.format(date!!)
         } catch (e: Exception) {
+            Log.e(TAG, "Error formatting date: $apiDateString", e)
             apiDateString // Return as-is if parsing fails
         }
     }

@@ -12,33 +12,24 @@ import kotlinx.parcelize.Parcelize
 data class WastageDataDto(
     @SerializedName("id")
     val id: String,
-
     @SerializedName("date")
     val date: String,
-
     @SerializedName("ingredientId")
     val ingredientId: String? = null,
-
     @SerializedName("recipeId")
     val recipeId: String? = null,
-
     @SerializedName("displayName")
     val displayName: String,
-
     @SerializedName("unit")
     val unit: String,
-
     @SerializedName("quantity")
-    val quantity: Double, // decimal in C#
-
+    val quantity: Double,
     @SerializedName("carbonFootprint")
-    val carbonFootprint: Double, // decimal in C#
-
+    val carbonFootprint: Double,
     @SerializedName("createdAt")
     val createdAt: String,
-
     @SerializedName("updatedAt")
-    val updatedAt: String
+    val updatedAt: String,
 ) : Parcelable
 
 /**
@@ -48,15 +39,12 @@ data class WastageDataDto(
 data class CreateWastageDataRequest(
     @SerializedName("date")
     val date: String,
-
     @SerializedName("ingredientId")
     val ingredientId: String? = null,
-
     @SerializedName("recipeId")
     val recipeId: String? = null,
-
     @SerializedName("quantity")
-    val quantity: Double // decimal in C#
+    val quantity: Double,
 )
 
 /**
@@ -66,15 +54,12 @@ data class CreateWastageDataRequest(
 data class UpdateWastageDataRequest(
     @SerializedName("date")
     val date: String,
-
     @SerializedName("ingredientId")
     val ingredientId: String? = null,
-
     @SerializedName("recipeId")
     val recipeId: String? = null,
-
     @SerializedName("quantity")
-    val quantity: Double // decimal in C#
+    val quantity: Double,
 )
 
 /**
@@ -85,15 +70,12 @@ data class UpdateWastageDataRequest(
 data class WastageTrendDto(
     @SerializedName("date")
     val date: String,
-
     @SerializedName("totalQuantity")
-    val totalQuantity: Double, // decimal in C#
-
+    val totalQuantity: Double,
     @SerializedName("totalCarbonFootprint")
-    val totalCarbonFootprint: Double, // decimal in C#
-
+    val totalCarbonFootprint: Double,
     @SerializedName("itemBreakdown")
-    val itemBreakdown: List<ItemWastageDto>
+    val itemBreakdown: List<ItemWastageDto>,
 ) : Parcelable
 
 /**
@@ -104,19 +86,14 @@ data class WastageTrendDto(
 data class ItemWastageDto(
     @SerializedName("ingredientId")
     val ingredientId: String? = null,
-
     @SerializedName("recipeId")
     val recipeId: String? = null,
-
     @SerializedName("displayName")
     val displayName: String,
-
     @SerializedName("unit")
     val unit: String,
-
     @SerializedName("quantity")
-    val quantity: Double, // decimal in C#
-
+    val quantity: Double,
     @SerializedName("carbonFootprint")
-    val carbonFootprint: Double // decimal in C#
+    val carbonFootprint: Double,
 ) : Parcelable

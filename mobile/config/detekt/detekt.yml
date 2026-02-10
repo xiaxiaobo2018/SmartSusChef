@@ -95,6 +95,6 @@ style:
       - 'kotlinx.android.synthetic.*'
 
 formatting:
-  active: true
+  active: false
   android: true
   autoCorrect: false

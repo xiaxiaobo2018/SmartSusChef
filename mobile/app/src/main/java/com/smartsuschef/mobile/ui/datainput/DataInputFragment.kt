@@ -10,16 +10,15 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.smartsuschef.mobile.R
+import com.smartsuschef.mobile.databinding.FragmentDataInputBinding
 import com.smartsuschef.mobile.network.dto.IngredientDto
 import com.smartsuschef.mobile.network.dto.RecipeDto
-import com.smartsuschef.mobile.databinding.FragmentDataInputBinding
 import com.smartsuschef.mobile.util.Resource
 import com.smartsuschef.mobile.util.showToast
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class DataInputFragment : Fragment(R.layout.fragment_data_input), RecentEntryActions {
-
     private var _binding: FragmentDataInputBinding? = null
     private val binding get() = _binding!!
     private val viewModel: DataInputViewModel by viewModels()
@@ -31,7 +30,10 @@ class DataInputFragment : Fragment(R.layout.fragment_data_input), RecentEntryAct
 
     private var currentEditedEntry: RecentEntry? = null
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentDataInputBinding.bind(view)
 
@@ -47,46 +49,55 @@ class DataInputFragment : Fragment(R.layout.fragment_data_input), RecentEntryAct
         mainRecipesAdapter = ArrayAdapter(requireContext(), spinnerLayout, mutableListOf())
         subRecipesAdapter = ArrayAdapter(requireContext(), spinnerLayout, mutableListOf())
 
-        binding.itemSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                if (position == 0) { // Hint position
+        binding.itemSpinner.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long,
+                ) {
+                    if (position == 0) { // Hint position
+                        viewModel.onItemSelected("", "")
+                        return
+                    }
+                    val selectedName = parent?.getItemAtPosition(position).toString()
+                    val isSalesMode = viewModel.isSalesMode.value ?: true
+                    val wastageType = viewModel.wastageType.value
+
+                    val (selectedId, selectedItemName) =
+                        when {
+                            isSalesMode -> {
+                                val item = viewModel.mainRecipes.value?.data?.find { it.name == selectedName }
+                                Pair(item?.id, item?.name)
+                            }
+                            else ->
+                                when (wastageType) {
+                                    WastageType.MAIN_DISH -> {
+                                        val item = viewModel.mainRecipes.value?.data?.find { it.name == selectedName }
+                                        Pair(item?.id, item?.name)
+                                    }
+                                    WastageType.SUB_RECIPE -> {
+                                        val item = viewModel.subRecipes.value?.data?.find { it.name == selectedName }
+                                        Pair(item?.id, item?.name)
+                                    }
+                                    WastageType.INGREDIENT -> {
+                                        val item = viewModel.ingredients.value?.data?.find { it.name == selectedName }
+                                        Pair(item?.id, item?.name)
+                                    }
+                                    else -> Pair(null, null)
+                                }
+                        }
+
+                    if (selectedId != null && selectedItemName != null) {
+                        viewModel.onItemSelected(selectedId, selectedItemName)
+                    }
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {
                     viewModel.onItemSelected("", "")
-                    return
-                }
-                val selectedName = parent?.getItemAtPosition(position).toString()
-                val isSalesMode = viewModel.isSalesMode.value ?: true
-                val wastageType = viewModel.wastageType.value
-
-                val (selectedId, selectedItemName) = when {
-                    isSalesMode -> {
-                        val item = viewModel.mainRecipes.value?.data?.find { it.name == selectedName }
-                        Pair(item?.id, item?.name)
-                    }
-                    else -> when (wastageType) {
-                        WastageType.MAIN_DISH -> {
-                            val item = viewModel.mainRecipes.value?.data?.find { it.name == selectedName }
-                            Pair(item?.id, item?.name)
-                        }
-                        WastageType.SUB_RECIPE -> {
-                            val item = viewModel.subRecipes.value?.data?.find { it.name == selectedName }
-                            Pair(item?.id, item?.name)
-                        }
-                        WastageType.INGREDIENT -> {
-                            val item = viewModel.ingredients.value?.data?.find { it.name == selectedName }
-                            Pair(item?.id, item?.name)
-                        }
-                        else -> Pair(null, null)
-                    }
-                }
-
-                if (selectedId != null && selectedItemName != null) {
-                    viewModel.onItemSelected(selectedId, selectedItemName)
                 }
             }
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                viewModel.onItemSelected("", "")
-            }
-        }
     }
 
     private fun setupTabs() {
@@ -100,28 +111,33 @@ class DataInputFragment : Fragment(R.layout.fragment_data_input), RecentEntryAct
 
         binding.wastageTypeToggleGroup.addOnButtonCheckedListener { group, checkedId, isChecked ->
             if (isChecked) {
-                val type = when (checkedId) {
-                    R.id.btnMainDishType -> WastageType.MAIN_DISH
-                    R.id.btnSubRecipeType -> WastageType.SUB_RECIPE
-                    else -> WastageType.INGREDIENT
-                }
+                val type =
+                    when (checkedId) {
+                        R.id.btnMainDishType -> WastageType.MAIN_DISH
+                        R.id.btnSubRecipeType -> WastageType.SUB_RECIPE
+                        else -> WastageType.INGREDIENT
+                    }
                 viewModel.setWastageType(type)
                 resetForm()
             }
         }
     }
 
-    private fun updateSpinnerAdapter(isSales: Boolean, wastageType: WastageType?) {
-        binding.itemSpinner.adapter = if (isSales) {
-            mainRecipesAdapter
-        } else {
-            when (wastageType) {
-                WastageType.MAIN_DISH -> mainRecipesAdapter
-                WastageType.SUB_RECIPE -> subRecipesAdapter
-                WastageType.INGREDIENT -> ingredientsAdapter
-                else -> null
+    private fun updateSpinnerAdapter(
+        isSales: Boolean,
+        wastageType: WastageType?,
+    ) {
+        binding.itemSpinner.adapter =
+            if (isSales) {
+                mainRecipesAdapter
+            } else {
+                when (wastageType) {
+                    WastageType.MAIN_DISH -> mainRecipesAdapter
+                    WastageType.SUB_RECIPE -> subRecipesAdapter
+                    WastageType.INGREDIENT -> ingredientsAdapter
+                    else -> null
+                }
             }
-        }
         binding.itemSpinner.setSelection(0)
     }
 
@@ -134,7 +150,13 @@ class DataInputFragment : Fragment(R.layout.fragment_data_input), RecentEntryAct
     }
 
     private fun observeViewModel() {
-        // --- Observers for Spinner Data ---
+        observeSpinnerData()
+        observeUiState()
+        observeActionsAndResults()
+        setupSaveButtonClickListener()
+    }
+
+    private fun observeSpinnerData() {
         viewModel.ingredients.observe(viewLifecycleOwner) { resource ->
             handleResource(resource, ingredientsAdapter, "Select Ingredient...")
         }
@@ -144,8 +166,9 @@ class DataInputFragment : Fragment(R.layout.fragment_data_input), RecentEntryAct
         viewModel.subRecipes.observe(viewLifecycleOwner) { resource ->
             handleResource(resource, subRecipesAdapter, "Select Sub-Recipe...")
         }
+    }
 
-        // --- Observers for UI State ---
+    private fun observeUiState() {
         viewModel.isSalesMode.observe(viewLifecycleOwner) { isSales ->
             binding.wastageTypeToggleGroup.isVisible = !isSales
             binding.tvStep1Label.text = if (isSales) "Step 1: Select Dish" else "Step 1: Select Item Type"
@@ -156,8 +179,9 @@ class DataInputFragment : Fragment(R.layout.fragment_data_input), RecentEntryAct
                 updateSpinnerAdapter(false, wastageType)
             }
         }
+    }
 
-        // --- Observers for Actions and Results ---
+    private fun observeActionsAndResults() {
         viewModel.recentEntries.observe(viewLifecycleOwner) { entries ->
             recentEntriesAdapter.submitList(entries)
         }
@@ -171,8 +195,9 @@ class DataInputFragment : Fragment(R.layout.fragment_data_input), RecentEntryAct
                 is Resource.Loading -> { /* Optionally show a loading dialog/spinner */ }
             }
         }
+    }
 
-        // --- Click Listener ---
+    private fun setupSaveButtonClickListener() {
         binding.btnSaveData.setOnClickListener {
             val qty = binding.etQuantity.text.toString().toDoubleOrNull()
 
@@ -197,21 +222,31 @@ class DataInputFragment : Fragment(R.layout.fragment_data_input), RecentEntryAct
             // Check for existing entry if not in edit mode
             val existingEntry = viewModel.findExistingEntry(selectedItemName)
             if (existingEntry != null) {
-                AlertDialog.Builder(requireContext())
-                    .setTitle("Entry Already Exists")
-                    .setMessage("You have already entered data for ${existingEntry.name}. Do you want to overwrite the existing quantity?")
-                    .setPositiveButton("Overwrite Entry") { dialog, _ ->
-                        viewModel.submitData(qty, existingEntry.id)
-                        dialog.dismiss()
-                    }
-                    .setNegativeButton("Cancel") { dialog, _ ->
-                        dialog.dismiss()
-                    }
-                    .show()
+                showOverwriteDialog(qty, existingEntry)
             } else {
                 viewModel.submitData(qty)
             }
         }
+    }
+
+    private fun showOverwriteDialog(
+        quantity: Double,
+        existingEntry: RecentEntry,
+    ) {
+        val message =
+            "You have already entered data for " +
+                "${existingEntry.name}. Do you want to overwrite the existing quantity?"
+        AlertDialog.Builder(requireContext())
+            .setTitle("Entry Already Exists")
+            .setMessage(message)
+            .setPositiveButton("Overwrite Entry") { dialog, _ ->
+                viewModel.submitData(quantity, existingEntry.id)
+                dialog.dismiss()
+            }
+            .setNegativeButton("Cancel") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
     }
 
     private fun resetForm() {
@@ -228,6 +263,7 @@ class DataInputFragment : Fragment(R.layout.fragment_data_input), RecentEntryAct
         binding.etQuantity.setText(entry.quantity.toString())
 
         // Set spinner selection
+        @Suppress("UNCHECKED_CAST")
         val adapter = binding.itemSpinner.adapter as? ArrayAdapter<String>
         if (adapter != null) {
             val position = adapter.getPosition(entry.name)
@@ -254,18 +290,24 @@ class DataInputFragment : Fragment(R.layout.fragment_data_input), RecentEntryAct
             .show()
     }
 
-    private fun <T> handleResource(resource: Resource<List<T>>, adapter: ArrayAdapter<String>, hint: String) {
+    private fun <T> handleResource(
+        resource: Resource<List<T>>,
+        adapter: ArrayAdapter<String>,
+        hint: String,
+    ) {
         when (resource) {
             is Resource.Success -> {
                 adapter.clear()
                 adapter.add(hint)
-                adapter.addAll(resource.data?.mapNotNull { item ->
-                    when(item) {
-                        is RecipeDto -> item.name
-                        is IngredientDto -> item.name
-                        else -> null
-                    }
-                } ?: emptyList())
+                adapter.addAll(
+                    resource.data?.mapNotNull { item ->
+                        when (item) {
+                            is RecipeDto -> item.name
+                            is IngredientDto -> item.name
+                            else -> null
+                        }
+                    } ?: emptyList(),
+                )
                 adapter.notifyDataSetChanged()
             }
             is Resource.Error -> requireContext().showToast("Error loading data: ${resource.message}")

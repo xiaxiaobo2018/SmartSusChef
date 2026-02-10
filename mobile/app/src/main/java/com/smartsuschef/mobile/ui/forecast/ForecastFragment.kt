@@ -1,46 +1,48 @@
 package com.smartsuschef.mobile.ui.forecast
 
-// Android
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.View
-
-// AndroidX
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-
-// MPAndroidChart
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.data.*
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.data.CombinedData
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
-
-// Hilt
-import dagger.hilt.android.AndroidEntryPoint
-
-// App-specific
 import com.smartsuschef.mobile.R
 import com.smartsuschef.mobile.databinding.FragmentForecastBinding
 import com.smartsuschef.mobile.network.dto.ForecastDto
 import com.smartsuschef.mobile.util.Resource
 import com.smartsuschef.mobile.util.showToast
-
-// Kotlin utils
+import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Locale
 
 @AndroidEntryPoint
 class ForecastFragment : Fragment(R.layout.fragment_forecast) {
+    companion object {
+        private const val TAG = "ForecastFragment"
+    }
 
     private var _binding: FragmentForecastBinding? = null
     private val binding get() = _binding!!
     private val viewModel: ForecastViewModel by viewModels()
     private lateinit var forecastSummaryAdapter: ForecastSummaryAdapter
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentForecastBinding.bind(view)
 
@@ -58,7 +60,13 @@ class ForecastFragment : Fragment(R.layout.fragment_forecast) {
     }
 
     private fun observeViewModel() {
-        // Summary Trend Chart
+        observeSummaryTrend()
+        observeDishForecasts()
+        observeIngredientForecast()
+        observeComparisonData()
+    }
+
+    private fun observeSummaryTrend() {
         viewModel.summaryTrend.observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Resource.Success -> {
@@ -72,8 +80,9 @@ class ForecastFragment : Fragment(R.layout.fragment_forecast) {
                 }
             }
         }
+    }
 
-        // Dish Breakdown Chart
+    private fun observeDishForecasts() {
         viewModel.dishForecasts.observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Resource.Success -> result.data?.let { setupStackedBarChart(it) }
@@ -81,8 +90,9 @@ class ForecastFragment : Fragment(R.layout.fragment_forecast) {
                 else -> {}
             }
         }
+    }
 
-        // Ingredient Table
+    private fun observeIngredientForecast() {
         viewModel.ingredientForecast.observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Resource.Success -> {
@@ -95,8 +105,9 @@ class ForecastFragment : Fragment(R.layout.fragment_forecast) {
                 else -> {}
             }
         }
+    }
 
-        // Comparison Chart
+    private fun observeComparisonData() {
         viewModel.comparisonData.observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Resource.Success -> result.data?.let { setupComparisonChart(it) }
@@ -110,6 +121,22 @@ class ForecastFragment : Fragment(R.layout.fragment_forecast) {
      * CHART 1: Prediction Summary (Combined Bar + Line)
      */
     private fun setupSummaryChart(trendData: List<ForecastDto>) {
+        val (barEntries, lineEntries, labels) = prepareSummaryChartData(trendData)
+
+        val barSet = createBarDataSet(barEntries)
+        val lineSet = createLineDataSet(lineEntries)
+
+        val combinedData =
+            CombinedData().apply {
+                setData(BarData(barSet))
+                setData(LineData(lineSet))
+            }
+
+        styleSummaryChart(labels, combinedData)
+    }
+
+    @Suppress("MaxLineLength")
+    private fun prepareSummaryChartData(trendData: List<ForecastDto>): Triple<List<BarEntry>, List<Entry>, List<String>> {
         val barEntries = mutableListOf<BarEntry>()
         val lineEntries = mutableListOf<Entry>()
         val labels = mutableListOf<String>()
@@ -123,13 +150,19 @@ class ForecastFragment : Fragment(R.layout.fragment_forecast) {
         }
 
         binding.tvTotalWeeklyDishes.text = totalDishes.toString()
+        return Triple(barEntries, lineEntries, labels)
+    }
 
-        val barSet = BarDataSet(barEntries, "Predicted Sales").apply {
+    private fun createBarDataSet(barEntries: List<BarEntry>): BarDataSet {
+        return BarDataSet(barEntries, "Predicted Sales").apply {
             color = ContextCompat.getColor(requireContext(), R.color.forecast_gold)
             setDrawValues(false)
         }
+    }
 
-        val lineSet = LineDataSet(lineEntries, "Trend").apply {
+    @Suppress("MagicNumber")
+    private fun createLineDataSet(lineEntries: List<Entry>): LineDataSet {
+        return LineDataSet(lineEntries, "Trend").apply {
             color = ContextCompat.getColor(requireContext(), R.color.forecast_trend)
             lineWidth = 2.5f
             circleRadius = 4f
@@ -138,12 +171,15 @@ class ForecastFragment : Fragment(R.layout.fragment_forecast) {
             setDrawValues(false)
             setDrawCircleHole(false)
         }
+    }
 
+    @Suppress("MagicNumber")
+    private fun styleSummaryChart(
+        labels: List<String>,
+        data: CombinedData,
+    ) {
         binding.summaryCombinedChart.apply {
-            data = CombinedData().apply {
-                setData(BarData(barSet))
-                setData(LineData(lineSet))
-            }
+            this.data = data
             description.isEnabled = false
             setDrawGridBackground(false)
             setExtraOffsets(10f, 10f, 10f, 20f)
@@ -199,7 +235,18 @@ class ForecastFragment : Fragment(R.layout.fragment_forecast) {
     /**
      * CHART 2: Dishes Forecast (Stacked Bar Chart)
      */
+    @Suppress("MagicNumber")
     private fun setupStackedBarChart(forecastData: List<DailyDishForecast>) {
+        val (entries, labels, dishNames) = prepareStackedBarChartData(forecastData)
+
+        val dataSet = createStackedBarDataSet(entries, dishNames)
+        val barData = BarData(dataSet).apply { barWidth = 0.8f }
+
+        styleStackedBarChart(labels, dishNames, barData)
+    }
+
+    @Suppress("MaxLineLength")
+    private fun prepareStackedBarChartData(forecastData: List<DailyDishForecast>): Triple<List<BarEntry>, List<String>, Array<String>> {
         val entries = mutableListOf<BarEntry>()
         val labels = mutableListOf<String>()
         val totalDishes = forecastData.sumOf { it.dishes.sumOf { d -> d.predictedSales } }
@@ -213,25 +260,40 @@ class ForecastFragment : Fragment(R.layout.fragment_forecast) {
             labels.add(formatDate(daily.date))
         }
 
-        val dishNames = if (forecastData.isNotEmpty()) {
-            forecastData[0].dishes.map { it.name }.toTypedArray()
-        } else {
-            arrayOf()
-        }
+        val dishNames =
+            if (forecastData.isNotEmpty()) {
+                forecastData[0].dishes.map { it.name }.toTypedArray()
+            } else {
+                arrayOf()
+            }
+        return Triple(entries, labels, dishNames)
+    }
 
-        val dataSet = BarDataSet(entries, "").apply {
-            colors = listOf(
-                ContextCompat.getColor(requireContext(), R.color.primary),
-                ContextCompat.getColor(requireContext(), R.color.wastage_primary),
-                ContextCompat.getColor(requireContext(), R.color.forecast_gold)
-            )
+    private fun createStackedBarDataSet(
+        entries: List<BarEntry>,
+        dishNames: Array<String>,
+    ): BarDataSet {
+        return BarDataSet(entries, "").apply {
+            colors =
+                listOf(
+                    ContextCompat.getColor(requireContext(), R.color.primary),
+                    ContextCompat.getColor(requireContext(), R.color.wastage_primary),
+                    ContextCompat.getColor(requireContext(), R.color.forecast_gold),
+                )
             stackLabels = dishNames
             setDrawValues(false)
             highLightAlpha = 0 // Disable highlight color change
         }
+    }
 
+    @Suppress("MagicNumber")
+    private fun styleStackedBarChart(
+        labels: List<String>,
+        dishNames: Array<String>,
+        data: BarData,
+    ) {
         binding.dishForecastStackedChart.apply {
-            data = BarData(dataSet).apply { barWidth = 0.8f }
+            this.data = data
             description.isEnabled = false
             setDrawGridBackground(false)
             setExtraOffsets(5f, 10f, 10f, 20f) // Reduced left offset from 10f to 5f
@@ -289,6 +351,7 @@ class ForecastFragment : Fragment(R.layout.fragment_forecast) {
     /**
      * CHART 4: Comparison (Grouped Bar - Predicted vs Actual)
      */
+    @Suppress("ForbiddenComment", "UnusedParameter")
     private fun setupComparisonChart(comparisonData: List<ForecastDto>) {
         // TODO: This chart is disabled until SalesData is fetched and merged with ForecastData.
         // The logic below is broken because `actualQuantity` was removed from ForecastDto.
@@ -303,6 +366,7 @@ class ForecastFragment : Fragment(R.layout.fragment_forecast) {
             val formatter = SimpleDateFormat("d MMM", Locale.getDefault())
             parser.parse(dateStr)?.let { formatter.format(it) } ?: dateStr
         } catch (e: Exception) {
+            Log.e(TAG, "Error formatting date: $dateStr", e)
             dateStr
         }
     }

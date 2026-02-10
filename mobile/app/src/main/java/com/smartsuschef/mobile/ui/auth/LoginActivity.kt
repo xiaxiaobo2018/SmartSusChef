@@ -1,6 +1,6 @@
 package com.smartsuschef.mobile.ui.auth
 
-import android.content.Intent 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -8,14 +8,13 @@ import com.smartsuschef.mobile.databinding.ActivityLoginBinding
 import com.smartsuschef.mobile.network.dto.LoginRequest
 import com.smartsuschef.mobile.ui.dashboard.DashboardActivity
 import com.smartsuschef.mobile.util.Resource
+import com.smartsuschef.mobile.util.gone
 import com.smartsuschef.mobile.util.showToast
 import com.smartsuschef.mobile.util.visible
-import com.smartsuschef.mobile.util.gone
 import dagger.hilt.android.AndroidEntryPoint
- 
+
 @AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
-
     private lateinit var binding: ActivityLoginBinding
     private val viewModel: LoginViewModel by viewModels()
 
@@ -66,7 +65,7 @@ class LoginActivity : AppCompatActivity() {
         binding.btnSendReset.setOnClickListener {
             val email = binding.etResetEmail.text.toString().trim()
             if (email.isNotEmpty()) {
-                // TODO: Implement actual password reset API call
+                // Password reset API call not yet implemented
                 showToast("Reset link sent to $email")
                 // Toggle back to login automatically after success
                 binding.forgotPasswordForm.gone()

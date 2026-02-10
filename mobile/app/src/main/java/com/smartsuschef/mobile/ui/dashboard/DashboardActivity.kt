@@ -1,26 +1,21 @@
 package com.smartsuschef.mobile.ui.dashboard
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
-import android.view.View
-import android.text.TextUtils
-
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
 import com.smartsuschef.mobile.R
 import com.smartsuschef.mobile.databinding.ActivityDashboardBinding
 import com.smartsuschef.mobile.ui.auth.LoginActivity
 import com.smartsuschef.mobile.ui.settings.SettingsActivity
-import com.smartsuschef.mobile.util.visible
 import com.smartsuschef.mobile.util.gone
-import com.smartsuschef.mobile.util.showToast
-
+import com.smartsuschef.mobile.util.visible
 import dagger.hilt.android.AndroidEntryPoint
-import androidx.navigation.NavController
-import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.setupWithNavController
 
 @AndroidEntryPoint
 class DashboardActivity : AppCompatActivity() {
@@ -48,12 +43,13 @@ class DashboardActivity : AppCompatActivity() {
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
             // Define main fragments (tabs in bottom navigation)
-            val mainFragments = setOf(
-                R.id.nav_sales,
-                R.id.nav_forecast,
-                R.id.nav_wastage,
-                R.id.nav_input
-            )
+            val mainFragments =
+                setOf(
+                    R.id.nav_sales,
+                    R.id.nav_forecast,
+                    R.id.nav_wastage,
+                    R.id.nav_input,
+                )
 
             // When we are on the main tabs, show the store info and hide back arrow
             if (destination.id in mainFragments) {
@@ -143,9 +139,10 @@ class DashboardActivity : AppCompatActivity() {
     private fun performLogout() {
         viewModel.logout()
         // Navigate back to Login and clear all previous screens
-        val intent = Intent(this, LoginActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
+        val intent =
+            Intent(this, LoginActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
         startActivity(intent)
         finish()
     }

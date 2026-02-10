@@ -1,38 +1,63 @@
 package com.smartsuschef.mobile.network.api
 
-import com.smartsuschef.mobile.network.dto.*
+import com.smartsuschef.mobile.network.dto.CalendarDayDto
+import com.smartsuschef.mobile.network.dto.ChangePasswordRequest
+import com.smartsuschef.mobile.network.dto.CreateIngredientRequest
+import com.smartsuschef.mobile.network.dto.CreateRecipeRequest
+import com.smartsuschef.mobile.network.dto.CreateSalesDataRequest
+import com.smartsuschef.mobile.network.dto.CreateWastageDataRequest
+import com.smartsuschef.mobile.network.dto.ForecastDto
+import com.smartsuschef.mobile.network.dto.ForecastSummaryDto
+import com.smartsuschef.mobile.network.dto.ForgotPasswordRequest
+import com.smartsuschef.mobile.network.dto.HolidayDto
+import com.smartsuschef.mobile.network.dto.IngredientDto
+import com.smartsuschef.mobile.network.dto.IngredientUsageDto
+import com.smartsuschef.mobile.network.dto.LoginRequest
+import com.smartsuschef.mobile.network.dto.LoginResponse
+import com.smartsuschef.mobile.network.dto.RecipeDto
+import com.smartsuschef.mobile.network.dto.RecipeSalesDto
+import com.smartsuschef.mobile.network.dto.SalesDataDto
+import com.smartsuschef.mobile.network.dto.SalesTrendDto
+import com.smartsuschef.mobile.network.dto.StoreDto
+import com.smartsuschef.mobile.network.dto.TomorrowForecastDto
+import com.smartsuschef.mobile.network.dto.UpdateIngredientRequest
+import com.smartsuschef.mobile.network.dto.UpdateProfileRequest
+import com.smartsuschef.mobile.network.dto.UpdateRecipeRequest
+import com.smartsuschef.mobile.network.dto.UpdateSalesDataRequest
+import com.smartsuschef.mobile.network.dto.UpdateWastageDataRequest
+import com.smartsuschef.mobile.network.dto.UserDto
+import com.smartsuschef.mobile.network.dto.WastageDataDto
+import com.smartsuschef.mobile.network.dto.WastageTrendDto
+import com.smartsuschef.mobile.network.dto.WeatherDto
 import retrofit2.Response
-import retrofit2.http.*
+import retrofit2.http.Body
+import retrofit2.http.DELETE
+import retrofit2.http.GET
+import retrofit2.http.POST
+import retrofit2.http.PUT
+import retrofit2.http.Path
+import retrofit2.http.Query
 
-/**
- * API Services for SmartSus Chef (Mobile)
- * // Old Base URL: http://oversea.zyh111.icu:234/api/
- * Base URL: http://192.168.50.133:5001/api/
- * All endpoints require JWT token in Authorization header (except login/resetPassword)
- *
- * Employee Restrictions:
- * - Can only view data for TODAY or last 7 days
- * - Can only input sales/wastage data for TODAY
- * - Cannot create/edit/delete recipes or ingredients
- *
- * Manager Additional Access (if using mobile):
- * - Can view up to 30 days of data
- * - Can manage recipes/ingredients (though typically done on web)
- */
+// API Services for SmartSus Chef (Mobile)
+// Old Base URL: http://oversea.zyh111.icu:234/api/
+// Base URL: http://192.168.50.133:5001/api/
+// All endpoints require JWT token in Authorization header (except login/resetPassword)
 
 /**
  * Authentication API Service
+
  * Maps to: AuthController.cs
  * Base Route: /api/auth
  */
 interface AuthApiService {
-
     /**
      * Login with username and password
      * POST /api/auth/login
      */
     @POST("auth/login")
-    suspend fun login(@Body request: LoginRequest): Response<LoginResponse>
+    suspend fun login(
+        @Body request: LoginRequest,
+    ): Response<LoginResponse>
 
     /**
      * Get current user information
@@ -49,7 +74,9 @@ interface AuthApiService {
      * Note: Username cannot be changed
      */
     @PUT("auth/profile")
-    suspend fun updateOwnProfile(@Body request: UpdateProfileRequest): Response<UserDto>
+    suspend fun updateOwnProfile(
+        @Body request: UpdateProfileRequest,
+    ): Response<UserDto>
 
     /**
      * Change own password
@@ -57,14 +84,18 @@ interface AuthApiService {
      * Requires: Authorization header with JWT token
      */
     @PUT("auth/password")
-    suspend fun changePassword(@Body request: ChangePasswordRequest): Response<Unit>
+    suspend fun changePassword(
+        @Body request: ChangePasswordRequest,
+    ): Response<Unit>
 
     /**
      * Request password reset (Forgot Password)
      * POST /api/auth/forgot-password
      */
     @POST("auth/forgot-password")
-    suspend fun forgotPassword(@Body request: ForgotPasswordRequest): Response<Unit>
+    suspend fun forgotPassword(
+        @Body request: ForgotPasswordRequest,
+    ): Response<Unit>
 }
 
 /**
@@ -75,7 +106,6 @@ interface AuthApiService {
  * Employee Usage: Primarily for inputting TODAY's sales data
  */
 interface SalesApiService {
-
     /**
      * Get all sales data with optional date filtering
      * GET /api/sales?startDate={startDate}&endDate={endDate}
@@ -85,7 +115,7 @@ interface SalesApiService {
     @GET("sales")
     suspend fun getAll(
         @Query("startDate") startDate: String? = null,
-        @Query("endDate") endDate: String? = null
+        @Query("endDate") endDate: String? = null,
     ): Response<List<SalesDataDto>>
 
     /**
@@ -93,7 +123,9 @@ interface SalesApiService {
      * GET /api/sales/{id}
      */
     @GET("sales/{id}")
-    suspend fun getById(@Path("id") id: String): Response<SalesDataDto>
+    suspend fun getById(
+        @Path("id") id: String,
+    ): Response<SalesDataDto>
 
     /**
      * Get sales trend (grouped by date with recipe breakdown)
@@ -103,7 +135,7 @@ interface SalesApiService {
     @GET("sales/trend")
     suspend fun getTrend(
         @Query("startDate") startDate: String,
-        @Query("endDate") endDate: String
+        @Query("endDate") endDate: String,
     ): Response<List<SalesTrendDto>>
 
     /**
@@ -112,7 +144,9 @@ interface SalesApiService {
      * Used for "Ingredient Breakdown" section
      */
     @GET("sales/ingredients/{date}")
-    suspend fun getIngredientUsageByDate(@Path("date") date: String): Response<List<IngredientUsageDto>>
+    suspend fun getIngredientUsageByDate(
+        @Path("date") date: String,
+    ): Response<List<IngredientUsageDto>>
 
     /**
      * Get recipe sales for a specific date
@@ -120,7 +154,9 @@ interface SalesApiService {
      * Used for "Sales Distribution" pie chart
      */
     @GET("sales/recipes/{date}")
-    suspend fun getRecipeSalesByDate(@Path("date") date: String): Response<List<RecipeSalesDto>>
+    suspend fun getRecipeSalesByDate(
+        @Path("date") date: String,
+    ): Response<List<RecipeSalesDto>>
 
     /**
      * Create new sales data (Employee primary function)
@@ -128,7 +164,9 @@ interface SalesApiService {
      * Employee: Can only create for TODAY
      */
     @POST("sales")
-    suspend fun create(@Body request: CreateSalesDataRequest): Response<SalesDataDto>
+    suspend fun create(
+        @Body request: CreateSalesDataRequest,
+    ): Response<SalesDataDto>
 
     /**
      * Update existing sales data
@@ -138,7 +176,7 @@ interface SalesApiService {
     @PUT("sales/{id}")
     suspend fun update(
         @Path("id") id: String,
-        @Body request: UpdateSalesDataRequest
+        @Body request: UpdateSalesDataRequest,
     ): Response<SalesDataDto>
 
     /**
@@ -147,7 +185,9 @@ interface SalesApiService {
      * Employee: Can only delete TODAY's entries
      */
     @DELETE("sales/{id}")
-    suspend fun delete(@Path("id") id: String): Response<Unit>
+    suspend fun delete(
+        @Path("id") id: String,
+    ): Response<Unit>
 }
 
 /**
@@ -158,7 +198,6 @@ interface SalesApiService {
  * Employee Usage: Primarily for inputting TODAY's wastage data
  */
 interface WastageApiService {
-
     /**
      * Get all wastage data with optional date filtering
      * GET /api/wastage?startDate={startDate}&endDate={endDate}
@@ -168,7 +207,7 @@ interface WastageApiService {
     @GET("wastage")
     suspend fun getAll(
         @Query("startDate") startDate: String? = null,
-        @Query("endDate") endDate: String? = null
+        @Query("endDate") endDate: String? = null,
     ): Response<List<WastageDataDto>>
 
     /**
@@ -176,7 +215,9 @@ interface WastageApiService {
      * GET /api/wastage/{id}
      */
     @GET("wastage/{id}")
-    suspend fun getById(@Path("id") id: String): Response<WastageDataDto>
+    suspend fun getById(
+        @Path("id") id: String,
+    ): Response<WastageDataDto>
 
     /**
      * Get wastage trend (grouped by date with item breakdown)
@@ -186,7 +227,7 @@ interface WastageApiService {
     @GET("wastage/trend")
     suspend fun getTrend(
         @Query("startDate") startDate: String,
-        @Query("endDate") endDate: String
+        @Query("endDate") endDate: String,
     ): Response<List<WastageTrendDto>>
 
     /**
@@ -195,7 +236,9 @@ interface WastageApiService {
      * Employee: Can only create for TODAY
      */
     @POST("wastage")
-    suspend fun create(@Body request: CreateWastageDataRequest): Response<WastageDataDto>
+    suspend fun create(
+        @Body request: CreateWastageDataRequest,
+    ): Response<WastageDataDto>
 
     /**
      * Update existing wastage data
@@ -205,7 +248,7 @@ interface WastageApiService {
     @PUT("wastage/{id}")
     suspend fun update(
         @Path("id") id: String,
-        @Body request: UpdateWastageDataRequest
+        @Body request: UpdateWastageDataRequest,
     ): Response<WastageDataDto>
 
     /**
@@ -214,7 +257,9 @@ interface WastageApiService {
      * Employee: Can only delete TODAY's entries
      */
     @DELETE("wastage/{id}")
-    suspend fun delete(@Path("id") id: String): Response<Unit>
+    suspend fun delete(
+        @Path("id") id: String,
+    ): Response<Unit>
 }
 
 /**
@@ -225,7 +270,6 @@ interface WastageApiService {
  * Employee/Manager Usage: View ML predictions and calendar signals
  */
 interface ForecastApiService {
-
     /**
      * Get forecast for next N days (1-30)
      * GET /api/forecast?days={days}
@@ -233,7 +277,9 @@ interface ForecastApiService {
      * Manager: Can view up to 30 days
      */
     @GET("forecast")
-    suspend fun getForecast(@Query("days") days: Int = 7): Response<List<ForecastDto>>
+    suspend fun getForecast(
+        @Query("days") days: Int = 7,
+    ): Response<List<ForecastDto>>
 
     /**
      * Get forecast summary for next N days
@@ -241,7 +287,9 @@ interface ForecastApiService {
      * Used for "Prediction Summary" card
      */
     @GET("forecast/summary")
-    suspend fun getForecastSummary(@Query("days") days: Int = 7): Response<List<ForecastSummaryDto>>
+    suspend fun getForecastSummary(
+        @Query("days") days: Int = 7,
+    ): Response<List<ForecastSummaryDto>>
 
     /**
      * Get current weather
@@ -257,7 +305,9 @@ interface ForecastApiService {
      * Used for "Upcoming Events" section
      */
     @GET("forecast/holidays/{year}")
-    suspend fun getHolidays(@Path("year") year: Int): Response<List<HolidayDto>>
+    suspend fun getHolidays(
+        @Path("year") year: Int,
+    ): Response<List<HolidayDto>>
 
     /**
      * Get tomorrow's forecast and calendar information
@@ -272,7 +322,9 @@ interface ForecastApiService {
      * GET /api/forecast/calendar/{date}
      */
     @GET("forecast/calendar/{date}")
-    suspend fun getCalendarDay(@Path("date") date: String): Response<CalendarDayDto>
+    suspend fun getCalendarDay(
+        @Path("date") date: String,
+    ): Response<CalendarDayDto>
 
     /**
      * Get calendar and weather information for a date range
@@ -282,7 +334,7 @@ interface ForecastApiService {
     @GET("forecast/calendar")
     suspend fun getCalendarRange(
         @Query("startDate") startDate: String,
-        @Query("endDate") endDate: String
+        @Query("endDate") endDate: String,
     ): Response<List<CalendarDayDto>>
 }
 
@@ -295,7 +347,6 @@ interface ForecastApiService {
  * Manager Usage: Full CRUD (typically done on web)
  */
 interface RecipeApiService {
-
     /**
      * Get all recipes
      * GET /api/recipes
@@ -310,14 +361,18 @@ interface RecipeApiService {
      * Used to view recipe details
      */
     @GET("recipes/{id}")
-    suspend fun getById(@Path("id") id: String): Response<RecipeDto>
+    suspend fun getById(
+        @Path("id") id: String,
+    ): Response<RecipeDto>
 
     /**
      * Create new recipe (Manager only - typically web-only)
      * POST /api/recipes
      */
     @POST("recipes")
-    suspend fun create(@Body request: CreateRecipeRequest): Response<RecipeDto>
+    suspend fun create(
+        @Body request: CreateRecipeRequest,
+    ): Response<RecipeDto>
 
     /**
      * Update existing recipe (Manager only - typically web-only)
@@ -326,7 +381,7 @@ interface RecipeApiService {
     @PUT("recipes/{id}")
     suspend fun update(
         @Path("id") id: String,
-        @Body request: UpdateRecipeRequest
+        @Body request: UpdateRecipeRequest,
     ): Response<RecipeDto>
 
     /**
@@ -334,7 +389,9 @@ interface RecipeApiService {
      * DELETE /api/recipes/{id}
      */
     @DELETE("recipes/{id}")
-    suspend fun delete(@Path("id") id: String): Response<Unit>
+    suspend fun delete(
+        @Path("id") id: String,
+    ): Response<Unit>
 }
 
 /**
@@ -346,7 +403,6 @@ interface RecipeApiService {
  * Manager Usage: Full CRUD (typically done on web)
  */
 interface IngredientApiService {
-
     /**
      * Get all ingredients
      * GET /api/ingredients
@@ -360,14 +416,18 @@ interface IngredientApiService {
      * GET /api/ingredients/{id}
      */
     @GET("ingredients/{id}")
-    suspend fun getById(@Path("id") id: String): Response<IngredientDto>
+    suspend fun getById(
+        @Path("id") id: String,
+    ): Response<IngredientDto>
 
     /**
      * Create new ingredient (Manager only - typically web-only)
      * POST /api/ingredients
      */
     @POST("ingredients")
-    suspend fun create(@Body request: CreateIngredientRequest): Response<IngredientDto>
+    suspend fun create(
+        @Body request: CreateIngredientRequest,
+    ): Response<IngredientDto>
 
     /**
      * Update existing ingredient (Manager only - typically web-only)
@@ -376,7 +436,7 @@ interface IngredientApiService {
     @PUT("ingredients/{id}")
     suspend fun update(
         @Path("id") id: String,
-        @Body request: UpdateIngredientRequest
+        @Body request: UpdateIngredientRequest,
     ): Response<IngredientDto>
 
     /**
@@ -384,7 +444,9 @@ interface IngredientApiService {
      * DELETE /api/ingredients/{id}
      */
     @DELETE("ingredients/{id}")
-    suspend fun delete(@Path("id") id: String): Response<Unit>
+    suspend fun delete(
+        @Path("id") id: String,
+    ): Response<Unit>
 }
 
 /**
@@ -396,7 +458,6 @@ interface IngredientApiService {
  * Manager Usage: Setup/update store (typically web-only)
  */
 interface StoreApiService {
-
     /**
      * Get store information for current user
      * GET /api/store

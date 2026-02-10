@@ -9,171 +9,181 @@ import com.smartsuschef.mobile.data.repository.UsersRepository
 import com.smartsuschef.mobile.network.dto.ChangePasswordRequest
 import com.smartsuschef.mobile.network.dto.UpdateProfileRequest
 import com.smartsuschef.mobile.network.dto.UserDto
-import com.smartsuschef.mobile.util.Resource
 import com.smartsuschef.mobile.util.EmailValidator
 import com.smartsuschef.mobile.util.PasswordValidator
+import com.smartsuschef.mobile.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SettingsViewModel @Inject constructor(
-    private val authRepository: AuthRepository,
-    private val usersRepository: UsersRepository,
-    private val emailValidator: EmailValidator
-) : ViewModel() {
+class SettingsViewModel
+    @Inject
+    constructor(
+        private val authRepository: AuthRepository,
+        private val usersRepository: UsersRepository,
+        private val emailValidator: EmailValidator,
+    ) : ViewModel() {
+        // Current user data
+        private val _currentUser = MutableLiveData<UserDto?>()
+        val currentUser: LiveData<UserDto?> = _currentUser
 
-    // Current user data
-    private val _currentUser = MutableLiveData<UserDto?>()
-    val currentUser: LiveData<UserDto?> = _currentUser
+        // Loading states
+        private val _isLoadingProfile = MutableLiveData(false)
+        val isLoadingProfile: LiveData<Boolean> = _isLoadingProfile
 
-    // Loading states
-    private val _isLoadingProfile = MutableLiveData(false)
-    val isLoadingProfile: LiveData<Boolean> = _isLoadingProfile
+        private val _isLoadingPassword = MutableLiveData(false)
+        val isLoadingPassword: LiveData<Boolean> = _isLoadingPassword
 
-    private val _isLoadingPassword = MutableLiveData(false)
-    val isLoadingPassword: LiveData<Boolean> = _isLoadingPassword
+        // Result messages
+        private val _profileUpdateResult = MutableLiveData<String?>()
+        val profileUpdateResult: LiveData<String?> = _profileUpdateResult
 
-    // Result messages
-    private val _profileUpdateResult = MutableLiveData<String?>()
-    val profileUpdateResult: LiveData<String?> = _profileUpdateResult
+        private val _passwordUpdateResult = MutableLiveData<String?>()
+        val passwordUpdateResult: LiveData<String?> = _passwordUpdateResult
 
-    private val _passwordUpdateResult = MutableLiveData<String?>()
-    val passwordUpdateResult: LiveData<String?> = _passwordUpdateResult
-
-    init {
-        loadCurrentUser()
-    }
-
-    /**
-     * Load current user information
-     */
-    private fun loadCurrentUser() {
-        viewModelScope.launch {
-            _isLoadingProfile.value = true
-            when (val result = usersRepository.getCurrentUser()) {
-                is Resource.Success -> {
-                    _currentUser.value = result.data
-                    _isLoadingProfile.value = false
-                }
-                is Resource.Error -> {
-                    _profileUpdateResult.value = "Failed to load user info: ${result.message}"
-                    _isLoadingProfile.value = false
-                }
-                is Resource.Loading -> {
-                    _isLoadingProfile.value = true
-                }
-            }
-        }
-    }
-
-    /**
-     * Update user profile (name and email)
-     */
-    fun updateProfile(name: String, email: String) {
-        // Validation
-        if (name.isBlank()) {
-            _profileUpdateResult.value = "Name cannot be empty"
-            return
-        }
-        if (email.isBlank()) {
-            _profileUpdateResult.value = "Email cannot be empty"
-            return
-        }
-        if (!isValidEmail(email)) {
-            _profileUpdateResult.value = "Please enter a valid email address"
-            return
+        init {
+            loadCurrentUser()
         }
 
-        viewModelScope.launch {
-            _isLoadingProfile.value = true
-            val request = UpdateProfileRequest(name = name.trim(), email = email.trim())
-
-            when (val result = usersRepository.updateUser(request)) {
-                is Resource.Success -> {
-                    _currentUser.value = result.data
-                    _profileUpdateResult.value = "Profile updated successfully"
-                    _isLoadingProfile.value = false
-                }
-                is Resource.Error -> {
-                    _profileUpdateResult.value = "Failed to update profile: ${result.message}"
-                    _isLoadingProfile.value = false
-                }
-                is Resource.Loading -> {
-                    _isLoadingProfile.value = true
+        /**
+         * Load current user information
+         */
+        private fun loadCurrentUser() {
+            viewModelScope.launch {
+                _isLoadingProfile.value = true
+                when (val result = usersRepository.getCurrentUser()) {
+                    is Resource.Success -> {
+                        _currentUser.value = result.data
+                        _isLoadingProfile.value = false
+                    }
+                    is Resource.Error -> {
+                        _profileUpdateResult.value = "Failed to load user info: ${result.message}"
+                        _isLoadingProfile.value = false
+                    }
+                    is Resource.Loading -> {
+                        _isLoadingProfile.value = true
+                    }
                 }
             }
         }
-    }
 
-    // Change password with comprehensive validation
-    fun changePassword(currentPassword: String, newPassword: String, confirmPassword: String) {
-        if (currentPassword.isBlank()) {
-            _passwordUpdateResult.value = "Current password is required"
-            return
-        }
+        /**
+         * Update user profile (name and email)
+         */
+        fun updateProfile(
+            name: String,
+            email: String,
+        ) {
+            // Validation
+            if (name.isBlank()) {
+                _profileUpdateResult.value = "Name cannot be empty"
+                return
+            }
+            if (email.isBlank()) {
+                _profileUpdateResult.value = "Email cannot be empty"
+                return
+            }
+            if (!isValidEmail(email)) {
+                _profileUpdateResult.value = "Please enter a valid email address"
+                return
+            }
 
-        if (newPassword.isBlank()) {
-            _passwordUpdateResult.value = "New password is required"
-            return
-        }
+            viewModelScope.launch {
+                _isLoadingProfile.value = true
+                val request = UpdateProfileRequest(name = name.trim(), email = email.trim())
 
-        if (newPassword != confirmPassword) {
-            _passwordUpdateResult.value = "Passwords do not match"
-            return
-        }
-
-        if (currentPassword == newPassword) {
-            _passwordUpdateResult.value = "New password must be different from current password"
-            return
-        }
-
-        val validationResult = PasswordValidator.validate(newPassword)
-        if (!validationResult.isValid) {
-            _passwordUpdateResult.value = validationResult.errorMessage
-            return
-        }
-
-        viewModelScope.launch {
-            _isLoadingPassword.value = true
-            val request = ChangePasswordRequest(
-                currentPassword = currentPassword,
-                newPassword = newPassword
-            )
-
-            when (val result = authRepository.changePassword(request)) {
-                is Resource.Success -> {
-                    _passwordUpdateResult.value = "Password changed successfully"
-                    _isLoadingPassword.value = false
-                }
-                is Resource.Error -> {
-                    _passwordUpdateResult.value = "Failed to change password: ${result.message}"
-                    _isLoadingPassword.value = false
-                }
-                is Resource.Loading -> {
-                    _isLoadingPassword.value = true
+                when (val result = usersRepository.updateUser(request)) {
+                    is Resource.Success -> {
+                        _currentUser.value = result.data
+                        _profileUpdateResult.value = "Profile updated successfully"
+                        _isLoadingProfile.value = false
+                    }
+                    is Resource.Error -> {
+                        _profileUpdateResult.value = "Failed to update profile: ${result.message}"
+                        _isLoadingProfile.value = false
+                    }
+                    is Resource.Loading -> {
+                        _isLoadingProfile.value = true
+                    }
                 }
             }
         }
-    }
 
-    // Validate password in real-time (for UI feedback)
-    fun validatePasswordFormat(password: String): String? {
-        return PasswordValidator.getErrorMessage(password)
-    }
+        // Change password with comprehensive validation
+        @Suppress("ReturnCount")
+        fun changePassword(
+            currentPassword: String,
+            newPassword: String,
+            confirmPassword: String,
+        ) {
+            if (currentPassword.isBlank()) {
+                _passwordUpdateResult.value = "Current password is required"
+                return
+            }
 
-    // Clear result messages after they've been shown
+            if (newPassword.isBlank()) {
+                _passwordUpdateResult.value = "New password is required"
+                return
+            }
 
-    fun clearProfileResult() {
-        _profileUpdateResult.value = null
-    }
+            if (newPassword != confirmPassword) {
+                _passwordUpdateResult.value = "Passwords do not match"
+                return
+            }
 
-    fun clearPasswordResult() {
-        _passwordUpdateResult.value = null
-    }
+            if (currentPassword == newPassword) {
+                _passwordUpdateResult.value = "New password must be different from current password"
+                return
+            }
 
-    // Email validation helper
-    private fun isValidEmail(email: String): Boolean {
-        return emailValidator.isValid(email)
+            val validationResult = PasswordValidator.validate(newPassword)
+            if (!validationResult.isValid) {
+                _passwordUpdateResult.value = validationResult.errorMessage
+                return
+            }
+
+            viewModelScope.launch {
+                _isLoadingPassword.value = true
+                val request =
+                    ChangePasswordRequest(
+                        currentPassword = currentPassword,
+                        newPassword = newPassword,
+                    )
+
+                when (val result = authRepository.changePassword(request)) {
+                    is Resource.Success -> {
+                        _passwordUpdateResult.value = "Password changed successfully"
+                        _isLoadingPassword.value = false
+                    }
+                    is Resource.Error -> {
+                        _passwordUpdateResult.value = "Failed to change password: ${result.message}"
+                        _isLoadingPassword.value = false
+                    }
+                    is Resource.Loading -> {
+                        _isLoadingPassword.value = true
+                    }
+                }
+            }
+        }
+
+        // Validate password in real-time (for UI feedback)
+        fun validatePasswordFormat(password: String): String? {
+            return PasswordValidator.getErrorMessage(password)
+        }
+
+        // Clear result messages after they've been shown
+
+        fun clearProfileResult() {
+            _profileUpdateResult.value = null
+        }
+
+        fun clearPasswordResult() {
+            _passwordUpdateResult.value = null
+        }
+
+        // Email validation helper
+        private fun isValidEmail(email: String): Boolean {
+            return emailValidator.isValid(email)
+        }
     }
-}
