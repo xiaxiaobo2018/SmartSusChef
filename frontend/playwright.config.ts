@@ -20,11 +20,11 @@ export default defineConfig({
   // 失败重试次数
   retries: process.env.CI ? 2 : 0,
   
-  // 并行 worker 数量
-  workers: process.env.CI ? 1 : undefined,
+  // 使用单 worker 串行运行
+  workers: 1,
   
-  // 测试报告
-  reporter: 'html',
+  // 测试报告 - 不自动打开浏览器，避免端口占用
+  reporter: [['html', { open: 'never' }]],
   
   // 全局配置
   use: {

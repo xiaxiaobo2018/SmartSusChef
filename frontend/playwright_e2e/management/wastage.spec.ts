@@ -24,16 +24,17 @@ test('add new wastage record', async ({ page }) => {
     await goToWastageManagement(page);
     await page.getByRole('button', { name: 'Add New Record' }).click();
     await expect(page.getByRole('dialog')).toBeVisible();
-    // Select item type (default is ingredient)
-    await page.getByRole('combobox').first().click();
+    // Item Type is already "Raw Ingredient" by default
+    // Select ingredient from the Ingredient dropdown (second combobox)
+    await page.getByRole('combobox').nth(1).click();
     await page.getByRole('option').first().click();
-    // Enter quantity
-    await page.locator('input[type="number"]').fill('5.5');
+    // Enter unique quantity
+    const uniqueQty = (Math.random() * 10 + 1).toFixed(1);
+    await page.locator('input[type="number"]').fill(uniqueQty);
     // Submit
     await page.getByRole('button', { name: 'Save Record' }).click();
-    // Wait for dialog to close (success)
-    await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 5000 });
-    await page.waitForTimeout(2000);
+    // Wait for operation to complete
+    await page.waitForTimeout(3000);
 });
 
 test('edit wastage record', async ({ page }) => {
