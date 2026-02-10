@@ -16,6 +16,9 @@ export function ExportData() {
       await exportData(type);
       setLastExport(`csv-${type}`);
       toast.success(`${type.charAt(0).toUpperCase() + type.slice(1)} data exported as CSV successfully`);
+    } catch (error) {
+      console.error('Export failed:', error);
+      toast.error(`Failed to export ${type} data`);
     } finally {
       setIsExporting(null);
     }

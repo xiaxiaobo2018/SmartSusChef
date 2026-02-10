@@ -27,6 +27,7 @@ export function WastageTrendChart({
 
   const { chartData, totalCarbonFootprint } = useMemo(() => {
     const today = new Date();
+    today.setHours(23, 59, 59, 999); // End of day to ensure date comparisons work correctly
 
     // Calculate daysToShow based on the selected range
     let daysToShow: number;
@@ -43,9 +44,12 @@ export function WastageTrendChart({
         daysToShow = 30;
       } else {
         const earliest = wastageData.reduce((min, w) => w.date < min ? w.date : min, wastageData[0].date);
-        const earliestDate = new Date(earliest);
+        const earliestDate = parseISO(earliest); // Use parseISO for consistent parsing
         earliestDate.setHours(0, 0, 0, 0);
-        daysToShow = Math.max(1, Math.ceil((today.getTime() - earliestDate.getTime()) / (1000 * 60 * 60 * 24)) + 1);
+        // Use start of today for calculation to avoid off-by-one error
+        const todayStart = new Date(today);
+        todayStart.setHours(0, 0, 0, 0);
+        daysToShow = Math.max(1, Math.ceil((todayStart.getTime() - earliestDate.getTime()) / (1000 * 60 * 60 * 24)) + 1);
       }
     } else {
       daysToShow = maxDays ? Math.min(maxDays, 30) : 30;
@@ -57,6 +61,7 @@ export function WastageTrendChart({
     }
 
     const startDate = subDays(today, daysToShow - 1);
+    startDate.setHours(0, 0, 0, 0); // Start of day to ensure date comparisons work correctly
 
     const ingredientMap = new Map(ingredients.map((i) => [i.id, { ...i }]));
     const recipeMap = new Map(recipes.map((r) => [r.id, r]));
