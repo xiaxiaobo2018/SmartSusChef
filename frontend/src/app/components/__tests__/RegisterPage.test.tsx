@@ -4,8 +4,8 @@ import { RegisterPage } from '../RegisterPage';
 
 const registerMock = vi.fn();
 
-vi.mock('@/app/context/AppContext', () => ({
-  useApp: () => ({
+vi.mock('@/app/context/AuthContext', () => ({
+  useAuth: () => ({
     register: registerMock,
   }),
 }));

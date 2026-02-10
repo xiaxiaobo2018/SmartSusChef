@@ -1,0 +1,104 @@
+# .github/workflows/security-scan.yml
+
+name: Security Scan (CodeQL)
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    - cron: '30 1 * * 0'
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+      actions: read
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'csharp', 'javascript-typescript', 'python', 'java-kotlin' ]
+        include:
+          - language: 'csharp'
+            build-dir: 'backend'
+          - language: 'javascript-typescript'
+            build-dir: 'frontend'
+          - language: 'python'
+            build-dir: 'ML'
+          - language: 'java-kotlin'
+            build-dir: 'mobile'
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up JDK17
+        if: matrix.language == 'java-kotlin'
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'gradle'
+      
+      - name: Setup .NET
+        if: matrix.language == 'csharp'
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      
+      - name: Setup Node.js
+        if: matrix.language == 'javascript-typescript'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      
+      - name: Setup Python
+        if: matrix.language == 'python'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: ML/requirements.txt
+      
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+      
+      # Manual builds for each language
+      - name: Build C#
+        if: matrix.language == 'csharp'
+        run: |
+          dotnet restore SmartSusChef.sln
+          dotnet build SmartSusChef.sln --configuration Release --no-restore
+        working-directory: ./backend
+      
+      - name: Build JavaScript/TypeScript
+        if: matrix.language == 'javascript-typescript'
+        run: |
+          npm ci
+          npm run build
+        working-directory: ./frontend
+      
+      - name: Build Python
+        if: matrix.language == 'python'
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+        working-directory: ./ML
+      
+      - name: Build Java/Kotlin
+        if: matrix.language == 'java-kotlin'
+        run: ./gradlew assembleDebug --no-daemon
+        working-directory: ./mobile
+      
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{ matrix.language }}"

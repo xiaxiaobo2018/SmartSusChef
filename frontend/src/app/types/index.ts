@@ -71,6 +71,9 @@ export interface WastageData {
   editHistory?: EditHistory[]; // Added for audit trail
 }
 
+// Alias for test compatibility
+export type WastageEntry = WastageData;
+
 export interface ForecastData {
   date: string; // YYYY-MM-DD
   recipeId: string;

@@ -5,8 +5,8 @@ import { authApi } from '@/app/services/api';
 
 const loginMock = vi.fn();
 
-vi.mock('@/app/context/AppContext', () => ({
-  useApp: () => ({
+vi.mock('@/app/context/AuthContext', () => ({
+  useAuth: () => ({
     login: loginMock,
   }),
 }));

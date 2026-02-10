@@ -3,9 +3,13 @@ import {
     setAuthToken,
     getAuthToken,
     authApi,
+    usersApi,
+    storeApi,
     LoginRequest,
     RegisterRequest,
 } from '../api';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 
 // Mock global fetch
 const mockFetch = vi.fn();
@@ -421,6 +425,223 @@ describe('api service', () => {
                     }),
                 })
             );
+        });
+    });
+
+    // ==========================================
+    // USERS API TESTS
+    // ==========================================
+    describe('usersApi', () => {
+        beforeEach(() => {
+            setAuthToken('test-token');
+        });
+
+        describe('getAll', () => {
+            it('should fetch all users', async () => {
+                const mockUsers = [
+                    { id: '1', username: 'user1', name: 'User One', email: 'user1@test.com', role: 'Manager', status: 'Active' },
+                    { id: '2', username: 'user2', name: 'User Two', email: 'user2@test.com', role: 'Staff', status: 'Active' },
+                ];
+
+                mockFetch.mockResolvedValueOnce({
+                    ok: true,
+                    status: 200,
+                    json: async () => mockUsers,
+                });
+
+                const result = await usersApi.getAll();
+
+                expect(result).toEqual(mockUsers);
+                expect(mockFetch).toHaveBeenCalledWith(
+                    `${API_BASE_URL}/users`,
+                    expect.objectContaining({
+                        headers: expect.anything(),
+                    })
+                );
+            });
+        });
+
+        describe('create', () => {
+            it('should create a new user', async () => {
+                const newUser = {
+                    username: 'newuser',
+                    password: 'password123',
+                    name: 'New User',
+                    email: 'new@test.com',
+                    role: 'Staff' as const,
+                };
+                const createdUser = { id: '3', ...newUser, status: 'Active' };
+
+                mockFetch.mockResolvedValueOnce({
+                    ok: true,
+                    status: 201,
+                    json: async () => createdUser,
+                });
+
+                const result = await usersApi.create(newUser);
+
+                expect(result).toEqual(createdUser);
+                expect(mockFetch).toHaveBeenCalledWith(
+                    `${API_BASE_URL}/users`,
+                    expect.objectContaining({
+                        method: 'POST',
+                        body: JSON.stringify(newUser),
+                    })
+                );
+            });
+        });
+
+        describe('update', () => {
+            it('should update an existing user', async () => {
+                const userId = '1';
+                const updates = { name: 'Updated Name', email: 'updated@test.com' };
+                const updatedUser = { id: userId, username: 'user1', ...updates, role: 'Manager', status: 'Active' };
+
+                mockFetch.mockResolvedValueOnce({
+                    ok: true,
+                    status: 200,
+                    json: async () => updatedUser,
+                });
+
+                const result = await usersApi.update(userId, updates);
+
+                expect(result).toEqual(updatedUser);
+                expect(mockFetch).toHaveBeenCalledWith(
+                    `${API_BASE_URL}/users/${userId}`,
+                    expect.objectContaining({
+                        method: 'PUT',
+                        body: JSON.stringify(updates),
+                    })
+                );
+            });
+        });
+
+        describe('delete', () => {
+            it('should delete a user', async () => {
+                const userId = '1';
+
+                mockFetch.mockResolvedValueOnce({
+                    ok: true,
+                    status: 204,
+                });
+
+                await usersApi.delete(userId);
+
+                expect(mockFetch).toHaveBeenCalledWith(
+                    `${API_BASE_URL}/users/${userId}`,
+                    expect.objectContaining({
+                        method: 'DELETE',
+                    })
+                );
+            });
+        });
+    });
+
+    // ==========================================
+    // STORE API TESTS
+    // ==========================================
+    describe('storeApi', () => {
+        beforeEach(() => {
+            setAuthToken('test-token');
+        });
+
+        describe('get', () => {
+            it('should fetch store settings', async () => {
+                const mockStore = {
+                    id: 1,
+                    name: 'Test Store',
+                    latitude: 40.7128,
+                    longitude: -74.0060,
+                    countryCode: 'US',
+                };
+
+                mockFetch.mockResolvedValueOnce({
+                    ok: true,
+                    status: 200,
+                    json: async () => mockStore,
+                });
+
+                const result = await storeApi.get();
+
+                expect(result).toEqual(mockStore);
+                expect(mockFetch).toHaveBeenCalledWith(
+                    `${API_BASE_URL}/store`,
+                    expect.anything()
+                );
+            });
+        });
+
+        describe('getStatus', () => {
+            it('should fetch store setup status', async () => {
+                const mockStatus = { storeSetupRequired: false };
+
+                mockFetch.mockResolvedValueOnce({
+                    ok: true,
+                    status: 200,
+                    json: async () => mockStatus,
+                });
+
+                const result = await storeApi.getStatus();
+
+                expect(result).toEqual(mockStatus);
+                expect(mockFetch).toHaveBeenCalledWith(
+                    `${API_BASE_URL}/store/status`,
+                    expect.anything()
+                );
+            });
+        });
+
+        describe('setup', () => {
+            it('should setup a new store', async () => {
+                const storeData = {
+                    name: 'New Store',
+                    latitude: 51.5074,
+                    longitude: -0.1278,
+                    countryCode: 'GB',
+                };
+                const createdStore = { id: 1, ...storeData };
+
+                mockFetch.mockResolvedValueOnce({
+                    ok: true,
+                    status: 201,
+                    json: async () => createdStore,
+                });
+
+                const result = await storeApi.setup(storeData);
+
+                expect(result).toEqual(createdStore);
+                expect(mockFetch).toHaveBeenCalledWith(
+                    `${API_BASE_URL}/store/setup`,
+                    expect.objectContaining({
+                        method: 'POST',
+                        body: JSON.stringify(storeData),
+                    })
+                );
+            });
+        });
+
+        describe('update', () => {
+            it('should update store settings', async () => {
+                const updates = { name: 'Updated Store', latitude: 48.8566 };
+                const updatedStore = { id: 1, ...updates, longitude: 2.3522, countryCode: 'FR' };
+
+                mockFetch.mockResolvedValueOnce({
+                    ok: true,
+                    status: 200,
+                    json: async () => updatedStore,
+                });
+
+                const result = await storeApi.update(updates);
+
+                expect(result).toEqual(updatedStore);
+                expect(mockFetch).toHaveBeenCalledWith(
+                    `${API_BASE_URL}/store`,
+                    expect.objectContaining({
+                        method: 'PUT',
+                        body: JSON.stringify(updates),
+                    })
+                );
+            });
         });
     });
 });
