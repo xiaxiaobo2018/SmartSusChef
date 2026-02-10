@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useApp } from '@/app/context/AppContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/app/components/ui/card';
 import { Button } from '@/app/components/ui/button';
@@ -7,7 +7,7 @@ import { Label } from '@/app/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/app/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/app/components/ui/dialog';
-import { format, parseISO } from 'date-fns';
+import { format } from 'date-fns';
 import { Plus, Edit, Trash2, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -107,7 +107,7 @@ export function SalesInputForm() {
 
       setSelectedRecipe('');
       setQuantity('');
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to save sales data');
     } finally {
       setIsSubmitting(false);
@@ -126,7 +126,7 @@ export function SalesInputForm() {
     }
   };
 
-  const handleEdit = (entry: any) => {
+  const handleEdit = (entry: { id: string; recipeId: string; quantity: number }) => {
     setEditingId(entry.id);
     setSelectedRecipe(entry.recipeId);
     setQuantity(entry.quantity.toString());
@@ -144,7 +144,7 @@ export function SalesInputForm() {
     try {
       await deleteSalesData(deletingData.id);
       toast.success('Entry deleted successfully');
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to delete entry');
     } finally {
       setIsDeleting(false);

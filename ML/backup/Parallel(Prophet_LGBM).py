@@ -29,14 +29,15 @@ except Exception:
 
 try:
     import seaborn as sns  # type: ignore
+
     sns.set_theme()
 except Exception:
     sns = None
 
 import matplotlib.pyplot as plt
 
-plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei']
-plt.rcParams['axes.unicode_minus'] = False
+plt.rcParams["font.sans-serif"] = ["SimHei", "Microsoft YaHei"]
+plt.rcParams["axes.unicode_minus"] = False
 
 HORIZON_DAYS = 14
 MAX_DISHES: int | None = None  # None = process all dishes
@@ -62,15 +63,15 @@ PROPHET_PARAMS = {
 LGBM_PARAMS = {
     "n_estimators": 600,
     "learning_rate": 0.05,
-    "num_leaves": 31,       # Controls complexity (approx max_depth 5-6)
-    "max_depth": -1,        # -1 means no limit, rely on num_leaves
-    "subsample": 0.8,       # Row subsampling
-    "colsample_bytree": 0.8,# Feature subsampling
-    "reg_alpha": 0.1,       # L1 Regularization
-    "reg_lambda": 1.0,      # L2 Regularization
+    "num_leaves": 31,  # Controls complexity (approx max_depth 5-6)
+    "max_depth": -1,  # -1 means no limit, rely on num_leaves
+    "subsample": 0.8,  # Row subsampling
+    "colsample_bytree": 0.8,  # Feature subsampling
+    "reg_alpha": 0.1,  # L1 Regularization
+    "reg_lambda": 1.0,  # L2 Regularization
     "random_state": 42,
-    "n_jobs": -1,           # Use all cores
-    "verbose": -1           # Suppress warnings
+    "n_jobs": -1,  # Use all cores
+    "verbose": -1,  # Suppress warnings
 }
 
 # File Paths
@@ -146,8 +147,8 @@ def _add_holiday_flag(ds: pd.Series, holidays: pd.DataFrame) -> pd.Series:
     ds_vals = pd.to_datetime(ds).to_numpy(dtype="datetime64[D]")
     flag = np.zeros(len(ds_vals), dtype=bool)
     for row in holidays.itertuples(index=False):
-        start = (np.datetime64(row.ds, "D") + np.timedelta64(row.lower_window, "D"))
-        end = (np.datetime64(row.ds, "D") + np.timedelta64(row.upper_window, "D"))
+        start = np.datetime64(row.ds, "D") + np.timedelta64(row.lower_window, "D")
+        end = np.datetime64(row.ds, "D") + np.timedelta64(row.upper_window, "D")
         flag |= (ds_vals >= start) & (ds_vals <= end)
     return pd.Series(flag.astype(int), index=ds.index)
 
@@ -167,7 +168,9 @@ def _prepare_dish_daily_series(df: pd.DataFrame, dish: str) -> pd.DataFrame:
     return daily
 
 
-def _merge_exog(dish_daily: pd.DataFrame, weather: pd.DataFrame, holidays: pd.DataFrame) -> pd.DataFrame:
+def _merge_exog(
+    dish_daily: pd.DataFrame, weather: pd.DataFrame, holidays: pd.DataFrame
+) -> pd.DataFrame:
     df_all = dish_daily.merge(weather, on="ds", how="left").sort_values("ds")
     for c in REG_COLS:
         df_all[c] = df_all[c].ffill().fillna(0.0)
@@ -270,10 +273,10 @@ def _recursive_hybrid_forecast(
 
         # Hybrid: Final = Prophet Trend + LGBM Residual
         yhat = float(feat["prophet_yhat"]) + resid_hat
-        yhat = max(0.0, yhat) # Sales cannot be negative
+        yhat = max(0.0, yhat)  # Sales cannot be negative
 
         rows.append({"ds": ds, "yhat": yhat})
-        y_hist.append(yhat) # Append prediction to history for next iteration
+        y_hist.append(yhat)  # Append prediction to history for next iteration
 
     return pd.DataFrame(rows)
 
@@ -284,9 +287,7 @@ def _train_hybrid(df_feat: pd.DataFrame, holidays: pd.DataFrame):
     # Use full dataset if data is scarce
     if len(df_feat) < max(120, HORIZON_DAYS * 3):
         p_train, _ = _fit_prophet_and_predict(
-            df_feat[["ds", "y"] + REG_COLS],
-            df_feat[["ds", "y"] + REG_COLS],
-            holidays
+            df_feat[["ds", "y"] + REG_COLS], df_feat[["ds", "y"] + REG_COLS], holidays
         )
         model, cols = _train_lgbm_on_residuals(df_feat, p_train)
         return model, cols, None
@@ -297,9 +298,7 @@ def _train_hybrid(df_feat: pd.DataFrame, holidays: pd.DataFrame):
     val_df = df_feat.iloc[split:].copy()
 
     p_train, p_val = _fit_prophet_and_predict(
-        train_df[["ds", "y"] + REG_COLS],
-        val_df[["ds", "y"] + REG_COLS],
-        holidays
+        train_df[["ds", "y"] + REG_COLS], val_df[["ds", "y"] + REG_COLS], holidays
     )
 
     # Train LGBM on residuals
@@ -328,7 +327,9 @@ def forecast_one_dish(df, weather, holidays, dish) -> DishForecast:
     model, cols, val_mae = _train_hybrid(df_feat, holidays)
 
     # Step 2: Future Forecast Prep
-    future_ds = pd.date_range(df_all["ds"].max() + pd.Timedelta(days=1), periods=HORIZON_DAYS, freq="D")
+    future_ds = pd.date_range(
+        df_all["ds"].max() + pd.Timedelta(days=1), periods=HORIZON_DAYS, freq="D"
+    )
 
     # Prepare future weather
     if DATA_WEATHER_FUTURE.exists():
@@ -349,9 +350,7 @@ def forecast_one_dish(df, weather, holidays, dish) -> DishForecast:
 
     # Step 3: Retrain Prophet on FULL data
     p_full, p_future = _fit_prophet_and_predict(
-        df_feat[["ds", "y"] + REG_COLS],
-        future_exog[["ds"] + REG_COLS],
-        holidays
+        df_feat[["ds", "y"] + REG_COLS], future_exog[["ds"] + REG_COLS], holidays
     )
     # Step 4: Retrain LGBM on FULL data residuals
     model_full, cols = _train_lgbm_on_residuals(df_feat, p_full)
@@ -370,13 +369,14 @@ def forecast_one_dish(df, weather, holidays, dish) -> DishForecast:
 
 
 def plot_results(results, summary, top_n=TOP_N_PLOT):
-    if not results: return
+    if not results:
+        return
     top = summary.sort_values("forecast_sum", ascending=False).head(top_n)
     top_dishes = top["dish"].tolist()
 
     # Bar Plot
     plt.figure(figsize=(12, max(4, 0.4 * len(top))))
-    plt.barh(top["dish"], top["forecast_sum"], color='skyblue')
+    plt.barh(top["dish"], top["forecast_sum"], color="skyblue")
     plt.gca().invert_yaxis()
     plt.title(f"Prophet + LightGBM: Top {len(top)} Sales Forecast ({HORIZON_DAYS} Days)")
     plt.xlabel("Total Forecasted Sales")
@@ -395,10 +395,11 @@ def plot_results(results, summary, top_n=TOP_N_PLOT):
     for i, dish in enumerate(top_dishes):
         ax = axes[i]
         r = by_dish[dish]
-        ax.plot(r.history_tail["ds"], r.history_tail["y"], 'k.-', alpha=0.3, label="History")
-        ax.plot(r.pred_future["ds"], r.pred_future["yhat"], 'r.-', label="Forecast(LGBM)")
+        ax.plot(r.history_tail["ds"], r.history_tail["y"], "k.-", alpha=0.3, label="History")
+        ax.plot(r.pred_future["ds"], r.pred_future["yhat"], "r.-", label="Forecast(LGBM)")
         ax.set_title(dish)
-        if i == 0: ax.legend()
+        if i == 0:
+            ax.legend()
 
     plt.tight_layout()
     plt.savefig(OUT_DIR / f"forecast_top{len(top_dishes)}_lines.png", dpi=200)
@@ -412,7 +413,8 @@ def main():
 
     # Use "菜品" as per original dataset column name
     dishes = df["菜品"].dropna().unique().tolist()
-    if MAX_DISHES: dishes = dishes[:MAX_DISHES]
+    if MAX_DISHES:
+        dishes = dishes[:MAX_DISHES]
 
     results = []
     print(f"Starting Prophet + LightGBM training for {len(dishes)} dishes...")
@@ -427,19 +429,20 @@ def main():
             print(f"[{i}/{len(dishes)}] {dish}: FAILED {e}")
 
     if results:
-
         summary_rows = []
         for r in results:
             preds = r.pred_future["yhat"]
             dates = pd.to_datetime(r.pred_future["ds"])
-            summary_rows.append({
-                "dish": r.dish,
-                "val_mae": r.val_mae,
-                "forecast_sum": preds.sum(),
-                "forecast_mean": preds.mean(),
-                "forecast_start": dates.min().strftime("%Y-%m-%d"),
-                "forecast_end": dates.max().strftime("%Y-%m-%d")
-            })
+            summary_rows.append(
+                {
+                    "dish": r.dish,
+                    "val_mae": r.val_mae,
+                    "forecast_sum": preds.sum(),
+                    "forecast_mean": preds.mean(),
+                    "forecast_start": dates.min().strftime("%Y-%m-%d"),
+                    "forecast_end": dates.max().strftime("%Y-%m-%d"),
+                }
+            )
 
         summary = pd.DataFrame(summary_rows)
 
@@ -448,6 +451,7 @@ def main():
         summary.to_csv(OUT_DIR / "summary.csv", index=False, encoding="utf-8-sig")
         plot_results(results, summary)
         print("All forecasts completed. Results saved to 'outputs_lgbm' directory.")
+
 
 if __name__ == "__main__":
     main()

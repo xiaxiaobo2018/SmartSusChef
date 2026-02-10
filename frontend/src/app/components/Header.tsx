@@ -1,4 +1,3 @@
-import React from 'react';
 import { useApp } from '@/app/context/AppContext';
 import { ChefHat, LogOut, Settings } from 'lucide-react';
 import { Button } from '@/app/components/ui/button';
@@ -10,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/app/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback, AvatarImage } from '@/app/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/app/components/ui/avatar';
 
 interface HeaderProps {
   onNavigateToSettings?: () => void;
@@ -48,7 +47,7 @@ export function Header({ onNavigateToSettings, showSettingsLink = true }: Header
         {storeSettings && (
           <div className="hidden sm:flex items-center border-r pr-4 mr-2 border-gray-200 h-8">
             <span className="text-sm font-bold text-[#1A1C18]">
-              {storeSettings.storeName} | {storeSettings.outletLocation}
+              {storeSettings.storeName} | {storeSettings.companyName || 'No Company Name'}
             </span>
           </div>
         )}

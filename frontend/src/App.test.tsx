@@ -1,6 +1,5 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import React from 'react';
 import App from './App'; // This will likely cause an error if App.tsx doesn't exist yet
 
 describe('App', () => {

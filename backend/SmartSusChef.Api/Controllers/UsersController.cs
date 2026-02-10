@@ -41,44 +41,12 @@ public class UsersController : ControllerBase
     [Authorize(Roles = "Manager")]
     public async Task<ActionResult<UserListDto>> CreateUser([FromBody] CreateUserRequest request)
     {
-        // 1. Validate that a password was actually provided
-        if (string.IsNullOrWhiteSpace(request.Password))
-        {
-            return BadRequest(new { message = "Initial password is required for new users." });
-        }
-
-        // 2. Validate password length
-        if (request.Password.Length < 12 || request.Password.Length > 36)
-        {
-            return BadRequest(new { message = "Password must be between 12 and 36 characters long." });
-        }
-
-        // 3. Validate password complexity
-        if (!System.Text.RegularExpressions.Regex.IsMatch(request.Password, @"[A-Z]"))
-        {
-            return BadRequest(new { message = "Password must contain at least one uppercase letter." });
-        }
-        if (!System.Text.RegularExpressions.Regex.IsMatch(request.Password, @"[a-z]"))
-        {
-            return BadRequest(new { message = "Password must contain at least one lowercase letter." });
-        }
-        if (!System.Text.RegularExpressions.Regex.IsMatch(request.Password, @"\d"))
-        {
-            return BadRequest(new { message = "Password must contain at least one number." });
-        }
-        if (!System.Text.RegularExpressions.Regex.IsMatch(request.Password, @"[@$!%*?&#\^()\-_=+\[\]{}|;:',.<>\/~`]"))
-        {
-            return BadRequest(new { message = "Password must contain at least one special character." });
-        }
-
         var storeId = GetStoreIdFromClaims();
         if (storeId == null)
         {
             return BadRequest(new { message = "Store ID not found in token" });
         }
 
-        // 3. Pass the request (now containing the password) to the service
-        // Ensure AuthService.CreateUserAsync hashes this password using BCrypt
         var user = await _authService.CreateUserAsync(request, storeId.Value);
 
         if (user == null)

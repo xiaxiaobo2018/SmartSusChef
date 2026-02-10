@@ -6,6 +6,7 @@ using SmartSusChef.Api.DTOs;
 using SmartSusChef.Api.Services;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -66,95 +67,69 @@ public class UsersControllerTests
         Assert.Equal("GetAllUsers", actionResult.ActionName);
     }
 
-    [Fact]
-    public async Task CreateUser_ShouldReturnBadRequest_WhenPasswordIsMissing()
+    private static bool ValidateModel(object model, out List<ValidationResult> results)
     {
-        // Arrange
-        var request = new CreateUserRequest("test", "", "test", "test", "test");
-
-        // Act
-        var result = await _controller.CreateUser(request);
-
-        // Assert
-        var actionResult = Assert.IsType<BadRequestObjectResult>(result.Result);
+        var context = new ValidationContext(model);
+        results = new List<ValidationResult>();
+        return Validator.TryValidateObject(model, context, results, validateAllProperties: true);
     }
 
     [Fact]
-    public async Task CreateUser_ShouldReturnBadRequest_WhenPasswordIsTooShort()
+    public void CreateUser_DtoValidation_ShouldFail_WhenPasswordIsMissing()
     {
-        // Arrange — 11 chars, meets complexity but too short
-        var request = new CreateUserRequest("test", "Abcdefgh1@!", "test", "test", "test");
-
-        // Act
-        var result = await _controller.CreateUser(request);
-
-        // Assert
-        var actionResult = Assert.IsType<BadRequestObjectResult>(result.Result);
+        var request = new CreateUserRequest("test", "", "test", "test@test.com", "employee");
+        var isValid = ValidateModel(request, out var results);
+        Assert.False(isValid);
     }
 
     [Fact]
-    public async Task CreateUser_ShouldReturnBadRequest_WhenPasswordIsTooLong()
+    public void CreateUser_DtoValidation_ShouldFail_WhenPasswordIsTooShort()
     {
-        // Arrange — 37 chars, exceeds max of 36
-        var request = new CreateUserRequest("test", "Abcdefghijklmnopqrstuvwxyz12345@!!!!!", "test", "test", "test");
-
-        // Act
-        var result = await _controller.CreateUser(request);
-
-        // Assert
-        var actionResult = Assert.IsType<BadRequestObjectResult>(result.Result);
+        // 11 chars, meets complexity but too short
+        var request = new CreateUserRequest("test", "Abcdefgh1@!", "test", "test@test.com", "employee");
+        var isValid = ValidateModel(request, out var results);
+        Assert.False(isValid);
     }
 
     [Fact]
-    public async Task CreateUser_ShouldReturnBadRequest_WhenPasswordMissingUppercase()
+    public void CreateUser_DtoValidation_ShouldFail_WhenPasswordIsTooLong()
     {
-        // Arrange
-        var request = new CreateUserRequest("test", "abcdefgh123@", "test", "test", "test");
-
-        // Act
-        var result = await _controller.CreateUser(request);
-
-        // Assert
-        var actionResult = Assert.IsType<BadRequestObjectResult>(result.Result);
+        // 37 chars, exceeds max of 36
+        var request = new CreateUserRequest("test", "Abcdefghijklmnopqrstuvwxyz12345@!!!!!", "test", "test@test.com", "employee");
+        var isValid = ValidateModel(request, out var results);
+        Assert.False(isValid);
     }
 
     [Fact]
-    public async Task CreateUser_ShouldReturnBadRequest_WhenPasswordMissingLowercase()
+    public void CreateUser_DtoValidation_ShouldFail_WhenPasswordMissingUppercase()
     {
-        // Arrange
-        var request = new CreateUserRequest("test", "ABCDEFGH123@", "test", "test", "test");
-
-        // Act
-        var result = await _controller.CreateUser(request);
-
-        // Assert
-        var actionResult = Assert.IsType<BadRequestObjectResult>(result.Result);
+        var request = new CreateUserRequest("test", "abcdefgh123@", "test", "test@test.com", "employee");
+        var isValid = ValidateModel(request, out var results);
+        Assert.False(isValid);
     }
 
     [Fact]
-    public async Task CreateUser_ShouldReturnBadRequest_WhenPasswordMissingNumber()
+    public void CreateUser_DtoValidation_ShouldFail_WhenPasswordMissingLowercase()
     {
-        // Arrange
-        var request = new CreateUserRequest("test", "Abcdefghijk@", "test", "test", "test");
-
-        // Act
-        var result = await _controller.CreateUser(request);
-
-        // Assert
-        var actionResult = Assert.IsType<BadRequestObjectResult>(result.Result);
+        var request = new CreateUserRequest("test", "ABCDEFGH123@", "test", "test@test.com", "employee");
+        var isValid = ValidateModel(request, out var results);
+        Assert.False(isValid);
     }
 
     [Fact]
-    public async Task CreateUser_ShouldReturnBadRequest_WhenPasswordMissingSpecialChar()
+    public void CreateUser_DtoValidation_ShouldFail_WhenPasswordMissingNumber()
     {
-        // Arrange
-        var request = new CreateUserRequest("test", "Abcdefghij12", "test", "test", "test");
+        var request = new CreateUserRequest("test", "Abcdefghijk@", "test", "test@test.com", "employee");
+        var isValid = ValidateModel(request, out var results);
+        Assert.False(isValid);
+    }
 
-        // Act
-        var result = await _controller.CreateUser(request);
-
-        // Assert
-        var actionResult = Assert.IsType<BadRequestObjectResult>(result.Result);
+    [Fact]
+    public void CreateUser_DtoValidation_ShouldFail_WhenPasswordMissingSpecialChar()
+    {
+        var request = new CreateUserRequest("test", "Abcdefghij12", "test", "test@test.com", "employee");
+        var isValid = ValidateModel(request, out var results);
+        Assert.False(isValid);
     }
 
     [Fact]

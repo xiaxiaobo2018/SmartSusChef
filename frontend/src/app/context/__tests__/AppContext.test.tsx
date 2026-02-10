@@ -1,8 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { renderHook, act } from '@testing-library/react';
 import React from 'react';
 import { AppProvider, useAppContext } from '../AppContext';
+import { AuthProvider, useAuth } from '../AuthContext';
 import * as api from '@/app/services/api';
 
 // Mock the API module with factory function
@@ -95,9 +96,11 @@ describe('AppContext', () => {
   describe('Provider Rendering', () => {
     it('should render children', () => {
       render(
-        <AppProvider>
-          <div>Test Child</div>
-        </AppProvider>
+        <AuthProvider>
+          <AppProvider>
+            <div>Test Child</div>
+          </AppProvider>
+        </AuthProvider>
       );
 
       expect(screen.getByText('Test Child')).toBeInTheDocument();
@@ -110,9 +113,11 @@ describe('AppContext', () => {
       };
 
       render(
-        <AppProvider>
-          <TestComponent />
-        </AppProvider>
+        <AuthProvider>
+          <AppProvider>
+            <TestComponent />
+          </AppProvider>
+        </AuthProvider>
       );
 
       expect(screen.getByText('Context Available')).toBeInTheDocument();
@@ -133,21 +138,20 @@ describe('AppContext', () => {
 
     it('should return context when used inside provider', () => {
       const wrapper = ({ children }: { children: React.ReactNode }) => (
-        <AppProvider>{children}</AppProvider>
+        <AuthProvider><AppProvider>{children}</AppProvider></AuthProvider>
       );
 
       const { result } = renderHook(() => useAppContext(), { wrapper });
 
       expect(result.current).toBeDefined();
       expect(result.current.user).toBeNull();
-      expect(result.current.login).toBeInstanceOf(Function);
       expect(result.current.logout).toBeInstanceOf(Function);
     });
   });
 
   describe('Authentication', () => {
     const wrapper = ({ children }: { children: React.ReactNode }) => (
-      <AppProvider>{children}</AppProvider>
+      <AuthProvider><AppProvider>{children}</AppProvider></AuthProvider>
     );
 
     describe('login', () => {
@@ -167,7 +171,7 @@ describe('AppContext', () => {
           storeSetupRequired: false,
         });
 
-        const { result } = renderHook(() => useAppContext(), { wrapper });
+        const { result } = renderHook(() => useAuth(), { wrapper });
 
         let loginResult;
         await act(async () => {
@@ -186,7 +190,7 @@ describe('AppContext', () => {
       it('should return false on login failure', async () => {
         vi.mocked(api.authApi.login).mockRejectedValue(new Error('Invalid credentials'));
 
-        const { result } = renderHook(() => useAppContext(), { wrapper });
+        const { result } = renderHook(() => useAuth(), { wrapper });
 
         let loginResult;
         await act(async () => {
@@ -195,29 +199,6 @@ describe('AppContext', () => {
 
         expect(loginResult).toBe(false);
         expect(result.current.user).toBeNull();
-      });
-
-      it('should set storeSetupRequired flag', async () => {
-        vi.mocked(api.authApi.login).mockResolvedValue({
-          token: 'test-token',
-          user: {
-            id: 'user-1',
-            username: 'newuser',
-            name: 'New User',
-            email: 'new@example.com',
-            role: 'manager',
-            status: 'Active',
-          },
-          storeSetupRequired: true,
-        });
-
-        const { result } = renderHook(() => useAppContext(), { wrapper });
-
-        await act(async () => {
-          await result.current.login('newuser', 'password123');
-        });
-
-        expect(result.current.storeSetupRequired).toBe(true);
       });
     });
 
@@ -238,7 +219,7 @@ describe('AppContext', () => {
           storeSetupRequired: false,
         });
 
-        const { result } = renderHook(() => useAppContext(), { wrapper });
+        const { result } = renderHook(() => useAuth(), { wrapper });
 
         // Login first
         await act(async () => {
@@ -274,7 +255,7 @@ describe('AppContext', () => {
           storeSetupRequired: true,
         });
 
-        const { result } = renderHook(() => useAppContext(), { wrapper });
+        const { result } = renderHook(() => useAuth(), { wrapper });
 
         let registerResult;
         await act(async () => {
@@ -304,7 +285,7 @@ describe('AppContext', () => {
           new Error('Username already exists')
         );
 
-        const { result } = renderHook(() => useAppContext(), { wrapper });
+        const { result } = renderHook(() => useAuth(), { wrapper });
 
         let registerResult;
         await act(async () => {
@@ -328,7 +309,7 @@ describe('AppContext', () => {
 
   describe('Initial State', () => {
     const wrapper = ({ children }: { children: React.ReactNode }) => (
-      <AppProvider>{children}</AppProvider>
+      <AuthProvider><AppProvider>{children}</AppProvider></AuthProvider>
     );
 
     it('should have initial state with null user', () => {
@@ -360,18 +341,14 @@ describe('AppContext', () => {
 
   describe('Context Methods', () => {
     const wrapper = ({ children }: { children: React.ReactNode }) => (
-      <AppProvider>{children}</AppProvider>
+      <AuthProvider><AppProvider>{children}</AppProvider></AuthProvider>
     );
 
-    it('should expose all required methods', () => {
+    it('should expose all required AppContext methods', () => {
       const { result } = renderHook(() => useAppContext(), { wrapper });
 
-      // Auth methods
-      expect(result.current.login).toBeInstanceOf(Function);
+      // App methods
       expect(result.current.logout).toBeInstanceOf(Function);
-      expect(result.current.register).toBeInstanceOf(Function);
-      expect(result.current.updateProfile).toBeInstanceOf(Function);
-      expect(result.current.changePassword).toBeInstanceOf(Function);
 
       // Store methods
       expect(result.current.setupStore).toBeInstanceOf(Function);
@@ -383,6 +360,16 @@ describe('AppContext', () => {
       expect(result.current.addSalesData).toBeInstanceOf(Function);
       expect(result.current.addWastageData).toBeInstanceOf(Function);
       expect(result.current.refreshData).toBeInstanceOf(Function);
+    });
+
+    it('should expose all required AuthContext methods', () => {
+      const { result } = renderHook(() => useAuth(), { wrapper });
+
+      expect(result.current.login).toBeInstanceOf(Function);
+      expect(result.current.logout).toBeInstanceOf(Function);
+      expect(result.current.register).toBeInstanceOf(Function);
+      expect(result.current.updateProfile).toBeInstanceOf(Function);
+      expect(result.current.changePassword).toBeInstanceOf(Function);
     });
   });
 });

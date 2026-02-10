@@ -32,20 +32,22 @@ except Exception:
 
 try:
     import optuna
-    optuna.logging.set_verbosity(optuna.logging.WARNING) # Suppress spammy logs
+
+    optuna.logging.set_verbosity(optuna.logging.WARNING)  # Suppress spammy logs
 except ImportError:
     raise ImportError("Missing dependency: optuna. Please run: pip install optuna")
 
 try:
     import seaborn as sns
+
     sns.set_theme()
 except Exception:
     sns = None
 
 import matplotlib.pyplot as plt
 
-plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei']
-plt.rcParams['axes.unicode_minus'] = False
+plt.rcParams["font.sans-serif"] = ["SimHei", "Microsoft YaHei"]
+plt.rcParams["axes.unicode_minus"] = False
 warnings.filterwarnings("ignore")
 
 
@@ -78,6 +80,7 @@ PROPHET_PARAMS = {
     "yearly_seasonality": False,
 }
 
+
 @dataclass(frozen=True)
 class DishForecast:
     dish: str
@@ -86,20 +89,27 @@ class DishForecast:
     history_tail: pd.DataFrame
     best_params: dict  # To store Optuna results
 
+
 def _sanitize_filename(name: str, max_len: int = 120) -> str:
     s = re.sub(r"[\\\\/:*?\"<>|]+", "_", name.strip())
     s = re.sub(r"\\s+", " ", s).strip()
-    if not s: s = "unnamed"
+    if not s:
+        s = "unnamed"
     return s[:max_len]
+
 
 def _ensure_dirs() -> None:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     OUT_FORECASTS_DIR.mkdir(parents=True, exist_ok=True)
 
+
 def _load_inputs() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-    if not DATA_FOOD.exists(): raise FileNotFoundError(f"Missing: {DATA_FOOD}")
-    if not DATA_WEATHER.exists(): raise FileNotFoundError(f"Missing: {DATA_WEATHER}")
-    if not DATA_HOLIDAY.exists(): raise FileNotFoundError(f"Missing: {DATA_HOLIDAY}")
+    if not DATA_FOOD.exists():
+        raise FileNotFoundError(f"Missing: {DATA_FOOD}")
+    if not DATA_WEATHER.exists():
+        raise FileNotFoundError(f"Missing: {DATA_WEATHER}")
+    if not DATA_HOLIDAY.exists():
+        raise FileNotFoundError(f"Missing: {DATA_HOLIDAY}")
 
     df = pd.read_csv(DATA_FOOD, encoding="utf-8-sig")
     weather = pd.read_csv(DATA_WEATHER, encoding="utf-8-sig")
@@ -111,9 +121,11 @@ def _load_inputs() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     hol["date"] = pd.to_datetime(hol["date"])
 
     for c in REG_COLS:
-        if c not in weather.columns: weather[c] = np.nan
+        if c not in weather.columns:
+            weather[c] = np.nan
     weather = weather[["ds"] + REG_COLS].copy().sort_values("ds")
     return df, weather, hol
+
 
 def _build_holidays(hol: pd.DataFrame) -> pd.DataFrame:
     name_col = "holiday_name" if "holiday_name" in hol.columns else "holiday"
@@ -123,15 +135,18 @@ def _build_holidays(hol: pd.DataFrame) -> pd.DataFrame:
     holidays["holiday"] = holidays["holiday"].fillna("").astype(str)
     return holidays[holidays["holiday"].ne("")]
 
+
 def _add_holiday_flag(ds: pd.Series, holidays: pd.DataFrame) -> pd.Series:
-    if holidays.empty: return pd.Series(np.zeros(len(ds), dtype=int), index=ds.index)
+    if holidays.empty:
+        return pd.Series(np.zeros(len(ds), dtype=int), index=ds.index)
     ds_vals = pd.to_datetime(ds).to_numpy(dtype="datetime64[D]")
     flag = np.zeros(len(ds_vals), dtype=bool)
     for row in holidays.itertuples(index=False):
-        start = (np.datetime64(row.ds, "D") + np.timedelta64(row.lower_window, "D"))
-        end = (np.datetime64(row.ds, "D") + np.timedelta64(row.upper_window, "D"))
+        start = np.datetime64(row.ds, "D") + np.timedelta64(row.lower_window, "D")
+        end = np.datetime64(row.ds, "D") + np.timedelta64(row.upper_window, "D")
         flag |= (ds_vals >= start) & (ds_vals <= end)
     return pd.Series(flag.astype(int), index=ds.index)
+
 
 def _prepare_dish_daily_series(df: pd.DataFrame, dish: str) -> pd.DataFrame:
     one = df.loc[df["菜品"] == dish, ["日期", "销量"]].copy()
@@ -146,11 +161,16 @@ def _prepare_dish_daily_series(df: pd.DataFrame, dish: str) -> pd.DataFrame:
     daily["y"] = daily["y"].fillna(0.0)
     return daily
 
-def _merge_exog(dish_daily: pd.DataFrame, weather: pd.DataFrame, holidays: pd.DataFrame) -> pd.DataFrame:
+
+def _merge_exog(
+    dish_daily: pd.DataFrame, weather: pd.DataFrame, holidays: pd.DataFrame
+) -> pd.DataFrame:
     df_all = dish_daily.merge(weather, on="ds", how="left").sort_values("ds")
-    for c in REG_COLS: df_all[c] = df_all[c].ffill().fillna(0.0)
+    for c in REG_COLS:
+        df_all[c] = df_all[c].ffill().fillna(0.0)
     df_all["is_holiday"] = _add_holiday_flag(df_all["ds"], holidays)
     return df_all
+
 
 def _add_date_features(df_all: pd.DataFrame) -> pd.DataFrame:
     ds = pd.to_datetime(df_all["ds"])
@@ -161,6 +181,7 @@ def _add_date_features(df_all: pd.DataFrame) -> pd.DataFrame:
     out["dayofyear"] = ds.dt.dayofyear
     out["is_weekend"] = (out["dow"] >= 5).astype(int)
     return out
+
 
 def _add_lag_roll_features(df_all: pd.DataFrame) -> pd.DataFrame:
     out = df_all.copy()
@@ -180,9 +201,11 @@ def _add_lag_roll_features(df_all: pd.DataFrame) -> pd.DataFrame:
 
     return out
 
+
 def _fit_prophet_and_predict(train_df, val_df, holidays):
     model = Prophet(holidays=holidays, **PROPHET_PARAMS)
-    for c in REG_COLS: model.add_regressor(c)
+    for c in REG_COLS:
+        model.add_regressor(c)
     model.fit(train_df[["ds", "y"] + REG_COLS])
     pred_train = model.predict(train_df[["ds"] + REG_COLS])
     pred_val = model.predict(val_df[["ds"] + REG_COLS])
@@ -193,6 +216,7 @@ def _optimize_lgbm_params(df_train, feature_cols, target_col="y"):
     """
     Uses Bayesian Optimization to find the best LightGBM parameters for this specific dish.
     """
+
     def objective(trial):
         # Hyperparameter search space
         param = {
@@ -227,6 +251,7 @@ def _optimize_lgbm_params(df_train, feature_cols, target_col="y"):
     study.optimize(objective, n_trials=OPTUNA_TRIALS)
     return study.best_params
 
+
 def _train_lgbm_stacking_optuna(train_feat, prophet_yhat_train):
     df = train_feat.copy()
     df["prophet_yhat"] = prophet_yhat_train
@@ -245,6 +270,7 @@ def _train_lgbm_stacking_optuna(train_feat, prophet_yhat_train):
 
     return model, feature_cols, best_params
 
+
 def _recursive_hybrid_forecast(hist_df, future_exog, prophet_yhat_future, model, feature_cols):
     hist_df = hist_df.sort_values("ds").copy()
     y_hist = hist_df["y"].tolist()
@@ -261,7 +287,8 @@ def _recursive_hybrid_forecast(hist_df, future_exog, prophet_yhat_future, model,
             "is_weekend": int(ds.dayofweek >= 5),
             "prophet_yhat": float(prophet_yhat_future[i]),
         }
-        for c in REG_COLS: feat[c] = float(row.get(c, 0.0))
+        for c in REG_COLS:
+            feat[c] = float(row.get(c, 0.0))
 
         # Dynamic Lags & Rolling
         for lag in LAGS:
@@ -291,6 +318,7 @@ def _recursive_hybrid_forecast(hist_df, future_exog, prophet_yhat_future, model,
         y_hist.append(yhat)
 
     return pd.DataFrame(rows)
+
 
 def _train_hybrid(df_feat: pd.DataFrame, holidays: pd.DataFrame):
     df_feat = df_feat.dropna().copy()
@@ -332,6 +360,7 @@ def _train_hybrid(df_feat: pd.DataFrame, holidays: pd.DataFrame):
     val_mae = mean_absolute_error(val_df["y"], pred_val_df["yhat"])
     return model, cols, val_mae, best_params
 
+
 def forecast_one_dish(df, weather, holidays, dish) -> DishForecast:
     dish_daily = _prepare_dish_daily_series(df, dish)
     df_all = _merge_exog(dish_daily, weather, holidays)
@@ -341,25 +370,27 @@ def forecast_one_dish(df, weather, holidays, dish) -> DishForecast:
     # Optuna happens inside here
     model, cols, val_mae, best_params = _train_hybrid(df_feat, holidays)
 
-    future_ds = pd.date_range(df_all["ds"].max() + pd.Timedelta(days=1), periods=HORIZON_DAYS, freq="D")
+    future_ds = pd.date_range(
+        df_all["ds"].max() + pd.Timedelta(days=1), periods=HORIZON_DAYS, freq="D"
+    )
 
     if DATA_WEATHER_FUTURE.exists():
         wf = pd.read_csv(DATA_WEATHER_FUTURE, encoding="utf-8-sig")
         wf["ds"] = pd.to_datetime(wf["ds"])
         future_weather = wf[wf["ds"].isin(future_ds)][["ds"] + REG_COLS].copy()
-        if len(future_weather) < len(future_ds): pass
+        if len(future_weather) < len(future_ds):
+            pass
     else:
         last = weather.iloc[-1]
         future_weather = pd.DataFrame({"ds": future_ds})
-        for c in REG_COLS: future_weather[c] = float(last.get(c, 0.0))
+        for c in REG_COLS:
+            future_weather[c] = float(last.get(c, 0.0))
 
     future_exog = future_weather.copy()
     future_exog["is_holiday"] = _add_holiday_flag(future_exog["ds"], holidays)
 
     p_full, p_future = _fit_prophet_and_predict(
-        df_feat[["ds", "y"] + REG_COLS],
-        future_exog[["ds"] + REG_COLS],
-        holidays
+        df_feat[["ds", "y"] + REG_COLS], future_exog[["ds"] + REG_COLS], holidays
     )
 
     # Retrain final model with BEST PARAMS on FULL DATA
@@ -380,13 +411,15 @@ def forecast_one_dish(df, weather, holidays, dish) -> DishForecast:
     history_tail = df_all[["ds", "y"]].tail(HISTORY_PLOT_DAYS).copy()
     return DishForecast(dish, val_mae, pred_future, history_tail, best_params)
 
+
 def plot_results(results, summary, top_n=TOP_N_PLOT):
-    if not results: return
+    if not results:
+        return
     top = summary.sort_values("forecast_sum", ascending=False).head(top_n)
     top_dishes = top["dish"].tolist()
 
     plt.figure(figsize=(12, max(4, 0.4 * len(top))))
-    plt.barh(top["dish"], top["forecast_sum"], color='skyblue')
+    plt.barh(top["dish"], top["forecast_sum"], color="skyblue")
     plt.gca().invert_yaxis()
     plt.title(f"V6 Optuna Optimized: Top {len(top)} Sales ({HORIZON_DAYS} Days)")
     plt.xlabel("Total Forecasted Sales")
@@ -404,14 +437,16 @@ def plot_results(results, summary, top_n=TOP_N_PLOT):
     for i, dish in enumerate(top_dishes):
         ax = axes[i]
         r = by_dish[dish]
-        ax.plot(r.history_tail["ds"], r.history_tail["y"], 'k.-', alpha=0.3, label="History")
-        ax.plot(r.pred_future["ds"], r.pred_future["yhat"], 'r.-', label="Forecast V6")
+        ax.plot(r.history_tail["ds"], r.history_tail["y"], "k.-", alpha=0.3, label="History")
+        ax.plot(r.pred_future["ds"], r.pred_future["yhat"], "r.-", label="Forecast V6")
         ax.set_title(dish)
-        if i == 0: ax.legend()
+        if i == 0:
+            ax.legend()
 
     plt.tight_layout()
     plt.savefig(OUT_DIR / f"forecast_top{len(top_dishes)}_lines.png", dpi=200)
     plt.close()
+
 
 def main():
     _ensure_dirs()
@@ -419,7 +454,8 @@ def main():
     holidays = _build_holidays(hol)
 
     dishes = df["菜品"].dropna().unique().tolist()
-    if MAX_DISHES: dishes = dishes[:MAX_DISHES]
+    if MAX_DISHES:
+        dishes = dishes[:MAX_DISHES]
 
     results = []
     print(f"Starting V6 (Optuna Auto-Tuning) for {len(dishes)} dishes...")
@@ -430,7 +466,9 @@ def main():
             r = forecast_one_dish(df, weather, holidays, dish)
             results.append(r)
             r.pred_future.to_csv(OUT_FORECASTS_DIR / f"{_sanitize_filename(dish)}.csv", index=False)
-            print(f"[{i}/{len(dishes)}] {dish}: OK | Best LR: {r.best_params.get('learning_rate', 'N/A'):.4f}")
+            print(
+                f"[{i}/{len(dishes)}] {dish}: OK | Best LR: {r.best_params.get('learning_rate', 'N/A'):.4f}"
+            )
         except Exception as e:
             print(f"[{i}/{len(dishes)}] {dish}: FAILED {e}")
 
@@ -439,14 +477,16 @@ def main():
         for r in results:
             preds = r.pred_future["yhat"]
             dates = pd.to_datetime(r.pred_future["ds"])
-            summary_rows.append({
-                "dish": r.dish,
-                "val_mae": r.val_mae,
-                "forecast_sum": preds.sum(),
-                "forecast_mean": preds.mean(),
-                "forecast_start": dates.min().strftime("%Y-%m-%d"),
-                "forecast_end": dates.max().strftime("%Y-%m-%d")
-            })
+            summary_rows.append(
+                {
+                    "dish": r.dish,
+                    "val_mae": r.val_mae,
+                    "forecast_sum": preds.sum(),
+                    "forecast_mean": preds.mean(),
+                    "forecast_start": dates.min().strftime("%Y-%m-%d"),
+                    "forecast_end": dates.max().strftime("%Y-%m-%d"),
+                }
+            )
 
         summary = pd.DataFrame(summary_rows)
         summary = summary.sort_values("forecast_sum", ascending=False)
@@ -454,6 +494,7 @@ def main():
 
         plot_results(results, summary)
         print("Optimization Complete. Results saved to 'outputs_lgbm_v6_optuna'.")
+
 
 if __name__ == "__main__":
     main()

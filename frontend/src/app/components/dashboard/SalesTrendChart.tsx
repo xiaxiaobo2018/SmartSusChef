@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { useApp } from '@/app/context/AppContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/app/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select';
@@ -95,16 +95,17 @@ export function SalesTrendChart({
     return chartData.length > 0 ? Math.round(total / chartData.length) : 0;
   }, [chartData]);
 
-  const handleBarClick = (data: any) => {
+  const handleBarClick = (data: Record<string, string>) => {
     if (onBarClick && data && data.date) {
       onBarClick(data.date);
     }
   };
 
   // Custom bar shape to show selected state
-  const CustomBar = (props: any) => {
-    const { x, y, width, height, fill } = props;
-    const isSelected = selectedDate === props.payload?.date;
+  const CustomBar = (props: Record<string, unknown>) => {
+    const { x, y, width, height, fill } = props as { x: number; y: number; width: number; height: number; fill: string };
+    const payload = props.payload as Record<string, string> | undefined;
+    const isSelected = selectedDate === payload?.date;
 
     return (
       <g>
@@ -152,7 +153,7 @@ export function SalesTrendChart({
               </span>
             </CardDescription>
           </div>
-          <Select value={dateRange} onValueChange={(value: any) => onDateRangeChange(value)}>
+          <Select value={dateRange} onValueChange={(value: typeof dateRange) => onDateRangeChange(value)}>
             <SelectTrigger className="w-36">
               <SelectValue />
             </SelectTrigger>

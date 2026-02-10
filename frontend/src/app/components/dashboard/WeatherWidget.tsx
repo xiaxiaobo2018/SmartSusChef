@@ -1,4 +1,3 @@
-import React from 'react';
 import { useApp } from '@/app/context/AppContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/card';
 import { Cloud, Droplets, Thermometer, Loader2 } from 'lucide-react';

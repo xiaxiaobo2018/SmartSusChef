@@ -27,7 +27,7 @@
  * @author Copilot
  * @lastUpdate 2026-02-09
  */
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useApp } from '@/app/context/AppContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/app/components/ui/card';
 import { Button } from '@/app/components/ui/button';
@@ -157,7 +157,7 @@ export function IngredientManagement({ onNavigateToRecipes }: IngredientManageme
         toast.success('Ingredient added successfully');
       }
       handleCloseDialog();
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to save ingredient');
     } finally {
       setIsSubmitting(false);
@@ -191,34 +191,14 @@ export function IngredientManagement({ onNavigateToRecipes }: IngredientManageme
   const handleDeleteConfirm = async () => {
     if (!deletingIngredient) return;
 
-    const { wastageCount } = deletingIngredient;
-    const hasRelatedData = wastageCount > 0;
-
-    // If no related data, just delete
-    if (!hasRelatedData) {
-      setIsDeleting(true);
-      try {
-        await deleteIngredient(deletingIngredient.id, false);
-        toast.success('Ingredient deleted successfully');
-        setIsDeleteDialogOpen(false);
-        setDeletingIngredient(null);
-      } catch (error) {
-        toast.error('Failed to delete ingredient');
-      } finally {
-        setIsDeleting(false);
-      }
-      return;
-    }
-
-    // If related data exists, delete with cascade
     setIsDeleting(true);
     try {
-      await deleteIngredient(deletingIngredient.id, true);
-      toast.success(`Ingredient and ${wastageCount} related wastage record${wastageCount > 1 ? 's' : ''} deleted successfully`);
+      await deleteIngredient(deletingIngredient.id);
+      toast.success('Ingredient deleted successfully');
       setIsDeleteDialogOpen(false);
       setDeletingIngredient(null);
-    } catch (error) {
-      toast.error('Failed to delete ingredient and related data');
+    } catch (_error) {
+      toast.error('Failed to delete ingredient');
     } finally {
       setIsDeleting(false);
     }

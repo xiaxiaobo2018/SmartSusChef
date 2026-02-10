@@ -28,18 +28,23 @@ except Exception:  # pragma: no cover
 TIME_FEATURES = ["day_of_week", "month", "day", "dayofyear", "is_weekend"]
 LAGS = (1, 7, 14)
 ROLL_WINDOWS = (7, 14, 28)
-TREE_FEATURES = TIME_FEATURES + ["is_public_holiday"] + WEATHER_COLS + [
-    "y_lag_1",
-    "y_lag_7",
-    "y_lag_14",
-    "y_roll_mean_7",
-    "y_roll_std_7",
-    "y_roll_mean_14",
-    "y_roll_std_14",
-    "y_roll_mean_28",
-    "y_roll_std_28",
-    "prophet_yhat",
-]
+TREE_FEATURES = (
+    TIME_FEATURES
+    + ["is_public_holiday"]
+    + WEATHER_COLS
+    + [
+        "y_lag_1",
+        "y_lag_7",
+        "y_lag_14",
+        "y_roll_mean_7",
+        "y_roll_std_7",
+        "y_roll_mean_14",
+        "y_roll_std_14",
+        "y_roll_mean_28",
+        "y_roll_std_28",
+        "prophet_yhat",
+    ]
+)
 
 
 @dataclass(frozen=True)
@@ -173,30 +178,38 @@ def _prepare_future_weather(
         forecast_weather["date"] = pd.to_datetime(forecast_weather["date"]).dt.normalize()
     else:
         try:
-            forecast_weather = _fetch_weather_forecast(latitude, longitude, forecast_days=max(16, horizon_days))
+            forecast_weather = _fetch_weather_forecast(
+                latitude, longitude, forecast_days=max(16, horizon_days)
+            )
         except Exception:
             # Weather API unavailable — use sensible defaults so prediction still works
-            forecast_weather = pd.DataFrame({
+            forecast_weather = pd.DataFrame(
+                {
+                    "date": future_dates,
+                    "temperature_2m_mean": 20.0,
+                    "precipitation_sum": 0.0,
+                    "wind_speed_10m_max": 10.0,
+                    "relative_humidity_2m_mean": 60.0,
+                }
+            )
+
+    if forecast_weather.empty:
+        # Last-resort fallback instead of crashing
+        forecast_weather = pd.DataFrame(
+            {
                 "date": future_dates,
                 "temperature_2m_mean": 20.0,
                 "precipitation_sum": 0.0,
                 "wind_speed_10m_max": 10.0,
                 "relative_humidity_2m_mean": 60.0,
-            })
-
-    if forecast_weather.empty:
-        # Last-resort fallback instead of crashing
-        forecast_weather = pd.DataFrame({
-            "date": future_dates,
-            "temperature_2m_mean": 20.0,
-            "precipitation_sum": 0.0,
-            "wind_speed_10m_max": 10.0,
-            "relative_humidity_2m_mean": 60.0,
-        })
+            }
+        )
 
     for col in WEATHER_COLS:
         if col not in forecast_weather.columns:
-            forecast_weather[col] = float(forecast_weather[col].mean()) if col in forecast_weather else 0.0
+            forecast_weather[col] = (
+                float(forecast_weather[col].mean()) if col in forecast_weather else 0.0
+            )
 
     future_weather = forecast_weather[forecast_weather["date"].isin(future_dates)].copy()
     if len(future_weather) < len(future_dates):
@@ -243,7 +256,11 @@ def predict_dish(
     if lat is None or lon is None:
         raise RuntimeError("Unable to resolve latitude/longitude")
 
-    start = pd.to_datetime(start_date).normalize() if start_date else pd.Timestamp.now().normalize() + pd.Timedelta(days=1)
+    start = (
+        pd.to_datetime(start_date).normalize()
+        if start_date
+        else pd.Timestamp.now().normalize() + pd.Timedelta(days=1)
+    )
     future_weather = _prepare_future_weather(
         start_date=start,
         horizon_days=horizon_days,

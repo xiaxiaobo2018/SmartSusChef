@@ -35,11 +35,31 @@ android {
         multiDexEnabled = true
     }
 
-    buildTypes {
-        debug {
-            // Read the base URL from local.properties, with a fallback to the Android emulator default
+    flavorDimensions += "environment"
+    productFlavors {
+        create("local") {
+            dimension = "environment"
+            applicationIdSuffix = ".local"
+            versionNameSuffix = "-local"
+            // Emulator localhost / internal network
             val baseUrl = localProperties.getProperty("local.base.url", "http://10.0.2.2:5001/api/")
             buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
+        }
+        create("uat") {
+            dimension = "environment"
+            applicationIdSuffix = ".uat"
+            versionNameSuffix = "-uat"
+            buildConfigField("String", "BASE_URL", "\"http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/api/\"")
+        }
+        create("production") {
+            dimension = "environment"
+            versionNameSuffix = "-prod"
+            buildConfigField("String", "BASE_URL", "\"http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/api/\"")
+        }
+    }
+
+    buildTypes {
+        debug {
             enableUnitTestCoverage = true
             enableAndroidTestCoverage = true
         }
@@ -49,8 +69,6 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
-            // Your production URL
-            buildConfigField("String", "BASE_URL", "\"https://smartsuschef.com/api/\"")
         }
     }
 

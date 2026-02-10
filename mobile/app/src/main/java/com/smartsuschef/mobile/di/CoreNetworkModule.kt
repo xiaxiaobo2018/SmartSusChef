@@ -109,7 +109,8 @@ object CoreNetworkModule {
     }
 
     /**
-     * Provides Retrofit instance
+     * Provides Retrofit instance.
+     * BASE_URL is determined by the product flavor (local / uat / production).
      */
     @Provides
     @Singleton

@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useApp } from '@/app/context/AppContext';
+import { useAuth } from '@/app/context/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/app/components/ui/card';
 import { Button } from '@/app/components/ui/button';
 import { Input } from '@/app/components/ui/input';
@@ -39,10 +40,12 @@ import {
   MapPin,
   Phone,
   Check,
-  X
+  X,
+  Loader2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { User } from '@/app/types';
+import { geocodeAddress, reverseGeocodeCoordinates } from '@/app/services/geocoding';
 
 const SPECIAL_CHARS = "@$!%*?&#^()-_=+[]{}|;:',.<>/~`";
 
@@ -52,7 +55,7 @@ function getPasswordRequirements(password: string) {
     { label: 'At least one uppercase letter (A-Z)', met: /[A-Z]/.test(password) },
     { label: 'At least one lowercase letter (a-z)', met: /[a-z]/.test(password) },
     { label: 'At least one number (0-9)', met: /\d/.test(password) },
-    { label: `At least one special character (${SPECIAL_CHARS})`, met: /[@$!%*?&#^()\-_=+\[\]{}|;:',.<>\/~`]/.test(password) },
+    { label: `At least one special character (${SPECIAL_CHARS})`, met: /[@$!%*?&#^()\-_=+[\]{}|;:',.<>/~`]/.test(password) },
   ];
 }
 
@@ -70,17 +73,18 @@ export function StoreSettings({ onBack }: StoreSettingsProps) {
     updateStoreSettings,
     storeUsers,
     user,
-    updateProfile,
-    changePassword,
     addUser,
     updateUser,
     deleteUser
   } = useApp();
+  const { updateProfile, changePassword } = useAuth();
 
   const isManager = user?.role === 'manager';
 
   const [formData, setFormData] = useState({ ...storeSettings });
   const [isSaving, setIsSaving] = useState(false);
+  const [isGeocoding, setIsGeocoding] = useState(false);
+  const [storeErrors, setStoreErrors] = useState<{ [key: string]: string | null }>({});
 
   // User Dialog State
   const [isUserDialogOpen, setIsUserDialogOpen] = useState(false);
@@ -134,13 +138,85 @@ export function StoreSettings({ onBack }: StoreSettingsProps) {
     });
   }, [user]);
 
+  const autoGeocode = useCallback(async (addr: string) => {
+    if (!addr.trim()) {
+      setFormData(prev => ({ ...prev, latitude: undefined, longitude: undefined }));
+      setStoreErrors(prev => ({ ...prev, location: null }));
+      return;
+    }
+    setIsGeocoding(true);
+    setStoreErrors(prev => ({ ...prev, location: null }));
+    try {
+      const coords = await geocodeAddress(addr);
+      if (coords) {
+        setFormData(prev => ({ ...prev, latitude: coords.latitude, longitude: coords.longitude }));
+        setStoreErrors(prev => ({ ...prev, location: null }));
+      } else {
+        setFormData(prev => ({ ...prev, latitude: undefined, longitude: undefined }));
+        toast.error('Could not auto-geocode address. Please try a different address.');
+        setStoreErrors(prev => ({ ...prev, location: 'Could not resolve address to coordinates' }));
+      }
+    } finally {
+      setIsGeocoding(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      autoGeocode(formData.address || '');
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [formData.address, autoGeocode]);
+
+  useEffect(() => {
+    const fetchCountryCode = async () => {
+      if (formData.latitude !== undefined && formData.longitude !== undefined) {
+        const code = await reverseGeocodeCoordinates(formData.latitude, formData.longitude);
+        setFormData(prev => ({ ...prev, countryCode: code || '' }));
+      } else {
+        setFormData(prev => ({ ...prev, countryCode: '' }));
+      }
+    };
+    fetchCountryCode();
+  }, [formData.latitude, formData.longitude]);
+
+  const validateStoreForm = () => {
+    const newErrors: { [key: string]: string | null } = {};
+    if (!formData.companyName?.trim()) newErrors.companyName = 'Company Name is required';
+    if (!formData.uen?.trim()) newErrors.uen = 'UEN is required';
+    if (!formData.storeName?.trim()) newErrors.storeName = 'Store Name is required';
+    if (!formData.address?.trim()) newErrors.address = 'Full Address is required';
+
+    const cleanedContact = (formData.contactNumber || '').replace(/\s/g, '');
+    if (!cleanedContact) {
+      newErrors.contactNumber = 'Contact Number is required';
+    } else if (!/^\+\d{10,}$/.test(cleanedContact)) {
+      newErrors.contactNumber = 'Invalid format (e.g., +6512345678, no spaces)';
+    }
+
+    if (formData.latitude === undefined || formData.longitude === undefined) {
+      newErrors.location = isGeocoding ? 'Geocoding address...' : 'Address not geocoded. Please enter a valid address.';
+    }
+
+    setStoreErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSaveStore = async () => {
     if (!isManager) return;
+    if (!validateStoreForm()) {
+      toast.error('Please correct the errors in the form.');
+      return;
+    }
     setIsSaving(true);
     try {
-      await updateStoreSettings(formData);
+      await updateStoreSettings({
+        ...formData,
+        contactNumber: (formData.contactNumber || '').replace(/\s/g, ''),
+      });
       toast.success('Store settings updated successfully');
-    } catch (error) {
+      setStoreErrors({});
+    } catch (_error) {
       toast.error('Failed to update store settings');
     } finally {
       setIsSaving(false);
@@ -179,7 +255,7 @@ export function StoreSettings({ onBack }: StoreSettingsProps) {
 
       setIsUserDialogOpen(false);
       setEditingUser(null);
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to save user');
     }
   };
@@ -198,7 +274,7 @@ export function StoreSettings({ onBack }: StoreSettingsProps) {
       try {
         await deleteUser(id);
         toast.success("User deleted successfully");
-      } catch (error) {
+      } catch (_error) {
         toast.error("Failed to delete user");
       }
     }
@@ -222,7 +298,7 @@ export function StoreSettings({ onBack }: StoreSettingsProps) {
       await changePassword(passwordForm.currentPassword, passwordForm.newPassword);
       toast.success('Password updated successfully');
       setPasswordForm({ currentPassword: '', newPassword: '' });
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to update password');
     }
   };
@@ -235,7 +311,7 @@ export function StoreSettings({ onBack }: StoreSettingsProps) {
     try {
       await updateProfile({ name: profileForm.name, email: profileForm.email });
       toast.success('Profile updated successfully');
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to update profile');
     }
   };
@@ -307,18 +383,33 @@ export function StoreSettings({ onBack }: StoreSettingsProps) {
                       <Input value={formData.storeId} readOnly className="bg-gray-50 border-gray-200 rounded-[8px] font-mono text-xs text-gray-500 cursor-not-allowed" />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-sm font-bold text-gray-700">Company Name</Label>
-                      <Input value={formData.companyName} onChange={(e) => setFormData({ ...formData, companyName: e.target.value })} className="rounded-[8px] border-gray-200" />
+                      <Label className="text-sm font-bold text-gray-700">Company Name *</Label>
+                      <Input
+                        value={formData.companyName}
+                        onChange={(e) => { setFormData({ ...formData, companyName: e.target.value }); setStoreErrors(prev => ({ ...prev, companyName: null })); }}
+                        className={`rounded-[8px] border-gray-200 ${storeErrors.companyName ? 'border-red-400' : ''}`}
+                      />
+                      {storeErrors.companyName && <p className="text-xs text-red-500">{storeErrors.companyName}</p>}
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-sm font-bold text-gray-700">UEN (Unique Entity Number)</Label>
-                      <Input value={formData.uen} onChange={(e) => setFormData({ ...formData, uen: e.target.value })} className="rounded-[8px] border-gray-200" />
+                      <Label className="text-sm font-bold text-gray-700">UEN (Unique Entity Number) *</Label>
+                      <Input
+                        value={formData.uen}
+                        onChange={(e) => { setFormData({ ...formData, uen: e.target.value }); setStoreErrors(prev => ({ ...prev, uen: null })); }}
+                        className={`rounded-[8px] border-gray-200 ${storeErrors.uen ? 'border-red-400' : ''}`}
+                      />
+                      {storeErrors.uen && <p className="text-xs text-red-500">{storeErrors.uen}</p>}
                     </div>
                   </div>
                   <div className="space-y-6">
                     <div className="space-y-2">
-                      <Label className="text-sm font-bold text-gray-700">Store Name</Label>
-                      <Input value={formData.storeName} onChange={(e) => setFormData({ ...formData, storeName: e.target.value })} className="rounded-[8px] border-gray-200" />
+                      <Label className="text-sm font-bold text-gray-700">Store Name *</Label>
+                      <Input
+                        value={formData.storeName}
+                        onChange={(e) => { setFormData({ ...formData, storeName: e.target.value }); setStoreErrors(prev => ({ ...prev, storeName: null })); }}
+                        className={`rounded-[8px] border-gray-200 ${storeErrors.storeName ? 'border-red-400' : ''}`}
+                      />
+                      {storeErrors.storeName && <p className="text-xs text-red-500">{storeErrors.storeName}</p>}
                     </div>
                     <div className="space-y-2">
                       <Label className="text-sm font-bold text-gray-700">Outlet Location (Optional)</Label>
@@ -328,17 +419,37 @@ export function StoreSettings({ onBack }: StoreSettingsProps) {
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-sm font-bold text-gray-700">Contact Number</Label>
+                      <Label className="text-sm font-bold text-gray-700">Contact Number *</Label>
                       <div className="relative">
                         <Phone className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-                        <Input value={formData.contactNumber} onChange={(e) => setFormData({ ...formData, contactNumber: e.target.value })} className="pl-10 rounded-[8px] border-gray-200" />
+                        <Input
+                          value={formData.contactNumber}
+                          onChange={(e) => { setFormData({ ...formData, contactNumber: e.target.value }); setStoreErrors(prev => ({ ...prev, contactNumber: null })); }}
+                          className={`pl-10 rounded-[8px] border-gray-200 ${storeErrors.contactNumber ? 'border-red-400' : ''}`}
+                          placeholder="e.g., +6512345678"
+                        />
                       </div>
+                      {storeErrors.contactNumber && <p className="text-xs text-red-500">{storeErrors.contactNumber}</p>}
+                      <p className="text-xs text-gray-500">No spaces (e.g., +6512345678)</p>
                     </div>
                   </div>
                   <div className="md:col-span-2 space-y-2">
-                    <Label className="text-sm font-bold text-gray-700">Store Address</Label>
-                    <Input value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} className="rounded-[8px] border-gray-200" />
+                    <Label className="text-sm font-bold text-gray-700">Full Address *</Label>
+                    <Input
+                      value={formData.address}
+                      onChange={(e) => { setFormData({ ...formData, address: e.target.value }); setStoreErrors(prev => ({ ...prev, address: null, location: null })); }}
+                      className={`rounded-[8px] border-gray-200 ${storeErrors.address ? 'border-red-400' : ''}`}
+                      placeholder="e.g., 1 Marina Blvd, Singapore"
+                      disabled={isGeocoding}
+                    />
+                    {storeErrors.address && <p className="text-xs text-red-500">{storeErrors.address}</p>}
                   </div>
+
+                  {isGeocoding && (
+                    <div className="flex items-center gap-2 text-sm text-gray-500 md:col-span-2">
+                      <Loader2 className="w-4 h-4 animate-spin" /> Auto-geocoding address...
+                    </div>
+                  )}
 
                   {/* Location Coordinates Section */}
                   <div className="md:col-span-2 pt-4 border-t">
@@ -350,23 +461,21 @@ export function StoreSettings({ onBack }: StoreSettingsProps) {
                       <div className="space-y-2">
                         <Label className="text-sm text-gray-600">Latitude</Label>
                         <Input
-                          type="number"
-                          step="any"
-                          placeholder="e.g., 1.3521"
-                          value={formData.latitude ?? ''}
-                          onChange={(e) => setFormData({ ...formData, latitude: e.target.value ? parseFloat(e.target.value) : undefined })}
-                          className="rounded-[8px] border-gray-200"
+                          type="text"
+                          placeholder="Auto-populated"
+                          value={formData.latitude !== undefined ? formData.latitude.toFixed(6) : ''}
+                          readOnly
+                          className="rounded-[8px] border-gray-200 bg-gray-50 cursor-not-allowed"
                         />
                       </div>
                       <div className="space-y-2">
                         <Label className="text-sm text-gray-600">Longitude</Label>
                         <Input
-                          type="number"
-                          step="any"
-                          placeholder="e.g., 103.8198"
-                          value={formData.longitude ?? ''}
-                          onChange={(e) => setFormData({ ...formData, longitude: e.target.value ? parseFloat(e.target.value) : undefined })}
-                          className="rounded-[8px] border-gray-200"
+                          type="text"
+                          placeholder="Auto-populated"
+                          value={formData.longitude !== undefined ? formData.longitude.toFixed(6) : ''}
+                          readOnly
+                          className="rounded-[8px] border-gray-200 bg-gray-50 cursor-not-allowed"
                         />
                       </div>
                       <div className="space-y-2">
@@ -374,13 +483,14 @@ export function StoreSettings({ onBack }: StoreSettingsProps) {
                         <Input
                           placeholder="Auto-detected from coordinates"
                           value={formData.countryCode ?? ''}
-                          onChange={(e) => setFormData({ ...formData, countryCode: e.target.value })}
-                          className="rounded-[8px] border-gray-200 bg-gray-50"
+                          readOnly
+                          className="rounded-[8px] border-gray-200 bg-gray-50 cursor-not-allowed"
                         />
                       </div>
                     </div>
+                    {storeErrors.location && <p className="text-xs text-red-500 mt-2">{storeErrors.location}</p>}
                     <p className="text-xs text-gray-500 mt-2">
-                      Country code will be automatically detected when you save if coordinates are provided and country code is empty.
+                      Coordinates and country code are auto-populated when you enter an address above.
                     </p>
                   </div>
                 </div>
@@ -651,7 +761,7 @@ export function StoreSettings({ onBack }: StoreSettingsProps) {
                 <Label className="text-sm font-bold">Role</Label>
                 <Select
                   value={userForm.role}
-                  onValueChange={(value: any) => setUserForm({ ...userForm, role: value })}
+                  onValueChange={(value: 'manager' | 'employee') => setUserForm({ ...userForm, role: value })}
                 >
                   <SelectTrigger className="rounded-[8px]">
                     <SelectValue placeholder="Select role" />
@@ -666,7 +776,7 @@ export function StoreSettings({ onBack }: StoreSettingsProps) {
                 <Label className="text-sm font-bold">Status</Label>
                 <Select
                   value={userForm.status}
-                  onValueChange={(value: any) => setUserForm({ ...userForm, status: value })}
+                  onValueChange={(value: 'Active' | 'Inactive') => setUserForm({ ...userForm, status: value })}
                 >
                   <SelectTrigger className="rounded-[8px]">
                     <SelectValue placeholder="Select status" />

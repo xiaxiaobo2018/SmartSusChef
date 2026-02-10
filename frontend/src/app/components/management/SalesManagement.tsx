@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useApp } from '@/app/context/AppContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/app/components/ui/card';
 import { Button } from '@/app/components/ui/button';
@@ -6,20 +6,18 @@ import { Input } from '@/app/components/ui/input';
 import { Label } from '@/app/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/app/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/components/ui/dialog';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/app/components/ui/sheet';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select';
-import { DollarSign, Edit, History, AlertTriangle, Plus } from 'lucide-react';
+import { DollarSign, Edit, AlertTriangle, Plus } from 'lucide-react';
 import { toast } from 'sonner';
-import { SalesData, EditHistory } from '@/app/types';
+import { SalesData } from '@/app/types';
 import { format, differenceInDays } from 'date-fns';
 
 export function SalesManagement() {
   const { user, salesData, recipes, updateSalesData, deleteSalesData, addSalesData } = useApp();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [editingData, setEditingData] = useState<SalesData | null>(null);
   const [newQuantity, setNewQuantity] = useState<string>('');
-  const [selectedHistoryItem, setSelectedHistoryItem] = useState<SalesData | null>(null);
+
   const [dateFilter, setDateFilter] = useState('all');
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [deletingData, setDeletingData] = useState<SalesData | null>(null);
@@ -57,9 +55,9 @@ export function SalesManagement() {
     }).sort((a, b) => b.date.localeCompare(a.date));
   }, [salesData, dateFilter]);
 
-  const getRecipeName = (id: string) => {
+  const getRecipeName = useCallback((id: string) => {
     return recipes.find((r) => r.id === id)?.name || 'Unknown Recipe';
-  };
+  }, [recipes]);
 
   const isManager = user?.role === 'manager';
 
@@ -112,7 +110,7 @@ export function SalesManagement() {
 
       toast.success('Sales data updated successfully');
       handleCloseEditDialog();
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to update sales data');
     } finally {
       setIsSubmitting(false);
@@ -189,15 +187,6 @@ export function SalesManagement() {
     setNewQuantity('');
   };
 
-  const handleViewHistory = (data: SalesData) => {
-    if (!data.editHistory || data.editHistory.length === 0) {
-      toast.info('No edit history available for this record');
-      return;
-    }
-    setSelectedHistoryItem(data);
-    setIsHistoryOpen(true);
-  };
-
   // Group sales data by date
   const groupedData = useMemo(() => {
     const grouped: Record<string, SalesData[]> = {};
@@ -218,7 +207,7 @@ export function SalesManagement() {
     });
 
     return grouped;
-  }, [filteredSalesData, recipes]); // Add recipes to dependencies
+  }, [filteredSalesData, getRecipeName]);
 
   return (
     <div className="space-y-6">
@@ -549,64 +538,6 @@ export function SalesManagement() {
         </DialogContent>
       </Dialog>
 
-      {/* History Sheet */}
-      <Sheet open={isHistoryOpen} onOpenChange={setIsHistoryOpen}>
-        <SheetContent className="w-[500px] sm:w-[600px] overflow-y-auto">
-          <SheetHeader>
-            <SheetTitle className="flex items-center gap-2">
-              <History className="w-5 h-5 text-[#81A263]" />
-              Edit History
-            </SheetTitle>
-          </SheetHeader>
-          {selectedHistoryItem && (
-            <div className="mt-6 space-y-4">
-              <div className="bg-gray-50 rounded-lg p-4 space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Date:</span>
-                  <span className="font-medium">
-                    {format(new Date(selectedHistoryItem.date), 'd MMM yyyy')}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Recipe:</span>
-                  <span className="font-medium">
-                    {getRecipeName(selectedHistoryItem.recipeId)}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Current Quantity:</span>
-                  <span className="font-medium">{selectedHistoryItem.quantity} dishes</span>
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <h4 className="font-medium text-[#333333]">
-                  Change History ({selectedHistoryItem.editHistory?.length || 0} edits)
-                </h4>
-                {selectedHistoryItem.editHistory?.map((entry, index) => (
-                  <div key={index} className="border rounded-lg p-4 space-y-2">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <p className="font-medium text-[#333333]">{entry.editedBy}</p>
-                        <p className="text-xs text-gray-500">
-                          {format(new Date(entry.timestamp), 'd MMM yyyy HH:mm')}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm text-gray-600">
-                          <span className="line-through">{entry.previousValue}</span>
-                          {' → '}
-                          <span className="font-medium text-[#81A263]">{entry.newValue}</span>
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </SheetContent>
-      </Sheet>
     </div>
   );
 }

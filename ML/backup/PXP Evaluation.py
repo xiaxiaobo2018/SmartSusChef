@@ -56,7 +56,7 @@ STEP_DAYS = 7
 MAX_FOLDS: int | None = 6  # None = 尽可能多
 
 # 评估哪些菜品
-MAX_DISHES_EVAL=3  # 随机三个菜品
+MAX_DISHES_EVAL = 3  # 随机三个菜品
 DISH_PICK_STRATEGY = "random"  # top_sales | random
 RANDOM_SEED = 42
 
@@ -69,7 +69,6 @@ ROLL_WINDOWS = (7, 14, 28)
 DATA_FOOD = Path("food_sales.csv")
 DATA_WEATHER = Path("df_weather.csv")
 DATA_HOLIDAY = Path("df_holiday.csv")
-
 
 
 # ==========================
@@ -118,12 +117,12 @@ PROPHET_GRID: list[dict[str, Any]] = [
 
 XGB_GRID: list[dict[str, Any]] = [
     {
-        "n_estimators": 600, #boosting 的轮数
+        "n_estimators": 600,  # boosting 的轮数
         "learning_rate": 0.05,
-        "max_depth": 6, #每棵树的最大深度
-        "subsample": 0.9, #每一棵树用多少比例的样本来训练
-        "colsample_bytree": 0.9,  #每棵树使用多少比例的特征
-        "reg_lambda": 1.0, #L2 正则化参数
+        "max_depth": 6,  # 每棵树的最大深度
+        "subsample": 0.9,  # 每一棵树用多少比例的样本来训练
+        "colsample_bytree": 0.9,  # 每棵树使用多少比例的特征
+        "reg_lambda": 1.0,  # L2 正则化参数
     },
     {
         "n_estimators": 1200,
@@ -262,7 +261,9 @@ def _prepare_dish_daily_series(df: pd.DataFrame, dish: str) -> pd.DataFrame:
     return daily
 
 
-def _merge_exog(dish_daily: pd.DataFrame, weather: pd.DataFrame, holidays: pd.DataFrame) -> pd.DataFrame:
+def _merge_exog(
+    dish_daily: pd.DataFrame, weather: pd.DataFrame, holidays: pd.DataFrame
+) -> pd.DataFrame:
     df_all = dish_daily.merge(weather, on="ds", how="left").sort_values("ds")
     for c in REG_COLS:
         df_all[c] = df_all[c].ffill()
@@ -294,7 +295,9 @@ def _add_lag_roll_features(df_all: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
-def _iter_backtest_splits(n: int, min_train: int, horizon: int, step: int, max_folds: int | None) -> list[int]:
+def _iter_backtest_splits(
+    n: int, min_train: int, horizon: int, step: int, max_folds: int | None
+) -> list[int]:
     """
     返回一组 train_end 索引（exclusive），对应滚动回测的每一折。
     例：train = [0:train_end), val = [train_end:train_end+horizon)
@@ -336,9 +339,7 @@ def _fit_prophet_and_predict(
     Prophet 只使用：ds, y, REG_COLS（天气回归变量）+ holidays（可选）。
     """
     if Prophet is None:
-        raise ImportError(
-            "缺少依赖：prophet。请在你的运行环境中安装：pip install prophet"
-        )
+        raise ImportError("缺少依赖：prophet。请在你的运行环境中安装：pip install prophet")
 
     model = Prophet(holidays=holidays, **prophet_params)  # type: ignore[misc]
     for c in REG_COLS:
@@ -582,7 +583,9 @@ def evaluate() -> tuple[pd.DataFrame, pd.DataFrame]:
 
     best = summary.iloc[0]
     print("最佳组合（按 mae_mean 升序）：")
-    print(f"  mae_mean={best['mae_mean']:.4f} | rmse_mean={best['rmse_mean']:.4f} | smape_mean={best['smape_mean']:.2f}")
+    print(
+        f"  mae_mean={best['mae_mean']:.4f} | rmse_mean={best['rmse_mean']:.4f} | smape_mean={best['smape_mean']:.2f}"
+    )
     print(f"  prophet_params={best['prophet_params']}")
     print(f"  xgb_params={best['xgb_params']}")
     return results, summary

@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useApp } from '@/app/context/AppContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/app/components/ui/card';
 import { Button } from '@/app/components/ui/button';
 import { Input } from '@/app/components/ui/input';
 import { Label } from '@/app/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/app/components/ui/table';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger, DialogFooter } from '@/app/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/app/components/ui/dialog';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue, SelectSeparator } from '@/app/components/ui/select';
 import { Checkbox } from '@/app/components/ui/checkbox';
 import { Badge } from '@/app/components/ui/badge';
@@ -21,7 +21,7 @@ interface FormRow {
 }
 
 export function RecipeManagement() {
-  const { recipes, ingredients, addRecipe, updateRecipe, deleteRecipe, storeSettings, salesData, wastageData } = useApp();
+  const { recipes, ingredients, addRecipe, updateRecipe, deleteRecipe, salesData, wastageData } = useApp();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null);
@@ -166,7 +166,7 @@ export function RecipeManagement() {
         toast.success('Recipe added successfully');
       }
       setIsDialogOpen(false);
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to save recipe');
     } finally {
       setIsSubmitting(false);
@@ -204,47 +204,27 @@ export function RecipeManagement() {
   const handleDeleteConfirm = async () => {
     if (!deletingRecipe) return;
 
-    const { salesCount, wastageCount } = deletingRecipe;
-    const hasRelatedData = salesCount > 0 || wastageCount > 0;
-
-    // If no related data, just delete
-    if (!hasRelatedData) {
-      setIsDeleting(true);
-      try {
-        await deleteRecipe(deletingRecipe.id, false);
-        toast.success('Recipe deleted successfully');
-        setIsDeleteDialogOpen(false);
-        setDeletingRecipe(null);
-      } catch (error) {
-        toast.error('Failed to delete recipe');
-      } finally {
-        setIsDeleting(false);
-      }
-      return;
-    }
-
-    // If related data exists, delete with cascade
     setIsDeleting(true);
     try {
-      await deleteRecipe(deletingRecipe.id, true);
-      toast.success(`Recipe and ${salesCount + wastageCount} related records deleted successfully`);
+      await deleteRecipe(deletingRecipe.id);
+      toast.success('Recipe deleted successfully');
       setIsDeleteDialogOpen(false);
       setDeletingRecipe(null);
-    } catch (error) {
-      toast.error('Failed to delete recipe and related data');
+    } catch (_error) {
+      toast.error('Failed to delete recipe');
     } finally {
       setIsDeleting(false);
     }
   };
 
-  const getComponentName = (item: any) => {
+  const getComponentName = (item: { childRecipeId?: string; ingredientId?: string }) => {
     if (item.childRecipeId) {
       return recipes.find(r => r.id === item.childRecipeId)?.name || 'Unknown Recipe';
     }
     return ingredients.find(i => i.id === item.ingredientId)?.name || 'Unknown Ingredient';
   };
 
-  const getComponentUnit = (item: any) => {
+  const getComponentUnit = (item: { childRecipeId?: string; ingredientId?: string }) => {
     if (item.childRecipeId) {
       const recipe = recipes.find(r => r.id === item.childRecipeId);
       return recipe?.unit || 'portion'; // Use recipe's unit or default to portion

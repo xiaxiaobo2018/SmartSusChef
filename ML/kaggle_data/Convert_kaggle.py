@@ -5,6 +5,7 @@ import pandas as pd
 INPUT_FILE = "3kaggle_data.csv"
 OUTPUT_FILE = "3final_kaggle.csv"
 
+
 def convert_data():
     input_path = Path(INPUT_FILE)
     if not input_path.exists():
@@ -14,9 +15,9 @@ def convert_data():
     print(f"Reading {INPUT_FILE}...")
     try:
         try:
-            df = pd.read_csv(input_path, encoding='utf-8')
+            df = pd.read_csv(input_path, encoding="utf-8")
         except UnicodeDecodeError:
-            df = pd.read_csv(input_path, encoding='ISO-8859-1')
+            df = pd.read_csv(input_path, encoding="ISO-8859-1")
     except Exception as e:
         print(f"Error reading file: {e}")
         return
@@ -28,26 +29,18 @@ def convert_data():
 
     if "menu_item_name" in cols and "quantity_sold" in cols:
         print("Detected Format: Sales Data (using menu_item_name)")
-        rename_map = {
-            "date": "date",
-            "menu_item_name": "dish_name",
-            "quantity_sold": "quantity"
-        }
+        rename_map = {"date": "date", "menu_item_name": "dish_name", "quantity_sold": "quantity"}
 
     elif "Item_Name" in cols and "Daily_Usage" in cols:
         print("Detected Format: Inventory Usage")
-        rename_map = {
-            "Date": "date",
-            "Item_Name": "dish_name",
-            "Daily_Usage": "quantity"
-        }
+        rename_map = {"Date": "date", "Item_Name": "dish_name", "Daily_Usage": "quantity"}
 
     elif "transaction_datetime" in cols and "menu_item" in cols:
         print("Detected Format: Transaction Logs")
         rename_map = {
             "transaction_datetime": "date",
             "menu_item": "dish_name",
-            "quantity": "quantity"
+            "quantity": "quantity",
         }
 
     else:
@@ -75,6 +68,7 @@ def convert_data():
     df_final.to_csv(OUTPUT_FILE, index=False, encoding="utf-8-sig")
     print(f"Success! Saved to: {OUTPUT_FILE}")
     print(df_final.head())
+
 
 if __name__ == "__main__":
     convert_data()
