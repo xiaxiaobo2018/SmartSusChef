@@ -2,9 +2,26 @@ name: SmartSusChef AWS CI/CD Pipeline
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main]
+    paths:                              
+      - 'backend/**'
+      - 'frontend/**'
+      - 'ML/**'
+      - '.aws/**'
+      - 'infrastructure/**'
+      - 'docker-compose.yml'
+      - '.github/workflows/aws-deploy.yml'
+      - '!mobile/**'                    
+      - '!.github/workflows/mobile-ci.yml'
   pull_request:
-    branches: [main, develop]
+    branches: [main]
+    paths:
+    - 'backend/**'
+    - 'frontend/**'
+    - 'ML/**'
+    - '.aws/**'
+    - 'infrastructure/**'
+    - '!mobile/**'
   workflow_dispatch:
 
 permissions:
