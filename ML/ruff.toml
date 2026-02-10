@@ -2,7 +2,7 @@ line-length = 100
 
 [lint]
 select = ["E", "F", "W", "I", "B", "UP"]
-ignore = ["E501"]
+ignore = ["E501", "B008"]
 
 [lint.per-file-ignores]
 "Final_model_v2.py" = ["E402", "F841", "E701", "B007"]
@@ -11,6 +11,7 @@ ignore = ["E501"]
 "train_offline.py" = ["E402"]
 "tests/*" = ["E402"]
 "app/store_manager.py" = ["B007"]
+"scripts/*" = ["E402"]
 "backup/*" = ["E402", "F841", "E701", "B007", "B904"]
 
 [lint.isort]

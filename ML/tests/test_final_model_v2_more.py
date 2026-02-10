@@ -1,10 +1,12 @@
 import pandas as pd
+
 import Final_model_v2 as fm
 
 
 def test_get_weather_forecast_no_libs(monkeypatch):
-    monkeypatch.setattr(fm, "openmeteo_requests", None)
-    monkeypatch.setattr(fm, "retry", None)
+    import app.utils as utils
+    monkeypatch.setattr(utils, "openmeteo_requests", None)
+    monkeypatch.setattr(utils, "retry", None)
     out = fm.get_weather_forecast(1.0, 2.0)
     assert out is None
 

@@ -66,7 +66,7 @@ trap cleanup EXIT INT TERM
 echo "[1/3] Starting ML Service (port 8000)..."
 (
     cd "$ROOT/ML"
-    python3 -m pip install -q -r requirements.txt
+    python3 -m pip install -q -r requirements-prod.txt
     python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ) &
 ML_PID=$!

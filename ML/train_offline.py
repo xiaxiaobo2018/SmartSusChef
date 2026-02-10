@@ -1,22 +1,16 @@
-from __future__ import annotations
-
 import argparse
-import logging
 import os
 from collections.abc import Iterable
+from concurrent.futures import ProcessPoolExecutor, as_completed
 
 import pandas as pd
 
 from app.store_manager import StoreModelManager
+from app.utils.logging_config import configure_basic_logging, setup_logger
 
-logger = logging.getLogger("train_offline")
+logger = setup_logger("train_offline")
 
-
-def _configure_logging() -> None:
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
-    )
+DEFAULT_MAX_WORKERS = 4
 
 
 def _fetch_store_ids(manager: StoreModelManager) -> list[int]:
@@ -44,15 +38,48 @@ def _fetch_store_ids(manager: StoreModelManager) -> list[int]:
     raise RuntimeError(f"Failed to fetch store list. Last error: {last_err}")
 
 
-def _train_store_ids(manager: StoreModelManager, store_ids: Iterable[int]) -> None:
-    for store_id in store_ids:
-        logger.info("Initiating training for a store (ID masked).")
-        result = manager.train_store_models(int(store_id))
-        logger.info("Training result for store (ID masked): %s", result["status"])
+def _train_single_store(base_model_dir: str, store_id: int) -> dict:
+    """Train models for a single store (top-level function for pickling)."""
+    mgr = StoreModelManager(base_model_dir=base_model_dir)
+    result = mgr.train_store_models(store_id)
+    return {"store_id": store_id, **result}
+
+
+def _train_store_ids(
+    manager: StoreModelManager,
+    store_ids: Iterable[int],
+    max_workers: int = 1,
+) -> None:
+    ids = list(store_ids)
+    if not ids:
+        logger.info("No stores to train.")
+        return
+
+    if max_workers <= 1 or len(ids) == 1:
+        for store_id in ids:
+            logger.info("Initiating training for a store (ID masked).")
+            result = manager.train_store_models(int(store_id))
+            logger.info("Training result for store (ID masked): %s", result["status"])
+        return
+
+    logger.info("Training %d stores with %d parallel workers.", len(ids), max_workers)
+    with ProcessPoolExecutor(max_workers=max_workers) as pool:
+        futures = {
+            pool.submit(_train_single_store, manager.base_model_dir, sid): sid
+            for sid in ids
+        }
+        for future in as_completed(futures):
+            try:
+                result = future.result()
+                logger.info(
+                    "Training result for store (ID masked): %s", result.get("status")
+                )
+            except Exception as exc:
+                logger.error("Training failed for a store (ID masked): %s", exc)
 
 
 def main() -> None:
-    _configure_logging()
+    configure_basic_logging()
 
     parser = argparse.ArgumentParser(
         description="Offline training entrypoint for SmartSusChef ML models."
@@ -74,6 +101,12 @@ def main() -> None:
         default=None,
         help="Limit number of stores when using --all.",
     )
+    parser.add_argument(
+        "--workers",
+        type=int,
+        default=DEFAULT_MAX_WORKERS,
+        help=f"Number of parallel workers (default: {DEFAULT_MAX_WORKERS}).",
+    )
     args = parser.parse_args()
 
     if not args.store_id and not args.all:
@@ -86,10 +119,10 @@ def main() -> None:
         store_ids = _fetch_store_ids(manager)
         if args.limit is not None:
             store_ids = store_ids[: args.limit]
-        _train_store_ids(manager, store_ids)
+        _train_store_ids(manager, store_ids, max_workers=args.workers)
         return
 
-    _train_store_ids(manager, args.store_id or [])
+    _train_store_ids(manager, args.store_id or [], max_workers=args.workers)
 
 
 if __name__ == "__main__":

@@ -1,33 +1,24 @@
-from __future__ import annotations
-
 import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
 import holidays
-import joblib
-import numpy as np
 import pandas as pd
 
-from training_logic_v2 import (
+from app.utils import (
     WEATHER_COLS,
-    PipelineConfig,
-    get_location_details,
+    compute_lag_features_from_history,
+    fetch_weather_forecast,
     safe_filename,
 )
-
-try:
-    import openmeteo_requests
-    from retry_requests import retry
-except Exception:  # pragma: no cover
-    openmeteo_requests = None  # type: ignore[assignment]
-    retry = None
-
+from app.utils.secure_io import secure_load
+from training_logic_v2 import (
+    PipelineConfig,
+    get_location_details,
+)
 
 TIME_FEATURES = ["day_of_week", "month", "day", "dayofyear", "is_weekend"]
-LAGS = (1, 7, 14)
-ROLL_WINDOWS = (7, 14, 28)
 TREE_FEATURES = (
     TIME_FEATURES
     + ["is_public_holiday"]
@@ -65,7 +56,7 @@ class ModelStore:
         registry_path = self.model_dir / "champion_registry.pkl"
         if not registry_path.exists():
             raise FileNotFoundError(f"Missing registry: {registry_path}")
-        self.registry = joblib.load(str(registry_path))
+        self.registry = secure_load(str(registry_path))
 
     def list_dishes(self) -> list[str]:
         return sorted(self.registry.keys())
@@ -91,8 +82,8 @@ class ModelStore:
                 f"Missing model files for '{dish}': {prophet_path.name}, {tree_path.name}"
             )
 
-        prophet_model = joblib.load(str(prophet_path))
-        tree_model = joblib.load(str(tree_path))
+        prophet_model = secure_load(str(prophet_path))
+        tree_model = secure_load(str(tree_path))
 
         loaded = LoadedDishModel(
             dish=dish,
@@ -104,64 +95,25 @@ class ModelStore:
         return loaded
 
 
-def _compute_lag_features_from_history(sales_history: list[float]) -> dict[str, float]:
-    features: dict[str, float] = {}
-    fallback = float(sales_history[-1]) if sales_history else 0.0
-
-    for lag in LAGS:
-        features[f"y_lag_{lag}"] = (
-            float(sales_history[-lag]) if len(sales_history) >= lag else fallback
-        )
-
-    for w in ROLL_WINDOWS:
-        window = sales_history[-w:] if len(sales_history) >= w else sales_history
-        if window:
-            features[f"y_roll_mean_{w}"] = float(np.mean(window))
-            features[f"y_roll_std_{w}"] = float(np.std(window, ddof=1)) if len(window) >= 2 else 0.0
-        else:
-            features[f"y_roll_mean_{w}"] = 0.0
-            features[f"y_roll_std_{w}"] = 0.0
-
-    return features
+# _compute_lag_features_from_history → app.utils.compute_lag_features_from_history
+# _fetch_weather_forecast → app.utils.fetch_weather_forecast
 
 
-def _fetch_weather_forecast(latitude: float, longitude: float, forecast_days: int) -> pd.DataFrame:
-    if openmeteo_requests is None or retry is None:
-        raise RuntimeError("openmeteo-requests / retry-requests not available")
+# Configurable weather fallback values (used when API is unavailable)
+WEATHER_FALLBACK = {
+    "temperature_2m_max": 25.0,
+    "temperature_2m_min": 15.0,
+    "relative_humidity_2m_mean": 60.0,
+    "precipitation_sum": 0.0,
+}
 
-    session = retry(retries=3, backoff_factor=0.5)
-    om = openmeteo_requests.Client(session=session)
 
-    url = "https://api.open-meteo.com/v1/forecast"
-    params = {
-        "latitude": latitude,
-        "longitude": longitude,
-        "daily": WEATHER_COLS,
-        "forecast_days": max(1, min(16, forecast_days)),
-        "timezone": "auto",
-    }
-
-    responses = om.weather_api(url, params=params)
-    daily = responses[0].Daily()
-
-    dates = pd.date_range(
-        start=pd.to_datetime(daily.Time(), unit="s", utc=True),
-        end=pd.to_datetime(daily.TimeEnd(), unit="s", utc=True),
-        freq=pd.Timedelta(seconds=daily.Interval()),
-        inclusive="left",
-    )
-
-    df = pd.DataFrame(
-        {
-            "date": dates,
-            WEATHER_COLS[0]: daily.Variables(0).ValuesAsNumpy(),
-            WEATHER_COLS[1]: daily.Variables(1).ValuesAsNumpy(),
-            WEATHER_COLS[2]: daily.Variables(2).ValuesAsNumpy(),
-            WEATHER_COLS[3]: daily.Variables(3).ValuesAsNumpy(),
-        }
-    )
-    df["date"] = pd.to_datetime(df["date"]).dt.tz_localize(None).dt.normalize()
-    return df
+def _weather_fallback_df(dates: pd.DatetimeIndex) -> pd.DataFrame:
+    """Build a fallback weather DataFrame using configurable defaults."""
+    data: dict[str, Any] = {"date": dates}
+    for col in WEATHER_COLS:
+        data[col] = WEATHER_FALLBACK.get(col, 0.0)
+    return pd.DataFrame(data)
 
 
 def _prepare_future_weather(
@@ -178,38 +130,20 @@ def _prepare_future_weather(
         forecast_weather["date"] = pd.to_datetime(forecast_weather["date"]).dt.normalize()
     else:
         try:
-            forecast_weather = _fetch_weather_forecast(
+            forecast_weather = fetch_weather_forecast(
                 latitude, longitude, forecast_days=max(16, horizon_days)
             )
+            if forecast_weather is None:
+                forecast_weather = _weather_fallback_df(future_dates)
         except Exception:
-            # Weather API unavailable — use sensible defaults so prediction still works
-            forecast_weather = pd.DataFrame(
-                {
-                    "date": future_dates,
-                    "temperature_2m_mean": 20.0,
-                    "precipitation_sum": 0.0,
-                    "wind_speed_10m_max": 10.0,
-                    "relative_humidity_2m_mean": 60.0,
-                }
-            )
+            forecast_weather = _weather_fallback_df(future_dates)
 
     if forecast_weather.empty:
-        # Last-resort fallback instead of crashing
-        forecast_weather = pd.DataFrame(
-            {
-                "date": future_dates,
-                "temperature_2m_mean": 20.0,
-                "precipitation_sum": 0.0,
-                "wind_speed_10m_max": 10.0,
-                "relative_humidity_2m_mean": 60.0,
-            }
-        )
+        forecast_weather = _weather_fallback_df(future_dates)
 
     for col in WEATHER_COLS:
         if col not in forecast_weather.columns:
-            forecast_weather[col] = (
-                float(forecast_weather[col].mean()) if col in forecast_weather else 0.0
-            )
+            forecast_weather[col] = WEATHER_FALLBACK.get(col, 0.0)
 
     future_weather = forecast_weather[forecast_weather["date"].isin(future_dates)].copy()
     if len(future_weather) < len(future_dates):
@@ -292,7 +226,7 @@ def predict_dish(
         for c in WEATHER_COLS:
             feat[c] = float(row.get(c, 0.0))
 
-        feat.update(_compute_lag_features_from_history(sales_history))
+        feat.update(compute_lag_features_from_history(sales_history))
 
         X_one = pd.DataFrame([{k: feat.get(k, 0.0) for k in TREE_FEATURES}])
         resid_hat = float(loaded.tree_model.predict(X_one)[0])

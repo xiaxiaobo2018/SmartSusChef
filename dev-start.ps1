@@ -77,7 +77,7 @@ Start-Process powershell -ArgumentList "-NoExit", "-Command", @"
     `$Host.UI.RawUI.WindowTitle = 'SmartSusChef - ML (8000)'
     Set-Location '$Root\ML'
     Write-Host 'Installing Python dependencies...' -ForegroundColor Yellow
-    python -m pip install -q -r requirements.txt
+    python -m pip install -q -r requirements-prod.txt
     Write-Host 'ML service starting...' -ForegroundColor Green
     python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 "@
