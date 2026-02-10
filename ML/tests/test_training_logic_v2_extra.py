@@ -1,8 +1,8 @@
-import sys
 from types import SimpleNamespace
 
 import numpy as np
 import pandas as pd
+
 import training_logic_v2 as tl
 
 
