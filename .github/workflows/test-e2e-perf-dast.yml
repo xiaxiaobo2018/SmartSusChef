@@ -181,7 +181,7 @@ jobs:
           retention-days: 30
 
   # ==========================================
-  # DAST Security Scan with OWASP ZAP
+  # DAST Security Scan with OWASP ZAP (Authenticated)
   # ==========================================
   dast-owasp-zap:
     name: "DAST Scan (OWASP ZAP)"
@@ -200,6 +200,24 @@ jobs:
           chmod -R 777 zap-reports
           chmod 777 .
 
+      - name: Login to get JWT token
+        id: auth
+        run: |
+          echo "Logging in to backend API..."
+          RESPONSE=$(curl -sf -X POST "${{ inputs.target_url }}/api/Auth/login" \
+            -H "Content-Type: application/json" \
+            -d "{\"username\":\"${{ secrets.ZAP_DAST_USERNAME }}\",\"password\":\"${{ secrets.ZAP_DAST_PASSWORD }}\"}" 2>&1) || true
+          TOKEN=$(echo "$RESPONSE" | jq -r '.token // empty')
+          if [ -z "$TOKEN" ]; then
+            echo "::warning::Login failed — DAST scan will run without authentication (reduced coverage)"
+            echo "authenticated=false" >> $GITHUB_OUTPUT
+          else
+            echo "::add-mask::$TOKEN"
+            echo "token=$TOKEN" >> $GITHUB_OUTPUT
+            echo "authenticated=true" >> $GITHUB_OUTPUT
+            echo "Login successful, token length: ${#TOKEN}"
+          fi
+
       - name: ZAP Baseline Scan (Frontend)
         run: |
           docker pull ghcr.io/zaproxy/zaproxy:stable -q
@@ -214,18 +232,68 @@ jobs:
             -a -j -m 5 -T 60 || true
         continue-on-error: true
 
-      - name: ZAP API Scan (Backend)
+      - name: ZAP API Scan (Backend - Authenticated)
+        env:
+          ZAP_AUTH_TOKEN: ${{ steps.auth.outputs.token }}
         run: |
           docker run --rm -v $(pwd):/zap/wrk/:rw --network=host \
+            -e ZAP_AUTH_TOKEN="$ZAP_AUTH_TOKEN" \
             -t ghcr.io/zaproxy/zaproxy:stable \
             zap-api-scan.py \
             -t '${{ inputs.target_url }}/swagger/v1/swagger.json' \
             -f openapi \
+            --hook '/zap/wrk/.zap/auth-hook.py' \
+            -c '.zap/rules.tsv' \
+            -z '-addoninstall replacer' \
             -J zap-reports/api-report.json \
             -w zap-reports/api-report.md \
             -r zap-reports/api-report.html \
-            -a -j -m 5 -T 60 || true
+            -a -j -m 10 -T 120 || true
         continue-on-error: true
+
+      - name: Verify DAST Coverage
+        if: always()
+        run: |
+          echo "## DAST Scan Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Authenticated:** ${{ steps.auth.outputs.authenticated }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          ALL_CONTROLLERS="Auth Dashboard Export Forecast Health Ingredients Ml Recipes Sales Store Users Wastage"
+          COVERED=0
+          TOTAL=0
+
+          if [ -f zap-reports/api-report.json ]; then
+            echo "| Controller | Covered |" >> $GITHUB_STEP_SUMMARY
+            echo "|------------|---------|" >> $GITHUB_STEP_SUMMARY
+            for ctrl in $ALL_CONTROLLERS; do
+              TOTAL=$((TOTAL + 1))
+              if grep -qi "/api/$ctrl" zap-reports/api-report.json 2>/dev/null; then
+                echo "| $ctrl | ✅ |" >> $GITHUB_STEP_SUMMARY
+                COVERED=$((COVERED + 1))
+              else
+                echo "| $ctrl | ❌ |" >> $GITHUB_STEP_SUMMARY
+              fi
+            done
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Coverage: $COVERED / $TOTAL controllers**" >> $GITHUB_STEP_SUMMARY
+
+            HIGH=$(jq '[.site[].alerts[] | select(.riskcode == "3")] | length' zap-reports/api-report.json 2>/dev/null || echo 0)
+            MEDIUM=$(jq '[.site[].alerts[] | select(.riskcode == "2")] | length' zap-reports/api-report.json 2>/dev/null || echo 0)
+            LOW=$(jq '[.site[].alerts[] | select(.riskcode == "1")] | length' zap-reports/api-report.json 2>/dev/null || echo 0)
+            INFO=$(jq '[.site[].alerts[] | select(.riskcode == "0")] | length' zap-reports/api-report.json 2>/dev/null || echo 0)
+
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Alert Summary" >> $GITHUB_STEP_SUMMARY
+            echo "| Severity | Count |" >> $GITHUB_STEP_SUMMARY
+            echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
+            echo "| 🔴 High | $HIGH |" >> $GITHUB_STEP_SUMMARY
+            echo "| 🟠 Medium | $MEDIUM |" >> $GITHUB_STEP_SUMMARY
+            echo "| 🟡 Low | $LOW |" >> $GITHUB_STEP_SUMMARY
+            echo "| 🔵 Info | $INFO |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ API report not generated" >> $GITHUB_STEP_SUMMARY
+          fi
 
       - name: Upload ZAP reports
         uses: actions/upload-artifact@v4
