@@ -18,8 +18,8 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/api': 'http://localhost:5000',
-      '/swagger': 'http://localhost:5000',
+      '/api': 'http://localhost:5001',
+      '/swagger': 'http://localhost:5001',
     },
   },
   test: {

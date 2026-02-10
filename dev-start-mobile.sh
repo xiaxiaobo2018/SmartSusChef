@@ -27,6 +27,7 @@ DB_PASSWORD="${DB_PASSWORD:?DB_PASSWORD not set in .env}"
 DB_NAME="${DB_NAME:?DB_NAME not set in .env}"
 
 BACKEND_PORT=5001
+ML_PORT=8000
 START_FRONTEND=${START_FRONTEND:-true}
 
 # -- Detect local Wi-Fi IP (for physical mobile devices) -------------------
@@ -96,6 +97,17 @@ echo "[OK] DB: $DB_SERVER:$DB_PORT/$DB_NAME (user: $DB_USER)"
 export DATABASE_URL="$CONN_STR"
 echo ""
 
+# -- Kill existing processes on ML_PORT -------------------------------------
+echo "[INFO] Checking for processes on port ${ML_PORT}..."
+# Find PIDs using the ML_PORT and process them with xargs to handle multiple PIDs
+lsof -t -i ":${ML_PORT}" | xargs -r kill -9
+if [ $? -eq 0 ]; then
+    echo "[INFO] Killed existing process(es) on port ${ML_PORT}."
+    sleep 1 # Give a moment for the port to release
+else
+    echo "[INFO] No process found or unable to kill processes on port ${ML_PORT}."
+fi
+
 # -- Kill existing processes on BACKEND_PORT --------------------------------
 echo "[INFO] Checking for processes on port ${BACKEND_PORT}..."
 # Find PIDs using the BACKEND_PORT and suppress errors if none are found
@@ -127,7 +139,7 @@ echo "[1/3] Starting ML Service (port 8000)..."
 (
     cd "$ROOT/ML"
     python3 -m pip install -q -r requirements-prod.txt
-    python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    python3 -m uvicorn app.main:app --host 0.0.0.0 --port ${ML_PORT} --reload
 ) &
 ML_PID=$!
 sleep 3
