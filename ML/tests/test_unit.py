@@ -301,7 +301,7 @@ class TestSecureIO:
         assert loaded == obj
 
     def test_secure_load_integrity_fails_on_tampered_file(self, tmp_path):
-        obj = {"secret": "safe"}
+        obj = {"secret": "safe"}  # nosec
         pkl_path = tmp_path / "tampered.pkl"
         secure_dump(obj, pkl_path)
 

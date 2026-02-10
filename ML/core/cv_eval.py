@@ -1,15 +1,15 @@
 """Cross-validation fold generation and Optuna hyperparameter optimization."""
 
+from __future__ import annotations
+
 from types import ModuleType
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    import optuna as _optuna_type
 
 import numpy as np
 import pandas as pd
-
-try:
-    import optuna
-except ImportError:
-    optuna = None  # Not needed for inference
 from sklearn.metrics import mean_absolute_error
 
 from app.utils.logging_config import setup_logger
@@ -18,7 +18,14 @@ from core.feature_eng import _build_residual_features
 
 logger = setup_logger(__name__)
 
-# Import tree frameworks (optional dependencies)
+# Import optional dependencies
+optuna: ModuleType | None = None
+try:
+    import optuna as _optuna
+
+    optuna = _optuna
+except ImportError:
+    pass
 lgb: ModuleType | None = None
 try:
     import lightgbm as _lgb
@@ -199,7 +206,7 @@ def _optimize_hybrid(
 ) -> tuple[float, dict[str, Any]]:
     """Optuna optimization for hybrid residual stacking per model type."""
 
-    def objective(trial: optuna.Trial) -> float:
+    def objective(trial: _optuna_type.Trial) -> float:
         if model_type == "xgboost":
             params = {
                 "max_depth": trial.suggest_int("max_depth", 3, 10),
@@ -227,6 +234,8 @@ def _optimize_hybrid(
 
         return _eval_hybrid_mae(model_type, fold_cache, params, config)
 
+    if optuna is None:
+        raise ImportError("Optuna is required but not installed.")
     study = optuna.create_study(
         direction="minimize",
         sampler=optuna.samplers.TPESampler(seed=config.random_seed),
