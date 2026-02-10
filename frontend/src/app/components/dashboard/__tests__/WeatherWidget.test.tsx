@@ -5,6 +5,20 @@ import { WeatherWidget } from '../WeatherWidget';
 import { AppProvider } from '@/app/context/AppContext';
 import * as api from '@/app/services/api';
 
+// Mock AuthContext (AppProvider now depends on useAuth)
+vi.mock('@/app/context/AuthContext', () => ({
+    useAuth: () => ({
+        user: null,
+        loading: false,
+        login: vi.fn(),
+        logout: vi.fn(),
+        register: vi.fn(),
+        updateProfile: vi.fn(),
+        changePassword: vi.fn(),
+    }),
+    AuthProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
+
 // Mock the API module
 vi.mock('@/app/services/api', () => ({
     setAuthToken: vi.fn(),

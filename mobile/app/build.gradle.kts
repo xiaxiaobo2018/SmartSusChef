@@ -1,5 +1,5 @@
-import java.util.Properties
 import java.io.FileInputStream
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
@@ -67,19 +67,14 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
 
     buildFeatures {
         buildConfig = true
-        dataBinding = true
         viewBinding = true
-    }
-
-    dataBinding {
-        enable = true
     }
 
     compileOptions {
@@ -101,6 +96,11 @@ android {
             isReturnDefaultValues = true
         }
         animationsDisabled = true
+    }
+
+    lint {
+        abortOnError = true
+        disable += "NullSafeMutableLiveData"
     }
 }
 
@@ -182,35 +182,45 @@ jacoco {
 
 tasks.withType<Test> {
     configure<JacocoTaskExtension> {
-        excludes = listOf(
+        excludes =
+            listOf(
+                "**/R.class",
+                "**/R\$*.class",
+                "**/BuildConfig.*",
+                "**/Manifest*.*",
+                "**/*Test*.*",
+                "android/**/*.*",
+                "**/di/**",
+            )
+    }
+}
+
+tasks.register<JacocoReport>("jacocoTestReportDebug") {
+    dependsOn("testDebugUnitTest")
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+    val fileFilter =
+        listOf(
             "**/R.class",
             "**/R\$*.class",
             "**/BuildConfig.*",
             "**/Manifest*.*",
             "**/*Test*.*",
             "android/**/*.*",
-            "**/di/**"
+            "**/di/**",
         )
-    }
-}
-
-tasks.register<JacocoReport>("jacocoTestReportDebug") {
-    dependsOn("testUatDebugUnitTest")
-    reports {
-        xml.required.set(true)
-        html.required.set(true)
-    }
-    val fileFilter = listOf(
-        "**/R.class", "**/R\$*.class", "**/BuildConfig.*",
-        "**/Manifest*.*", "**/*Test*.*", "android/**/*.*", "**/di/**"
-    )
-    val debugTree = fileTree("${layout.buildDirectory.get().asFile}/tmp/kotlin-classes/uatDebug") {
-        exclude(fileFilter)
-    }
+    val debugTree =
+        fileTree("${layout.buildDirectory.get().asFile}/tmp/kotlin-classes/debug") {
+            exclude(fileFilter)
+        }
     val mainSrc = "${project.projectDir}/src/main/java"
     sourceDirectories.setFrom(files(mainSrc))
     classDirectories.setFrom(files(debugTree))
-    executionData.setFrom(fileTree(layout.buildDirectory.get().asFile) {
-        include("jacoco/testUatDebugUnitTest.exec")
-    })
+    executionData.setFrom(
+        fileTree(layout.buildDirectory.get().asFile) {
+            include("jacoco/testDebugUnitTest.exec")
+        },
+    )
 }

@@ -9,24 +9,18 @@ import com.google.gson.annotations.SerializedName
 data class SalesDataDto(
     @SerializedName("id")
     val id: String,
-
     @SerializedName("date")
     val date: String,
-
     @SerializedName("recipeId")
     val recipeId: String,
-
     @SerializedName("recipeName")
     val recipeName: String,
-
     @SerializedName("quantity")
     val quantity: Int,
-
     @SerializedName("createdAt")
     val createdAt: String,
-
     @SerializedName("updatedAt")
-    val updatedAt: String
+    val updatedAt: String,
 )
 
 /**
@@ -36,12 +30,10 @@ data class SalesDataDto(
 data class CreateSalesDataRequest(
     @SerializedName("date")
     val date: String,
-
     @SerializedName("recipeId")
     val recipeId: String,
-
     @SerializedName("quantity")
-    val quantity: Int
+    val quantity: Int,
 )
 
 /**
@@ -50,7 +42,7 @@ data class CreateSalesDataRequest(
  */
 data class UpdateSalesDataRequest(
     @SerializedName("quantity")
-    val quantity: Int
+    val quantity: Int,
 )
 
 /**
@@ -60,12 +52,10 @@ data class UpdateSalesDataRequest(
 data class SalesTrendDto(
     @SerializedName("date")
     val date: String,
-
     @SerializedName("totalQuantity")
     val totalQuantity: Int,
-
     @SerializedName("recipeBreakdown")
-    val recipeBreakdown: List<RecipeSalesDto>
+    val recipeBreakdown: List<RecipeSalesDto>,
 )
 
 /**
@@ -75,12 +65,10 @@ data class SalesTrendDto(
 data class RecipeSalesDto(
     @SerializedName("recipeId")
     val recipeId: String,
-
     @SerializedName("recipeName")
     val recipeName: String,
-
     @SerializedName("quantity")
-    val quantity: Int
+    val quantity: Int,
 )
 
 /**
@@ -90,15 +78,12 @@ data class RecipeSalesDto(
 data class IngredientUsageDto(
     @SerializedName("ingredientId")
     val ingredientId: String,
-
     @SerializedName("ingredientName")
     val ingredientName: String,
-
     @SerializedName("unit")
     val unit: String,
-
     @SerializedName("quantity")
-    val quantity: Double // decimal in C#
+    val quantity: Double,
 )
 
 /**
@@ -107,7 +92,7 @@ data class IngredientUsageDto(
  */
 data class ImportSalesDataRequest(
     @SerializedName("salesData")
-    val salesData: List<CreateSalesDataRequest>
+    val salesData: List<CreateSalesDataRequest>,
 )
 
 /**
@@ -117,22 +102,16 @@ data class ImportSalesDataRequest(
 data class SalesWithSignalsDto(
     @SerializedName("date")
     val date: String,
-
     @SerializedName("totalQuantity")
     val totalQuantity: Int,
-
     @SerializedName("isHoliday")
     val isHoliday: Boolean,
-
     @SerializedName("holidayName")
     val holidayName: String,
-
     @SerializedName("rainMm")
     val rainMm: Double,
-
     @SerializedName("weatherDesc")
     val weatherDesc: String,
-
     @SerializedName("recipes")
-    val recipes: List<RecipeSalesDto>
+    val recipes: List<RecipeSalesDto>,
 )

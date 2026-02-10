@@ -280,17 +280,15 @@ def get_location_details(address):
         geolocator = Nominatim(user_agent="smartsus_chef_v3")
         location = geolocator.geocode(address, addressdetails=True)
         if location is None:
-            logger.warning("Could not geocode address: '%s'", address)
+            logger.warning("Could not geocode address.")
             return None, None, None
         lat = location.latitude
         lon = location.longitude
         country_code = location.raw.get("address", {}).get("country_code", "").upper()
-        logger.info(
-            "Geocoded '%s' -> Lat: %.4f, Lon: %.4f, Country: %s", address, lat, lon, country_code
-        )
+        logger.info("Address geocoded successfully.")
         return lat, lon, country_code
     except Exception as e:
-        logger.warning("Geocoding failed for '%s': %s", address, e)
+        logger.warning("Geocoding failed. Error: %s", e)
         return None, None, None
 
 
@@ -413,13 +411,12 @@ def add_local_context(
     # Ensure valid country code for holidays
     if not country_code or country_code not in holidays.list_supported_countries():
         logger.warning(
-            "Country '%s' not supported for holidays. Defaulting to '%s'.",
-            country_code,
+            "Unsupported country for holidays. Defaulting to '%s'.",
             config.default_fallback_country,
         )
         country_code = config.default_fallback_country
 
-    logger.info("Location: %s (Lat: %.4f, Lon: %.4f)", country_code, lat, lon)
+    logger.info("Location context processed.")
 
     df["day_of_week"] = df["date"].dt.dayofweek
     df["month"] = df["date"].dt.month

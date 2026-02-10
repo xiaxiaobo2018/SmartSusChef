@@ -1,6 +1,12 @@
 package com.smartsuschef.mobile.di
 
-import com.smartsuschef.mobile.network.api.*
+import com.smartsuschef.mobile.network.api.AuthApiService
+import com.smartsuschef.mobile.network.api.ForecastApiService
+import com.smartsuschef.mobile.network.api.IngredientApiService
+import com.smartsuschef.mobile.network.api.RecipeApiService
+import com.smartsuschef.mobile.network.api.SalesApiService
+import com.smartsuschef.mobile.network.api.StoreApiService
+import com.smartsuschef.mobile.network.api.WastageApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -11,7 +17,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object ApiModule {
-
     @Provides
     @Singleton
     fun provideAuthApiService(retrofit: Retrofit): AuthApiService {

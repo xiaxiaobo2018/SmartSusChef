@@ -10,10 +10,10 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
-import org.junit.Before
-import org.junit.Test
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Before
+import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
@@ -23,7 +23,6 @@ import org.junit.runner.RunWith
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class TokenManagerTest {
-
     private lateinit var tokenManager: TokenManager
     private lateinit var context: Context
 
@@ -35,18 +34,20 @@ class TokenManagerTest {
         context = ApplicationProvider.getApplicationContext()
 
         // Create MasterKey using the new builder pattern
-        val masterKey = MasterKey.Builder(context)
-            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-            .build()
+        val masterKey =
+            MasterKey.Builder(context)
+                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                .build()
 
         // Create EncryptedSharedPreferences using the new method
-        val testPrefs = EncryptedSharedPreferences.create(
-            context,
-            Constants.SHARED_PREFS_FILE_NAME,
-            masterKey,
-            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-        )
+        val testPrefs =
+            EncryptedSharedPreferences.create(
+                context,
+                Constants.SHARED_PREFS_FILE_NAME,
+                masterKey,
+                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
+            )
         testPrefs.edit().clear().apply() // Use apply() for asynchronous write
 
         tokenManager = TokenManager(context) // Initialize TokenManager
@@ -55,32 +56,36 @@ class TokenManagerTest {
     @After
     fun tearDown() {
         // Clear preferences after each test to prevent interference
-        val masterKey = MasterKey.Builder(context)
-            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-            .build()
-        val testPrefs = EncryptedSharedPreferences.create(
-            context,
-            Constants.SHARED_PREFS_FILE_NAME,
-            masterKey,
-            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-        )
+        val masterKey =
+            MasterKey.Builder(context)
+                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                .build()
+        val testPrefs =
+            EncryptedSharedPreferences.create(
+                context,
+                Constants.SHARED_PREFS_FILE_NAME,
+                masterKey,
+                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
+            )
         testPrefs.edit().clear().apply()
     }
 
     @Test
-    fun saveTokenShouldStoreTokenSecurely() = runTest {
-        val testToken = "test_jwt_token_123"
-        tokenManager.saveToken(testToken)
-        assertEquals(testToken, tokenManager.getTokenFlow().first())
-    }
+    fun saveTokenShouldStoreTokenSecurely() =
+        runTest {
+            val testToken = "test_jwt_token_123"
+            tokenManager.saveToken(testToken)
+            assertEquals(testToken, tokenManager.getTokenFlow().first())
+        }
 
     @Test
-    fun getTokenShouldRetrieveStoredTokenSynchronously() = runTest {
-        val testToken = "sync_jwt_token_456"
-        tokenManager.saveToken(testToken)
-        assertEquals(testToken, tokenManager.getToken())
-    }
+    fun getTokenShouldRetrieveStoredTokenSynchronously() =
+        runTest {
+            val testToken = "sync_jwt_token_456"
+            tokenManager.saveToken(testToken)
+            assertEquals(testToken, tokenManager.getToken())
+        }
 
     @Test
     fun saveUserRoleShouldStoreUserRoleSecurely() {
@@ -97,20 +102,22 @@ class TokenManagerTest {
     }
 
     @Test
-    fun clearSessionShouldRemoveTokenAndUserRole() = runTest {
-        tokenManager.saveToken("some_token")
-        tokenManager.saveUserRole("some_role")
+    fun clearSessionShouldRemoveTokenAndUserRole() =
+        runTest {
+            tokenManager.saveToken("some_token")
+            tokenManager.saveUserRole("some_role")
 
-        tokenManager.clearSession()
+            tokenManager.clearSession()
 
-        assertNull(tokenManager.getTokenFlow().first())
-        assertNull(tokenManager.getUserRole())
-    }
+            assertNull(tokenManager.getTokenFlow().first())
+            assertNull(tokenManager.getUserRole())
+        }
 
     @Test
-    fun getTokenShouldReturnNullWhenNoTokenIsStored() = runTest {
-        assertNull(tokenManager.getToken())
-    }
+    fun getTokenShouldReturnNullWhenNoTokenIsStored() =
+        runTest {
+            assertNull(tokenManager.getToken())
+        }
 
     @Test
     fun getUserRoleShouldReturnNullWhenNoRoleIsStored() {

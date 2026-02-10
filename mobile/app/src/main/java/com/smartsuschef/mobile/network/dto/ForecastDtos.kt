@@ -9,21 +9,16 @@ import com.google.gson.annotations.SerializedName
 data class ForecastDto(
     @SerializedName("date")
     val date: String,
-
     @SerializedName("recipeId")
     val recipeId: String,
-
     @SerializedName("recipeName")
     val recipeName: String,
-
     @SerializedName("quantity")
     val quantity: Int,
-
     @SerializedName("confidence")
     val confidence: String,
-
     @SerializedName("ingredients")
-    val ingredients: List<ForecastIngredientDto>
+    val ingredients: List<ForecastIngredientDto>,
 )
 
 /**
@@ -33,15 +28,12 @@ data class ForecastDto(
 data class ForecastIngredientDto(
     @SerializedName("ingredientId")
     val ingredientId: String,
-
     @SerializedName("ingredientName")
     val ingredientName: String,
-
     @SerializedName("unit")
     val unit: String,
-
     @SerializedName("quantity")
-    val quantity: Double // decimal in C#
+    val quantity: Double,
 )
 
 /**
@@ -51,12 +43,10 @@ data class ForecastIngredientDto(
 data class ForecastSummaryDto(
     @SerializedName("date")
     val date: String,
-
     @SerializedName("totalQuantity")
     val totalQuantity: Int,
-
     @SerializedName("changePercentage")
-    val changePercentage: Double // decimal in C#
+    val changePercentage: Double,
 )
 
 /**
@@ -65,16 +55,13 @@ data class ForecastSummaryDto(
  */
 data class WeatherDto(
     @SerializedName("temperature")
-    val temperature: Double, // decimal in C#
-
+    val temperature: Double,
     @SerializedName("condition")
     val condition: String,
-
     @SerializedName("humidity")
     val humidity: Int,
-
     @SerializedName("description")
-    val description: String
+    val description: String,
 )
 
 /**
@@ -84,9 +71,8 @@ data class WeatherDto(
 data class HolidayDto(
     @SerializedName("date")
     val date: String,
-
     @SerializedName("name")
-    val name: String
+    val name: String,
 )
 
 /**
@@ -96,21 +82,16 @@ data class HolidayDto(
 data class WeatherForecastDto(
     @SerializedName("date")
     val date: String,
-
     @SerializedName("temperatureMax")
     val temperatureMax: Double? = null,
-
     @SerializedName("temperatureMin")
     val temperatureMin: Double? = null,
-
     @SerializedName("rainMm")
-    val rainMm: Double, // decimal in C#
-
+    val rainMm: Double,
     @SerializedName("weatherCode")
     val weatherCode: Int,
-
     @SerializedName("weatherDescription")
-    val weatherDescription: String
+    val weatherDescription: String,
 )
 
 /**
@@ -120,21 +101,16 @@ data class WeatherForecastDto(
 data class CalendarDayDto(
     @SerializedName("date")
     val date: String,
-
     @SerializedName("isHoliday")
     val isHoliday: Boolean,
-
     @SerializedName("holidayName")
     val holidayName: String? = null,
-
     @SerializedName("isSchoolHoliday")
     val isSchoolHoliday: Boolean,
-
     @SerializedName("isWeekend")
     val isWeekend: Boolean,
-
     @SerializedName("weather")
-    val weather: WeatherForecastDto? = null
+    val weather: WeatherForecastDto? = null,
 )
 
 /**
@@ -144,10 +120,8 @@ data class CalendarDayDto(
 data class TomorrowForecastDto(
     @SerializedName("date")
     val date: String,
-
     @SerializedName("calendar")
     val calendar: CalendarDayDto,
-
     @SerializedName("weather")
-    val weather: WeatherForecastDto? = null
+    val weather: WeatherForecastDto? = null,
 )

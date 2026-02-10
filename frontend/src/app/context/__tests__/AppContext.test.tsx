@@ -3,8 +3,39 @@ import { render, screen } from '@testing-library/react';
 import { renderHook, act } from '@testing-library/react';
 import React from 'react';
 import { AppProvider, useAppContext } from '../AppContext';
-import { AuthProvider, useAuth } from '../AuthContext';
 import * as api from '@/app/services/api';
+
+const mockLogout = vi.fn();
+
+// Stable user reference to prevent infinite re-renders in AppProvider's useEffect
+const mockUser = { id: '1', username: 'admin', name: 'Admin', email: 'admin@test.com', role: 'manager', status: 'Active' };
+
+// Helper to renderHook with AppProvider and properly await async effects
+async function renderAppHook() {
+    let result: any;
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+        <AppProvider>{children}</AppProvider>
+    );
+    await act(async () => {
+        const hook = renderHook(() => useAppContext(), { wrapper });
+        result = hook.result;
+    });
+    return result;
+}
+
+// Mock AuthContext since AppProvider now depends on useAuth()
+vi.mock('../AuthContext', () => ({
+    useAuth: () => ({
+        user: mockUser,
+        loading: false,
+        login: vi.fn(),
+        logout: mockLogout,
+        register: vi.fn(),
+        updateProfile: vi.fn(),
+        changePassword: vi.fn(),
+    }),
+    AuthProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
 
 // Mock the API module with factory function
 vi.mock('@/app/services/api', () => ({
@@ -15,6 +46,9 @@ vi.mock('@/app/services/api', () => ({
         register: vi.fn(),
         forgotPassword: vi.fn(),
         getCurrentUser: vi.fn(),
+        checkStoreSetupRequired: vi.fn(() => Promise.resolve({ storeSetupRequired: false })),
+        updateProfile: vi.fn(),
+        changePassword: vi.fn(),
     },
     storeApi: {
         get: vi.fn(),
@@ -99,27 +133,31 @@ describe('AppContext', () => {
     });
 
     describe('Provider Rendering', () => {
-        it('should render children', () => {
-            render(
-                <AppProvider>
-                    <div>Test Child</div>
-                </AppProvider>
-            );
+        it('should render children', async () => {
+            await act(async () => {
+                render(
+                    <AppProvider>
+                        <div>Test Child</div>
+                    </AppProvider>
+                );
+            });
 
             expect(screen.getByText('Test Child')).toBeInTheDocument();
         });
 
-        it('should provide context to children', () => {
+        it('should provide context to children', async () => {
             const TestComponent = () => {
                 const context = useAppContext();
                 return <div>{context ? 'Context Available' : 'No Context'}</div>;
             };
 
-            render(
-                <AppProvider>
-                    <TestComponent />
-                </AppProvider>
-            );
+            await act(async () => {
+                render(
+                    <AppProvider>
+                        <TestComponent />
+                    </AppProvider>
+                );
+            });
 
             expect(screen.getByText('Context Available')).toBeInTheDocument();
         });
@@ -137,216 +175,37 @@ describe('AppContext', () => {
             consoleError.mockRestore();
         });
 
-        it('should return context when used inside provider', () => {
-            const wrapper = ({ children }: { children: React.ReactNode }) => (
-                <AppProvider>{children}</AppProvider>
-            );
-
-            const { result } = renderHook(() => useAppContext(), { wrapper });
+        it('should return context when used inside provider', async () => {
+            const result = await renderAppHook();
 
             expect(result.current).toBeDefined();
-            expect(result.current.user).toBeNull();
-            expect(result.current.login).toBeInstanceOf(Function);
             expect(result.current.logout).toBeInstanceOf(Function);
         });
     });
 
-    describe('Authentication', () => {
-        const wrapper = ({ children }: { children: React.ReactNode }) => (
-            <AppProvider>{children}</AppProvider>
-        );
+    describe('Logout', () => {
+        it('should call authLogout when logout is called', async () => {
+            const result = await renderAppHook();
 
-        describe('login', () => {
-            it('should call authApi.login and set user on success', async () => {
-                const mockUser = {
-                    id: 'user-1',
-                    username: 'testuser',
-                    name: 'Test User',
-                    email: 'test@example.com',
-                    role: 'manager',
-                    status: 'Active',
-                };
-
-                vi.mocked(api.authApi.login).mockResolvedValue({
-                    token: 'test-token',
-                    user: mockUser,
-                    storeSetupRequired: false,
-                });
-
-                const { result } = renderHook(() => useAppContext(), { wrapper });
-
-                let loginResult;
-                await act(async () => {
-                    loginResult = await result.current.login('testuser', 'password123');
-                });
-
-                expect(api.authApi.login).toHaveBeenCalledWith({
-                    username: 'testuser',
-                    password: 'password123',
-                });
-                expect(api.setAuthToken).toHaveBeenCalledWith('test-token');
-                expect(loginResult).toBe(true);
-                expect(result.current.user).toEqual(mockUser);
+            act(() => {
+                result.current.logout();
             });
 
-            it('should return false on login failure', async () => {
-                vi.mocked(api.authApi.login).mockRejectedValue(new Error('Invalid credentials'));
-
-                const { result } = renderHook(() => useAppContext(), { wrapper });
-
-                let loginResult;
-                await act(async () => {
-                    loginResult = await result.current.login('testuser', 'wrongpassword');
-                });
-
-                expect(loginResult).toBe(false);
-                expect(result.current.user).toBeNull();
-            });
-
-            it('should set storeSetupRequired flag', async () => {
-                vi.mocked(api.authApi.login).mockResolvedValue({
-                    token: 'test-token',
-                    user: {
-                        id: 'user-1',
-                        username: 'newuser',
-                        name: 'New User',
-                        email: 'new@example.com',
-                        role: 'manager',
-                        status: 'Active',
-                    },
-                    storeSetupRequired: true,
-                });
-
-                const { result } = renderHook(() => useAppContext(), { wrapper });
-
-                await act(async () => {
-                    await result.current.login('newuser', 'password123');
-                });
-
-                expect(result.current.storeSetupRequired).toBe(true);
-            });
-        });
-
-        describe('logout', () => {
-            it('should clear user and token', async () => {
-                const mockUser = {
-                    id: 'user-1',
-                    username: 'testuser',
-                    name: 'Test User',
-                    email: 'test@example.com',
-                    role: 'manager',
-                    status: 'Active',
-                };
-
-                vi.mocked(api.authApi.login).mockResolvedValue({
-                    token: 'test-token',
-                    user: mockUser,
-                    storeSetupRequired: false,
-                });
-
-                const { result } = renderHook(() => useAppContext(), { wrapper });
-
-                // Login first
-                await act(async () => {
-                    await result.current.login('testuser', 'password123');
-                });
-
-                expect(result.current.user).toEqual(mockUser);
-
-                // Then logout
-                act(() => {
-                    result.current.logout();
-                });
-
-                expect(result.current.user).toBeNull();
-                expect(api.setAuthToken).toHaveBeenCalledWith(null);
-            });
-        });
-
-        describe('register', () => {
-            it('should call authApi.register and return success', async () => {
-                const mockUser = {
-                    id: 'user-2',
-                    username: 'newuser',
-                    name: 'New User',
-                    email: 'new@example.com',
-                    role: 'employee',
-                    status: 'Active',
-                };
-
-                vi.mocked(api.authApi.register).mockResolvedValue({
-                    token: 'new-token',
-                    user: mockUser,
-                    storeSetupRequired: true,
-                });
-
-                const { result } = renderHook(() => useAppContext(), { wrapper });
-
-                let registerResult;
-                await act(async () => {
-                    registerResult = await result.current.register(
-                        'newuser',
-                        'password123',
-                        'New User',
-                        'new@example.com'
-                    );
-                });
-
-                expect(api.authApi.register).toHaveBeenCalledWith({
-                    username: 'newuser',
-                    password: 'password123',
-                    name: 'New User',
-                    email: 'new@example.com',
-                });
-                expect(registerResult).toEqual({
-                    success: true,
-                    storeSetupRequired: true,
-                });
-                expect(result.current.user).toEqual(mockUser);
-            });
-
-            it('should return error on registration failure', async () => {
-                vi.mocked(api.authApi.register).mockRejectedValue(
-                    new Error('Username already exists')
-                );
-
-                const { result } = renderHook(() => useAppContext(), { wrapper });
-
-                let registerResult;
-                await act(async () => {
-                    registerResult = await result.current.register(
-                        'duplicate',
-                        'password123',
-                        'User',
-                        'email@example.com'
-                    );
-                });
-
-                expect(registerResult).toEqual({
-                    success: false,
-                    storeSetupRequired: false,
-                    error: 'Username already exists',
-                });
-                expect(result.current.user).toBeNull();
-            });
+            expect(mockLogout).toHaveBeenCalled();
         });
     });
 
     describe('Initial State', () => {
-        const wrapper = ({ children }: { children: React.ReactNode }) => (
-            <AppProvider>{children}</AppProvider>
-        );
+        it('should have initial state with user from AuthContext', async () => {
+            const result = await renderAppHook();
 
-        it('should have initial state with null user', () => {
-            const { result } = renderHook(() => useAppContext(), { wrapper });
-
-            expect(result.current.user).toBeNull();
+            expect(result.current.user).toBeDefined();
             expect(result.current.loading).toBe(false);
             expect(result.current.storeSetupRequired).toBe(false);
         });
 
-        it('should have empty arrays for data', () => {
-            const { result } = renderHook(() => useAppContext(), { wrapper });
+        it('should have empty arrays for data', async () => {
+            const result = await renderAppHook();
 
             expect(result.current.ingredients).toEqual([]);
             expect(result.current.recipes).toEqual([]);
@@ -355,8 +214,8 @@ describe('AppContext', () => {
             expect(result.current.forecastData).toEqual([]);
         });
 
-        it('should have empty store settings', () => {
-            const { result } = renderHook(() => useAppContext(), { wrapper });
+        it('should have empty store settings', async () => {
+            const result = await renderAppHook();
 
             expect(result.current.storeSettings).toBeDefined();
             expect(result.current.storeSettings.storeId).toBe('');
@@ -365,19 +224,11 @@ describe('AppContext', () => {
     });
 
     describe('Context Methods', () => {
-        const wrapper = ({ children }: { children: React.ReactNode }) => (
-            <AppProvider>{children}</AppProvider>
-        );
+        it('should expose all required methods', async () => {
+            const result = await renderAppHook();
 
-        it('should expose all required methods', () => {
-            const { result } = renderHook(() => useAppContext(), { wrapper });
-
-            // Auth methods
-            expect(result.current.login).toBeInstanceOf(Function);
+            // Logout method
             expect(result.current.logout).toBeInstanceOf(Function);
-            expect(result.current.register).toBeInstanceOf(Function);
-            expect(result.current.updateProfile).toBeInstanceOf(Function);
-            expect(result.current.changePassword).toBeInstanceOf(Function);
 
             // Store methods
             expect(result.current.setupStore).toBeInstanceOf(Function);
@@ -392,69 +243,7 @@ describe('AppContext', () => {
         });
     });
 
-    describe('Profile Management', () => {
-        const wrapper = ({ children }: { children: React.ReactNode }) => (
-            <AppProvider>{children}</AppProvider>
-        );
-
-        beforeEach(() => {
-            vi.mocked(api.authApi.login).mockResolvedValue({
-                token: 'test-token',
-                user: { id: '1', username: 'testuser', name: 'Test', email: 'test@test.com', role: 'Owner', status: 'Active' },
-                storeSetupRequired: false,
-            });
-        });
-
-        it('should update user profile', async () => {
-            const updateProfileMock = vi.fn().mockResolvedValue({
-                id: '1',
-                username: 'testuser',
-                name: 'Updated Name',
-                email: 'updated@test.com',
-                role: 'Owner',
-                status: 'Active',
-            });
-            vi.mocked(api.authApi as any).updateProfile = updateProfileMock;
-
-            const { result } = renderHook(() => useAppContext(), { wrapper });
-
-            await act(async () => {
-                await result.current.login('testuser', 'password');
-            });
-
-            await act(async () => {
-                await result.current.updateProfile({ name: 'Updated Name', email: 'updated@test.com' });
-            });
-
-            expect(updateProfileMock).toHaveBeenCalledWith({ name: 'Updated Name', email: 'updated@test.com' });
-        });
-
-        it('should change password', async () => {
-            const changePasswordMock = vi.fn().mockResolvedValue({});
-            vi.mocked(api.authApi as any).changePassword = changePasswordMock;
-
-            const { result } = renderHook(() => useAppContext(), { wrapper });
-
-            await act(async () => {
-                await result.current.login('testuser', 'password');
-            });
-
-            await act(async () => {
-                await result.current.changePassword('oldpass', 'newpass');
-            });
-
-            expect(changePasswordMock).toHaveBeenCalledWith({
-                currentPassword: 'oldpass',
-                newPassword: 'newpass',
-            });
-        });
-    });
-
     describe('Store Management', () => {
-        const wrapper = ({ children }: { children: React.ReactNode }) => (
-            <AppProvider>{children}</AppProvider>
-        );
-
         it('should setup store', async () => {
             const setupMock = vi.mocked(api.storeApi.setup).mockResolvedValue({
                 id: 1,
@@ -465,7 +254,7 @@ describe('AppContext', () => {
                 countryCode: 'SG',
             });
 
-            const { result } = renderHook(() => useAppContext(), { wrapper });
+            const result = await renderAppHook();
 
             await act(async () => {
                 await result.current.setupStore({
@@ -489,7 +278,7 @@ describe('AppContext', () => {
                 countryCode: 'SG',
             });
 
-            const { result } = renderHook(() => useAppContext(), { wrapper });
+            const result = await renderAppHook();
 
             await act(async () => {
                 await result.current.updateStoreSettings({
@@ -505,10 +294,6 @@ describe('AppContext', () => {
     });
 
     describe('Ingredient CRUD', () => {
-        const wrapper = ({ children }: { children: React.ReactNode }) => (
-            <AppProvider>{children}</AppProvider>
-        );
-
         beforeEach(() => {
             vi.mocked(api.ingredientsApi as any).create = vi.fn();
             vi.mocked(api.ingredientsApi as any).update = vi.fn();
@@ -524,7 +309,7 @@ describe('AppContext', () => {
                 globalIngredientId: null,
             });
 
-            const { result } = renderHook(() => useAppContext(), { wrapper });
+            const result = await renderAppHook();
 
             await act(async () => {
                 await result.current.addIngredient({
@@ -547,7 +332,7 @@ describe('AppContext', () => {
                 globalIngredientId: null,
             });
 
-            const { result } = renderHook(() => useAppContext(), { wrapper });
+            const result = await renderAppHook();
 
             // Manually set initial ingredients state
             act(() => {
@@ -564,7 +349,7 @@ describe('AppContext', () => {
         it('should delete ingredient', async () => {
             const deleteMock = vi.mocked(api.ingredientsApi as any).delete = vi.fn().mockResolvedValue({});
 
-            const { result } = renderHook(() => useAppContext(), { wrapper });
+            const result = await renderAppHook();
 
             await act(async () => {
                 await result.current.deleteIngredient('1');
@@ -575,10 +360,6 @@ describe('AppContext', () => {
     });
 
     describe('Recipe CRUD', () => {
-        const wrapper = ({ children }: { children: React.ReactNode }) => (
-            <AppProvider>{children}</AppProvider>
-        );
-
         beforeEach(() => {
             vi.mocked(api.recipesApi as any).create = vi.fn();
             vi.mocked(api.recipesApi as any).update = vi.fn();
@@ -594,7 +375,7 @@ describe('AppContext', () => {
                 ingredients: [],
             });
 
-            const { result } = renderHook(() => useAppContext(), { wrapper });
+            const result = await renderAppHook();
 
             await act(async () => {
                 await result.current.addRecipe({
@@ -611,7 +392,7 @@ describe('AppContext', () => {
         it('should delete recipe', async () => {
             const deleteMock = vi.mocked(api.recipesApi as any).delete = vi.fn().mockResolvedValue({});
 
-            const { result } = renderHook(() => useAppContext(), { wrapper });
+            const result = await renderAppHook();
 
             await act(async () => {
                 await result.current.deleteRecipe('1');
@@ -622,10 +403,6 @@ describe('AppContext', () => {
     });
 
     describe('Sales Data CRUD', () => {
-        const wrapper = ({ children }: { children: React.ReactNode }) => (
-            <AppProvider>{children}</AppProvider>
-        );
-
         beforeEach(() => {
             vi.mocked(api.salesApi as any).create = vi.fn();
             vi.mocked(api.salesApi as any).update = vi.fn();
@@ -642,7 +419,7 @@ describe('AppContext', () => {
                 quantity: 10,
             });
 
-            const { result } = renderHook(() => useAppContext(), { wrapper });
+            const result = await renderAppHook();
 
             await act(async () => {
                 await result.current.addSalesData({
@@ -658,7 +435,7 @@ describe('AppContext', () => {
         it('should delete sales data', async () => {
             const deleteMock = vi.mocked(api.salesApi as any).delete = vi.fn().mockResolvedValue({});
 
-            const { result } = renderHook(() => useAppContext(), { wrapper });
+            const result = await renderAppHook();
 
             await act(async () => {
                 await result.current.deleteSalesData('1');
@@ -671,7 +448,7 @@ describe('AppContext', () => {
             const importMock = vi.mocked(api.salesApi as any).import.mockResolvedValue({ message: 'Success', count: 2 });
             vi.mocked(api.salesApi.getAll).mockResolvedValue([]);
 
-            const { result } = renderHook(() => useAppContext(), { wrapper });
+            const result = await renderAppHook();
 
             await act(async () => {
                 await result.current.importSalesData([
@@ -685,10 +462,6 @@ describe('AppContext', () => {
     });
 
     describe('Wastage Data CRUD', () => {
-        const wrapper = ({ children }: { children: React.ReactNode }) => (
-            <AppProvider>{children}</AppProvider>
-        );
-
         beforeEach(() => {
             vi.mocked(api.wastageApi as any).create = vi.fn();
             vi.mocked(api.wastageApi as any).update = vi.fn();
@@ -703,7 +476,7 @@ describe('AppContext', () => {
                 quantity: 2,
             });
 
-            const { result } = renderHook(() => useAppContext(), { wrapper });
+            const result = await renderAppHook();
 
             await act(async () => {
                 await result.current.addWastageData({
@@ -719,7 +492,7 @@ describe('AppContext', () => {
         it('should delete wastage data', async () => {
             const deleteMock = vi.mocked(api.wastageApi as any).delete = vi.fn().mockResolvedValue({});
 
-            const { result } = renderHook(() => useAppContext(), { wrapper });
+            const result = await renderAppHook();
 
             await act(async () => {
                 await result.current.deleteWastageData('1');
@@ -730,12 +503,8 @@ describe('AppContext', () => {
     });
 
     describe('Data Refresh', () => {
-        const wrapper = ({ children }: { children: React.ReactNode }) => (
-            <AppProvider>{children}</AppProvider>
-        );
-
         it('should refresh all data', async () => {
-            const { result } = renderHook(() => useAppContext(), { wrapper });
+            const result = await renderAppHook();
 
             await act(async () => {
                 await result.current.refreshData();
@@ -749,16 +518,7 @@ describe('AppContext', () => {
     });
 
     describe('User Management', () => {
-        const wrapper = ({ children }: { children: React.ReactNode }) => (
-            <AppProvider>{children}</AppProvider>
-        );
-
         beforeEach(() => {
-            vi.mocked(api.authApi.login).mockResolvedValue({
-                token: 'test-token',
-                user: { id: '1', username: 'admin', name: 'Admin', email: 'admin@test.com', role: 'Owner', status: 'Active' },
-                storeSetupRequired: false,
-            });
             vi.mocked(api.usersApi as any).create = vi.fn();
             vi.mocked(api.usersApi as any).update = vi.fn();
             vi.mocked(api.usersApi as any).delete = vi.fn();
@@ -774,11 +534,7 @@ describe('AppContext', () => {
                 status: 'Active',
             });
 
-            const { result } = renderHook(() => useAppContext(), { wrapper });
-
-            await act(async () => {
-                await result.current.login('admin', 'password');
-            });
+            const result = await renderAppHook();
 
             await act(async () => {
                 await result.current.addUser({
@@ -803,11 +559,7 @@ describe('AppContext', () => {
                 status: 'Active',
             });
 
-            const { result } = renderHook(() => useAppContext(), { wrapper });
-
-            await act(async () => {
-                await result.current.login('admin', 'password');
-            });
+            const result = await renderAppHook();
 
             await act(async () => {
                 await result.current.updateUser('2', { name: 'Updated User', email: 'updated@test.com' });
@@ -819,11 +571,7 @@ describe('AppContext', () => {
         it('should delete user', async () => {
             const deleteMock = vi.mocked(api.usersApi as any).delete = vi.fn().mockResolvedValue({});
 
-            const { result } = renderHook(() => useAppContext(), { wrapper });
-
-            await act(async () => {
-                await result.current.login('admin', 'password');
-            });
+            const result = await renderAppHook();
 
             await act(async () => {
                 await result.current.deleteUser('2');
@@ -834,10 +582,6 @@ describe('AppContext', () => {
     });
 
     describe('Export Data', () => {
-        const wrapper = ({ children }: { children: React.ReactNode }) => (
-            <AppProvider>{children}</AppProvider>
-        );
-
         beforeEach(() => {
             vi.mocked(api.exportApi).getSalesCsv = vi.fn();
             vi.mocked(api.exportApi).getWastageCsv = vi.fn();
@@ -847,7 +591,7 @@ describe('AppContext', () => {
         it('should export sales data', async () => {
             const exportMock = vi.mocked(api.exportApi).getSalesCsv.mockResolvedValue(new Blob(['sales data']));
 
-            const { result } = renderHook(() => useAppContext(), { wrapper });
+            const result = await renderAppHook();
 
             await act(async () => {
                 await result.current.exportData('sales');
@@ -859,7 +603,7 @@ describe('AppContext', () => {
         it('should export wastage data', async () => {
             const exportMock = vi.mocked(api.exportApi).getWastageCsv.mockResolvedValue(new Blob(['wastage data']));
 
-            const { result } = renderHook(() => useAppContext(), { wrapper });
+            const result = await renderAppHook();
 
             await act(async () => {
                 await result.current.exportData('wastage');
@@ -871,7 +615,7 @@ describe('AppContext', () => {
         it('should export forecast data', async () => {
             const exportMock = vi.mocked(api.exportApi).getForecastCsv.mockResolvedValue(new Blob(['forecast data']));
 
-            const { result } = renderHook(() => useAppContext(), { wrapper });
+            const result = await renderAppHook();
 
             await act(async () => {
                 await result.current.exportData('forecast');

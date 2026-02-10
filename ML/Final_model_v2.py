@@ -741,9 +741,8 @@ if __name__ == "__main__":
         forecast_14day_df = pd.DataFrame(forecast_table_rows)
 
         logger.info(
-            "Forecast starting: %s | Location: %s | Horizon: %d days",
+            "Forecast starting: %s | Horizon: %d days",
             forecast_date,
-            address_input,
             config.forecast_horizon,
         )
         logger.info("Model: Prophet + Tree Residual Stacking")

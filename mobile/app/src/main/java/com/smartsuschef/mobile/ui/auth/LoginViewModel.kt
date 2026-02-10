@@ -12,26 +12,27 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class LoginViewModel @Inject constructor(
-    private val repository: AuthRepository
-) : ViewModel() {
+class LoginViewModel
+    @Inject
+    constructor(
+        private val repository: AuthRepository,
+    ) : ViewModel() {
+        private val _loginResponse = MutableLiveData<Resource<LoginResponse>>()
+        val loginResponse: LiveData<Resource<LoginResponse>> = _loginResponse
 
-    private val _loginResponse = MutableLiveData<Resource<LoginResponse>>()
-    val loginResponse: LiveData<Resource<LoginResponse>> = _loginResponse
-
-    /**
-     * Called when user clicks "Sign In"
-     */
-    fun login(request: LoginRequest) {
-        _loginResponse.value = Resource.Loading()
-        viewModelScope.launch {
-            val result = repository.login(request)
-            _loginResponse.value = result
+        /**
+         * Called when user clicks "Sign In"
+         */
+        fun login(request: LoginRequest) {
+            _loginResponse.value = Resource.Loading()
+            viewModelScope.launch {
+                val result = repository.login(request)
+                _loginResponse.value = result
+            }
         }
-    }
 
-    /**
-     * Checks if a session already exists to skip the login screen
-     */
-    fun isUserLoggedIn() = repository.isUserLoggedIn()
-}
+        /**
+         * Checks if a session already exists to skip the login screen
+         */
+        fun isUserLoggedIn() = repository.isUserLoggedIn()
+    }

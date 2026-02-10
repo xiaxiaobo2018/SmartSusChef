@@ -450,7 +450,7 @@ resource "aws_ecs_task_definition" "backend" {
       },
       {
         name  = "ConnectionStrings__DefaultConnection"
-        value = "Server=${aws_db_instance.mysql.endpoint};Database=smartsuschef;User=smartsuschef;Password=${var.db_password};"
+        value = "Server=${aws_db_instance.mysql.address};Port=3306;Database=smartsuschef;User=smartsuschef;Password=${var.db_password};"
       },
       {
         name  = "Jwt__Secret"

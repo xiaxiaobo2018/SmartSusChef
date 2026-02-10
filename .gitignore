@@ -180,3 +180,5 @@ tools/
 # Rider specific
 .idea/
 *.sln.DotSettings.user
+
+*.pyc
