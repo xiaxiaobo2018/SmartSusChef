@@ -23,6 +23,17 @@ on:
     - 'infrastructure/**'
     - '!mobile/**'
   workflow_dispatch:
+    inputs:
+      deploy_uat:
+        description: 'Deploy to UAT (manual approval)'
+        required: false
+        default: false
+        type: boolean
+      run_jmeter:
+        description: 'Run JMeter performance tests'
+        required: false
+        default: true
+        type: boolean
 
 permissions:
   contents: read
@@ -534,7 +545,8 @@ jobs:
     needs: [docker-build-push, detect-changes]
     if: |
       !cancelled() && !failure() &&
-      github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'workflow_dispatch' && inputs.deploy_uat == 'true')
     environment:
       name: uat
       url: http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com
@@ -675,6 +687,36 @@ jobs:
             echo "No services to deploy."
           fi
 
+      - name: Ensure ALB routes /swagger to backend
+        run: |
+          ALB_NAME="smartsuschef-uat-alb"
+          REGION="${{ env.AWS_REGION }}"
+
+          # Get listener ARN
+          LISTENER_ARN=$(aws elbv2 describe-listeners \
+            --load-balancer-arn $(aws elbv2 describe-load-balancers --names "$ALB_NAME" --query 'LoadBalancers[0].LoadBalancerArn' --output text --region "$REGION") \
+            --query 'Listeners[0].ListenerArn' --output text --region "$REGION")
+
+          # Check if /swagger* rule already exists
+          SWAGGER_RULE=$(aws elbv2 describe-rules --listener-arn "$LISTENER_ARN" --region "$REGION" \
+            --query "Rules[?Conditions[?Values[0]=='/swagger*']].RuleArn" --output text)
+
+          if [ -n "$SWAGGER_RULE" ] && [ "$SWAGGER_RULE" != "None" ]; then
+            echo "ALB rule for /swagger* already exists: $SWAGGER_RULE"
+          else
+            echo "Creating ALB rule: /swagger* -> backend target group..."
+            # Get backend target group ARN (the one used by /api/* rule)
+            BACKEND_TG=$(aws elbv2 describe-rules --listener-arn "$LISTENER_ARN" --region "$REGION" \
+              --query "Rules[?Conditions[?Values[0]=='/api/*']].Actions[0].TargetGroupArn" --output text)
+            aws elbv2 create-rule \
+              --listener-arn "$LISTENER_ARN" \
+              --priority 90 \
+              --conditions "Field=path-pattern,Values=/swagger*" \
+              --actions "Type=forward,TargetGroupArn=$BACKEND_TG" \
+              --region "$REGION" --output text > /dev/null
+            echo "ALB rule created: /swagger* -> $BACKEND_TG"
+          fi
+
       - name: Run UAT Smoke Tests
         run: |
           echo "Running UAT smoke tests..."
@@ -682,6 +724,7 @@ jobs:
           ALB_URL="http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com"
           curl -sf "$ALB_URL/" -o /dev/null && echo "[PASS] Frontend OK" || echo "[WARN] Frontend not ready"
           curl -sf "$ALB_URL/api/health" -o /dev/null && echo "[PASS] Backend OK" || echo "[WARN] Backend not ready"
+          curl -sf "$ALB_URL/swagger/v1/swagger.json" -o /dev/null && echo "[PASS] Swagger OK" || echo "[WARN] Swagger not ready"
           echo "UAT deployment completed!"
 
   # ==========================================
@@ -736,7 +779,12 @@ jobs:
     needs: [deploy-uat, detect-changes]
     if: |
       !cancelled() && !failure() &&
-      (needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.ml == 'true' || needs.detect-changes.outputs.infra == 'true')
+      (
+        needs.detect-changes.outputs.backend == 'true' ||
+        needs.detect-changes.outputs.ml == 'true' ||
+        needs.detect-changes.outputs.infra == 'true' ||
+        (github.event_name == 'workflow_dispatch' && inputs.run_jmeter == 'true')
+      )
 
     steps:
       - name: Checkout code
@@ -1138,6 +1186,34 @@ jobs:
             echo "No services to deploy."
           fi
 
+      - name: Ensure ALB routes /swagger to backend (Production)
+        env:
+          PROD_ALB_DNS: ${{ steps.prod-alb.outputs.alb_dns }}
+        if: env.PROD_ALB_DNS != ''
+        run: |
+          REGION="${{ env.AWS_REGION }}"
+          ALB_ARN=$(aws elbv2 describe-load-balancers --names smartsuschef-prod-alb \
+            --query 'LoadBalancers[0].LoadBalancerArn' --output text --region "$REGION" 2>/dev/null || echo "")
+          if [ -z "$ALB_ARN" ] || [ "$ALB_ARN" = "None" ]; then
+            echo "Production ALB not found, skipping."
+            exit 0
+          fi
+          LISTENER_ARN=$(aws elbv2 describe-listeners --load-balancer-arn "$ALB_ARN" \
+            --query 'Listeners[0].ListenerArn' --output text --region "$REGION")
+          SWAGGER_RULE=$(aws elbv2 describe-rules --listener-arn "$LISTENER_ARN" --region "$REGION" \
+            --query "Rules[?Conditions[?Values[0]=='/swagger*']].RuleArn" --output text)
+          if [ -n "$SWAGGER_RULE" ] && [ "$SWAGGER_RULE" != "None" ]; then
+            echo "ALB rule for /swagger* already exists."
+          else
+            BACKEND_TG=$(aws elbv2 describe-rules --listener-arn "$LISTENER_ARN" --region "$REGION" \
+              --query "Rules[?Conditions[?Values[0]=='/api/*']].Actions[0].TargetGroupArn" --output text)
+            aws elbv2 create-rule --listener-arn "$LISTENER_ARN" --priority 90 \
+              --conditions "Field=path-pattern,Values=/swagger*" \
+              --actions "Type=forward,TargetGroupArn=$BACKEND_TG" \
+              --region "$REGION" --output text > /dev/null
+            echo "ALB rule created for /swagger*."
+          fi
+
       - name: Production Smoke Tests
         env:
           PROD_ALB_DNS: ${{ steps.prod-alb.outputs.alb_dns }}
@@ -1151,6 +1227,7 @@ jobs:
           ALB_URL="http://$PROD_ALB_DNS"
           curl -sf "$ALB_URL/" -o /dev/null && echo "[PASS] Frontend OK" || echo "[WARN] Frontend not ready"
           curl -sf "$ALB_URL/api/health" -o /dev/null && echo "[PASS] Backend OK" || echo "[WARN] Backend not ready"
+          curl -sf "$ALB_URL/swagger/v1/swagger.json" -o /dev/null && echo "[PASS] Swagger OK" || echo "[WARN] Swagger not ready"
           echo "[PASS] Production deployment completed!"
 
   # ==========================================

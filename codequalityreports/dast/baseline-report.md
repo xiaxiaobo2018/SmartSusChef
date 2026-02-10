@@ -8,7 +8,7 @@ ZAP by [Checkmarx](https://checkmarx.com/).
 | Risk Level | Number of Alerts |
 | --- | --- |
 | High | 0 |
-| Medium | 4 |
+| Medium | 2 |
 | Low | 1 |
 | Informational | 7 |
 
@@ -19,7 +19,6 @@ ZAP by [Checkmarx](https://checkmarx.com/).
 
 | Level | Reason | Site | Description | Statistic |
 | --- | --- | --- | --- | --- |
-| Low | Warning |  | ZAP warnings logged - see the zap.log file for details | 2    |
 | Info | Informational | http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com | Percentage of responses with status code 2xx | 100 % |
 | Info | Informational | http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com | Percentage of endpoints with content type application/javascript | 16 % |
 | Info | Informational | http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com | Percentage of endpoints with content type text/css | 16 % |
@@ -35,17 +34,15 @@ ZAP by [Checkmarx](https://checkmarx.com/).
 
 | Name | Risk Level | Number of Instances |
 | --- | --- | --- |
-| CSP: Failure to Define Directive with No Fallback | Medium | 1 |
-| CSP: Wildcard Directive | Medium | 3 |
-| CSP: script-src unsafe-inline | Medium | 3 |
-| CSP: style-src unsafe-inline | Medium | 3 |
+| CSP: script-src unsafe-inline | Medium | 4 |
+| CSP: style-src unsafe-inline | Medium | 5 |
 | Insufficient Site Isolation Against Spectre Vulnerability | Low | 5 |
 | Information Disclosure - Suspicious Comments | Informational | 1 |
 | Modern Web Application | Informational | 5 |
-| Sec-Fetch-Dest Header is Missing | Informational | 3 |
-| Sec-Fetch-Mode Header is Missing | Informational | 3 |
-| Sec-Fetch-Site Header is Missing | Informational | 3 |
-| Sec-Fetch-User Header is Missing | Informational | 3 |
+| Sec-Fetch-Dest Header is Missing | Informational | 2 |
+| Sec-Fetch-Mode Header is Missing | Informational | 2 |
+| Sec-Fetch-Site Header is Missing | Informational | 2 |
+| Sec-Fetch-User Header is Missing | Informational | 2 |
 | Storable and Cacheable Content | Informational | Systemic |
 
 
@@ -54,107 +51,6 @@ ZAP by [Checkmarx](https://checkmarx.com/).
 ## Alert Detail
 
 
-
-### [ CSP: Failure to Define Directive with No Fallback ](https://www.zaproxy.org/docs/alerts/10055/)
-
-
-
-##### Medium (High)
-
-### Description
-
-The Content Security Policy fails to define one of the directives that has no fallback. Missing/excluding them is the same as allowing anything.
-
-* URL: http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/robots.txt
-  * Node Name: `http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/robots.txt`
-  * Method: `GET`
-  * Parameter: `Content-Security-Policy`
-  * Attack: ``
-  * Evidence: `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' http: https:;`
-  * Other Info: `The directive(s): frame-ancestors, form-action is/are among the directives that do not fallback to default-src.`
-
-
-Instances: 1
-
-### Solution
-
-Ensure that your web server, application server, load balancer, etc. is properly configured to set the Content-Security-Policy header.
-
-### Reference
-
-
-* [ https://www.w3.org/TR/CSP/ ](https://www.w3.org/TR/CSP/)
-* [ https://caniuse.com/#search=content+security+policy ](https://caniuse.com/#search=content+security+policy)
-* [ https://content-security-policy.com/ ](https://content-security-policy.com/)
-* [ https://github.com/HtmlUnit/htmlunit-csp ](https://github.com/HtmlUnit/htmlunit-csp)
-* [ https://web.dev/articles/csp#resource-options ](https://web.dev/articles/csp#resource-options)
-
-
-#### CWE Id: [ 693 ](https://cwe.mitre.org/data/definitions/693.html)
-
-
-#### WASC Id: 15
-
-#### Source ID: 3
-
-### [ CSP: Wildcard Directive ](https://www.zaproxy.org/docs/alerts/10055/)
-
-
-
-##### Medium (High)
-
-### Description
-
-Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks. Including (but not limited to) Cross Site Scripting (XSS), and data injection attacks. These attacks are used for everything from data theft to site defacement or distribution of malware. CSP provides a set of standard HTTP headers that allow website owners to declare approved sources of content that browsers should be allowed to load on that page — covered types are JavaScript, CSS, HTML frames, fonts, images and embeddable objects such as Java applets, ActiveX, audio and video files.
-
-* URL: http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com
-  * Node Name: `http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com`
-  * Method: `GET`
-  * Parameter: `Content-Security-Policy`
-  * Attack: ``
-  * Evidence: `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' http: https:;`
-  * Other Info: `The following directives either allow wildcard sources (or ancestors), are not defined, or are overly broadly defined:
-connect-src`
-* URL: http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/robots.txt
-  * Node Name: `http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/robots.txt`
-  * Method: `GET`
-  * Parameter: `Content-Security-Policy`
-  * Attack: ``
-  * Evidence: `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' http: https:;`
-  * Other Info: `The following directives either allow wildcard sources (or ancestors), are not defined, or are overly broadly defined:
-connect-src`
-* URL: http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/sitemap.xml
-  * Node Name: `http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/sitemap.xml`
-  * Method: `GET`
-  * Parameter: `Content-Security-Policy`
-  * Attack: ``
-  * Evidence: `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' http: https:;`
-  * Other Info: `The following directives either allow wildcard sources (or ancestors), are not defined, or are overly broadly defined:
-connect-src`
-
-
-Instances: 3
-
-### Solution
-
-Ensure that your web server, application server, load balancer, etc. is properly configured to set the Content-Security-Policy header.
-
-### Reference
-
-
-* [ https://www.w3.org/TR/CSP/ ](https://www.w3.org/TR/CSP/)
-* [ https://caniuse.com/#search=content+security+policy ](https://caniuse.com/#search=content+security+policy)
-* [ https://content-security-policy.com/ ](https://content-security-policy.com/)
-* [ https://github.com/HtmlUnit/htmlunit-csp ](https://github.com/HtmlUnit/htmlunit-csp)
-* [ https://web.dev/articles/csp#resource-options ](https://web.dev/articles/csp#resource-options)
-
-
-#### CWE Id: [ 693 ](https://cwe.mitre.org/data/definitions/693.html)
-
-
-#### WASC Id: 15
-
-#### Source ID: 3
 
 ### [ CSP: script-src unsafe-inline ](https://www.zaproxy.org/docs/alerts/10055/)
 
@@ -171,25 +67,32 @@ Content Security Policy (CSP) is an added layer of security that helps to detect
   * Method: `GET`
   * Parameter: `Content-Security-Policy`
   * Attack: ``
-  * Evidence: `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' http: https:;`
+  * Evidence: `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; form-action 'self';`
   * Other Info: `script-src includes unsafe-inline.`
-* URL: http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/robots.txt
-  * Node Name: `http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/robots.txt`
+* URL: http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/
+  * Node Name: `http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/`
   * Method: `GET`
   * Parameter: `Content-Security-Policy`
   * Attack: ``
-  * Evidence: `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' http: https:;`
+  * Evidence: `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; form-action 'self';`
+  * Other Info: `script-src includes unsafe-inline.`
+* URL: http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/favicon.ico
+  * Node Name: `http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/favicon.ico`
+  * Method: `GET`
+  * Parameter: `Content-Security-Policy`
+  * Attack: ``
+  * Evidence: `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; form-action 'self';`
   * Other Info: `script-src includes unsafe-inline.`
 * URL: http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/sitemap.xml
   * Node Name: `http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/sitemap.xml`
   * Method: `GET`
   * Parameter: `Content-Security-Policy`
   * Attack: ``
-  * Evidence: `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' http: https:;`
+  * Evidence: `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; form-action 'self';`
   * Other Info: `script-src includes unsafe-inline.`
 
 
-Instances: 3
+Instances: 4
 
 ### Solution
 
@@ -227,25 +130,39 @@ Content Security Policy (CSP) is an added layer of security that helps to detect
   * Method: `GET`
   * Parameter: `Content-Security-Policy`
   * Attack: ``
-  * Evidence: `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' http: https:;`
+  * Evidence: `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; form-action 'self';`
+  * Other Info: `style-src includes unsafe-inline.`
+* URL: http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/
+  * Node Name: `http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/`
+  * Method: `GET`
+  * Parameter: `Content-Security-Policy`
+  * Attack: ``
+  * Evidence: `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; form-action 'self';`
+  * Other Info: `style-src includes unsafe-inline.`
+* URL: http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/favicon.ico
+  * Node Name: `http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/favicon.ico`
+  * Method: `GET`
+  * Parameter: `Content-Security-Policy`
+  * Attack: ``
+  * Evidence: `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; form-action 'self';`
   * Other Info: `style-src includes unsafe-inline.`
 * URL: http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/robots.txt
   * Node Name: `http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/robots.txt`
   * Method: `GET`
   * Parameter: `Content-Security-Policy`
   * Attack: ``
-  * Evidence: `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' http: https:;`
+  * Evidence: `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; form-action 'self';`
   * Other Info: `style-src includes unsafe-inline.`
 * URL: http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/sitemap.xml
   * Node Name: `http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/sitemap.xml`
   * Method: `GET`
   * Parameter: `Content-Security-Policy`
   * Attack: ``
-  * Evidence: `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' http: https:;`
+  * Evidence: `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; form-action 'self';`
   * Other Info: `style-src includes unsafe-inline.`
 
 
-Instances: 3
+Instances: 5
 
 ### Solution
 
@@ -345,8 +262,8 @@ If possible, ensure that the end user uses a standards-compliant and modern web 
 
 The response appears to contain suspicious comments which may help an attacker.
 
-* URL: http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/assets/index-CDL483OP.js
-  * Node Name: `http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/assets/index-CDL483OP.js`
+* URL: http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/assets/index-BorlWs-V.js
+  * Node Name: `http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/assets/index-BorlWs-V.js`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
@@ -386,35 +303,35 @@ The application appears to be a modern web application. If you need to explore i
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `<script type="module" crossorigin src="/assets/index-CDL483OP.js"></script>`
+  * Evidence: `<script type="module" crossorigin src="/assets/index-BorlWs-V.js"></script>`
   * Other Info: `No links have been found while there are scripts, which is an indication that this is a modern web application.`
 * URL: http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/
   * Node Name: `http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `<script type="module" crossorigin src="/assets/index-CDL483OP.js"></script>`
+  * Evidence: `<script type="module" crossorigin src="/assets/index-BorlWs-V.js"></script>`
   * Other Info: `No links have been found while there are scripts, which is an indication that this is a modern web application.`
 * URL: http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/favicon.ico
   * Node Name: `http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/favicon.ico`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `<script type="module" crossorigin src="/assets/index-CDL483OP.js"></script>`
+  * Evidence: `<script type="module" crossorigin src="/assets/index-BorlWs-V.js"></script>`
   * Other Info: `No links have been found while there are scripts, which is an indication that this is a modern web application.`
 * URL: http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/robots.txt
   * Node Name: `http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/robots.txt`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `<script type="module" crossorigin src="/assets/index-CDL483OP.js"></script>`
+  * Evidence: `<script type="module" crossorigin src="/assets/index-BorlWs-V.js"></script>`
   * Other Info: `No links have been found while there are scripts, which is an indication that this is a modern web application.`
 * URL: http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/sitemap.xml
   * Node Name: `http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/sitemap.xml`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `<script type="module" crossorigin src="/assets/index-CDL483OP.js"></script>`
+  * Evidence: `<script type="module" crossorigin src="/assets/index-BorlWs-V.js"></script>`
   * Other Info: `No links have been found while there are scripts, which is an indication that this is a modern web application.`
 
 
@@ -448,13 +365,6 @@ Specifies how and where the data would be used. For instance, if the value is au
   * Attack: ``
   * Evidence: ``
   * Other Info: ``
-* URL: http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/robots.txt
-  * Node Name: `http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/robots.txt`
-  * Method: `GET`
-  * Parameter: `Sec-Fetch-Dest`
-  * Attack: ``
-  * Evidence: ``
-  * Other Info: ``
 * URL: http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/sitemap.xml
   * Node Name: `http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/sitemap.xml`
   * Method: `GET`
@@ -464,7 +374,7 @@ Specifies how and where the data would be used. For instance, if the value is au
   * Other Info: ``
 
 
-Instances: 3
+Instances: 2
 
 ### Solution
 
@@ -500,13 +410,6 @@ Allows to differentiate between requests for navigating between HTML pages and r
   * Attack: ``
   * Evidence: ``
   * Other Info: ``
-* URL: http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/robots.txt
-  * Node Name: `http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/robots.txt`
-  * Method: `GET`
-  * Parameter: `Sec-Fetch-Mode`
-  * Attack: ``
-  * Evidence: ``
-  * Other Info: ``
 * URL: http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/sitemap.xml
   * Node Name: `http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/sitemap.xml`
   * Method: `GET`
@@ -516,7 +419,7 @@ Allows to differentiate between requests for navigating between HTML pages and r
   * Other Info: ``
 
 
-Instances: 3
+Instances: 2
 
 ### Solution
 
@@ -552,13 +455,6 @@ Specifies the relationship between request initiator's origin and target's origi
   * Attack: ``
   * Evidence: ``
   * Other Info: ``
-* URL: http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/robots.txt
-  * Node Name: `http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/robots.txt`
-  * Method: `GET`
-  * Parameter: `Sec-Fetch-Site`
-  * Attack: ``
-  * Evidence: ``
-  * Other Info: ``
 * URL: http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/sitemap.xml
   * Node Name: `http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/sitemap.xml`
   * Method: `GET`
@@ -568,7 +464,7 @@ Specifies the relationship between request initiator's origin and target's origi
   * Other Info: ``
 
 
-Instances: 3
+Instances: 2
 
 ### Solution
 
@@ -604,13 +500,6 @@ Specifies if a navigation request was initiated by a user.
   * Attack: ``
   * Evidence: ``
   * Other Info: ``
-* URL: http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/robots.txt
-  * Node Name: `http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/robots.txt`
-  * Method: `GET`
-  * Parameter: `Sec-Fetch-User`
-  * Attack: ``
-  * Evidence: ``
-  * Other Info: ``
 * URL: http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/sitemap.xml
   * Node Name: `http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/sitemap.xml`
   * Method: `GET`
@@ -620,7 +509,7 @@ Specifies if a navigation request was initiated by a user.
   * Other Info: ``
 
 
-Instances: 3
+Instances: 2
 
 ### Solution
 
@@ -663,8 +552,8 @@ The response contents are storable by caching components such as proxy servers, 
   * Attack: ``
   * Evidence: ``
   * Other Info: `In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234.`
-* URL: http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/assets/index-CDL483OP.js
-  * Node Name: `http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/assets/index-CDL483OP.js`
+* URL: http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/assets/index-BorlWs-V.js
+  * Node Name: `http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/assets/index-BorlWs-V.js`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
