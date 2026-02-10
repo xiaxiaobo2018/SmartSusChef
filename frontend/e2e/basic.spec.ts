@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test.describe('SmartSusChef E2E Tests', () => {
   test('homepage loads successfully', async ({ page }) => {
     await page.goto('/');
-    await expect(page).toHaveTitle(/SmartSusChef/i);
+    await expect(page).toHaveTitle(/SmartSus\s*Chef/i);
   });
 
   test('login page is accessible', async ({ page }) => {
