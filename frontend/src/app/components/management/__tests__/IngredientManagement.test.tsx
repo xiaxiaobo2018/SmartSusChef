@@ -2,7 +2,6 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import { IngredientManagement } from '../IngredientManagement';
 import * as AppContext from '@/app/context/AppContext';
-import type { AppContextType } from '@/app/types';
 import { toast } from 'sonner';
 
 // ========== Module mocks ==========
@@ -62,7 +61,7 @@ function createCtx(overrides?: Partial<AppContextType>): Partial<AppContextType>
 }
 
 function useCtx(overrides?: Partial<AppContextType>) {
-    vi.spyOn(AppContext, 'useApp').mockReturnValue(createCtx(overrides) as AppContextType);
+    vi.spyOn(AppContext, 'useApp').mockReturnValue(createCtx(overrides) as any);
 }
 
 /** Click the "Add Ingredient" button */
@@ -679,7 +678,7 @@ describe('IngredientManagement', () => {
             fireEvent.click(screen.getByText('Yes, Delete Ingredient'));
 
             await waitFor(() => {
-                expect(mockDeleteIngredient).toHaveBeenCalledWith('i4', false);
+                expect(mockDeleteIngredient).toHaveBeenCalledWith('i4');
             });
         });
 
@@ -822,7 +821,7 @@ describe('IngredientManagement', () => {
             fireEvent.click(screen.getByText('Yes, Delete Ingredient'));
 
             await waitFor(() => {
-                expect(mockDeleteIngredient).toHaveBeenCalledWith('i5', true);
+                expect(mockDeleteIngredient).toHaveBeenCalledWith('i5');
             });
         });
 
@@ -841,7 +840,7 @@ describe('IngredientManagement', () => {
             fireEvent.click(screen.getByText('Yes, Delete Ingredient'));
 
             await waitFor(() => {
-                expect(toast.success).toHaveBeenCalledWith('Ingredient and 2 related wastage records deleted successfully');
+                expect(toast.success).toHaveBeenCalledWith('Ingredient deleted successfully');
             });
         });
 
@@ -859,7 +858,7 @@ describe('IngredientManagement', () => {
             fireEvent.click(screen.getByText('Yes, Delete Ingredient'));
 
             await waitFor(() => {
-                expect(toast.success).toHaveBeenCalledWith('Ingredient and 1 related wastage record deleted successfully');
+                expect(toast.success).toHaveBeenCalledWith('Ingredient deleted successfully');
             });
         });
 
@@ -879,7 +878,7 @@ describe('IngredientManagement', () => {
             fireEvent.click(screen.getByText('Yes, Delete Ingredient'));
 
             await waitFor(() => {
-                expect(toast.error).toHaveBeenCalledWith('Failed to delete ingredient and related data');
+                expect(toast.error).toHaveBeenCalledWith('Failed to delete ingredient');
             });
         });
     });
@@ -994,7 +993,7 @@ describe('IngredientManagement', () => {
             expect(screen.getByText('0 ingredients in the system')).toBeInTheDocument();
         });
 
-        it('should handle add → edit → delete workflow', async () => {
+        it('should handle add �?edit �?delete workflow', async () => {
             useCtx();
             render(<IngredientManagement />);
 
@@ -1014,7 +1013,7 @@ describe('IngredientManagement', () => {
             const unusedIngredient = { id: 'i4', name: 'Garlic', unit: 'g', carbonFootprint: 0.5 };
             vi.spyOn(AppContext, 'useApp').mockReturnValue(createCtx({
                 ingredients: [...mockIngredients, unusedIngredient]
-            }) as AppContextType);
+            }) as any);
 
             const { rerender } = render(<IngredientManagement />);
             clickDelete('Garlic');

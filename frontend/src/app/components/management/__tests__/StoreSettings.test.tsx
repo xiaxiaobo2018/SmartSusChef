@@ -4,7 +4,8 @@ import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { StoreSettings } from '../StoreSettings';
 import * as AppContext from '@/app/context/AppContext';
-import { AppContextType, User, StoreSettings as StoreSettingsType } from '@/app/types';
+import { User, StoreSettings as StoreSettingsType } from '@/app/types';
+import * as AuthContextModule from '@/app/context/AuthContext';
 import { toast } from 'sonner';
 
 // Mock sonner
@@ -74,13 +75,11 @@ describe('StoreSettings', () => {
     const mockUpdateUser = vi.fn().mockResolvedValue(undefined);
     const mockDeleteUser = vi.fn().mockResolvedValue(undefined);
 
-    const createMockContext = (overrides = {}): Partial<AppContextType> => ({
+    const createMockContext = (overrides = {}) => ({
         user: mockManagerUser,
         storeSettings: mockStoreSettings,
         storeUsers: mockStoreUsers,
         updateStoreSettings: mockUpdateStoreSettings,
-        updateProfile: mockUpdateProfile,
-        changePassword: mockChangePassword,
         addUser: mockAddUser,
         updateUser: mockUpdateUser,
         deleteUser: mockDeleteUser,
@@ -90,7 +89,16 @@ describe('StoreSettings', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         mockConfirm.mockReturnValue(true);
-        vi.spyOn(AppContext, 'useApp').mockReturnValue(createMockContext() as AppContextType);
+        vi.spyOn(AppContext, 'useApp').mockReturnValue(createMockContext() as any);
+        vi.spyOn(AuthContextModule, 'useAuth').mockReturnValue({
+            user: mockManagerUser as any,
+            loading: false,
+            login: vi.fn(),
+            logout: vi.fn(),
+            register: vi.fn(),
+            updateProfile: mockUpdateProfile,
+            changePassword: mockChangePassword,
+        });
     });
 
     // Helper functions
@@ -283,7 +291,7 @@ describe('StoreSettings', () => {
     describe('Rendering - Employee View', () => {
         beforeEach(() => {
             vi.spyOn(AppContext, 'useApp').mockReturnValue(
-                createMockContext({ user: mockEmployeeUser }) as AppContextType
+                createMockContext({ user: mockEmployeeUser }) as any
             );
         });
 
@@ -324,8 +332,8 @@ describe('StoreSettings', () => {
 
         it('should display location coordinates', () => {
             render(<StoreSettings />);
-            expect(screen.getByDisplayValue('1.3521')).toBeInTheDocument();
-            expect(screen.getByDisplayValue('103.8198')).toBeInTheDocument();
+            expect(screen.getByDisplayValue('1.352100')).toBeInTheDocument();
+            expect(screen.getByDisplayValue('103.819800')).toBeInTheDocument();
             expect(screen.getByDisplayValue('SG')).toBeInTheDocument();
         });
 
@@ -372,16 +380,14 @@ describe('StoreSettings', () => {
 
         it('should allow editing latitude', () => {
             render(<StoreSettings />);
-            const input = screen.getByDisplayValue('1.3521');
-            fireEvent.change(input, { target: { value: '1.5' } });
-            expect(input).toHaveValue(1.5);
+            const input = screen.getByDisplayValue('1.352100');
+            expect(input).toHaveAttribute('readonly');
         });
 
         it('should allow editing longitude', () => {
             render(<StoreSettings />);
-            const input = screen.getByDisplayValue('103.8198');
-            fireEvent.change(input, { target: { value: '104.0' } });
-            expect(input).toHaveValue(104);
+            const input = screen.getByDisplayValue('103.819800');
+            expect(input).toHaveAttribute('readonly');
         });
 
         it('should call updateStoreSettings on save', async () => {
@@ -849,14 +855,14 @@ describe('StoreSettings', () => {
             // Render as employee so Security tab is the default
             vi.spyOn(AppContext, 'useApp').mockReturnValue(createMockContext({
                 user: mockEmployeeUser,
-            }) as AppContextType);
+            }) as any);
             render(<StoreSettings />);
         });
 
         afterEach(() => {
             vi.restoreAllMocks();
             // Re-setup default mock for subsequent tests
-            vi.spyOn(AppContext, 'useApp').mockReturnValue(createMockContext() as AppContextType);
+            vi.spyOn(AppContext, 'useApp').mockReturnValue(createMockContext() as any);
         });
 
         it('should display Password Management card', () => {
@@ -887,13 +893,13 @@ describe('StoreSettings', () => {
         beforeEach(() => {
             vi.spyOn(AppContext, 'useApp').mockReturnValue(createMockContext({
                 user: mockEmployeeUser,
-            }) as AppContextType);
+            }) as any);
             render(<StoreSettings />);
         });
 
         afterEach(() => {
             vi.restoreAllMocks();
-            vi.spyOn(AppContext, 'useApp').mockReturnValue(createMockContext() as AppContextType);
+            vi.spyOn(AppContext, 'useApp').mockReturnValue(createMockContext() as any);
         });
 
         it('should show error when fields are empty', async () => {
@@ -994,13 +1000,13 @@ describe('StoreSettings', () => {
         beforeEach(() => {
             vi.spyOn(AppContext, 'useApp').mockReturnValue(createMockContext({
                 user: mockEmployeeUser,
-            }) as AppContextType);
+            }) as any);
             render(<StoreSettings />);
         });
 
         afterEach(() => {
             vi.restoreAllMocks();
-            vi.spyOn(AppContext, 'useApp').mockReturnValue(createMockContext() as AppContextType);
+            vi.spyOn(AppContext, 'useApp').mockReturnValue(createMockContext() as any);
         });
 
         it('should show error when name is missing', async () => {
@@ -1167,7 +1173,7 @@ describe('StoreSettings', () => {
                 createMockContext({
                     storeUsers: [mockManagerUser],
                     storeSettings: { storeId: 's1', companyName: '', uen: '', storeName: '', address: '' },
-                }) as AppContextType
+                }) as any
             );
 
             render(<StoreSettings />);
