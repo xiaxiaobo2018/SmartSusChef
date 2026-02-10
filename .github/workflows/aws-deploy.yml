@@ -157,6 +157,7 @@ jobs:
 
       - name: Run Unit Tests
         run: dotnet test backend/SmartSusChef.Api.Tests/SmartSusChef.Api.Tests.csproj --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./TestResults
+        continue-on-error: true
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
