@@ -1,44 +1,44 @@
 import { defineConfig, devices } from '@playwright/test';
 
 /**
- * Playwright E2E 测试配置
+ * Playwright E2E Test Configuration
  * @see https://playwright.dev/docs/test-configuration
  */
 export default defineConfig({
-  // 测试文件目录
+  // Test files directory
   testDir: './playwright_e2e',
   
-  // 只匹配 .spec.ts 文件
+  // Only match .spec.ts files
   testMatch: '**/*.spec.ts',
   
-  // 并行运行测试
+  // Run tests in parallel
   fullyParallel: true,
   
-  // CI 环境下禁止 test.only
+  // Forbid test.only in CI environment
   forbidOnly: !!process.env.CI,
   
-  // 失败重试次数
+  // Retry count on failure
   retries: process.env.CI ? 2 : 0,
   
-  // 使用单 worker 串行运行
+  // Use single worker for sequential execution
   workers: 1,
   
-  // 测试报告 - 不自动打开浏览器，避免端口占用
+  // Test reporter - don't auto-open browser to avoid port conflicts
   reporter: [['html', { open: 'never' }]],
   
-  // 全局配置
+  // Global configuration
   use: {
-    // 基础 URL - 优先使用 BASE_URL 环境变量（CI 中指向 AWS ALB）
+    // Base URL - prioritize BASE_URL env var (points to AWS ALB in CI)
     baseURL: process.env.BASE_URL || 'http://localhost:5173',
     
-    // 失败时记录 trace
+    // Record trace on first retry
     trace: 'on-first-retry',
     
-    // 截图设置
+    // Screenshot settings
     screenshot: 'only-on-failure',
   },
 
-  // 测试的浏览器
+  // Browsers to test
   projects: [
     {
       name: 'chromium',
@@ -46,7 +46,7 @@ export default defineConfig({
     },
   ],
 
-  // 自动启动开发服务器（CI 中使用 BASE_URL 指向 AWS，不需要本地 dev server）
+  // Auto-start dev server (in CI, BASE_URL points to AWS, no local dev server needed)
   ...(process.env.BASE_URL ? {} : {
     webServer: {
       command: 'npm run dev',
