@@ -1,7 +1,12 @@
 """Cross-validation fold generation and Optuna hyperparameter optimization."""
 
+from __future__ import annotations
+
 from types import ModuleType
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    import optuna as _optuna_type
 
 import numpy as np
 import pandas as pd
@@ -202,7 +207,7 @@ def _optimize_hybrid(
 ) -> tuple[float, dict[str, Any]]:
     """Optuna optimization for hybrid residual stacking per model type."""
 
-    def objective(trial: optuna.Trial) -> float:
+    def objective(trial: _optuna_type.Trial) -> float:
         if model_type == "xgboost":
             params = {
                 "max_depth": trial.suggest_int("max_depth", 3, 10),
@@ -230,6 +235,8 @@ def _optimize_hybrid(
 
         return _eval_hybrid_mae(model_type, fold_cache, params, config)
 
+    if optuna is None:
+        raise ImportError("Optuna is required but not installed.")
     study = optuna.create_study(
         direction="minimize",
         sampler=optuna.samplers.TPESampler(seed=config.random_seed),

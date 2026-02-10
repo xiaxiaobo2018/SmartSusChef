@@ -1,0 +1,5 @@
+core/cv_eval.py:12: error: Incompatible types in assignment (expression has type "None", variable has type Module)  [assignment]
+tests/test_core_model_train.py:34: note: By default the bodies of untyped functions are not checked, consider using --check-untyped-defs  [annotation-unchecked]
+tests/test_core_model_train.py:35: note: By default the bodies of untyped functions are not checked, consider using --check-untyped-defs  [annotation-unchecked]
+tests/test_core_cv_eval.py:458: note: By default the bodies of untyped functions are not checked, consider using --check-untyped-defs  [annotation-unchecked]
+Found 1 error in 1 file (checked 29 source files)
