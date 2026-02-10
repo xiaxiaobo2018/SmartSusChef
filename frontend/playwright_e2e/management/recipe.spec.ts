@@ -1,4 +1,4 @@
-﻿import { test, expect } from '@playwright/test';
+﻿import { test, expect, Page } from '@playwright/test';
 
 const API_BASE = (process.env.BASE_URL || 'http://localhost:5000') + '/api';
 const TEST_USER = { username: 'Simon', password: 'Leinuozhen2003.' };
@@ -37,7 +37,7 @@ test.afterAll(async () => {
 });
 
 // Helper: login and navigate to Recipe Management
-async function goToRecipeManagement(page) {
+async function goToRecipeManagement(page: Page) {
     await page.goto('/login');
     await page.getByRole('textbox', { name: 'Username' }).fill('Simon');
     await page.getByRole('textbox', { name: 'Password' }).fill('Leinuozhen2003.');
