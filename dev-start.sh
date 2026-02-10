@@ -9,7 +9,7 @@ ROOT="$(cd "$(dirname "$0")" && pwd)"
 # -- Load .env file ---------------------------------------------------------
 ENV_FILE="$ROOT/.env"
 if [ -f "$ENV_FILE" ]; then
-    echo "[OK] Loading config from .env"
+    echo "Loading config from .env"
     set -a
     # shellcheck disable=SC1090 
     . "$ENV_FILE"
