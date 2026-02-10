@@ -340,6 +340,23 @@ export const ingredientsApi = {
 };
 
 // ==========================================
+// GLOBAL INGREDIENTS API
+// ==========================================
+export interface GlobalIngredientDto {
+  id: number;
+  name: string;
+  carbonFootprint: number;
+}
+
+export const globalIngredientsApi = {
+  getAll: (): Promise<GlobalIngredientDto[]> =>
+    fetchWithAuth('/globalingredients'),
+
+  getById: (id: string): Promise<GlobalIngredientDto> =>
+    fetchWithAuth(`/globalingredients/${id}`),
+};
+
+// ==========================================
 // RECIPES API
 // ==========================================
 export interface RecipeIngredientDto {
