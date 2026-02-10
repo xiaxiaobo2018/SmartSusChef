@@ -20,11 +20,14 @@ export default defineConfig({
   // 失败重试次数
   retries: process.env.CI ? 2 : 0,
   
-  // 并行 worker 数量
-  workers: process.env.CI ? 1 : undefined,
+  // 使用单 worker 串行运行，避免多窗口同时弹出
+  workers: 1,
   
-  // 测试报告
-  reporter: 'html',
+  // 测试报告 - CI 环境不自动打开，本地环境自动打开
+  reporter: [['html', { open: process.env.CI ? 'never' : 'on-failure' }]],
+  
+  // 报告输出目录（每次运行会覆盖）
+  outputDir: 'test-results',
   
   // 全局配置
   use: {
