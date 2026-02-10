@@ -16,6 +16,7 @@
         "isolatedModules": true,
         "noEmit": true,
         "jsx": "react-jsx",
+        "types": ["vite/client", "node"],
         /* Linting */
         "strict": true,
         "noUnusedLocals": true,
@@ -30,7 +31,7 @@
         }
     },
     "include": [
-        "src"
+        "src", "playwright_e2e"
     ],
     "references": [
         {
