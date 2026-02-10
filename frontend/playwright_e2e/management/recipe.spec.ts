@@ -1,6 +1,6 @@
 ﻿import { test, expect } from '@playwright/test';
 
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = (process.env.BASE_URL || 'http://localhost:5000') + '/api';
 const TEST_USER = { username: 'Simon', password: 'Leinuozhen2003.' };
 
 // Helper: get auth token
@@ -38,7 +38,7 @@ test.afterAll(async () => {
 
 // Helper: login and navigate to Recipe Management
 async function goToRecipeManagement(page) {
-    await page.goto('http://localhost:5173/login');
+    await page.goto('/login');
     await page.getByRole('textbox', { name: 'Username' }).fill('Simon');
     await page.getByRole('textbox', { name: 'Password' }).fill('Leinuozhen2003.');
     await page.getByRole('button', { name: 'Sign In' }).click();

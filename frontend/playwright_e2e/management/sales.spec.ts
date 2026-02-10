@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 // Helper: login and navigate to Sales Data Management
 async function goToSalesManagement(page) {
-    await page.goto('http://localhost:5173/login');
+    await page.goto('/login');
     await page.getByRole('textbox', { name: 'Username' }).fill('Simon');
     await page.getByRole('textbox', { name: 'Password' }).fill('Leinuozhen2003.');
     await page.getByRole('button', { name: 'Sign In' }).click();

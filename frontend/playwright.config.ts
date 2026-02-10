@@ -28,8 +28,8 @@ export default defineConfig({
   
   // 全局配置
   use: {
-    // 基础 URL
-    baseURL: 'http://localhost:5173',
+    // 基础 URL - 优先使用 BASE_URL 环境变量（CI 中指向 AWS ALB）
+    baseURL: process.env.BASE_URL || 'http://localhost:5173',
     
     // 失败时记录 trace
     trace: 'on-first-retry',
@@ -46,11 +46,13 @@ export default defineConfig({
     },
   ],
 
-  // 自动启动开发服务器
-  webServer: {
-    command: 'npm run dev',
-    url: 'http://localhost:5173',
-    reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000,
-  },
+  // 自动启动开发服务器（CI 中使用 BASE_URL 指向 AWS，不需要本地 dev server）
+  ...(process.env.BASE_URL ? {} : {
+    webServer: {
+      command: 'npm run dev',
+      url: 'http://localhost:5173',
+      reuseExistingServer: !process.env.CI,
+      timeout: 120 * 1000,
+    },
+  }),
 });

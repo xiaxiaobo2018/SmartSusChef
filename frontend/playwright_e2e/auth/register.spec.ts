@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test('test', async ({ page }) => {
-    await page.goto('http://localhost:5173/register');
+    await page.goto('/register');
     await page.getByRole('button', { name: 'Register as Manager' }).click();
     await page.getByRole('textbox', { name: 'Full Name' }).click();
     await page.getByRole('textbox', { name: 'Full Name' }).fill('testtest');

@@ -8,5 +8,5 @@ test('Playwright 配置验证 - 应用能正常加载', async ({ page }) => {
   await page.goto('/');
   
   // 验证页面加载成功（根据实际页面内容调整）
-  await expect(page).toHaveURL(/localhost:5173/);
+  await expect(page).toHaveURL(/\//);
 });
