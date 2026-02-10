@@ -119,6 +119,7 @@ $RECYCLE.BIN/
 *.env
 appsettings.Development.json
 appsettings.Production.json
+local.properties
 
 # =====================================================
 # Testing
