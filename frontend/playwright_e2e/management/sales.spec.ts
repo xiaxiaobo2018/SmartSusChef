@@ -1,7 +1,7 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
 
 // Helper: login and navigate to Sales Data Management
-async function goToSalesManagement(page) {
+async function goToSalesManagement(page: Page) {
     await page.goto('/login');
     await page.getByRole('textbox', { name: 'Username' }).fill('Simon');
     await page.getByRole('textbox', { name: 'Password' }).fill('Leinuozhen2003.');
