@@ -53,8 +53,8 @@ export function DistributionPieChart({ date }: DistributionPieChartProps) {
       .map(([name, value]) => ({ name, value }))
       .sort((a, b) => b.value - a.value);
 
-    // If more than 9 items, group the rest into "Others"
-    if (entries.length > 9) {
+    // If 10 or fewer items, show all; if more than 10, show top 9 + Others
+    if (entries.length > 10) {
       const top9 = entries.slice(0, 9);
       const others = entries.slice(9);
       const othersTotal = others.reduce((sum, item) => sum + item.value, 0);
