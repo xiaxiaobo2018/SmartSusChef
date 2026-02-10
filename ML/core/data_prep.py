@@ -273,8 +273,12 @@ def fetch_training_data():
             ORDER BY s.Date ASC
             """
             df = pd.read_sql(query, engine)
-            df["date"] = pd.to_datetime(df["date"])
-            logger.info("Loaded %d rows from MySQL.", len(df))
+            if df.empty:
+                logger.warning("MySQL returned 0 rows. Falling back to CSV.")
+                df = None
+            else:
+                df["date"] = pd.to_datetime(df["date"])
+                logger.info("Loaded %d rows from MySQL.", len(df))
         except Exception as e:
             logger.warning("MySQL connection failed: %s. Falling back to CSV.", e)
             df = None
@@ -282,7 +286,14 @@ def fetch_training_data():
         logger.info("DATABASE_URL not set. Using CSV fallback.")
 
     if df is None:
-        df = pd.read_csv("food_sales_eng.csv")
+        df = pd.read_csv("food_sales_eng.csv", encoding="utf-8-sig")
+        # Normalise column names: the CSV may use Date/Dish_Name/Quantity_Sold
+        rename_map = {
+            "Date": "date",
+            "Dish_Name": "dish",
+            "Quantity_Sold": "sales",
+        }
+        df = df.rename(columns=rename_map)
         df["date"] = pd.to_datetime(df["date"], format="%m/%d/%Y")
         logger.info("Loaded %d rows from CSV.", len(df))
 
