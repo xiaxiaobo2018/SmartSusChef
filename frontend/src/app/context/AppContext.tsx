@@ -481,6 +481,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     try {
       await recipesApi.delete(id);
       setRecipes(prev => prev.filter(r => r.id !== id));
+      // Cascade delete: Remove related sales data from local state
+      setSalesData(prev => prev.filter(s => s.recipeId !== id));
+      // Cascade delete: Remove related wastage data from local state
+      setWastageData(prev => prev.filter(w => w.recipeId !== id));
     } catch (error) {
       console.error('Failed to delete recipe:', error);
       throw error;

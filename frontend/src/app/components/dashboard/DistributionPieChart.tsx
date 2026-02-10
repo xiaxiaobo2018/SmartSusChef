@@ -34,7 +34,7 @@ export function DistributionPieChart({ date }: DistributionPieChartProps) {
         .filter(r => !r.isSubRecipe)
         .map((r) => [r.id, r.name])
     );
-    
+
     const distribution: { [key: string]: number } = {};
 
     salesData
@@ -42,9 +42,9 @@ export function DistributionPieChart({ date }: DistributionPieChartProps) {
       .forEach((sale) => {
         // If the ID isn't in our Main Dish map, it will be undefined (filtered out)
         const recipeName = recipeMap.get(sale.recipeId);
-        
+
         if (recipeName) {
-            distribution[recipeName] = (distribution[recipeName] || 0) + sale.quantity;
+          distribution[recipeName] = (distribution[recipeName] || 0) + sale.quantity;
         }
       });
 
@@ -53,12 +53,12 @@ export function DistributionPieChart({ date }: DistributionPieChartProps) {
       .map(([name, value]) => ({ name, value }))
       .sort((a, b) => b.value - a.value);
 
-    // If 10 or fewer items, show all; if more than 10, show top 9 + Others
-    if (entries.length > 10) {
+    // If 9 or fewer items, show all; if 10 or more, show top 9 + Others
+    if (entries.length > 9) {
       const top9 = entries.slice(0, 9);
       const others = entries.slice(9);
       const othersTotal = others.reduce((sum, item) => sum + item.value, 0);
-      
+
       return [...top9, { name: 'Others', value: othersTotal }];
     }
 
@@ -93,9 +93,9 @@ export function DistributionPieChart({ date }: DistributionPieChartProps) {
                 dataKey="value"
               >
                 {chartData.map((entry, index) => (
-                  <Cell 
-                    key={`cell-${index}`} 
-                    fill={entry.name === 'Others' ? OTHERS_COLOR : PIE_COLORS[index % PIE_COLORS.length]} 
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={entry.name === 'Others' ? OTHERS_COLOR : PIE_COLORS[index % PIE_COLORS.length]}
                   />
                 ))}
               </Pie>

@@ -400,6 +400,44 @@ describe('AppContext', () => {
 
             expect(deleteMock).toHaveBeenCalledWith('1');
         });
+
+        it('should cascade delete related sales and wastage data when deleting recipe', async () => {
+            const deleteMock = vi.mocked(api.recipesApi as any).delete = vi.fn().mockResolvedValue({});
+
+            // Mock initial data with recipe, sales, and wastage
+            vi.mocked(api.recipesApi.getAll).mockResolvedValue([
+                { id: 'recipe-1', name: 'Test Recipe', isSellable: true, isSubRecipe: false, ingredients: [], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
+            ]);
+            vi.mocked(api.salesApi.getAll).mockResolvedValue([
+                { id: 'sales-1', date: '2024-01-01', recipeId: 'recipe-1', recipeName: 'Test Recipe', quantity: 10 },
+                { id: 'sales-2', date: '2024-01-02', recipeId: 'recipe-2', recipeName: 'Other Recipe', quantity: 5 }
+            ]);
+            vi.mocked(api.wastageApi.getAll).mockResolvedValue([
+                { id: 'waste-1', date: '2024-01-01', recipeId: 'recipe-1', quantity: 2, ingredientId: null, ingredientName: null, recipeName: 'Test Recipe', unit: 'portions' },
+                { id: 'waste-2', date: '2024-01-02', recipeId: 'recipe-2', quantity: 1, ingredientId: null, ingredientName: null, recipeName: 'Other Recipe', unit: 'portions' }
+            ]);
+
+            const result = await renderAppHook();
+
+            // Verify initial state
+            expect(result.current.recipes).toHaveLength(1);
+            expect(result.current.salesData).toHaveLength(2);
+            expect(result.current.wastageData).toHaveLength(2);
+
+            // Delete the recipe
+            await act(async () => {
+                await result.current.deleteRecipe('recipe-1');
+            });
+
+            expect(deleteMock).toHaveBeenCalledWith('recipe-1');
+
+            // Verify cascade deletion from local state
+            expect(result.current.recipes).toHaveLength(0);
+            expect(result.current.salesData).toHaveLength(1);
+            expect(result.current.salesData[0].id).toBe('sales-2');
+            expect(result.current.wastageData).toHaveLength(1);
+            expect(result.current.wastageData[0].id).toBe('waste-2');
+        });
     });
 
     describe('Sales Data CRUD', () => {

@@ -120,7 +120,7 @@ public class RecipeService : IRecipeService
         {
             _context.RecipeIngredients.RemoveRange(recipe.RecipeIngredients);
         }
-        
+
         // Save changes to the recipe details and remove the old ingredients
         await _context.SaveChangesAsync();
 
@@ -187,6 +187,26 @@ public class RecipeService : IRecipeService
         if (isChild)
         {
             throw new InvalidOperationException("Recipe is used as a sub-recipe and cannot be deleted");
+        }
+
+        // Cascade delete: Remove related sales data
+        var relatedSalesData = await _context.SalesData
+            .Where(s => s.RecipeId == id && s.StoreId == CurrentStoreId)
+            .ToListAsync();
+
+        if (relatedSalesData.Any())
+        {
+            _context.SalesData.RemoveRange(relatedSalesData);
+        }
+
+        // Cascade delete: Remove related wastage data
+        var relatedWastageData = await _context.WastageData
+            .Where(w => w.RecipeId == id && w.StoreId == CurrentStoreId)
+            .ToListAsync();
+
+        if (relatedWastageData.Any())
+        {
+            _context.WastageData.RemoveRange(relatedWastageData);
         }
 
         _context.Recipes.Remove(recipe);
