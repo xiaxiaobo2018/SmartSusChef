@@ -8,7 +8,7 @@ const __dirname = path.dirname(__filename);
 test.describe('Data Management Tests', () => {
 
   test('Import Sales Data Test', async ({ page }) => {
-    await page.goto('http://localhost:5173/login');
+    await page.goto('/login');
     await page.getByRole('textbox', { name: 'Username' }).fill('Simon');
     await page.getByRole('textbox', { name: 'Password' }).fill('Leinuozhen2003.');
     await page.getByRole('button', { name: 'Sign In' }).click();
@@ -29,7 +29,7 @@ test.describe('Data Management Tests', () => {
     const page = await context.newPage();
 
     try {
-      await page.goto('http://localhost:5173/login');
+      await page.goto('/login');
       await page.getByRole('textbox', { name: 'Username' }).fill('Simon');
       await page.getByRole('textbox', { name: 'Password' }).fill('Leinuozhen2003.');
       await page.getByRole('button', { name: 'Sign In' }).click();
