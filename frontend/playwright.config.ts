@@ -8,6 +8,9 @@ export default defineConfig({
   // 测试文件目录
   testDir: './playwright_e2e',
   
+  // 只匹配 .spec.ts 文件
+  testMatch: '**/*.spec.ts',
+  
   // 并行运行测试
   fullyParallel: true,
   
