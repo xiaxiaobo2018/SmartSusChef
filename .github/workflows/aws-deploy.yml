@@ -516,7 +516,7 @@ jobs:
     needs: [docker-build-push, detect-changes]
     if: |
       !cancelled() && !failure() &&
-      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop') && github.event_name == 'push'
+      github.ref == 'refs/heads/main' && github.event_name == 'push'
     environment:
       name: uat
       url: http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com
@@ -675,7 +675,7 @@ jobs:
     needs: [deploy-uat, detect-changes]
     if: |
       !cancelled() && !failure() &&
-      (needs.detect-changes.outputs.frontend == 'true' || needs.detect-changes.outputs.backend == 'true')
+      (needs.detect-changes.outputs.frontend == 'true' || needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.infra == 'true')
 
     steps:
       - name: Checkout code
@@ -718,7 +718,7 @@ jobs:
     needs: [deploy-uat, detect-changes]
     if: |
       !cancelled() && !failure() &&
-      (needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.ml == 'true')
+      (needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.ml == 'true' || needs.detect-changes.outputs.infra == 'true')
 
     steps:
       - name: Checkout code
@@ -828,7 +828,7 @@ jobs:
     needs: [deploy-uat, detect-changes]
     if: |
       !cancelled() && !failure() &&
-      (needs.detect-changes.outputs.frontend == 'true' || needs.detect-changes.outputs.backend == 'true')
+      (needs.detect-changes.outputs.frontend == 'true' || needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.infra == 'true')
     permissions:
       security-events: write
 
