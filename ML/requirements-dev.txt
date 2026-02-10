@@ -3,24 +3,24 @@
 # --- Development Tools ---
 matplotlib==3.10.8
 optuna==4.7.0
-tqdm==4.67.2
-shap==0.48.0
+tqdm==4.67.3
+shap==0.50.0
 
 # --- Testing Frameworks ---
 pytest==9.0.2
-pytest-cov==6.1.1
-pytest-mock==3.14.0
+pytest-cov==7.0.0
+pytest-mock==3.15.1
 httpx==0.28.1  # required by starlette TestClient
 
 # --- Code Quality & Security ---
-ruff==0.14.14
-mypy==1.16.1
+ruff==0.15.0
+mypy==1.19.1
 bandit==1.9.3
-types-requests==2.32.0.20241016
-types-python-dateutil==2.9.0.20241206
+types-requests==2.32.4.20260107
+types-python-dateutil==2.9.0.20260124
 
 # --- Data Validation ---
-great-expectations==1.4.1
+great-expectations==1.11.3
 
 # --- Model Validation / Drift Detection ---
-evidently==0.6.7
+evidently==0.7.20
