@@ -1,6 +1,8 @@
 """Data ingestion, geocoding, weather fetching, and context enrichment."""
 
 import os
+from types import ModuleType
+from typing import Any
 
 import holidays
 import pandas as pd
@@ -9,12 +11,16 @@ from sqlalchemy import create_engine
 
 from app.utils.logging_config import setup_logger
 
+openmeteo_requests: ModuleType | None = None
+retry: Any = None
 try:
-    import openmeteo_requests
-    from retry_requests import retry
+    import openmeteo_requests as _openmeteo_requests
+    from retry_requests import retry as _retry
+
+    openmeteo_requests = _openmeteo_requests
+    retry = _retry
 except ImportError:
-    openmeteo_requests = None
-    retry = None
+    pass
 
 logger = setup_logger(__name__)
 
