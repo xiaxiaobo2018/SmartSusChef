@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useApp } from "@/app/context/AppContext";
 import {
   Tabs,
@@ -31,10 +31,6 @@ export function Dashboard({
   onNavigateToManagement,
 }: DashboardProps) {
   const context = useApp();
-  if (!context) return null;
-  const { user, storeSettings } = context;
-  const isManager = user?.role === "manager";
-
   const [selectedSalesDate, setSelectedSalesDate] = useState<
     string | null
   >(null);
@@ -43,6 +39,10 @@ export function Dashboard({
   const [dateRange, setDateRange] = useState<
     "today" | "7days" | "30days" | "90days" | "all" | "custom"
   >("7days");
+
+  if (!context) return null;
+  const { user } = context;
+  const isManager = user?.role === "manager";
 
   return (
     <div className="min-h-screen">

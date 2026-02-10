@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { useApp } from '@/app/context/AppContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/app/components/ui/card';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
@@ -30,7 +30,7 @@ export function DishesForecast() {
   const chartData = useMemo(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Normalize to start of day
-    const data: any[] = [];
+    const data: Record<string, string | number>[] = [];
 
     console.log('[DishesForecast] Total forecast data:', forecastData.length);
     console.log('[DishesForecast] Main recipes:', mainRecipes.length);
@@ -55,12 +55,12 @@ export function DishesForecast() {
       dayForecasts.forEach((forecast) => {
         const recipe = mainRecipes.find(r => r.id === forecast.recipeId);
         if (recipe) {
-          const qty = forecast.quantity || (forecast as any).predictedQuantity || 0;
+          const qty = forecast.quantity || (forecast as unknown as Record<string, number>).predictedQuantity || 0;
           recipeForecasts[recipe.name] = (recipeForecasts[recipe.name] || 0) + qty;
         }
       });
 
-      const dayData: any = {
+      const dayData: Record<string, string | number> = {
         date: dateKey,
         displayDate: format(date, 'd MMM'),
         day: dayOfWeek,
@@ -80,7 +80,7 @@ export function DishesForecast() {
   const totalForWeek = chartData.reduce((sum, day) => {
     let dayTotal = 0;
     mainRecipes.forEach(recipe => {
-      dayTotal += day[recipe.name] || 0;
+      dayTotal += Number(day[recipe.name]) || 0;
     });
     return sum + dayTotal;
   }, 0);
@@ -129,8 +129,8 @@ export function DishesForecast() {
                         <p className="font-semibold text-sm">{data.day}</p>
                         <p className="text-xs text-gray-600 mb-2">{data.displayDate}</p>
                         <div className="space-y-1">
-                          {payload.map((entry: any, index: number) => {
-                            const value = entry.value || 0;
+                          {payload.map((entry, index: number) => {
+                            const value = (entry.value as number) || 0;
                             total += value;
                             if (value > 0) {
                               return (

@@ -1,8 +1,19 @@
+# --- Testing Frameworks ---
+pytest
+pytest-cov
+pytest-mock
+httpx
+eval-type-backport
+
+# --- Code Quality & Security ---
 ruff
 mypy
 bandit
-pytest
-pytest-cov
 types-requests
 types-python-dateutil
-httpx
+
+# --- Data Validation ---
+great_expectations
+
+# --- Model Validation / Drift Detection ---
+evidently

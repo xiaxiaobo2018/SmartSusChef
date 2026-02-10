@@ -1,5 +1,10 @@
-import { CSVRow, CSVValidationError, CSVValidationResult } from '@/app/types/csv';
+import { CSVValidationError, CSVValidationResult, ValidatedCSVRow } from '@/app/types/csv';
 import { Recipe } from '@/app/types';
+
+/** Input row from parsed CSV data */
+export interface CSVInputRow {
+  [key: string]: string;
+}
 
 const REQUIRED_COLUMNS = ['Date', 'Dish_Name', 'Quantity_Sold'];
 
@@ -108,10 +113,10 @@ export class CSVValidator {
   /**
    * Main validation function
    */
-  validate(rows: any[]): CSVValidationResult {
+  validate(rows: CSVInputRow[]): CSVValidationResult {
     this.errors = [];
     this.warnings = [];
-    const validRows: any[] = [];
+    const validRows: ValidatedCSVRow[] = [];
 
     // Validate headers
     if (rows.length === 0) {
@@ -167,9 +172,9 @@ export class CSVValidator {
   /**
    * Validate a single row
    */
-  private validateRow(row: any, rowNumber: number): any | null {
+  private validateRow(row: CSVInputRow, rowNumber: number): ValidatedCSVRow | null {
     let hasErrors = false;
-    const validated: any = {};
+    const validated: Partial<ValidatedCSVRow> = {};
 
     // Validate Date
     const dateValidation = this.validateDate(row.Date, rowNumber);
@@ -207,7 +212,7 @@ export class CSVValidator {
       validated.quantity = quantityValidation.value;
     }
 
-    return hasErrors ? null : validated;
+    return hasErrors ? null : validated as ValidatedCSVRow;
   }
 
   /**
@@ -317,58 +322,6 @@ export class CSVValidator {
   }
 
   /**
-   * Find closest matching recipe name using Levenshtein distance
-   */
-  private findClosestRecipe(target: string): Recipe | null {
-    if (this.recipes.length === 0) return null;
-
-    let closest = this.recipes[0];
-    let minDistance = this.levenshteinDistance(target.toLowerCase(), closest.name.toLowerCase());
-
-    this.recipes.forEach(recipe => {
-      const distance = this.levenshteinDistance(target.toLowerCase(), recipe.name.toLowerCase());
-      if (distance < minDistance) {
-        minDistance = distance;
-        closest = recipe;
-      }
-    });
-
-    // Only suggest if similarity is reasonable (distance < 5)
-    return minDistance < 5 ? closest : null;
-  }
-
-  /**
-   * Calculate Levenshtein distance for fuzzy matching
-   */
-  private levenshteinDistance(a: string, b: string): number {
-    const matrix: number[][] = [];
-
-    for (let i = 0; i <= b.length; i++) {
-      matrix[i] = [i];
-    }
-
-    for (let j = 0; j <= a.length; j++) {
-      matrix[0][j] = j;
-    }
-
-    for (let i = 1; i <= b.length; i++) {
-      for (let j = 1; j <= a.length; j++) {
-        if (b.charAt(i - 1) === a.charAt(j - 1)) {
-          matrix[i][j] = matrix[i - 1][j - 1];
-        } else {
-          matrix[i][j] = Math.min(
-            matrix[i - 1][j - 1] + 1,
-            matrix[i][j - 1] + 1,
-            matrix[i - 1][j] + 1
-          );
-        }
-      }
-    }
-
-    return matrix[b.length][a.length];
-  }
-
-  /**
    * Validate and auto-correct number fields
    */
   private validateNumber(
@@ -441,64 +394,6 @@ export class CSVValidator {
   }
 
   /**
-   * Validate and auto-correct currency format
-   * Silently strips "S$", "$", and other currency symbols
-   */
-  private validateCurrency(
-    value: string,
-    column: string,
-    row: number
-  ): { value?: number; error?: CSVValidationError; warning?: CSVValidationError } {
-    if (value === undefined || value === null || value.trim() === '') {
-      return {
-        error: {
-          row,
-          column,
-          value,
-          error: `${column} is required`,
-        },
-      };
-    }
-
-    // Auto-correct: strip currency symbols and whitespace
-    const cleaned = value.toString()
-      .replace(/S\$/g, '')
-      .replace(/\$/g, '')
-      .replace(/,/g, '')
-      .trim();
-
-    const parsed = parseFloat(cleaned);
-
-    if (isNaN(parsed)) {
-      return {
-        error: {
-          row,
-          column,
-          value,
-          error: `Invalid currency format`,
-          suggestion: 'Expected format: 5.00 or S$ 5.00',
-        },
-      };
-    }
-
-    // Format to 2 decimal places
-    const formatted = parseFloat(parsed.toFixed(2));
-
-    // Add warning if format was corrected
-    let warning: CSVValidationError | undefined;
-    if (value !== formatted.toFixed(2)) {
-      warning = {
-        row,
-        column,
-        value,
-        error: `Auto-corrected to ${formatted.toFixed(2)}`,
-      };
-    }
-
-    return { value: formatted, warning };
-  }
-
-  /**
    * Generate error summary for high-volume failures
    */
   private generateErrorSummary(): string {
@@ -520,7 +415,7 @@ export class CSVValidator {
   /**
    * Build validation result
    */
-  private buildResult(validRows: any[], totalRows: number): CSVValidationResult {
+  private buildResult(validRows: ValidatedCSVRow[], totalRows: number): CSVValidationResult {
     return {
       isValid: this.errors.length === 0,
       errors: this.errors,

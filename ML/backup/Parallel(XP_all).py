@@ -168,11 +168,10 @@ def _add_holiday_flag(ds: pd.Series, holidays: pd.DataFrame) -> pd.Series:
     ds_vals = pd.to_datetime(ds).to_numpy(dtype="datetime64[D]")
     flag = np.zeros(len(ds_vals), dtype=bool)
     for row in holidays.itertuples(index=False):
-        start = (np.datetime64(row.ds, "D") + np.timedelta64(row.lower_window, "D"))
-        end = (np.datetime64(row.ds, "D") + np.timedelta64(row.upper_window, "D"))
+        start = np.datetime64(row.ds, "D") + np.timedelta64(row.lower_window, "D")
+        end = np.datetime64(row.ds, "D") + np.timedelta64(row.upper_window, "D")
         flag |= (ds_vals >= start) & (ds_vals <= end)
     return pd.Series(flag.astype(int), index=ds.index)
-
 
 
 def _prepare_dish_daily_series(df: pd.DataFrame, dish: str) -> pd.DataFrame:
@@ -266,7 +265,9 @@ def _train_xgb_on_residuals(
     return model, feature_cols
 
 
-def _train_hybrid(df_feat: pd.DataFrame, holidays: pd.DataFrame) -> tuple[XGBRegressor, list[str], float | None]:
+def _train_hybrid(
+    df_feat: pd.DataFrame, holidays: pd.DataFrame
+) -> tuple[XGBRegressor, list[str], float | None]:
     """训练 Prophet + XGB 残差模型；数据足够则做末尾 HORIZON 验证。"""
     df_feat = df_feat.dropna().copy()
     if len(df_feat) < max(120, HORIZON_DAYS * 3):
@@ -388,7 +389,9 @@ def forecast_one_dish(
 
     model, feature_cols, val_mae = _train_hybrid(df_feat, holidays)
 
-    future_ds = pd.date_range(df_all["ds"].max() + pd.Timedelta(days=1), periods=HORIZON_DAYS, freq="D")
+    future_ds = pd.date_range(
+        df_all["ds"].max() + pd.Timedelta(days=1), periods=HORIZON_DAYS, freq="D"
+    )
     future_weather = _prepare_future_weather(weather, future_ds)
     future_exog = future_weather.copy()
     future_exog["is_holiday"] = _add_holiday_flag(future_exog["ds"], holidays)
@@ -410,7 +413,9 @@ def forecast_one_dish(
     )
 
     history_tail = df_all[["ds", "y"]].tail(HISTORY_PLOT_DAYS).copy()
-    return DishForecast(dish=dish, val_mae=val_mae, pred_future=pred_future, history_tail=history_tail)
+    return DishForecast(
+        dish=dish, val_mae=val_mae, pred_future=pred_future, history_tail=history_tail
+    )
 
 
 def plot_results(
@@ -458,7 +463,10 @@ def plot_results(
     for j in range(n, len(axes_list)):
         axes_list[j].axis("off")
 
-    fig.suptitle(f"Top{len(top_dishes)}：历史（近 {HISTORY_PLOT_DAYS} 天）+ 未来 {HORIZON_DAYS} 天预测", y=1.02)
+    fig.suptitle(
+        f"Top{len(top_dishes)}：历史（近 {HISTORY_PLOT_DAYS} 天）+ 未来 {HORIZON_DAYS} 天预测",
+        y=1.02,
+    )
     fig.tight_layout()
     fig.savefig(OUT_DIR / f"forecast_top{len(top_dishes)}_lines.png", dpi=200, bbox_inches="tight")
     plt.close(fig)

@@ -1,10 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/app/components/ui/button';
 import { Input } from '@/app/components/ui/input';
 import { Label } from '@/app/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/app/components/ui/card';
 import { ChefHat, AlertCircle, ArrowLeft, UserPlus, Check, X } from 'lucide-react';
-import { useApp } from '@/app/context/AppContext';
+import { useAuth } from '@/app/context/AuthContext';
 import { toast } from 'sonner';
 
 const SPECIAL_CHARS = "@$!%*?&#^()-_=+[]{}|;:',.<>/~`";
@@ -15,7 +15,7 @@ function getPasswordRequirements(password: string) {
     { label: 'At least one uppercase letter (A-Z)', met: /[A-Z]/.test(password) },
     { label: 'At least one lowercase letter (a-z)', met: /[a-z]/.test(password) },
     { label: 'At least one number (0-9)', met: /\d/.test(password) },
-    { label: `At least one special character (${SPECIAL_CHARS})`, met: /[@$!%*?&#^()\-_=+\[\]{}|;:',.<>\/~`]/.test(password) },
+    { label: `At least one special character (${SPECIAL_CHARS})`, met: /[@$!%*?&#^()\-_=+[\]{}|;:',.<>/~`]/.test(password) },
   ];
 }
 
@@ -25,7 +25,7 @@ interface RegisterPageProps {
 }
 
 export function RegisterPage({ onBackToLogin, onRegisterSuccess }: RegisterPageProps) {
-  const { register } = useApp();
+  const { register } = useAuth();
   const [formData, setFormData] = useState({
     username: '',
     password: '',

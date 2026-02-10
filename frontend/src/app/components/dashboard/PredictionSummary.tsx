@@ -33,7 +33,7 @@ export function PredictionSummary() {
       const dayOfWeek = format(date, 'EEE');
 
       const dayForecasts = forecastData.filter((f) => f.date === dateKey && mainRecipeIds.has(f.recipeId));
-      const forecast = dayForecasts.reduce((sum, f) => sum + (f.quantity || (f as any).predictedQuantity || 0), 0);
+      const forecast = dayForecasts.reduce((sum, f) => sum + (f.quantity || 0), 0);
 
       console.log(`[PredictionSummary] ${dateKey}: ${dayForecasts.length} forecasts, total: ${forecast}`);
 

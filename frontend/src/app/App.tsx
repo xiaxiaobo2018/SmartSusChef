@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { AppProvider, useApp } from '@/app/context/AppContext';
+import { AuthProvider } from '@/app/context/AuthContext';
 import { LoginPage } from '@/app/components/LoginPage';
 import { RegisterPage } from '@/app/components/RegisterPage';
 import { StoreSetupPage } from '@/app/components/StoreSetupPage';
@@ -8,12 +9,15 @@ import { ManagementSystem } from '@/app/components/ManagementSystem';
 import { StoreSettings } from '@/app/components/management/StoreSettings';
 import { Header } from '@/app/components/Header';
 import { Toaster } from 'sonner';
+import ErrorBoundary from '@/app/components/ErrorBoundary';
 
 type View = 'dashboard' | 'management' | 'settings';
 type AuthView = 'login' | 'register';
 
 function MainContent() {
   const context = useApp();
+  const [currentView, setCurrentView] = useState<View>('dashboard');
+  const [authView, setAuthView] = useState<AuthView>('login');
 
   if (!context) {
     return (
@@ -26,8 +30,6 @@ function MainContent() {
   }
 
   const { user, loading, storeSetupRequired } = context;
-  const [currentView, setCurrentView] = useState<View>('dashboard');
-  const [authView, setAuthView] = useState<AuthView>('login');
 
   if (loading) {
     return (
@@ -101,8 +103,12 @@ export default function App() {
   }
 
   return (
-    <AppProvider>
-      <MainContent />
-    </AppProvider>
+    <AuthProvider>
+      <AppProvider>
+        <ErrorBoundary>
+          <MainContent />
+        </ErrorBoundary>
+      </AppProvider>
+    </AuthProvider>
   );
 }

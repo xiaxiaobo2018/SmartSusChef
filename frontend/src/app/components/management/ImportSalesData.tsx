@@ -1,22 +1,22 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useApp } from '@/app/context/AppContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/app/components/ui/card';
 import { Button } from '@/app/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/app/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/app/components/ui/dialog';
-import { Upload, Download, AlertCircle, CheckCircle, ArrowRight, ChefHat, FileText, AlertTriangle, CalendarDays } from 'lucide-react';
+import { Upload, Download, AlertCircle, CheckCircle, ArrowRight, ChefHat, AlertTriangle, CalendarDays } from 'lucide-react';
 import { toast } from 'sonner';
 import { parse } from 'papaparse';
 import { format } from 'date-fns';
 import { CSVValidator, DATE_FORMATS } from '@/app/utils/csvValidator';
 import { CSVValidationError } from '@/app/types/csv';
-import { SalesData } from '@/app/types';
 import { salesApi } from '@/app/services/api';
 
 interface CSVRow {
   Date: string;
   Dish_Name: string;
   Quantity_Sold: string;
+  [key: string]: string;
 }
 
 export function ImportSalesData() {
@@ -130,8 +130,8 @@ export function ImportSalesData() {
       // Refresh data
       await new Promise(resolve => setTimeout(resolve, 500));
       await refreshData();
-    } catch (error: any) {
-      toast.error(`Failed to import sales data: ${error.message}`);
+    } catch (error: unknown) {
+      toast.error(`Failed to import sales data: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsOverwriteDialogSubmitting(false);
     }
@@ -242,8 +242,8 @@ export function ImportSalesData() {
       // Refresh data
       await new Promise(resolve => setTimeout(resolve, 500));
       await refreshData();
-    } catch (error: any) {
-      toast.error(`Failed to import sales data: ${error.message}`);
+    } catch (error: unknown) {
+      toast.error(`Failed to import sales data: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsOverwriteDialogSubmitting(false);
     }
@@ -465,11 +465,11 @@ export function ImportSalesData() {
         console.error('[ImportSalesData] Failed to refresh data:', refreshError);
         toast.warning('Data imported successfully, but failed to refresh. Please reload the page.');
       }
-    } catch (error: any) {
-      if (error.message?.includes('duplicate')) {
+    } catch (error: unknown) {
+      if (error instanceof Error && error.message?.includes('duplicate')) {
         toast.error('Duplicate records detected. The system prevents duplicate entries for the same date and recipe.');
       } else {
-        toast.error(`Failed to import sales data: ${error.message}`);
+        toast.error(`Failed to import sales data: ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
     } finally {
       setIsImporting(false);
@@ -633,7 +633,6 @@ export function ImportSalesData() {
               <Button
                 variant="outline"
                 onClick={() => {
-                  const recipeManagementUrl = '#recipes';
                   window.location.hash = 'recipes';
                   toast.info('Navigate to Recipe Management to add missing dishes');
                 }}

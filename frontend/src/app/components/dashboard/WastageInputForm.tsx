@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useApp } from '@/app/context/AppContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/app/components/ui/card';
 import { Button } from '@/app/components/ui/button';
@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/app/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/app/components/ui/dialog';
 import { Badge } from '@/app/components/ui/badge';
-import { format, parseISO } from 'date-fns';
+import { format } from 'date-fns';
 import { Plus, Edit, Trash2, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -75,7 +75,11 @@ export function WastageInputForm() {
   // Determine the unit for the currently selected item to display in the input box
   const currentUnit = useMemo(() => {
     if (!selectedItemId) return '';
-    return getItemData(selectedItemId).unit;
+    const recipe = recipes.find(r => r.id === selectedItemId);
+    if (recipe) return recipe.isSubRecipe ? 'L' : 'plate';
+    const ingredient = ingredients.find(i => i.id === selectedItemId);
+    if (ingredient) return ingredient.unit;
+    return '';
   }, [selectedItemId, recipes, ingredients]);
 
   const handleCategoryChange = (val: string) => {
@@ -130,7 +134,7 @@ export function WastageInputForm() {
       setSelectedCategory('');
       setSelectedItemId('');
       setQuantity('');
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to save wastage data');
     } finally {
       setIsSubmitting(false);
@@ -149,7 +153,7 @@ export function WastageInputForm() {
     }
   };
 
-  const handleEdit = (entry: any) => {
+  const handleEdit = (entry: { id: string; recipeId?: string; ingredientId?: string; quantity: number }) => {
     setEditingId(entry.id);
 
     // Explicitly check which ID exists to determine category
@@ -157,11 +161,11 @@ export function WastageInputForm() {
       const recipe = recipes.find(r => r.id === entry.recipeId);
       if (recipe) {
         setSelectedCategory(recipe.isSubRecipe ? 'Sub-Recipe' : 'Main Dish');
-        setTimeout(() => setSelectedItemId(entry.recipeId), 0);
+        setTimeout(() => setSelectedItemId(entry.recipeId!), 0);
       }
     } else if (entry.ingredientId) {
       setSelectedCategory('Raw Ingredient');
-      setTimeout(() => setSelectedItemId(entry.ingredientId), 0);
+      setTimeout(() => setSelectedItemId(entry.ingredientId!), 0);
     }
 
     setQuantity(entry.quantity.toString());
@@ -179,7 +183,7 @@ export function WastageInputForm() {
     try {
       await deleteWastageData(deletingData.id);
       toast.success('Entry deleted successfully');
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to delete entry');
     } finally {
       setIsDeleting(false);
@@ -301,10 +305,10 @@ export function WastageInputForm() {
                   <SelectValue placeholder={selectedCategory ? "Choose an item..." : "Select category first"} />
                 </SelectTrigger>
                 <SelectContent className="max-h-[300px]">
-                  {filteredItems.map((item: any) => {
+                  {filteredItems.map((item) => {
                     // UI Enhancement 1: Show Unit in Dropdown
                     let displayUnit = '';
-                    if (selectedCategory === 'Raw Ingredient') displayUnit = item.unit;
+                    if (selectedCategory === 'Raw Ingredient') displayUnit = item.unit || '';
                     else if (selectedCategory === 'Sub-Recipe') displayUnit = 'L';
                     else displayUnit = 'plate';
 

@@ -1,6 +1,8 @@
 // API Service for SmartSusChef Frontend
 // Connects to the backend API
 
+import { toast } from 'sonner';
+
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 // Token management
@@ -70,12 +72,14 @@ async function fetchWithAuth<T>(
 
     if (!response.ok) {
       const error = await response.json().catch(() => ({ message: 'Request failed' }));
+      let errorMessage = error.message || error.title || `HTTP error ${response.status}`;
       // Handle ASP.NET model validation errors ({ title, errors: { Field: ["msg"] } })
       if (error.errors && typeof error.errors === 'object') {
         const messages = Object.values(error.errors).flat().join(' ');
-        throw new Error(messages || error.title || `HTTP error ${response.status}`);
+        errorMessage = messages || errorMessage;
       }
-      throw new Error(error.message || error.title || `HTTP error ${response.status}`);
+      toast.error(errorMessage);
+      throw new Error(errorMessage);
     }
 
     return response.json();
@@ -118,11 +122,13 @@ async function fetchBlobWithAuth(
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({ message: 'Request failed' }));
+    let errorMessage = error.message || error.title || `HTTP error ${response.status}`;
     if (error.errors && typeof error.errors === 'object') {
       const messages = Object.values(error.errors).flat().join(' ');
-      throw new Error(messages || error.title || `HTTP error ${response.status}`);
+      errorMessage = messages || errorMessage;
     }
-    throw new Error(error.message || error.title || `HTTP error ${response.status}`);
+    toast.error(errorMessage);
+    throw new Error(errorMessage);
   }
 
   return response.blob();
@@ -331,6 +337,23 @@ export const ingredientsApi = {
 
   delete: (id: string): Promise<void> =>
     fetchWithAuth(`/ingredients/${id}`, { method: 'DELETE' }),
+};
+
+// ==========================================
+// GLOBAL INGREDIENTS API
+// ==========================================
+export interface GlobalIngredientDto {
+  id: number;
+  name: string;
+  carbonFootprint: number;
+}
+
+export const globalIngredientsApi = {
+  getAll: (): Promise<GlobalIngredientDto[]> =>
+    fetchWithAuth('/globalingredients'),
+
+  getById: (id: string): Promise<GlobalIngredientDto> =>
+    fetchWithAuth(`/globalingredients/${id}`),
 };
 
 // ==========================================

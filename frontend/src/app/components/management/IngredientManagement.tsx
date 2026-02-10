@@ -1,32 +1,3 @@
-/**
- * IngredientManagement Component
- * ---------------------------------------------
- * Main Features:
- *   - Display, add, edit, and delete store-specific ingredients (Ingredients)
- *   - Simple input-based creation and editing of ingredients (name, unit, carbonFootprint)
- *   - User-friendly interactions: form validation, delete confirmation, prevent deletion if referenced by recipes
- *   - All data operations are managed via AppContext methods (addIngredient, updateIngredient, etc.)
- *
- * Design Overview:
- *   1. Ingredient name, unit, and carbon footprint are entered directly
- *   2. Delete operations include confirmation; if the ingredient is referenced by recipes/wastage data, deletion is blocked or cascaded
- *
- * Key State Variables:
- *   - name: Ingredient name input
- *   - unit/carbonFootprint: Unit/carbon, auto-filled for global ingredients
- *   - isDialogOpen/isDeleteDialogOpen/etc.: Dialog controls
- *
- * Interaction Highlights:
- *   - Friendly form validation and clear error messages
- *   - Deletion checks for references to prevent accidental data loss
- *
- * Maintenance Tips:
- *   - If IngredientDto structure changes, update form data assembly and context method parameters
- *   - If API endpoints change, update fetch logic
- *
- * @author Copilot
- * @lastUpdate 2026-02-09
- */
 import React, { useState } from 'react';
 import { useApp } from '@/app/context/AppContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/app/components/ui/card';
@@ -157,7 +128,7 @@ export function IngredientManagement({ onNavigateToRecipes }: IngredientManageme
         toast.success('Ingredient added successfully');
       }
       handleCloseDialog();
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to save ingredient');
     } finally {
       setIsSubmitting(false);
@@ -191,34 +162,14 @@ export function IngredientManagement({ onNavigateToRecipes }: IngredientManageme
   const handleDeleteConfirm = async () => {
     if (!deletingIngredient) return;
 
-    const { wastageCount } = deletingIngredient;
-    const hasRelatedData = wastageCount > 0;
-
-    // If no related data, just delete
-    if (!hasRelatedData) {
-      setIsDeleting(true);
-      try {
-        await deleteIngredient(deletingIngredient.id, false);
-        toast.success('Ingredient deleted successfully');
-        setIsDeleteDialogOpen(false);
-        setDeletingIngredient(null);
-      } catch (error) {
-        toast.error('Failed to delete ingredient');
-      } finally {
-        setIsDeleting(false);
-      }
-      return;
-    }
-
-    // If related data exists, delete with cascade
     setIsDeleting(true);
     try {
-      await deleteIngredient(deletingIngredient.id, true);
-      toast.success(`Ingredient and ${wastageCount} related wastage record${wastageCount > 1 ? 's' : ''} deleted successfully`);
+      await deleteIngredient(deletingIngredient.id);
+      toast.success('Ingredient deleted successfully');
       setIsDeleteDialogOpen(false);
       setDeletingIngredient(null);
-    } catch (error) {
-      toast.error('Failed to delete ingredient and related data');
+    } catch (_error) {
+      toast.error('Failed to delete ingredient');
     } finally {
       setIsDeleting(false);
     }

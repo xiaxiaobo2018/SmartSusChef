@@ -1,4 +1,3 @@
-import React from 'react';
 import { useApp } from '@/app/context/AppContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/card';
 import { Calendar as CalendarIcon, Loader2 } from 'lucide-react';
@@ -7,7 +6,6 @@ import { format, parseISO, isAfter, isBefore, addDays } from 'date-fns';
 export function CalendarWidget() {
   const { holidays, dataLoading } = useApp();
   const today = new Date();
-  const nextWeek = addDays(today, 7);
 
   const upcomingHolidays = holidays
     .filter((holiday) => {

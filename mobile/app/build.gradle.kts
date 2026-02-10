@@ -35,12 +35,31 @@ android {
         multiDexEnabled = true
     }
 
-    buildTypes {
-        debug {
-            // Read the base URL from local.properties, with a fallback to the Android emulator default
+    flavorDimensions += "environment"
+    productFlavors {
+        create("local") {
+            dimension = "environment"
+            applicationIdSuffix = ".local"
+            versionNameSuffix = "-local"
+            // Emulator localhost / internal network
             val baseUrl = localProperties.getProperty("local.base.url", "http://10.0.2.2:5001/api/")
             buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
-            buildConfigField("String", "AWS_BASE_URL", "\"http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/api/\"")
+        }
+        create("uat") {
+            dimension = "environment"
+            applicationIdSuffix = ".uat"
+            versionNameSuffix = "-uat"
+            buildConfigField("String", "BASE_URL", "\"http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/api/\"")
+        }
+        create("production") {
+            dimension = "environment"
+            versionNameSuffix = "-prod"
+            buildConfigField("String", "BASE_URL", "\"http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/api/\"")
+        }
+    }
+
+    buildTypes {
+        debug {
             enableUnitTestCoverage = true
             enableAndroidTestCoverage = true
         }
@@ -50,9 +69,6 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            // Your production URL
-            buildConfigField("String", "BASE_URL", "\"http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/api/\"")
-            buildConfigField("String", "AWS_BASE_URL", "\"http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/api/\"")
         }
     }
 
@@ -179,7 +195,7 @@ tasks.withType<Test> {
 }
 
 tasks.register<JacocoReport>("jacocoTestReportDebug") {
-    dependsOn("testDebugUnitTest")
+    dependsOn("testUatDebugUnitTest")
     reports {
         xml.required.set(true)
         html.required.set(true)
@@ -188,13 +204,13 @@ tasks.register<JacocoReport>("jacocoTestReportDebug") {
         "**/R.class", "**/R\$*.class", "**/BuildConfig.*",
         "**/Manifest*.*", "**/*Test*.*", "android/**/*.*", "**/di/**"
     )
-    val debugTree = fileTree("${layout.buildDirectory.get().asFile}/tmp/kotlin-classes/debug") {
+    val debugTree = fileTree("${layout.buildDirectory.get().asFile}/tmp/kotlin-classes/uatDebug") {
         exclude(fileFilter)
     }
     val mainSrc = "${project.projectDir}/src/main/java"
     sourceDirectories.setFrom(files(mainSrc))
     classDirectories.setFrom(files(debugTree))
     executionData.setFrom(fileTree(layout.buildDirectory.get().asFile) {
-        include("jacoco/testDebugUnitTest.exec")
+        include("jacoco/testUatDebugUnitTest.exec")
     })
 }

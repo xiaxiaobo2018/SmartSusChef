@@ -23,6 +23,7 @@ os.environ.setdefault("CMDSTANPY_LOG_LEVEL", "WARNING")
 # Load environment variables from .env file
 try:
     from dotenv import load_dotenv
+
     load_dotenv()
 except ImportError:
     pass  # python-dotenv not installed, use system env vars
@@ -68,7 +69,7 @@ try:
 except Exception:
     XGBRegressor = None
 
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
 
 # Suppress verbose output
 optuna.logging.set_verbosity(optuna.logging.WARNING)
@@ -80,10 +81,11 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 if not logger.handlers:
     _handler = logging.StreamHandler()
-    _handler.setFormatter(logging.Formatter(
-        "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S"
-    ))
+    _handler.setFormatter(
+        logging.Formatter(
+            "%(asctime)s [%(levelname)s] %(name)s: %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
+        )
+    )
     logger.addHandler(_handler)
 
 
@@ -110,6 +112,7 @@ def _detect_gpu() -> dict[str, bool]:
     # XGBoost: check for CUDA device
     try:
         import xgboost as _xgb
+
         _test = _xgb.XGBRegressor(tree_method="hist", device="cuda", n_estimators=1)
         _test.fit(np.array([[0]]), np.array([0]))
         gpu["xgboost"] = True
@@ -119,6 +122,7 @@ def _detect_gpu() -> dict[str, bool]:
     # CatBoost: check for GPU task_type
     try:
         from catboost import CatBoostRegressor as _CB
+
         _test = _CB(iterations=1, task_type="GPU", verbose=False)
         _test.fit(np.array([[0]]), np.array([0]))
         gpu["catboost"] = True
@@ -128,6 +132,7 @@ def _detect_gpu() -> dict[str, bool]:
     # LightGBM: check for GPU device
     try:
         import lightgbm as _lgb
+
         _test = _lgb.LGBMRegressor(n_estimators=1, device="gpu", verbose=-1)
         _test.fit(np.array([[0]]), np.array([0]))
         gpu["lightgbm"] = True
@@ -174,63 +179,93 @@ class PipelineConfig:
     default_fallback_country: str = "CN"
 
     # Prophet parameters
-    prophet_params: dict[str, Any] = field(default_factory=lambda: {
-        "changepoint_prior_scale": 0.5,
-        "daily_seasonality": False,
-        "holidays_prior_scale": 10.0,
-        "seasonality_mode": "additive",
-        "seasonality_prior_scale": 10.0,
-        "weekly_seasonality": True,
-        "yearly_seasonality": False,
-    })
+    prophet_params: dict[str, Any] = field(
+        default_factory=lambda: {
+            "changepoint_prior_scale": 0.5,
+            "daily_seasonality": False,
+            "holidays_prior_scale": 10.0,
+            "seasonality_mode": "additive",
+            "seasonality_prior_scale": 10.0,
+            "weekly_seasonality": True,
+            "yearly_seasonality": False,
+        }
+    )
 
     # Time-based features
-    time_features: list[str] = field(default_factory=lambda: [
-        "day_of_week", "month", "day", "dayofyear", "is_weekend"
-    ])
+    time_features: list[str] = field(
+        default_factory=lambda: ["day_of_week", "month", "day", "dayofyear", "is_weekend"]
+    )
 
     # Lag and rolling window settings
     lags: tuple[int, ...] = field(default_factory=lambda: (1, 7, 14))
     roll_windows: tuple[int, ...] = field(default_factory=lambda: (7, 14, 28))
 
     # Features for hybrid tree model (predicting residuals)
-    hybrid_tree_features: list[str] = field(default_factory=lambda: [
-        "day_of_week", "month", "day", "dayofyear", "is_weekend",
-        "is_public_holiday",
-        "temperature_2m_max", "temperature_2m_min",
-        "relative_humidity_2m_mean", "precipitation_sum",
-        "y_lag_1", "y_lag_7", "y_lag_14",
-        "y_roll_mean_7", "y_roll_std_7",
-        "y_roll_mean_14", "y_roll_std_14",
-        "y_roll_mean_28", "y_roll_std_28",
-        "prophet_yhat",
-    ])
+    hybrid_tree_features: list[str] = field(
+        default_factory=lambda: [
+            "day_of_week",
+            "month",
+            "day",
+            "dayofyear",
+            "is_weekend",
+            "is_public_holiday",
+            "temperature_2m_max",
+            "temperature_2m_min",
+            "relative_humidity_2m_mean",
+            "precipitation_sum",
+            "y_lag_1",
+            "y_lag_7",
+            "y_lag_14",
+            "y_roll_mean_7",
+            "y_roll_std_7",
+            "y_roll_mean_14",
+            "y_roll_std_14",
+            "y_roll_mean_28",
+            "y_roll_std_28",
+            "prophet_yhat",
+        ]
+    )
 
     # Feature groups for SHAP explanation
-    feature_groups: dict[str, list[str]] = field(default_factory=lambda: {
-        "Seasonality": ["day_of_week", "month", "day", "dayofyear", "is_weekend"],
-        "Holiday": ["is_public_holiday"],
-        "Weather": ["temperature_2m_max", "temperature_2m_min",
-                    "relative_humidity_2m_mean", "precipitation_sum"],
-        "Lags/Trend": [
-            "y_lag_1", "y_lag_7", "y_lag_14",
-            "y_roll_mean_7", "y_roll_std_7",
-            "y_roll_mean_14", "y_roll_std_14",
-            "y_roll_mean_28", "y_roll_std_28",
-        ],
-        "ProphetTrend": ["prophet_yhat"],
-    })
+    feature_groups: dict[str, list[str]] = field(
+        default_factory=lambda: {
+            "Seasonality": ["day_of_week", "month", "day", "dayofyear", "is_weekend"],
+            "Holiday": ["is_public_holiday"],
+            "Weather": [
+                "temperature_2m_max",
+                "temperature_2m_min",
+                "relative_humidity_2m_mean",
+                "precipitation_sum",
+            ],
+            "Lags/Trend": [
+                "y_lag_1",
+                "y_lag_7",
+                "y_lag_14",
+                "y_roll_mean_7",
+                "y_roll_std_7",
+                "y_roll_mean_14",
+                "y_roll_std_14",
+                "y_roll_mean_28",
+                "y_roll_std_28",
+            ],
+            "ProphetTrend": ["prophet_yhat"],
+        }
+    )
 
 
 CFG = PipelineConfig()
 
-WEATHER_COLS = ['temperature_2m_max', 'temperature_2m_min',
-                'relative_humidity_2m_mean', 'precipitation_sum']
+WEATHER_COLS = [
+    "temperature_2m_max",
+    "temperature_2m_min",
+    "relative_humidity_2m_mean",
+    "precipitation_sum",
+]
 
 
 def safe_filename(name):
     """Sanitize dish name for use as a filename."""
-    return name.replace(' ', '_').replace('-', '_').replace('/', '_')
+    return name.replace(" ", "_").replace("-", "_").replace("/", "_")
 
 
 # ---------------------------------------------------------------------------
@@ -249,8 +284,10 @@ def get_location_details(address):
             return None, None, None
         lat = location.latitude
         lon = location.longitude
-        country_code = location.raw.get('address', {}).get('country_code', '').upper()
-        logger.info("Geocoded '%s' -> Lat: %.4f, Lon: %.4f, Country: %s", address, lat, lon, country_code)
+        country_code = location.raw.get("address", {}).get("country_code", "").upper()
+        logger.info(
+            "Geocoded '%s' -> Lat: %.4f, Lon: %.4f, Country: %s", address, lat, lon, country_code
+        )
         return lat, lon, country_code
     except Exception as e:
         logger.warning("Geocoding failed for '%s': %s", address, e)
@@ -275,11 +312,15 @@ def get_historical_weather(latitude, longitude, start_date, end_date):
         params = {
             "latitude": latitude,
             "longitude": longitude,
-            "start_date": start_date.strftime('%Y-%m-%d'),
-            "end_date": end_date.strftime('%Y-%m-%d'),
-            "daily": ["temperature_2m_max", "temperature_2m_min",
-                      "relative_humidity_2m_mean", "precipitation_sum"],
-            "timezone": "auto"
+            "start_date": start_date.strftime("%Y-%m-%d"),
+            "end_date": end_date.strftime("%Y-%m-%d"),
+            "daily": [
+                "temperature_2m_max",
+                "temperature_2m_min",
+                "relative_humidity_2m_mean",
+                "precipitation_sum",
+            ],
+            "timezone": "auto",
         }
 
         responses = om.weather_api(url, params=params)
@@ -290,17 +331,19 @@ def get_historical_weather(latitude, longitude, start_date, end_date):
             start=pd.to_datetime(daily.Time(), unit="s", utc=True),
             end=pd.to_datetime(daily.TimeEnd(), unit="s", utc=True),
             freq=pd.Timedelta(seconds=daily.Interval()),
-            inclusive="left"
+            inclusive="left",
         )
 
-        weather_df = pd.DataFrame({
-            "date": dates,
-            "temperature_2m_max": daily.Variables(0).ValuesAsNumpy(),
-            "temperature_2m_min": daily.Variables(1).ValuesAsNumpy(),
-            "relative_humidity_2m_mean": daily.Variables(2).ValuesAsNumpy(),
-            "precipitation_sum": daily.Variables(3).ValuesAsNumpy(),
-        })
-        weather_df['date'] = weather_df['date'].dt.tz_localize(None).dt.normalize()
+        weather_df = pd.DataFrame(
+            {
+                "date": dates,
+                "temperature_2m_max": daily.Variables(0).ValuesAsNumpy(),
+                "temperature_2m_min": daily.Variables(1).ValuesAsNumpy(),
+                "relative_humidity_2m_mean": daily.Variables(2).ValuesAsNumpy(),
+                "precipitation_sum": daily.Variables(3).ValuesAsNumpy(),
+            }
+        )
+        weather_df["date"] = weather_df["date"].dt.tz_localize(None).dt.normalize()
 
         logger.info("Fetched %d days of historical weather data.", len(weather_df))
         return weather_df
@@ -329,13 +372,12 @@ def fetch_weather_from_db(start_date, end_date):
         WHERE Date BETWEEN %s AND %s
         ORDER BY Date ASC
         """
-        df = pd.read_sql(query, engine, params=[
-            start_date.strftime('%Y-%m-%d'),
-            end_date.strftime('%Y-%m-%d')
-        ])
+        df = pd.read_sql(
+            query, engine, params=[start_date.strftime("%Y-%m-%d"), end_date.strftime("%Y-%m-%d")]
+        )
         if len(df) == 0:
             return None
-        df['date'] = pd.to_datetime(df['date']).dt.normalize()
+        df["date"] = pd.to_datetime(df["date"]).dt.normalize()
         logger.info("Fetched %d days of weather data from database.", len(df))
         return df
     except Exception as e:
@@ -343,8 +385,9 @@ def fetch_weather_from_db(start_date, end_date):
         return None
 
 
-def add_local_context(df, address, config: PipelineConfig = CFG,
-                      latitude=None, longitude=None, country_code=None):
+def add_local_context(
+    df, address, config: PipelineConfig = CFG, latitude=None, longitude=None, country_code=None
+):
     """
     Enriches the sales data with local context features (Holidays + Weather).
     Uses geocoding to detect location and Open-Meteo for real weather data.
@@ -362,7 +405,7 @@ def add_local_context(df, address, config: PipelineConfig = CFG,
     if lat is None:
         logger.warning(
             "Geocoding failed. Falling back to default location (%s).",
-            config.default_fallback_address
+            config.default_fallback_address,
         )
         country_code = config.default_fallback_country
         lat, lon = config.default_fallback_lat, config.default_fallback_lon
@@ -371,28 +414,29 @@ def add_local_context(df, address, config: PipelineConfig = CFG,
     if not country_code or country_code not in holidays.list_supported_countries():
         logger.warning(
             "Country '%s' not supported for holidays. Defaulting to '%s'.",
-            country_code, config.default_fallback_country
+            country_code,
+            config.default_fallback_country,
         )
         country_code = config.default_fallback_country
 
     logger.info("Location: %s (Lat: %.4f, Lon: %.4f)", country_code, lat, lon)
 
-    df['day_of_week'] = df['date'].dt.dayofweek
-    df['month'] = df['date'].dt.month
+    df["day_of_week"] = df["date"].dt.dayofweek
+    df["month"] = df["date"].dt.month
 
     local_holidays = holidays.country_holidays(country_code, years=CFG.holiday_years)
-    df['is_public_holiday'] = df['date'].apply(lambda x: 1 if x in local_holidays else 0)
+    df["is_public_holiday"] = df["date"].apply(lambda x: 1 if x in local_holidays else 0)
 
     # Try to fetch weather data: DB first, then API fallback
-    weather_df = fetch_weather_from_db(df['date'].min(), df['date'].max())
+    weather_df = fetch_weather_from_db(df["date"].min(), df["date"].max())
     if weather_df is None:
-        weather_df = get_historical_weather(lat, lon, df['date'].min(), df['date'].max())
+        weather_df = get_historical_weather(lat, lon, df["date"].min(), df["date"].max())
 
     if weather_df is not None and len(weather_df) > 0:
-        df = df.merge(weather_df, on='date', how='left')
-        df = df.set_index('date')
+        df = df.merge(weather_df, on="date", how="left")
+        df = df.set_index("date")
         for col in WEATHER_COLS:
-            df[col] = df[col].interpolate(method='time').bfill().ffill().fillna(0)
+            df[col] = df[col].interpolate(method="time").bfill().ffill().fillna(0)
         df = df.reset_index()
     else:
         # Graceful fallback: proceed without weather features
@@ -426,7 +470,7 @@ def fetch_training_data():
             ORDER BY s.Date ASC
             """
             df = pd.read_sql(query, engine)
-            df['date'] = pd.to_datetime(df['date'])
+            df["date"] = pd.to_datetime(df["date"])
             logger.info("Loaded %d rows from MySQL.", len(df))
         except Exception as e:
             logger.warning("MySQL connection failed: %s. Falling back to CSV.", e)
@@ -435,47 +479,47 @@ def fetch_training_data():
         logger.info("DATABASE_URL not set. Using CSV fallback.")
 
     if df is None:
-        df = pd.read_csv('food_sales_eng.csv')
-        df['date'] = pd.to_datetime(df['date'], format='%m/%d/%Y')
+        df = pd.read_csv("food_sales_eng.csv")
+        df["date"] = pd.to_datetime(df["date"], format="%m/%d/%Y")
         logger.info("Loaded %d rows from CSV.", len(df))
 
     # Normalize the date to remove time component, ensuring one record per day
-    df['date'] = df['date'].dt.normalize()
+    df["date"] = df["date"].dt.normalize()
 
     # Aggregate sales to ensure each dish has exactly one entry per day.
     # This is critical for preventing errors in time-series models.
-    df = df.groupby(['date', 'dish']).agg(sales=('sales', 'sum')).reset_index()
+    df = df.groupby(["date", "dish"]).agg(sales=("sales", "sum")).reset_index()
 
-    return df.sort_values('date')
+    return df.sort_values("date")
 
 
 def sanitize_sparse_data(df, country_code):
     """Fill missing days with time-based interpolation."""
     # Create a full date range and reindex the DataFrame to identify missing dates.
-    all_dates = pd.date_range(start=df['date'].min(), end=df['date'].max(), freq='D')
-    df = df.set_index('date').reindex(all_dates)
+    all_dates = pd.date_range(start=df["date"].min(), end=df["date"].max(), freq="D")
+    df = df.set_index("date").reindex(all_dates)
 
     # Interpolate missing sales values and fill remaining gaps with 0
-    df['sales'] = df['sales'].interpolate(method='time').fillna(0)
+    df["sales"] = df["sales"].interpolate(method="time").fillna(0)
 
-    if 'dish' in df.columns:
-        df['dish'] = df['dish'].dropna().iloc[0] if not df['dish'].dropna().empty else "Unknown"
+    if "dish" in df.columns:
+        df["dish"] = df["dish"].dropna().iloc[0] if not df["dish"].dropna().empty else "Unknown"
 
     for col in WEATHER_COLS:
         if col in df.columns:
-            df[col] = df[col].interpolate(method='time').bfill().ffill()
+            df[col] = df[col].interpolate(method="time").bfill().ffill()
         else:
             df[col] = 0.0
 
     if country_code and country_code in holidays.list_supported_countries():
         local_holidays = holidays.country_holidays(country_code, years=CFG.holiday_years)
     else:
-        local_holidays = holidays.country_holidays('CN', years=CFG.holiday_years)
+        local_holidays = holidays.country_holidays("CN", years=CFG.holiday_years)
 
-    df['is_public_holiday'] = df.index.to_series().apply(lambda x: 1 if x in local_holidays else 0)
-    df['day_of_week'] = df.index.dayofweek
-    df['month'] = df.index.month
-    df = df.reset_index().rename(columns={'index': 'date'})
+    df["is_public_holiday"] = df.index.to_series().apply(lambda x: 1 if x in local_holidays else 0)
+    df["day_of_week"] = df.index.dayofweek
+    df["month"] = df.index.month
+    df = df.reset_index().rename(columns={"index": "date"})
 
     return df
 
@@ -573,17 +617,17 @@ def _generate_cv_folds(df: pd.DataFrame, config: PipelineConfig):
     Final fold test period = most recent config.test_window_days days.
     Yields (train_df, test_df) tuples.
     """
-    dates = df['date'].sort_values()
+    dates = df["date"].sort_values()
     end_date = dates.max()
 
     for fold_i in range(config.n_cv_folds, 0, -1):
         test_end = end_date - pd.Timedelta(days=config.test_window_days * (fold_i - 1))
         test_start = test_end - pd.Timedelta(days=config.test_window_days)
 
-        train = df[df['date'] < test_start].copy()
-        test = df[(df['date'] >= test_start) & (df['date'] < test_end)].copy()
+        train = df[df["date"] < test_start].copy()
+        test = df[(df["date"] >= test_start) & (df["date"] < test_end)].copy()
 
-        train_span = (train['date'].max() - train['date'].min()).days if len(train) > 1 else 0
+        train_span = (train["date"].max() - train["date"].min()).days if len(train) > 1 else 0
         if train_span < config.min_train_days or len(test) < 1:
             continue
 
@@ -626,14 +670,16 @@ def _prepare_cv_fold_cache(
         if X_train.empty or X_test.empty:
             continue
 
-        fold_cache.append({
-            "X_train": X_train,
-            "y_train": train_r.loc[X_train.index, "resid"],
-            "X_test": X_test,
-            "y_test": test_r.loc[X_test.index, "resid"],
-            "prophet_test": test_r.loc[X_test.index, "prophet_yhat"].to_numpy(),
-            "sales_test": test_r.loc[X_test.index, "sales"].to_numpy(),
-        })
+        fold_cache.append(
+            {
+                "X_train": X_train,
+                "y_train": train_r.loc[X_train.index, "resid"],
+                "X_test": X_test,
+                "y_test": test_r.loc[X_test.index, "resid"],
+                "prophet_test": test_r.loc[X_test.index, "prophet_yhat"].to_numpy(),
+                "sales_test": test_r.loc[X_test.index, "sales"].to_numpy(),
+            }
+        )
 
     return fold_cache
 
@@ -711,9 +757,7 @@ def _eval_hybrid_mae(
 
 
 def _optimize_hybrid(
-    model_type: str,
-    fold_cache: list[dict[str, Any]],
-    config: PipelineConfig
+    model_type: str, fold_cache: list[dict[str, Any]], config: PipelineConfig
 ) -> tuple[float, dict[str, Any]]:
     """Optuna optimization for hybrid residual stacking per model type."""
 
@@ -757,11 +801,7 @@ def _optimize_hybrid(
 # Model Persistence
 # ---------------------------------------------------------------------------
 def _save_hybrid_models(
-    dish: str,
-    prophet_model: Any,
-    tree_model: Any,
-    champion: str,
-    config: PipelineConfig
+    dish: str, prophet_model: Any, tree_model: Any, champion: str, config: PipelineConfig
 ) -> None:
     """Save both Prophet and tree models for a dish using joblib (safer than pickle)."""
     safe_name = safe_filename(dish)
@@ -785,7 +825,9 @@ def _load_hybrid_models(dish: str, champion: str, config: PipelineConfig) -> tup
 # ---------------------------------------------------------------------------
 # Per-Dish Processing (Hybrid Prophet + Tree)
 # ---------------------------------------------------------------------------
-def process_dish(dish_name: str, shared_df: pd.DataFrame, country_code: str, config: PipelineConfig) -> dict[str, Any]:
+def process_dish(
+    dish_name: str, shared_df: pd.DataFrame, country_code: str, config: PipelineConfig
+) -> dict[str, Any]:
     """
     Process a single dish using Prophet + Tree Residual Stacking:
     1. Sanitize data and add features
@@ -801,20 +843,24 @@ def process_dish(dish_name: str, shared_df: pd.DataFrame, country_code: str, con
     os.makedirs(config.model_dir, exist_ok=True)
 
     # Isolate dish data (sanitation will happen per-fold to prevent data leakage)
-    dish_data = shared_df[shared_df['dish'] == dish_name].copy()
+    dish_data = shared_df[shared_df["dish"] == dish_name].copy()
 
     if len(dish_data) == 0:
         raise RuntimeError(f"{dish_name}: No data found for this dish.")
 
     if len(dish_data) < config.min_train_days:
-        raise RuntimeError(f"{dish_name}: Insufficient raw data ({len(dish_data)} days < {config.min_train_days} required).")
+        raise RuntimeError(
+            f"{dish_name}: Insufficient raw data ({len(dish_data)} days < {config.min_train_days} required)."
+        )
 
     # Add all features for hybrid model BEFORE CV splits
     # Note: Sanitation (interpolation) happens per-fold to prevent data leakage
     dish_feat = add_hybrid_features(dish_data.copy(), config)
 
     if len(dish_feat) < config.min_train_days:
-        raise RuntimeError(f"{dish_name}: Insufficient data after feature engineering ({len(dish_feat)} rows).")
+        raise RuntimeError(
+            f"{dish_name}: Insufficient data after feature engineering ({len(dish_feat)} rows)."
+        )
 
     # Prepare CV fold cache (pre-compute Prophet for each fold)
     # Sanitation is applied per-fold inside this function
@@ -846,7 +892,9 @@ def process_dish(dish_name: str, shared_df: pd.DataFrame, country_code: str, con
     y_full = train_r.loc[X_full.index, "resid"]
 
     if len(X_full) == 0:
-        raise RuntimeError(f"{dish_name}: No valid training data after feature/residual processing.")
+        raise RuntimeError(
+            f"{dish_name}: No valid training data after feature/residual processing."
+        )
 
     # 2. Train champion tree model on residuals
     tree_n_jobs = 1 if config.max_workers > 1 else -1
@@ -888,16 +936,16 @@ def process_dish(dish_name: str, shared_df: pd.DataFrame, country_code: str, con
     _save_hybrid_models(dish_name, pm, model, champion, config)
 
     # Save recent sales for lag computation at prediction time
-    recent_sales = dish_feat_sanitized[['date', 'sales']].tail(28).copy()
-    joblib.dump(recent_sales, f'{config.model_dir}/recent_sales_{safe_name}.pkl')
+    recent_sales = dish_feat_sanitized[["date", "sales"]].tail(28).copy()
+    joblib.dump(recent_sales, f"{config.model_dir}/recent_sales_{safe_name}.pkl")
 
     return {
-        'dish': dish_name,
-        'champion': champion,
-        'mae': mae_map,
-        'best_params': params_map,
-        'champion_mae': mae_map[champion],
-        'model_type': 'hybrid',  # Indicates Prophet + Tree stacking
+        "dish": dish_name,
+        "champion": champion,
+        "mae": mae_map,
+        "best_params": params_map,
+        "champion_mae": mae_map[champion],
+        "model_type": "hybrid",  # Indicates Prophet + Tree stacking
     }
 
 
@@ -905,8 +953,7 @@ def process_dish(dish_name: str, shared_df: pd.DataFrame, country_code: str, con
 # Utility function for computing lag features at prediction time
 # ---------------------------------------------------------------------------
 def compute_lag_features_from_history(
-    sales_history: list[float],
-    config: PipelineConfig = CFG
+    sales_history: list[float], config: PipelineConfig = CFG
 ) -> dict[str, float]:
     """Compute lag and rolling features from a sales history array."""
     features: dict[str, float] = {}

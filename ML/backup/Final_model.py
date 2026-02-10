@@ -137,13 +137,23 @@ PROPHET_PARAMS = {
 TIME_FEATURES = ["day_of_week", "month", "day", "dayofyear", "is_weekend"]
 LAGS = (1, 7, 14)
 ROLL_WINDOWS = (7, 14, 28)
-TREE_FEATURES = TIME_FEATURES + ["is_public_holiday"] + WEATHER_COLS + [
-    "y_lag_1", "y_lag_7", "y_lag_14",
-    "y_roll_mean_7", "y_roll_std_7",
-    "y_roll_mean_14", "y_roll_std_14",
-    "y_roll_mean_28", "y_roll_std_28",
-    "prophet_yhat",
-]
+TREE_FEATURES = (
+    TIME_FEATURES
+    + ["is_public_holiday"]
+    + WEATHER_COLS
+    + [
+        "y_lag_1",
+        "y_lag_7",
+        "y_lag_14",
+        "y_roll_mean_7",
+        "y_roll_std_7",
+        "y_roll_mean_14",
+        "y_roll_std_14",
+        "y_roll_mean_28",
+        "y_roll_std_28",
+        "prophet_yhat",
+    ]
+)
 
 # 输出路径
 OUT_DIR = Path("outputs")
@@ -158,6 +168,7 @@ HISTORY_PLOT_DAYS = 90
 # ==========================
 # 工具函数
 # ==========================
+
 
 def _generate_cv_folds(df: pd.DataFrame, config: PipelineConfig):
     """
@@ -340,10 +351,11 @@ def _prepare_cv_fold_cache(
 
 def _optimize_hybrid(model_type: str, fold_cache: list[dict[str, Any]], config: PipelineConfig):
     """Optuna for hybrid residual stacking per model type."""
+
     def objective(trial: optuna.Trial) -> float:
         if model_type == "xgboost":
             params = {
-                "max_depth": trial.suggest_int("max_depth", 3,10),
+                "max_depth": trial.suggest_int("max_depth", 3, 10),
                 "learning_rate": trial.suggest_float("learning_rate", 0.01, 0.3, log=True),
                 "subsample": trial.suggest_float("subsample", 0.6, 1.0),
                 "reg_alpha": trial.suggest_float("reg_alpha", 0.0, 10.0),
@@ -392,7 +404,9 @@ class DishForecast:
     history_tail: pd.DataFrame  # date, sales
 
 
-def _save_models(dish: str, prophet_model: Prophet, tree_model: Any, config: PipelineConfig, champion: str) -> None:
+def _save_models(
+    dish: str, prophet_model: Prophet, tree_model: Any, config: PipelineConfig, champion: str
+) -> None:
     safe_name = safe_filename(dish)
     model_dir = Path(config.model_dir)
     model_dir.mkdir(parents=True, exist_ok=True)
@@ -413,7 +427,9 @@ def _load_models(dish: str, config: PipelineConfig, champion: str) -> tuple[Prop
     return prophet_model, tree_model
 
 
-def process_dish(dish_name: str, dish_data: pd.DataFrame, country_code: str, config: PipelineConfig) -> DishResult:
+def process_dish(
+    dish_name: str, dish_data: pd.DataFrame, country_code: str, config: PipelineConfig
+) -> DishResult:
     _silence_logs()
     # Prepare data
     dish_data = dish_data.copy()
@@ -522,13 +538,15 @@ def _get_weather_forecast(latitude: float, longitude: float) -> pd.DataFrame | N
             inclusive="left",
         )
 
-        forecast_df = pd.DataFrame({
-            "date": dates,
-            WEATHER_COLS[0]: daily.Variables(0).ValuesAsNumpy(),
-            WEATHER_COLS[1]: daily.Variables(1).ValuesAsNumpy(),
-            WEATHER_COLS[2]: daily.Variables(2).ValuesAsNumpy(),
-            WEATHER_COLS[3]: daily.Variables(3).ValuesAsNumpy(),
-        })
+        forecast_df = pd.DataFrame(
+            {
+                "date": dates,
+                WEATHER_COLS[0]: daily.Variables(0).ValuesAsNumpy(),
+                WEATHER_COLS[1]: daily.Variables(1).ValuesAsNumpy(),
+                WEATHER_COLS[2]: daily.Variables(2).ValuesAsNumpy(),
+                WEATHER_COLS[3]: daily.Variables(3).ValuesAsNumpy(),
+            }
+        )
         forecast_df["date"] = forecast_df["date"].dt.tz_localize(None).dt.normalize()
         return forecast_df
     except Exception:
@@ -570,7 +588,9 @@ def _predict_future(
 
     # 递归预测残差
     sales_history = dish_data["sales"].astype(float).tolist()
-    local_hols = holidays.country_holidays(country_code, years=CFG.holiday_years) if country_code else None
+    local_hols = (
+        holidays.country_holidays(country_code, years=CFG.holiday_years) if country_code else None
+    )
 
     rows = []
     for i, row in future_weather.sort_values("date").reset_index(drop=True).iterrows():
@@ -614,10 +634,15 @@ def _predict_future(
                     "Holiday": ["is_public_holiday"],
                     "Weather": WEATHER_COLS,
                     "Lags/Trend": [
-                        "y_lag_1", "y_lag_7", "y_lag_14",
-                        "y_roll_mean_7", "y_roll_std_7",
-                        "y_roll_mean_14", "y_roll_std_14",
-                        "y_roll_mean_28", "y_roll_std_28",
+                        "y_lag_1",
+                        "y_lag_7",
+                        "y_lag_14",
+                        "y_roll_mean_7",
+                        "y_roll_std_7",
+                        "y_roll_mean_14",
+                        "y_roll_std_14",
+                        "y_roll_mean_28",
+                        "y_roll_std_28",
                     ],
                     "ProphetTrend": ["prophet_yhat"],
                 }
@@ -642,20 +667,26 @@ def _predict_future(
             except Exception:
                 expl = None
 
-        rows.append({
-            "date": dt,
-            "yhat": yhat,
-            "lower": lower,
-            "upper": upper,
-            "explanation": expl,
-        })
+        rows.append(
+            {
+                "date": dt,
+                "yhat": yhat,
+                "lower": lower,
+                "upper": upper,
+                "explanation": expl,
+            }
+        )
         sales_history.append(yhat)
 
     pred_future = pd.DataFrame(rows)
-    return DishForecast(dish=dish, val_mae=dish_mae, pred_future=pred_future, history_tail=history_tail)
+    return DishForecast(
+        dish=dish, val_mae=dish_mae, pred_future=pred_future, history_tail=history_tail
+    )
 
 
-def plot_results(results: list[DishForecast], summary: pd.DataFrame, top_n: int = TOP_N_PLOT) -> None:
+def plot_results(
+    results: list[DishForecast], summary: pd.DataFrame, top_n: int = TOP_N_PLOT
+) -> None:
     if not results:
         return
 
@@ -694,7 +725,10 @@ def plot_results(results: list[DishForecast], summary: pd.DataFrame, top_n: int 
     for j in range(n, len(axes_list)):
         axes_list[j].axis("off")
 
-    fig.suptitle(f"Top{len(top_dishes)}：历史（近 {HISTORY_PLOT_DAYS} 天）+ 未来 {HORIZON_DAYS} 天预测", y=1.02)
+    fig.suptitle(
+        f"Top{len(top_dishes)}：历史（近 {HISTORY_PLOT_DAYS} 天）+ 未来 {HORIZON_DAYS} 天预测",
+        y=1.02,
+    )
     fig.tight_layout()
     fig.savefig(OUT_DIR / f"forecast_top{len(top_dishes)}_lines.png", dpi=200, bbox_inches="tight")
     plt.close(fig)
@@ -811,7 +845,9 @@ def main() -> None:
                 "dish": r.dish,
                 "model": champion_model,
                 "model_combo": f"Prophet+{champion_model}" if champion_model else "Prophet+unknown",
-                "model_params": reg.get("best_params", {}).get(champion_model, {}) if champion_model else {},
+                "model_params": reg.get("best_params", {}).get(champion_model, {})
+                if champion_model
+                else {},
                 "val_mae": r.val_mae,
                 "forecast_sum": float(r.pred_future["yhat"].sum()),
                 "forecast_mean": float(r.pred_future["yhat"].mean()),

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useApp } from '@/app/context/AppContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/app/components/ui/card';
 import { Button } from '@/app/components/ui/button';
@@ -6,24 +6,22 @@ import { Input } from '@/app/components/ui/input';
 import { Label } from '@/app/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/app/components/ui/table';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/app/components/ui/dialog';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/app/components/ui/sheet';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/components/ui/dialog';
 import { Badge } from '@/app/components/ui/badge';
-import { Trash2, Edit, History, AlertTriangle, Plus } from 'lucide-react';
+import { Trash2, Edit, AlertTriangle, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { format, differenceInDays, subDays, parseISO } from 'date-fns';
-import { WastageData, EditHistory } from '@/app/types/index';
+import { WastageData } from '@/app/types/index';
 import { getRecipeUnit, calculateRecipeCarbon } from '@/app/utils/recipeCalculations';
 import { getStandardizedQuantity } from '@/app/utils/unitConversion';
 
 export function WastageManagement() {
-  const { user, wastageData, ingredients, recipes, updateWastageData, deleteWastageData, addWastageData } = useApp();
+  const { wastageData, ingredients, recipes, updateWastageData, deleteWastageData, addWastageData } = useApp();
   const [selectedType, setSelectedType] = useState<string>('all');
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [editingData, setEditingData] = useState<WastageData | null>(null);
   const [newQuantity, setNewQuantity] = useState<string>('');
-  const [selectedHistoryItem, setSelectedHistoryItem] = useState<WastageData | null>(null);
+
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [deletingData, setDeletingData] = useState<WastageData | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -38,11 +36,10 @@ export function WastageManagement() {
   today.setHours(0, 0, 0, 0);
   const sevenDaysAgo = new Date(today);
   sevenDaysAgo.setDate(today.getDate() - 7);
-  const todayStr = format(today, 'yyyy-MM-dd');
   const sevenDaysAgoStr = format(sevenDaysAgo, 'yyyy-MM-dd');
 
   // --- LOGIC: Check both recipeId and ingredientId ---
-  const getItemInfo = (recipeId?: string | null, ingredientId?: string | null) => {
+  const getItemInfo = useCallback((recipeId?: string | null, ingredientId?: string | null) => {
     // 1. Try to find a Recipe/Sub-Recipe first
     if (recipeId) {
       const recipe = recipes.find(r => r.id === recipeId);
@@ -71,7 +68,7 @@ export function WastageManagement() {
 
     // Fallback for corrupted or legacy "ghost" data
     return { name: 'Unknown Item', type: 'Unknown', unit: '-', badgeColor: 'bg-gray-400' };
-  };
+  }, [recipes, ingredients]);
 
   const filteredData = useMemo(() => {
     const today = new Date();
@@ -96,7 +93,7 @@ export function WastageManagement() {
     }
 
     return data.sort((a, b) => b.date.localeCompare(a.date));
-  }, [wastageData, selectedType, recipes, ingredients]);
+  }, [wastageData, selectedType, getItemInfo]);
 
   const stats = useMemo(() => {
     const ingredientMap = new Map(ingredients.map((i) => [i.id, i]));
@@ -167,20 +164,11 @@ export function WastageManagement() {
 
       toast.success('Wastage data updated successfully');
       handleCloseEditDialog();
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to update wastage data');
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const handleViewHistory = (data: WastageData) => {
-    if (!data.editHistory || data.editHistory.length === 0) {
-      toast.info('No edit history available for this record');
-      return;
-    }
-    setSelectedHistoryItem(data);
-    setIsHistoryOpen(true);
   };
 
   const handleDeleteRecord = async () => {
@@ -624,52 +612,6 @@ export function WastageManagement() {
         </DialogContent>
       </Dialog>
 
-      <Sheet open={isHistoryOpen} onOpenChange={setIsHistoryOpen}>
-        <SheetContent className="w-full sm:max-w-md md:max-w-lg overflow-y-auto">
-          <SheetHeader>
-            <SheetTitle className="flex items-center gap-2">
-              <History className="w-5 h-5 text-[#4F6F52]" /> Audit Trail: Edit History
-            </SheetTitle>
-          </SheetHeader>
-          {selectedHistoryItem && (
-            <div className="mt-6 space-y-4">
-              <div className="bg-gray-50 rounded-[8px] p-4 border space-y-2">
-                <div className="flex justify-between items-center border-b pb-2">
-                  <span className="text-sm text-gray-600">Item:</span>
-                  <span className="font-bold text-[#1A1C18]">{getItemInfo(selectedHistoryItem.recipeId, selectedHistoryItem.ingredientId).name}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Current Quantity:</span>
-                  <span className="font-mono bg-white px-2 py-0.5 rounded border">{selectedHistoryItem.quantity} {getItemInfo(selectedHistoryItem.recipeId, selectedHistoryItem.ingredientId).unit}</span>
-                </div>
-              </div>
-              <div className="space-y-3">
-                <h4 className="font-semibold text-sm text-gray-500 uppercase tracking-widest">Change Log</h4>
-                {selectedHistoryItem.editHistory?.slice().reverse().map((entry, index) => (
-                  <div key={index} className="border rounded-[8px] p-4 space-y-3 bg-white shadow-sm">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <p className="font-bold text-[#1A1C18]">{entry.editedBy}</p>
-                        <p className="text-xs text-gray-400">{format(new Date(entry.timestamp), 'd MMM yyyy, h:mm a')}</p>
-                      </div>
-                      <div className="text-right">
-                        <div className="flex items-center gap-1 text-sm">
-                          <span className="text-gray-400 line-through">{entry.previousValue}</span>
-                          <span className="text-gray-400">→</span>
-                          <span className="font-bold text-[#4F6F52]">{entry.newValue}</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="bg-gray-50 rounded p-3 text-sm text-gray-700 italic border-l-4 border-[#4F6F52]">
-                      "{entry.reason}"
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </SheetContent>
-      </Sheet>
     </div>
   );
 }
