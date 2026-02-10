@@ -23,10 +23,14 @@ try:
 except ImportError:
     pass
 
-import optuna
+try:
+    import optuna
+
+    optuna.logging.set_verbosity(optuna.logging.WARNING)
+except ImportError:
+    optuna = None  # Not needed for inference
 
 warnings.filterwarnings("ignore")
-optuna.logging.set_verbosity(optuna.logging.WARNING)
 
 # ---------------------------------------------------------------------------
 # Re-exports from core modules  (preserves backward-compatible imports)

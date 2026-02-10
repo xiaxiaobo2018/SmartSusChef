@@ -1,0 +1,52 @@
+﻿---
+env:
+  contexts:
+    - name: "SmartSusChef API"
+      urls:
+        - "http://localhost:5000"
+      includePaths:
+        - "http://localhost:5000/api/.*"
+        - "http://localhost:5000/Health.*"
+      excludePaths:
+        - "http://localhost:5000/swagger/.*"
+  parameters:
+    failOnError: false
+    failOnWarning: false
+    progressToStdout: true
+
+jobs:
+  # Import OpenAPI spec to discover all endpoints
+  - type: openapi
+    parameters:
+      apiUrl: "http://localhost:5000/swagger/v1/swagger.json"
+      context: "SmartSusChef API"
+
+  # Passive scan (automatically runs during spidering/importing)
+  - type: passiveScan-config
+    parameters:
+      maxAlertsPerRule: 10
+      scanOnlyInScope: true
+
+  # Active scan all discovered endpoints
+  - type: activeScan
+    parameters:
+      context: "SmartSusChef API"
+      maxRuleDurationInMins: 2
+      maxScanDurationInMins: 10
+
+  # Generate JSON report
+  - type: report
+    parameters:
+      template: "traditional-json-plus"
+      reportDir: "D:/Nus/ad/SmartSusChef/codequalityreports/dast"
+      reportFile: "local-api-report"
+      reportTitle: "SmartSusChef DAST API Scan (Authenticated)"
+
+  # Generate HTML report
+  - type: report
+    parameters:
+      template: "traditional-html-plus"
+      reportDir: "D:/Nus/ad/SmartSusChef/codequalityreports/dast"
+      reportFile: "local-api-report"
+      reportTitle: "SmartSusChef DAST API Scan (Authenticated)"
+
