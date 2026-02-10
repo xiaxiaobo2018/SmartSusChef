@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
     <domain-config cleartextTrafficPermitted="true">
-        <domain includeSubdomains="true">10.0.2.2</domain> <!-- For Android Emulator -->
-        <domain includeSubdomains="true">192.168.50.133</domain> <!-- Example for local IP -->
-        <domain includeSubdomains="true">smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com</domain> <!-- UAT ALB -->
-        <domain includeSubdomains="true">smartsuschef-prod-alb-909143264.ap-southeast-1.elb.amazonaws.com</domain> <!-- Production ALB -->
+        <!-- For Android Emulator -->
+        <domain includeSubdomains="true">10.0.2.2</domain>
+        <!-- UAT ALB -->
+        <domain includeSubdomains="true">smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com</domain>
+        <!-- Production ALB -->
+        <domain includeSubdomains="true">smartsuschef-prod-alb-909143264.ap-southeast-1.elb.amazonaws.com</domain>
     </domain-config>
 </network-security-config>
