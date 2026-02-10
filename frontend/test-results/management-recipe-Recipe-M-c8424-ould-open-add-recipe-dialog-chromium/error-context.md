@@ -1,0 +1,159 @@
+# Page snapshot
+
+```yaml
+- generic:
+  - generic:
+    - generic:
+      - banner:
+        - generic:
+          - generic:
+            - img
+          - generic: SmartSus Chef
+        - generic:
+          - generic:
+            - generic: E2E Test Restaurant | Test Location
+          - generic:
+            - button:
+              - generic:
+                - generic: TM
+              - generic:
+                - generic: Test Manager
+                - generic: manager
+      - main:
+        - generic:
+          - complementary:
+            - generic:
+              - heading [level=2]: Management Module
+              - paragraph: E2E Test Restaurant
+            - generic:
+              - button:
+                - img
+                - text: Exit Management
+            - navigation:
+              - list:
+                - listitem:
+                  - button:
+                    - img
+                    - generic: Recipe Management
+                - listitem:
+                  - button:
+                    - img
+                    - generic: Ingredient Management
+                - listitem:
+                  - button:
+                    - img
+                    - generic: Import Sales Data
+                - listitem:
+                  - button:
+                    - img
+                    - generic: Sales Data Management
+                - listitem:
+                  - button:
+                    - img
+                    - generic: Wastage Data Management
+                - listitem:
+                  - button:
+                    - img
+                    - generic: Export Data
+          - main:
+            - generic:
+              - generic:
+                - generic:
+                  - generic:
+                    - heading [level=1]:
+                      - img
+                      - text: Recipe Management
+                    - paragraph: Manage main dishes and sub-recipes
+                  - button:
+                    - img
+                    - text: Add Recipe
+                - generic:
+                  - generic:
+                    - heading [level=4]: All Recipes
+                    - paragraph: 2 recipes in the system
+                  - generic:
+                    - generic:
+                      - generic:
+                        - table:
+                          - rowgroup:
+                            - row:
+                              - columnheader: Recipe Name
+                              - columnheader: Type
+                              - columnheader: Components
+                              - columnheader: Actions
+                          - rowgroup:
+                            - row:
+                              - cell: Chicken Rice
+                              - cell:
+                                - generic: Main Dish
+                              - cell:
+                                - generic:
+                                  - generic:
+                                    - img
+                                    - generic: Chicken
+                                    - generic: — 0.2 kg
+                                  - generic:
+                                    - img
+                                    - generic: Rice
+                                    - generic: — 0.15 kg
+                              - cell:
+                                - generic:
+                                  - button:
+                                    - img
+                                  - button:
+                                    - img
+                            - row:
+                              - cell: Tomato Salad
+                              - cell:
+                                - generic: Main Dish
+                              - cell:
+                                - generic:
+                                  - generic:
+                                    - img
+                                    - generic: Tomato
+                                    - generic: — 0.3 kg
+                              - cell:
+                                - generic:
+                                  - button:
+                                    - img
+                                  - button:
+                                    - img
+      - region "Notifications alt+T"
+  - generic: "0"
+  - dialog "Add New Recipe" [ref=e2]:
+    - generic [ref=e3]:
+      - heading "Add New Recipe" [level=2] [ref=e4]
+      - paragraph [ref=e5]: Build your recipe by adding raw ingredients or existing sub-recipes.
+    - generic [ref=e6]:
+      - generic [ref=e7]:
+        - generic [ref=e8]:
+          - generic [ref=e9]: Recipe Name
+          - textbox "Recipe Name" [active] [ref=e10]:
+            - /placeholder: e.g. Mala Xiang Guo
+        - generic [ref=e11]:
+          - checkbox "Set as Sub-Recipe (e.g. Sauce, Stock)" [ref=e12]
+          - generic [ref=e13] [cursor=pointer]: Set as Sub-Recipe (e.g. Sauce, Stock)
+      - generic [ref=e14]:
+        - generic [ref=e15]:
+          - generic [ref=e16]: Recipe Components
+          - button "Add Component" [ref=e17]:
+            - img
+            - text: Add Component
+        - generic [ref=e18]:
+          - generic [ref=e19]: Item Name
+          - generic [ref=e20]: Qty
+        - generic [ref=e23]:
+          - combobox [ref=e25]:
+            - generic: Select Ingredient...
+            - img
+          - spinbutton [ref=e27]
+          - generic [ref=e28]:
+            - button [disabled]:
+              - img
+    - generic [ref=e29]:
+      - button "Cancel" [ref=e30]
+      - button "Create Recipe" [ref=e31]
+    - button "Close" [ref=e32]:
+      - img
+      - generic [ref=e33]: Close
+```

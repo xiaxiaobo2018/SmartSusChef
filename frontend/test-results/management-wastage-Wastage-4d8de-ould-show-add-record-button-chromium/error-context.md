@@ -1,0 +1,93 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e5]:
+        - img [ref=e7]
+        - generic [ref=e9]: SmartSus Chef
+      - generic [ref=e10]:
+        - generic [ref=e12]: E2E Test Restaurant | Test Location
+        - button "TM Test Manager manager" [ref=e14]:
+          - generic [ref=e16]: TM
+          - generic [ref=e17]:
+            - generic [ref=e18]: Test Manager
+            - generic [ref=e19]: manager
+    - main [ref=e20]:
+      - generic [ref=e21]:
+        - complementary [ref=e22]:
+          - generic [ref=e23]:
+            - heading "Management Module" [level=2] [ref=e24]
+            - paragraph [ref=e25]: E2E Test Restaurant
+          - button "Exit Management" [ref=e27]:
+            - img
+            - text: Exit Management
+          - navigation [ref=e28]:
+            - list [ref=e29]:
+              - listitem [ref=e30]:
+                - button "Recipe Management" [ref=e31]:
+                  - img [ref=e32]
+                  - generic [ref=e34]: Recipe Management
+              - listitem [ref=e35]:
+                - button "Ingredient Management" [ref=e36]:
+                  - img [ref=e37]
+                  - generic [ref=e41]: Ingredient Management
+              - listitem [ref=e42]:
+                - button "Import Sales Data" [ref=e43]:
+                  - img [ref=e44]
+                  - generic [ref=e47]: Import Sales Data
+              - listitem [ref=e48]:
+                - button "Sales Data Management" [ref=e49]:
+                  - img [ref=e50]
+                  - generic [ref=e52]: Sales Data Management
+              - listitem [ref=e53]:
+                - button "Wastage Data Management" [active] [ref=e54]:
+                  - img [ref=e55]
+                  - generic [ref=e58]: Wastage Data Management
+              - listitem [ref=e59]:
+                - button "Export Data" [ref=e60]:
+                  - img [ref=e61]
+                  - generic [ref=e64]: Export Data
+        - main [ref=e65]:
+          - generic [ref=e67]:
+            - generic [ref=e68]:
+              - generic [ref=e69]:
+                - heading "Wastage Data Management" [level=1] [ref=e70]:
+                  - img [ref=e71]
+                  - text: Wastage Data Management
+                - paragraph [ref=e74]: Audit log and data controls for store management
+              - button "Add New Record" [ref=e75]:
+                - img
+                - text: Add New Record
+            - generic [ref=e76]:
+              - generic [ref=e77]:
+                - heading "Total Records" [level=4] [ref=e79]
+                - generic [ref=e80]:
+                  - generic [ref=e81]: "0"
+                  - paragraph [ref=e82]: Last 30 days
+              - generic [ref=e83]:
+                - heading "Total Wastage" [level=4] [ref=e85]
+                - generic [ref=e86]:
+                  - generic [ref=e87]: "0.0"
+                  - paragraph [ref=e88]: mixed units
+              - generic [ref=e89]:
+                - heading "Carbon Footprint" [level=4] [ref=e91]:
+                  - generic [ref=e92]: Carbon Footprint
+                - generic [ref=e93]:
+                  - generic [ref=e94]: "0.00"
+                  - paragraph [ref=e95]: kg CO₂
+            - generic [ref=e96]:
+              - generic [ref=e98]:
+                - generic [ref=e99]:
+                  - heading "Wastage Records" [level=4] [ref=e100]
+                  - paragraph [ref=e101]: Last 30 days. Only data from the last 7 days can be edited.
+                - generic [ref=e102]:
+                  - generic [ref=e103]: "Filter by Item Type:"
+                  - combobox [ref=e104]:
+                    - generic: All Items
+                    - img
+              - generic [ref=e106]: No wastage data available for this filter.
+    - region "Notifications alt+T"
+  - generic [ref=e107]: "0"
+```

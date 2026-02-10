@@ -61,20 +61,8 @@ const MOCK_WASTAGE: { id: string; date: string; ingredientId?: string; recipeId?
  * Setup API mocking for all backend endpoints
  */
 async function setupApiMocking(page: Page) {
-  // IMPORTANT: Playwright routes have inverse priority (last registered = first checked)
-  // So we register fallback FIRST to make it lowest priority
-  
-  // Fallback: Catch any unhandled /api/ requests for debugging (lowest priority)
-  await page.route('**/api/**', async (route) => {
-    const url = route.request().url();
-    const method = route.request().method();
-    console.log(`[Mock API] Unhandled: ${method} ${url}`);
-    // Let it continue to real server (will fail but good for debugging)
-    await route.continue();
-  });
-
-  // Mock auth - getCurrentUser
-  await page.route('**/api/auth/me', async (route) => {
+  // Mock auth - getCurrentUser (MUST be registered first - highest priority)
+  await page.route(/.*\/api\/auth\/me.*/, async (route) => {
     console.log('[Mock API] Intercepted /api/auth/me');
     await route.fulfill({
       status: 200,
