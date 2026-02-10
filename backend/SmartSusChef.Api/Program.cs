@@ -162,9 +162,10 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Configure the HTTP request pipeline.
+// Swagger enabled in all environments for API documentation and DAST scanning
+app.UseSwagger();
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
     app.UseSwaggerUI();
 }
 
