@@ -10,14 +10,6 @@ if TYPE_CHECKING:
 
 import numpy as np
 import pandas as pd
-
-optuna: ModuleType | None = None
-try:
-    import optuna as _optuna
-
-    optuna = _optuna
-except ImportError:
-    pass
 from sklearn.metrics import mean_absolute_error
 
 from app.utils.logging_config import setup_logger
@@ -26,7 +18,14 @@ from core.feature_eng import _build_residual_features
 
 logger = setup_logger(__name__)
 
-# Import tree frameworks (optional dependencies)
+# Import optional dependencies
+optuna: ModuleType | None = None
+try:
+    import optuna as _optuna
+
+    optuna = _optuna
+except ImportError:
+    pass
 lgb: ModuleType | None = None
 try:
     import lightgbm as _lgb
