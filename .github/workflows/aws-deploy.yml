@@ -839,9 +839,8 @@ jobs:
       - name: Prepare ZAP workspace
         run: |
           mkdir -p zap-reports
-          touch zap-reports/baseline-report.html zap-reports/baseline-report.json zap-reports/baseline-report.md
-          touch zap-reports/api-report.html zap-reports/api-report.json zap-reports/api-report.md
           chmod -R 777 zap-reports
+          chmod 777 .
 
       - name: ZAP Baseline Scan (Frontend)
         run: |
