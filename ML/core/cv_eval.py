@@ -4,8 +4,12 @@ from types import ModuleType
 from typing import Any
 
 import numpy as np
-import optuna
 import pandas as pd
+
+try:
+    import optuna
+except ImportError:
+    optuna = None  # Not needed for inference
 from sklearn.metrics import mean_absolute_error
 
 from app.utils.logging_config import setup_logger
