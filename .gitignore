@@ -183,3 +183,6 @@ tools/
 *.sln.DotSettings.user
 
 *.pyc
+
+# Do not ignore the Android debug source set
+!mobile/app/src/debug/
