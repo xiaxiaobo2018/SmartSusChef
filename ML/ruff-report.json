@@ -1,1 +1,101 @@
-[]
+[
+  {
+    "cell": null,
+    "code": "I001",
+    "end_location": {
+      "column": 28,
+      "row": 2
+    },
+    "filename": "D:\\Nus\\ad\\SmartSusChef\\ML\\tests\\test_final_model_v2_more.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "import pandas as pd\r\n\r\nimport Final_model_v2 as fm\r\n\r\n\r\n",
+          "end_location": {
+            "column": 1,
+            "row": 5
+          },
+          "location": {
+            "column": 1,
+            "row": 1
+          }
+        }
+      ],
+      "message": "Organize imports"
+    },
+    "location": {
+      "column": 1,
+      "row": 1
+    },
+    "message": "Import block is un-sorted or un-formatted",
+    "noqa_row": 1,
+    "url": "https://docs.astral.sh/ruff/rules/unsorted-imports"
+  },
+  {
+    "cell": null,
+    "code": "I001",
+    "end_location": {
+      "column": 31,
+      "row": 6
+    },
+    "filename": "D:\\Nus\\ad\\SmartSusChef\\ML\\tests\\test_training_logic_v2_extra.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "import sys\r\nfrom types import SimpleNamespace\r\n\r\nimport numpy as np\r\nimport pandas as pd\r\n\r\nimport training_logic_v2 as tl\r\n\r\n\r\n",
+          "end_location": {
+            "column": 1,
+            "row": 9
+          },
+          "location": {
+            "column": 1,
+            "row": 1
+          }
+        }
+      ],
+      "message": "Organize imports"
+    },
+    "location": {
+      "column": 1,
+      "row": 1
+    },
+    "message": "Import block is un-sorted or un-formatted",
+    "noqa_row": 1,
+    "url": "https://docs.astral.sh/ruff/rules/unsorted-imports"
+  },
+  {
+    "cell": null,
+    "code": "F401",
+    "end_location": {
+      "column": 11,
+      "row": 1
+    },
+    "filename": "D:\\Nus\\ad\\SmartSusChef\\ML\\tests\\test_training_logic_v2_extra.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "",
+          "end_location": {
+            "column": 1,
+            "row": 2
+          },
+          "location": {
+            "column": 1,
+            "row": 1
+          }
+        }
+      ],
+      "message": "Remove unused import: `sys`"
+    },
+    "location": {
+      "column": 8,
+      "row": 1
+    },
+    "message": "`sys` imported but unused",
+    "noqa_row": 1,
+    "url": "https://docs.astral.sh/ruff/rules/unused-import"
+  }
+]
