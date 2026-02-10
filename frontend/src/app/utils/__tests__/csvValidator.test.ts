@@ -377,4 +377,188 @@ describe('csvValidator', () => {
             });
         });
     });
+
+    describe('Additional Date Formats', () => {
+        it('should parse d/M/yy format', () => {
+            const fmt = DATE_FORMATS.find(f => f.value === 'd/M/yy')!;
+            expect(fmt).toBeDefined();
+            const date = fmt.parse('1/5/25');
+            expect(date?.getFullYear()).toBe(2025);
+            expect(date?.getMonth()).toBe(4); // May
+            expect(date?.getDate()).toBe(1);
+        });
+
+        it('should parse M/d/yyyy format', () => {
+            const fmt = DATE_FORMATS.find(f => f.value === 'M/d/yyyy')!;
+            expect(fmt).toBeDefined();
+            const date = fmt.parse('5/1/2025');
+            expect(date?.getFullYear()).toBe(2025);
+            expect(date?.getMonth()).toBe(4);
+            expect(date?.getDate()).toBe(1);
+        });
+
+        it('should parse dd-MM-yyyy format', () => {
+            const fmt = DATE_FORMATS.find(f => f.value === 'dd-MM-yyyy')!;
+            expect(fmt).toBeDefined();
+            const date = fmt.parse('01-05-2025');
+            expect(date?.getFullYear()).toBe(2025);
+            expect(date?.getMonth()).toBe(4);
+            expect(date?.getDate()).toBe(1);
+        });
+
+        it('should parse yyyy/MM/dd format', () => {
+            const fmt = DATE_FORMATS.find(f => f.value === 'yyyy/MM/dd')!;
+            expect(fmt).toBeDefined();
+            const date = fmt.parse('2025/05/01');
+            expect(date?.getFullYear()).toBe(2025);
+            expect(date?.getMonth()).toBe(4);
+            expect(date?.getDate()).toBe(1);
+        });
+
+        it('should validate regex for each format', () => {
+            const cases = [
+                { value: 'd/M/yy', valid: '1/5/25', invalid: '2025-01-01' },
+                { value: 'M/d/yyyy', valid: '5/1/2025', invalid: '2025-01-01' },
+                { value: 'dd-MM-yyyy', valid: '01-05-2025', invalid: '01/05/2025' },
+                { value: 'yyyy/MM/dd', valid: '2025/05/01', invalid: '2025-05-01' },
+            ];
+            cases.forEach(({ value, valid, invalid }) => {
+                const fmt = DATE_FORMATS.find(f => f.value === value)!;
+                expect(fmt.regex.test(valid)).toBe(true);
+                expect(fmt.regex.test(invalid)).toBe(false);
+            });
+        });
+    });
+
+    describe('Date Cross-Validation', () => {
+        it('should detect invalid calendar dates like Feb 30 with M/d/yy', () => {
+            const validator = new CSVValidator([] as any, 'M/d/yy');
+            const result = validator.validate([
+                { Date: '2/30/25', Dish_Name: 'Test', Quantity_Sold: '10' },
+            ]);
+            expect(result.isValid).toBe(false);
+            expect(result.errors.some(e => e.error === 'Invalid date')).toBe(true);
+        });
+
+        it('should detect invalid calendar dates with yyyy-MM-dd', () => {
+            const validator = new CSVValidator([] as any, 'yyyy-MM-dd');
+            const result = validator.validate([
+                { Date: '2025-02-30', Dish_Name: 'Test', Quantity_Sold: '10' },
+            ]);
+            expect(result.isValid).toBe(false);
+        });
+
+        it('should accept valid dates with d/M/yy format', () => {
+            const validator = new CSVValidator([] as any, 'd/M/yy');
+            const result = validator.validate([
+                { Date: '1/5/25', Dish_Name: 'Test', Quantity_Sold: '10' },
+            ]);
+            expect(result.errors.filter(e => e.column === 'Date').length).toBe(0);
+        });
+
+        it('should accept valid dates with dd-MM-yyyy format', () => {
+            const validator = new CSVValidator([] as any, 'dd-MM-yyyy');
+            const result = validator.validate([
+                { Date: '01-05-2025', Dish_Name: 'Test', Quantity_Sold: '10' },
+            ]);
+            expect(result.errors.filter(e => e.column === 'Date').length).toBe(0);
+        });
+
+        it('should accept valid dates with yyyy/MM/dd format', () => {
+            const validator = new CSVValidator([] as any, 'yyyy/MM/dd');
+            const result = validator.validate([
+                { Date: '2025/05/01', Dish_Name: 'Test', Quantity_Sold: '10' },
+            ]);
+            expect(result.errors.filter(e => e.column === 'Date').length).toBe(0);
+        });
+
+        it('should detect overflow in d/M/yy format', () => {
+            const validator = new CSVValidator([] as any, 'd/M/yy');
+            const result = validator.validate([
+                { Date: '31/2/25', Dish_Name: 'Test', Quantity_Sold: '10' },
+            ]);
+            expect(result.isValid).toBe(false);
+        });
+
+        it('should detect overflow in dd/MM/yyyy format', () => {
+            const validator = new CSVValidator([] as any, 'dd/MM/yyyy');
+            const result = validator.validate([
+                { Date: '30/02/2025', Dish_Name: 'Test', Quantity_Sold: '10' },
+            ]);
+            expect(result.isValid).toBe(false);
+        });
+    });
+
+    describe('Static Methods', () => {
+        it('should generate error log with details', () => {
+            const errors = [
+                { row: 2, column: 'Date', value: 'invalid', error: 'Invalid date format', suggestion: 'Use M/d/yy' },
+                { row: 3, column: 'Quantity_Sold', value: '-5', error: 'Value must be at least 0' },
+            ];
+            const log = CSVValidator.generateErrorLog(errors);
+            expect(log).toContain('SmartSus Chef - CSV Import Error Log');
+            expect(log).toContain('Error 1:');
+            expect(log).toContain('Error 2:');
+            expect(log).toContain('Row: 2');
+            expect(log).toContain('Invalid date format');
+            expect(log).toContain('Suggestion: Use M/d/yy');
+            expect(log).toContain('Total Errors: 2');
+            expect(log).toContain('Common Solutions:');
+        });
+
+        it('should generate error log without suggestions', () => {
+            const errors = [
+                { row: 2, column: 'Dish_Name', value: '', error: 'Dish name is required' },
+            ];
+            const log = CSVValidator.generateErrorLog(errors);
+            expect(log).toContain('Error 1:');
+            expect(log).not.toContain('Suggestion:');
+        });
+
+        it('should generate sample CSV with default format', () => {
+            const csv = CSVValidator.generateSampleCSV();
+            expect(csv).toContain('Date,Dish_Name,Quantity_Sold');
+            expect(csv).toContain('Laksa');
+            expect(csv).toContain('Hainanese Chicken Rice');
+            expect(csv).toContain('Chicken Salad');
+        });
+
+        it('should generate sample CSV with yyyy-MM-dd format', () => {
+            const csv = CSVValidator.generateSampleCSV('yyyy-MM-dd');
+            expect(csv).toContain('Date,Dish_Name,Quantity_Sold');
+            expect(csv).toContain('2025-05-01');
+        });
+
+        it('should generate sample CSV with dd/MM/yyyy format', () => {
+            const csv = CSVValidator.generateSampleCSV('dd/MM/yyyy');
+            expect(csv).toContain('01/05/2025');
+        });
+
+        it('should generate sample CSV with dd-MM-yyyy format', () => {
+            const csv = CSVValidator.generateSampleCSV('dd-MM-yyyy');
+            expect(csv).toContain('01-05-2025');
+        });
+
+        it('should generate sample CSV with yyyy/MM/dd format', () => {
+            const csv = CSVValidator.generateSampleCSV('yyyy/MM/dd');
+            expect(csv).toContain('2025/05/01');
+        });
+    });
+
+    describe('Error Summary Generation', () => {
+        it('should generate grouped error summary for high-volume failures', () => {
+            const manyInvalidRows = Array.from({ length: 55 }, (_, i) => ({
+                Date: 'invalid',
+                Dish_Name: '',
+                Quantity_Sold: 'abc',
+            }));
+            const validator = new CSVValidator([] as any, 'M/d/yy');
+            const result = validator.validate(manyInvalidRows);
+            expect(result.isValid).toBe(false);
+            // When > 50 errors, they get replaced with a single summary error
+            expect(result.errors.length).toBe(1);
+            expect(result.errors[0].error).toBe('Massive data mismatch detected');
+            expect(result.errors[0].suggestion).toContain('Download Error Log');
+        });
+    });
 });
