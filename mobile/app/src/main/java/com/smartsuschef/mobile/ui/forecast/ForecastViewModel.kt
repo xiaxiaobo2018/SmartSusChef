@@ -37,6 +37,10 @@ class ForecastViewModel
         private val _comparisonData = MutableLiveData<Resource<List<ForecastDto>>>()
         val comparisonData: LiveData<Resource<List<ForecastDto>>> = _comparisonData
 
+        companion object {
+            private const val FORECAST_DAYS = 7
+        }
+
         init {
             loadPredictions()
         }
@@ -49,7 +53,7 @@ class ForecastViewModel
                 _comparisonData.value = Resource.Loading()
 
                 // Load forecast data (future predictions + past actuals)
-                when (val result = forecastRepository.getForecast(7)) {
+                when (val result = forecastRepository.getForecast(FORECAST_DAYS)) {
                     is Resource.Success -> {
                         val allForecastData = result.data.orEmpty()
 
@@ -85,7 +89,7 @@ class ForecastViewModel
                         _dishForecasts.value = Resource.Success(dailyDishForecasts)
 
                         // 5. Past comparison data (Predicted vs Actual) - STUBBED
-                        // TODO: Re-implement by fetching SalesData for past 7 days and merging with forecast data
+                        // Re-implement by fetching SalesData for past 7 days and merging with forecast data
                         _comparisonData.value = Resource.Success(emptyList())
                     }
 

@@ -1,5 +1,6 @@
 package com.smartsuschef.mobile.ui.forecast
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.widget.TextView
 import com.github.mikephil.charting.components.MarkerView
@@ -16,6 +17,7 @@ import com.smartsuschef.mobile.R
  * - Stacked bar breakdown (Dishes Forecast)
  * - Grouped bar comparison (Predicted vs Actual)
  */
+@SuppressLint("ViewConstructor")
 class ForecastMarkerView(context: Context, layoutResource: Int) : MarkerView(context, layoutResource) {
     private val tvDate: TextView = findViewById(R.id.tvMarkerDate)
     private val tvQuantity: TextView = findViewById(R.id.tvMarkerQuantity)

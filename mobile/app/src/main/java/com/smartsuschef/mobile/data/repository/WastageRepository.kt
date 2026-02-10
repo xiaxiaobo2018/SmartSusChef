@@ -21,6 +21,7 @@ class WastageRepository
         companion object {
             private const val TAG = "WastageRepository"
         }
+
         suspend fun getTrend(
             startDate: String,
             endDate: String,
@@ -31,7 +32,8 @@ class WastageRepository
                     if (response.isSuccessful) {
                         Resource.Success(response.body() ?: emptyList())
                     } else {
-                        Resource.Error("Failed to fetch wastage trend: ${response.errorBody()?.string() ?: response.message()}")
+                        val errorBody = response.errorBody()?.string()
+                        Resource.Error("Failed to fetch wastage trend: ${errorBody ?: response.message()}")
                     }
                 } catch (e: HttpException) {
                     Log.e(TAG, "HTTP error in repository: ${e.message()}", e)
@@ -50,7 +52,8 @@ class WastageRepository
                     if (response.isSuccessful) {
                         Resource.Success(response.body()!!)
                     } else {
-                        Resource.Error("Failed to add wastage: ${response.errorBody()?.string() ?: response.message()}")
+                        val errorBody = response.errorBody()?.string()
+                        Resource.Error("Failed to add wastage: ${errorBody ?: response.message()}")
                     }
                 } catch (e: HttpException) {
                     Log.e(TAG, "HTTP error in repository: ${e.message()}", e)
@@ -72,7 +75,8 @@ class WastageRepository
                     if (response.isSuccessful) {
                         Resource.Success(response.body()!!)
                     } else {
-                        Resource.Error("Failed to update wastage: ${response.errorBody()?.string() ?: response.message()}")
+                        val errorBody = response.errorBody()?.string()
+                        Resource.Error("Failed to update wastage: ${errorBody ?: response.message()}")
                     }
                 } catch (e: HttpException) {
                     Log.e(TAG, "HTTP error in repository: ${e.message()}", e)
@@ -91,7 +95,8 @@ class WastageRepository
                     if (response.isSuccessful) {
                         Resource.Success(Unit)
                     } else {
-                        Resource.Error("Failed to delete wastage: ${response.errorBody()?.string() ?: response.message()}")
+                        val errorBody = response.errorBody()?.string()
+                        Resource.Error("Failed to delete wastage: ${errorBody ?: response.message()}")
                     }
                 } catch (e: HttpException) {
                     Log.e(TAG, "HTTP error in repository: ${e.message()}", e)

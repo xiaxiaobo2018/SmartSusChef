@@ -41,7 +41,17 @@ class UsersRepositoryTest {
     fun `getCurrentUser success should return success resource with UserDto`() =
         runTest(testDispatcher) {
             // Arrange
-            val userDto = UserDto("id1", "user1", "Name1", "email1", "role1", "status1", "2026-02-08T00:00:00", "2026-02-08T00:00:00")
+            val userDto =
+                UserDto(
+                    "id1",
+                    "user1",
+                    "Name1",
+                    "email1",
+                    "role1",
+                    "status1",
+                    "2026-02-08T00:00:00",
+                    "2026-02-08T00:00:00",
+                )
             whenever(mockAuthApiService.getCurrentUser()).thenReturn(Response.success(userDto))
 
             // Act
@@ -105,7 +115,16 @@ class UsersRepositoryTest {
             // Arrange
             val request = UpdateProfileRequest("New Name", "new@example.com")
             val updatedUserDto =
-                UserDto("id1", "user1", "New Name", "new@example.com", "role1", "status1", "2026-02-08T00:00:00", "2026-02-08T00:00:00")
+                UserDto(
+                    "id1",
+                    "user1",
+                    "New Name",
+                    "new@example.com",
+                    "role1",
+                    "status1",
+                    "2026-02-08T00:00:00",
+                    "2026-02-08T00:00:00",
+                )
             whenever(mockAuthApiService.updateOwnProfile(any())).thenReturn(Response.success(updatedUserDto))
 
             // Act

@@ -48,6 +48,7 @@ class WastageDetailFragment : Fragment(R.layout.fragment_wastage_detail) {
         binding.tvDetailTitle.text = "Wastage for ${args.date}"
     }
 
+    @Suppress("MagicNumber")
     private fun setupPieChart(data: List<WastageBreakdownItem>) {
         val breakdown =
             data.groupBy { it.type }

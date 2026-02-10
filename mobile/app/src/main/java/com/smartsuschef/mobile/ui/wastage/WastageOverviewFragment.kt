@@ -50,6 +50,7 @@ class WastageOverviewFragment : Fragment(R.layout.fragment_wastage_overview) {
         binding.tvDateContext.setOnClickListener { v -> showFilterMenu(v) }
     }
 
+    @Suppress("MagicNumber")
     private fun setupCombinedChart() {
         binding.wastageCombinedChart.apply {
             description.isEnabled = false
@@ -88,7 +89,9 @@ class WastageOverviewFragment : Fragment(R.layout.fragment_wastage_overview) {
                         h: Highlight?,
                     ) {
                         val selectedDateIndex = e?.x?.toInt() ?: return
-                        val trendItem = (viewModel.wastageTrend.value as? Resource.Success)?.data?.getOrNull(selectedDateIndex)
+                        val wastageTrendData =
+                            (viewModel.wastageTrend.value as? Resource.Success)?.data
+                        val trendItem = wastageTrendData?.getOrNull(selectedDateIndex)
 
                         if (trendItem != null) {
                             val action =
@@ -134,6 +137,7 @@ class WastageOverviewFragment : Fragment(R.layout.fragment_wastage_overview) {
         }
     }
 
+    @Suppress("MagicNumber")
     private fun updateChart(wastageData: List<WastageTrendDto>) {
         val totalCarbonFootprint = wastageData.sumOf { it.totalCarbonFootprint }
         binding.tvWastageSubtitle.text = "Total Carbon Footprint: %.2f kg".format(totalCarbonFootprint)

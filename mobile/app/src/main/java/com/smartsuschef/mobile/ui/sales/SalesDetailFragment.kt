@@ -55,6 +55,7 @@ class SalesDetailFragment : Fragment(R.layout.fragment_sales_detail) {
     }
 
     // This function now only sets up the chart's appearance
+    @Suppress("MagicNumber")
     private fun setupPieChartStyle() {
         binding.pieChartDishBreakdown.apply {
             description.isEnabled = false
@@ -128,6 +129,7 @@ class SalesDetailFragment : Fragment(R.layout.fragment_sales_detail) {
         }
     }
 
+    @Suppress("MagicNumber")
     private fun updatePieChart(data: List<RecipeSalesItem>) {
         val chartPalette =
             listOf(
@@ -153,7 +155,11 @@ class SalesDetailFragment : Fragment(R.layout.fragment_sales_detail) {
         val finalEntries =
             if (rawEntries.size > 10) {
                 val topNine = rawEntries.sortedByDescending { it.value }.take(9)
-                val othersSum = rawEntries.sortedByDescending { it.value }.drop(9).sumOf { it.value.toDouble() }.toFloat()
+                val othersSum =
+                    rawEntries.sortedByDescending { it.value }
+                        .drop(9)
+                        .sumOf { it.value.toDouble() }
+                        .toFloat()
                 topNine + PieEntry(othersSum, "Others")
             } else {
                 rawEntries

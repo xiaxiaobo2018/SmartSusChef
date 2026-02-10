@@ -18,6 +18,7 @@ class StoreRepository
         companion object {
             private const val TAG = "StoreRepository"
         }
+
         suspend fun getStore(): Resource<StoreDto> {
             return withContext(Dispatchers.IO) {
                 try {
@@ -25,7 +26,8 @@ class StoreRepository
                     if (response.isSuccessful) {
                         Resource.Success(response.body()!!)
                     } else {
-                        Resource.Error("Failed to fetch store details: ${response.errorBody()?.string() ?: response.message()}")
+                        val errorBody = response.errorBody()?.string()
+                        Resource.Error("Failed to fetch store details: ${errorBody ?: response.message()}")
                     }
                 } catch (e: HttpException) {
                     Log.e(TAG, "HTTP error in getStore: ${e.message()}", e)

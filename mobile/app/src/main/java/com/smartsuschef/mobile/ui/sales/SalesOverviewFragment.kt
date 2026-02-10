@@ -50,6 +50,7 @@ class SalesOverviewFragment : Fragment(R.layout.fragment_sales_overview) {
         setWeatherIcon("cloudy")
     }
 
+    @Suppress("MagicNumber")
     private fun setupCombinedChart() {
         binding.salesCombinedChart.apply {
             description.isEnabled = false
@@ -68,7 +69,8 @@ class SalesOverviewFragment : Fragment(R.layout.fragment_sales_overview) {
                 axisLineColor = Color.TRANSPARENT
                 labelRotationAngle = -45f
                 textSize = 8f
-                setAvoidFirstLastClipping(false) // Allow MPAndroidChart to handle spacing naturally without facing labels inward
+                // Allow MPAndroidChart to handle spacing naturally without facing labels inward
+                setAvoidFirstLastClipping(false)
             }
 
             axisLeft.apply {
@@ -93,7 +95,9 @@ class SalesOverviewFragment : Fragment(R.layout.fragment_sales_overview) {
                         val selectedDateIndex = e?.x?.toInt() ?: return
 
                         // Find the original full date string from the ViewModel's salesTrend
-                        val fullDate = (viewModel.salesTrend.value as? Resource.Success)?.data?.getOrNull(selectedDateIndex)?.date
+                        val salesTrendData =
+                            (viewModel.salesTrend.value as? Resource.Success)?.data
+                        val fullDate = salesTrendData?.getOrNull(selectedDateIndex)?.date
 
                         if (fullDate != null) {
                             val action =
@@ -137,6 +141,7 @@ class SalesOverviewFragment : Fragment(R.layout.fragment_sales_overview) {
         }
     }
 
+    @Suppress("MagicNumber")
     private fun updateChart(salesData: List<SalesTrendItem>) {
         // Calculate average for subtitle
         val avgSales = salesData.map { it.sales }.average().toInt()

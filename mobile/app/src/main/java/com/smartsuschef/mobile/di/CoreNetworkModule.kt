@@ -22,6 +22,8 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object CoreNetworkModule {
+    private const val TIMEOUT_SECONDS = 30L
+
     /**
      * Provides Gson instance for JSON serialization/deserialization
      */
@@ -100,9 +102,9 @@ object CoreNetworkModule {
             .addInterceptor(authInterceptor) // Add auth token to requests
             .addInterceptor(ApdexInterceptor()) // Log Apdex performance metrics
             .addInterceptor(loggingInterceptor) // Log requests/responses
-            .connectTimeout(30, TimeUnit.SECONDS) // Connection timeout
-            .readTimeout(30, TimeUnit.SECONDS) // Read timeout
-            .writeTimeout(30, TimeUnit.SECONDS) // Write timeout
+            .connectTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS) // Connection timeout
+            .readTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS) // Read timeout
+            .writeTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS) // Write timeout
             .build()
     }
 

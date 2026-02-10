@@ -98,7 +98,8 @@ class IngredientsRepositoryTest {
         runTest(testDispatcher) {
             // Arrange
             val createRequest = CreateIngredientRequest("Sugar", "kg", 0.3)
-            whenever(mockIngredientApiService.create(any())).thenReturn(Response.success(sampleIngredientDto.copy(name = "Sugar")))
+            whenever(mockIngredientApiService.create(any()))
+                .thenReturn(Response.success(sampleIngredientDto.copy(name = "Sugar")))
 
             // Act
             val result = ingredientsRepository.create(createRequest)

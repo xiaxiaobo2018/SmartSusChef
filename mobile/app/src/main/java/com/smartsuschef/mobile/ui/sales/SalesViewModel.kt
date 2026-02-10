@@ -57,7 +57,7 @@ class SalesViewModel
                     if (filter == SalesFilter.TODAY) {
                         endDate // Start and end are the same for "Today"
                     } else {
-                        calendar.add(Calendar.DAY_OF_YEAR, -6) // Go back 6 days from today
+                        calendar.add(Calendar.DAY_OF_YEAR, -DAYS_BACK) // Go back 6 days from today
                         dateFormat.format(calendar.time)
                     }
 
@@ -87,7 +87,8 @@ class SalesViewModel
                         _ingredientBreakdown.value = Resource.Success(requirements ?: emptyList())
                     }
                     is Resource.Error -> {
-                        _ingredientBreakdown.value = Resource.Error(result.message ?: "Failed to load ingredient breakdown")
+                        _ingredientBreakdown.value =
+                            Resource.Error(result.message ?: "Failed to load ingredient breakdown")
                     }
                     else -> { /* Loading state is already set */ }
                 }
@@ -111,6 +112,10 @@ class SalesViewModel
                     else -> { /* Loading state is already set */ }
                 }
             }
+        }
+
+        companion object {
+            private const val DAYS_BACK = 6
         }
     }
 

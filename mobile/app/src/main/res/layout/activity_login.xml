@@ -3,7 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
     android:fillViewport="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -33,6 +32,7 @@
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:layout_gravity="center"
+                    android:importantForAccessibility="no"
                     android:src="@drawable/chef"
                     app:tint="@color/on_primary" />
             </com.google.android.material.card.MaterialCardView>
@@ -78,6 +78,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:layout_marginTop="4dp"
+                    android:autofillHints="username"
                     android:background="@drawable/bg_input_field"
                     android:hint="Enter your username"
                     android:inputType="text"
@@ -111,6 +112,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:layout_marginTop="4dp"
+                    android:autofillHints="password"
                     android:background="@drawable/bg_input_field"
                     android:hint="Enter your password"
                     android:inputType="textPassword"
@@ -164,6 +166,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:layout_marginTop="4dp"
+                    android:autofillHints="emailAddress"
                     android:background="@drawable/bg_input_field"
                     android:hint="Enter your registered email"
                     android:inputType="textEmailAddress"
@@ -193,6 +196,7 @@
                     <ImageView
                         android:layout_width="16dp"
                         android:layout_height="16dp"
+                        android:importantForAccessibility="no"
                         android:src="@drawable/arrow_left"
                         app:tint="@color/muted_text" />
 

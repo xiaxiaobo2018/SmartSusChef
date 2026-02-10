@@ -19,6 +19,7 @@ class RecipesRepository
         companion object {
             private const val TAG = "RecipesRepository"
         }
+
         suspend fun getAll(): Resource<List<RecipeDto>> {
             return withContext(Dispatchers.IO) {
                 try {
@@ -26,7 +27,8 @@ class RecipesRepository
                     if (response.isSuccessful) {
                         Resource.Success(response.body() ?: emptyList())
                     } else {
-                        Resource.Error("Failed to fetch recipes: ${response.errorBody()?.string() ?: response.message()}")
+                        val errorBody = response.errorBody()?.string()
+                        Resource.Error("Failed to fetch recipes: ${errorBody ?: response.message()}")
                     }
                 } catch (e: HttpException) {
                     Log.e(TAG, "HTTP error in repository: ${e.message()}", e)
@@ -45,7 +47,8 @@ class RecipesRepository
                     if (response.isSuccessful) {
                         Resource.Success(response.body()!!)
                     } else {
-                        Resource.Error("Failed to add recipe: ${response.errorBody()?.string() ?: response.message()}")
+                        val errorBody = response.errorBody()?.string()
+                        Resource.Error("Failed to add recipe: ${errorBody ?: response.message()}")
                     }
                 } catch (e: HttpException) {
                     Log.e(TAG, "HTTP error in repository: ${e.message()}", e)

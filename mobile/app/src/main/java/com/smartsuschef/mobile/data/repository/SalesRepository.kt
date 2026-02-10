@@ -23,6 +23,7 @@ class SalesRepository
         companion object {
             private const val TAG = "SalesRepository"
         }
+
         suspend fun getAll(
             startDate: String?,
             endDate: String?,
@@ -33,7 +34,8 @@ class SalesRepository
                     if (response.isSuccessful) {
                         Resource.Success(response.body() ?: emptyList())
                     } else {
-                        Resource.Error("Failed to fetch sales history: ${response.errorBody()?.string() ?: response.message()}")
+                        val errorBody = response.errorBody()?.string()
+                        Resource.Error("Failed to fetch sales history: ${errorBody ?: response.message()}")
                     }
                 } catch (e: HttpException) {
                     Log.e(TAG, "HTTP error in repository: ${e.message()}", e)
@@ -55,7 +57,8 @@ class SalesRepository
                     if (response.isSuccessful) {
                         Resource.Success(response.body() ?: emptyList())
                     } else {
-                        Resource.Error("Failed to fetch sales trend: ${response.errorBody()?.string() ?: response.message()}")
+                        val errorBody = response.errorBody()?.string()
+                        Resource.Error("Failed to fetch sales trend: ${errorBody ?: response.message()}")
                     }
                 } catch (e: HttpException) {
                     Log.e(TAG, "HTTP error in repository: ${e.message()}", e)
@@ -74,7 +77,8 @@ class SalesRepository
                     if (response.isSuccessful) {
                         Resource.Success(response.body() ?: emptyList())
                     } else {
-                        Resource.Error("Failed to fetch ingredient usage: ${response.errorBody()?.string() ?: response.message()}")
+                        val errorBody = response.errorBody()?.string()
+                        Resource.Error("Failed to fetch ingredient usage: ${errorBody ?: response.message()}")
                     }
                 } catch (e: HttpException) {
                     Log.e(TAG, "HTTP error in repository: ${e.message()}", e)
@@ -93,7 +97,8 @@ class SalesRepository
                     if (response.isSuccessful) {
                         Resource.Success(response.body() ?: emptyList())
                     } else {
-                        Resource.Error("Failed to fetch recipe sales: ${response.errorBody()?.string() ?: response.message()}")
+                        val errorBody = response.errorBody()?.string()
+                        Resource.Error("Failed to fetch recipe sales: ${errorBody ?: response.message()}")
                     }
                 } catch (e: HttpException) {
                     Log.e(TAG, "HTTP error in repository: ${e.message()}", e)
@@ -112,7 +117,8 @@ class SalesRepository
                     if (response.isSuccessful) {
                         Resource.Success(response.body()!!)
                     } else {
-                        Resource.Error("Failed to add sale: ${response.errorBody()?.string() ?: response.message()}")
+                        val errorBody = response.errorBody()?.string()
+                        Resource.Error("Failed to add sale: ${errorBody ?: response.message()}")
                     }
                 } catch (e: HttpException) {
                     Log.e(TAG, "HTTP error in repository: ${e.message()}", e)
@@ -134,7 +140,8 @@ class SalesRepository
                     if (response.isSuccessful) {
                         Resource.Success(response.body()!!)
                     } else {
-                        Resource.Error("Failed to update sale: ${response.errorBody()?.string() ?: response.message()}")
+                        val errorBody = response.errorBody()?.string()
+                        Resource.Error("Failed to update sale: ${errorBody ?: response.message()}")
                     }
                 } catch (e: HttpException) {
                     Log.e(TAG, "HTTP error in repository: ${e.message()}", e)
@@ -153,7 +160,8 @@ class SalesRepository
                     if (response.isSuccessful) {
                         Resource.Success(Unit)
                     } else {
-                        Resource.Error("Failed to delete sale: ${response.errorBody()?.string() ?: response.message()}")
+                        val errorBody = response.errorBody()?.string()
+                        Resource.Error("Failed to delete sale: ${errorBody ?: response.message()}")
                     }
                 } catch (e: HttpException) {
                     Log.e(TAG, "HTTP error in repository: ${e.message()}", e)

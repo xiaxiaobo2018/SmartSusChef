@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.smartsuschef.mobile.R
 
@@ -36,7 +37,25 @@ class IngredientAdapter(private var ingredients: List<IngredientRequirement>) :
     override fun getItemCount() = ingredients.size
 
     fun updateData(newItems: List<IngredientRequirement>) {
+        val diffResult =
+            DiffUtil.calculateDiff(
+                object : DiffUtil.Callback() {
+                    override fun getOldListSize() = ingredients.size
+
+                    override fun getNewListSize() = newItems.size
+
+                    override fun areItemsTheSame(
+                        oldPos: Int,
+                        newPos: Int,
+                    ) = ingredients[oldPos].name == newItems[newPos].name
+
+                    override fun areContentsTheSame(
+                        oldPos: Int,
+                        newPos: Int,
+                    ) = ingredients[oldPos] == newItems[newPos]
+                },
+            )
         ingredients = newItems
-        notifyDataSetChanged()
+        diffResult.dispatchUpdatesTo(this)
     }
 }

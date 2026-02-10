@@ -1,10 +1,10 @@
 package com.smartsuschef.mobile.util
 
+import android.util.Log
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
-import android.util.Log
 
 object DateUtils {
     private const val TAG = "DateUtils"

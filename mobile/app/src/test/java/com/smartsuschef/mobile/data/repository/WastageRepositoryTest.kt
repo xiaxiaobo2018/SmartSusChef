@@ -146,7 +146,8 @@ class WastageRepositoryTest {
         runTest(testDispatcher) {
             // Arrange
             val updateRequest = UpdateWastageDataRequest("2023-01-01", "ing1", null, 6.0)
-            whenever(mockWastageApiService.update(any(), any())).thenReturn(Response.success(sampleWastageDataDto.copy(quantity = 6.0)))
+            whenever(mockWastageApiService.update(any(), any()))
+                .thenReturn(Response.success(sampleWastageDataDto.copy(quantity = 6.0)))
 
             // Act
             val result = wastageRepository.update("wastage1", updateRequest)

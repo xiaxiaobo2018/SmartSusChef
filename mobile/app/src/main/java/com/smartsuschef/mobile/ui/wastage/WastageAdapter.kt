@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.smartsuschef.mobile.R
 
@@ -40,7 +41,25 @@ class WastageAdapter(private var wastedItems: List<WastageBreakdownItem>) :
     override fun getItemCount() = wastedItems.size
 
     fun updateData(newItems: List<WastageBreakdownItem>) {
+        val diffResult =
+            DiffUtil.calculateDiff(
+                object : DiffUtil.Callback() {
+                    override fun getOldListSize() = wastedItems.size
+
+                    override fun getNewListSize() = newItems.size
+
+                    override fun areItemsTheSame(
+                        oldPos: Int,
+                        newPos: Int,
+                    ) = wastedItems[oldPos].name == newItems[newPos].name
+
+                    override fun areContentsTheSame(
+                        oldPos: Int,
+                        newPos: Int,
+                    ) = wastedItems[oldPos] == newItems[newPos]
+                },
+            )
         wastedItems = newItems
-        notifyDataSetChanged()
+        diffResult.dispatchUpdatesTo(this)
     }
 }

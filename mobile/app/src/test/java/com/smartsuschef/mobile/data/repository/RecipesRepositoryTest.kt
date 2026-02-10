@@ -110,7 +110,8 @@ class RecipesRepositoryTest {
                     isSubRecipe = false,
                     ingredients = emptyList(),
                 )
-            whenever(mockRecipeApiService.create(any())).thenReturn(Response.success(sampleRecipeDto.copy(name = "Fish Curry")))
+            whenever(mockRecipeApiService.create(any()))
+                .thenReturn(Response.success(sampleRecipeDto.copy(name = "Fish Curry")))
 
             // Act
             val result = recipesRepository.create(createRequest)

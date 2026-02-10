@@ -111,6 +111,7 @@ class SettingsViewModel
         }
 
         // Change password with comprehensive validation
+        @Suppress("ReturnCount")
         fun changePassword(
             currentPassword: String,
             newPassword: String,

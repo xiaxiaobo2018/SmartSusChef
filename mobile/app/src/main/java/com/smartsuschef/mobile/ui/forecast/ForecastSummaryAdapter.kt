@@ -3,6 +3,7 @@ package com.smartsuschef.mobile.ui.forecast
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.smartsuschef.mobile.databinding.ItemIngredientForecastRowBinding
 import com.smartsuschef.mobile.databinding.ItemIngredientHeaderBinding
@@ -17,6 +18,7 @@ class ForecastSummaryAdapter(
         private const val TAG = "ForecastSummaryAdapter"
         private const val VIEW_TYPE_HEADER = 0
         private const val VIEW_TYPE_ITEM = 1
+        private const val DAYS_COUNT = 7
     }
 
     // Header ViewHolder
@@ -67,7 +69,7 @@ class ForecastSummaryAdapter(
         holder.binding.apply {
             // Set date headers (formatted to "d MMM")
             val headerViews = listOf(day1Header, day2Header, day3Header, day4Header, day5Header, day6Header, day7Header)
-            dates.take(7).forEachIndexed { index, date ->
+            dates.take(DAYS_COUNT).forEachIndexed { index, date ->
                 if (index < headerViews.size) {
                     headerViews[index].text = formatDate(date)
                 }
@@ -87,7 +89,7 @@ class ForecastSummaryAdapter(
             val quantityViews = listOf(day1, day2, day3, day4, day5, day6, day7)
             item.totalQuantity.forEachIndexed { index, qty ->
                 if (index < quantityViews.size) {
-                    quantityViews[index].text = if (qty > 0) String.format("%.1f", qty) else "-"
+                    quantityViews[index].text = if (qty > 0) String.format(Locale.US, "%.1f", qty) else "-"
                 }
             }
         }
@@ -99,9 +101,37 @@ class ForecastSummaryAdapter(
         newItems: List<IngredientForecast>,
         newDates: List<String>,
     ) {
+        val oldItems = items
+        val oldDates = dates
+        val diffResult =
+            DiffUtil.calculateDiff(
+                object : DiffUtil.Callback() {
+                    override fun getOldListSize() = oldItems.size + 1
+
+                    override fun getNewListSize() = newItems.size + 1
+
+                    override fun areItemsTheSame(
+                        oldPos: Int,
+                        newPos: Int,
+                    ): Boolean {
+                        if (oldPos == 0 && newPos == 0) return true
+                        if (oldPos == 0 || newPos == 0) return false
+                        return oldItems[oldPos - 1].name == newItems[newPos - 1].name
+                    }
+
+                    override fun areContentsTheSame(
+                        oldPos: Int,
+                        newPos: Int,
+                    ): Boolean {
+                        if (oldPos == 0 && newPos == 0) return oldDates == newDates
+                        if (oldPos == 0 || newPos == 0) return false
+                        return oldItems[oldPos - 1] == newItems[newPos - 1]
+                    }
+                },
+            )
         items = newItems
         dates = newDates
-        notifyDataSetChanged()
+        diffResult.dispatchUpdatesTo(this)
     }
 
     private fun formatDate(dateStr: String): String {

@@ -5,6 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smartsuschef.mobile.data.repository.WastageRepository
+import com.smartsuschef.mobile.network.dto.ItemWastageDto
+import com.smartsuschef.mobile.network.dto.WastageTrendDto
 import com.smartsuschef.mobile.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -21,8 +23,8 @@ class WastageViewModel
     constructor(
         private val wastageRepository: WastageRepository,
     ) : ViewModel() {
-        private val _wastageTrend = MutableLiveData<Resource<List<com.smartsuschef.mobile.network.dto.WastageTrendDto>>>()
-        val wastageTrend: LiveData<Resource<List<com.smartsuschef.mobile.network.dto.WastageTrendDto>>> = _wastageTrend
+        private val _wastageTrend = MutableLiveData<Resource<List<WastageTrendDto>>>()
+        val wastageTrend: LiveData<Resource<List<WastageTrendDto>>> = _wastageTrend
 
         private val _wastageBreakdown = MutableLiveData<Resource<List<WastageBreakdownItem>>>()
         val wastageBreakdown: LiveData<Resource<List<WastageBreakdownItem>>> = _wastageBreakdown
@@ -51,7 +53,7 @@ class WastageViewModel
                     if (filter == WastageFilter.TODAY) {
                         endDate
                     } else {
-                        calendar.add(Calendar.DAY_OF_YEAR, -6)
+                        calendar.add(Calendar.DAY_OF_YEAR, -DAYS_BACK)
                         dateFormat.format(calendar.time)
                     }
 
@@ -59,7 +61,7 @@ class WastageViewModel
             }
         }
 
-        fun setWastageBreakdown(itemBreakdown: List<com.smartsuschef.mobile.network.dto.ItemWastageDto>) {
+        fun setWastageBreakdown(itemBreakdown: List<ItemWastageDto>) {
             val breakdownItems =
                 itemBreakdown.map {
                     WastageBreakdownItem(
@@ -77,6 +79,10 @@ class WastageViewModel
                     )
                 }
             _wastageBreakdown.value = Resource.Success(breakdownItems)
+        }
+
+        companion object {
+            private const val DAYS_BACK = 6
         }
     }
 

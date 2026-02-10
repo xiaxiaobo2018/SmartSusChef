@@ -19,6 +19,7 @@ class UsersRepository
         companion object {
             private const val TAG = "UsersRepository"
         }
+
         suspend fun getCurrentUser(): Resource<UserDto> {
             return withContext(Dispatchers.IO) {
                 try {
@@ -26,7 +27,8 @@ class UsersRepository
                     if (response.isSuccessful) {
                         Resource.Success(response.body()!!)
                     } else {
-                        Resource.Error("Failed to fetch user profile: ${response.errorBody()?.string() ?: response.message()}")
+                        val errorBody = response.errorBody()?.string()
+                        Resource.Error("Failed to fetch user profile: ${errorBody ?: response.message()}")
                     }
                 } catch (e: HttpException) {
                     Log.e(TAG, "HTTP error in repository: ${e.message()}", e)
@@ -45,7 +47,8 @@ class UsersRepository
                     if (response.isSuccessful) {
                         Resource.Success(response.body()!!)
                     } else {
-                        Resource.Error("Failed to update user: ${response.errorBody()?.string() ?: response.message()}")
+                        val errorBody = response.errorBody()?.string()
+                        Resource.Error("Failed to update user: ${errorBody ?: response.message()}")
                     }
                 } catch (e: HttpException) {
                     Log.e(TAG, "HTTP error in repository: ${e.message()}", e)

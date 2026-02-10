@@ -189,11 +189,11 @@ class DataInputViewModelTest {
             assertEquals(false, recentEntries?.first()?.isSales)
         }
 
+    @Suppress("LongMethod")
     @Test
     fun `deleteEntry for sales should call salesRepository delete and update status`() =
         runTest {
-            // ARRANGE
-            // 1. Prepare mock responses for initial submissions and the delete operation
+            // ARRANGE: Prepare mock responses for initial submissions and the delete operation
             val initialEntryId1 = "sales-initial-1"
             val initialEntryId2 = "sales-initial-2"
             val initialEntryName1 = "Pizza A"
@@ -255,11 +255,9 @@ class DataInputViewModelTest {
             whenever(mockSalesRepository.delete(entryToDelete.id)).thenReturn(Resource.Success(Unit))
 
             // ACT
-            // 5. Call the function we want to test
             viewModel.deleteEntry(entryToDelete)
 
             // ASSERT
-            // 6. Verify that salesRepository.delete was called with the correct ID
             verify(mockSalesRepository).delete(entryToDelete.id)
 
             // 7. Verify that the submitStatus LiveData reflects the success
@@ -270,7 +268,10 @@ class DataInputViewModelTest {
             // 8. Verify that the entry is removed from the recent entries list
             val recentEntries = viewModel.recentEntries.value
             assertEquals("Recent entries should contain one entry", 1, recentEntries?.size)
-            assertTrue("Recent entries should not contain the deleted entry", recentEntries?.contains(entryToDelete) == false)
+            assertTrue(
+                "Recent entries should not contain the deleted entry",
+                recentEntries?.contains(entryToDelete) == false,
+            )
             assertEquals(initialEntryId2, recentEntries?.first()?.id) // The other entry should remain
         }
 
@@ -318,7 +319,8 @@ class DataInputViewModelTest {
                     createdAt = todayStr,
                     updatedAt = todayStr,
                 )
-            whenever(mockSalesRepository.update(eq(existingEntryId), any())).thenReturn(Resource.Success(mockSalesDtoForUpdate))
+            whenever(mockSalesRepository.update(eq(existingEntryId), any()))
+                .thenReturn(Resource.Success(mockSalesDtoForUpdate))
 
             // 3. Use a captor to verify the update request sent to the repository
             val updateRequestCaptor = argumentCaptor<UpdateSalesDataRequest>()
@@ -397,7 +399,8 @@ class DataInputViewModelTest {
                     createdAt = todayStr,
                     updatedAt = todayStr,
                 )
-            whenever(mockWastageRepository.update(eq(existingEntryId), any())).thenReturn(Resource.Success(mockWastageDtoForUpdate))
+            whenever(mockWastageRepository.update(eq(existingEntryId), any()))
+                .thenReturn(Resource.Success(mockWastageDtoForUpdate))
 
             // 3. Use a captor to verify the update request sent to the repository
             val updateRequestCaptor = argumentCaptor<UpdateWastageDataRequest>()

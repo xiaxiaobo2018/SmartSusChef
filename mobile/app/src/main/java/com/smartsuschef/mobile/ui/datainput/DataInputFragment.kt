@@ -229,10 +229,16 @@ class DataInputFragment : Fragment(R.layout.fragment_data_input), RecentEntryAct
         }
     }
 
-    private fun showOverwriteDialog(quantity: Double, existingEntry: RecentEntry) {
+    private fun showOverwriteDialog(
+        quantity: Double,
+        existingEntry: RecentEntry,
+    ) {
+        val message =
+            "You have already entered data for " +
+                "${existingEntry.name}. Do you want to overwrite the existing quantity?"
         AlertDialog.Builder(requireContext())
             .setTitle("Entry Already Exists")
-            .setMessage("You have already entered data for ${existingEntry.name}. Do you want to overwrite the existing quantity?")
+            .setMessage(message)
             .setPositiveButton("Overwrite Entry") { dialog, _ ->
                 viewModel.submitData(quantity, existingEntry.id)
                 dialog.dismiss()
@@ -257,6 +263,7 @@ class DataInputFragment : Fragment(R.layout.fragment_data_input), RecentEntryAct
         binding.etQuantity.setText(entry.quantity.toString())
 
         // Set spinner selection
+        @Suppress("UNCHECKED_CAST")
         val adapter = binding.itemSpinner.adapter as? ArrayAdapter<String>
         if (adapter != null) {
             val position = adapter.getPosition(entry.name)

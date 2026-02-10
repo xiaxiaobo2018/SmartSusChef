@@ -109,7 +109,8 @@ class SalesRepositoryTest {
     fun `getAll network error should return error resource with network message`() =
         runTest(testDispatcher) {
             // Arrange
-            whenever(mockSalesApiService.getAll(anyOrNull(), anyOrNull())).thenAnswer { throw IOException("No internet") }
+            whenever(mockSalesApiService.getAll(anyOrNull(), anyOrNull()))
+                .thenAnswer { throw IOException("No internet") }
 
             // Act
             val result = salesRepository.getAll(null, null)
@@ -227,7 +228,8 @@ class SalesRepositoryTest {
         runTest(testDispatcher) {
             // Arrange
             val updateRequest = UpdateSalesDataRequest(15)
-            whenever(mockSalesApiService.update(any(), any())).thenReturn(Response.success(sampleSalesDataDto.copy(quantity = 15)))
+            whenever(mockSalesApiService.update(any(), any()))
+                .thenReturn(Response.success(sampleSalesDataDto.copy(quantity = 15)))
 
             // Act
             val result = salesRepository.update("sale1", updateRequest)

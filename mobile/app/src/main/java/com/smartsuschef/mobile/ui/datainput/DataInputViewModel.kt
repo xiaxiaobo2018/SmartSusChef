@@ -121,26 +121,41 @@ class DataInputViewModel
                     return@launch
                 }
 
-                val result = if (_isSalesMode.value == true) {
-                    submitSalesData(id, quantity.toInt(), existingEntryId)
-                } else {
-                    submitWastageData(id, quantity, existingEntryId)
-                }
+                val result =
+                    if (_isSalesMode.value == true) {
+                        submitSalesData(id, quantity.toInt(), existingEntryId)
+                    } else {
+                        submitWastageData(id, quantity, existingEntryId)
+                    }
 
                 handleSubmissionResult(result, name, quantity, existingEntryId)
             }
         }
 
-        private suspend fun submitSalesData(recipeId: String, quantity: Int, existingEntryId: String?): Resource<out Any> {
+        private suspend fun submitSalesData(
+            recipeId: String,
+            quantity: Int,
+            existingEntryId: String?,
+        ): Resource<out Any> {
             val todayStr = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
             return if (existingEntryId != null) {
                 salesRepository.update(existingEntryId, UpdateSalesDataRequest(quantity = quantity))
             } else {
-                salesRepository.create(CreateSalesDataRequest(date = todayStr, recipeId = recipeId, quantity = quantity))
+                salesRepository.create(
+                    CreateSalesDataRequest(
+                        date = todayStr,
+                        recipeId = recipeId,
+                        quantity = quantity,
+                    ),
+                )
             }
         }
 
-        private suspend fun submitWastageData(itemId: String, quantity: Double, existingEntryId: String?): Resource<out Any> {
+        private suspend fun submitWastageData(
+            itemId: String,
+            quantity: Double,
+            existingEntryId: String?,
+        ): Resource<out Any> {
             val todayStr = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
             return if (existingEntryId != null) {
                 val isIngredient = _wastageType.value == WastageType.INGREDIENT
@@ -150,20 +165,36 @@ class DataInputViewModel
                         date = todayStr,
                         ingredientId = if (isIngredient) itemId else null,
                         recipeId = if (!isIngredient) itemId else null,
-                        quantity = quantity
-                    )
+                        quantity = quantity,
+                    ),
                 )
             } else {
-                val wastageRequest = when (_wastageType.value) {
-                    WastageType.MAIN_DISH, WastageType.SUB_RECIPE -> CreateWastageDataRequest(date = todayStr, recipeId = itemId, quantity = quantity)
-                    WastageType.INGREDIENT -> CreateWastageDataRequest(date = todayStr, ingredientId = itemId, quantity = quantity)
-                    else -> null
-                }
+                val wastageRequest =
+                    when (_wastageType.value) {
+                        WastageType.MAIN_DISH, WastageType.SUB_RECIPE ->
+                            CreateWastageDataRequest(
+                                date = todayStr,
+                                recipeId = itemId,
+                                quantity = quantity,
+                            )
+                        WastageType.INGREDIENT ->
+                            CreateWastageDataRequest(
+                                date = todayStr,
+                                ingredientId = itemId,
+                                quantity = quantity,
+                            )
+                        else -> null
+                    }
                 wastageRequest?.let { wastageRepository.create(it) } ?: Resource.Error("Invalid wastage type.")
             }
         }
 
-        private fun handleSubmissionResult(result: Resource<out Any>, name: String, quantity: Double, existingEntryId: String?) {
+        private fun handleSubmissionResult(
+            result: Resource<out Any>,
+            name: String,
+            quantity: Double,
+            existingEntryId: String?,
+        ) {
             when (result) {
                 is Resource.Success -> {
                     val isSalesMode = _isSalesMode.value ?: true
@@ -171,11 +202,12 @@ class DataInputViewModel
                     val todayStr = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
                     val currentTimeStr = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
 
-                    val newEntryId = when (val data = result.data) {
-                        is SalesDataDto -> data.id
-                        is WastageDataDto -> data.id
-                        else -> existingEntryId
-                    } ?: return // Should not be null on success
+                    val newEntryId =
+                        when (val data = result.data) {
+                            is SalesDataDto -> data.id
+                            is WastageDataDto -> data.id
+                            else -> existingEntryId
+                        } ?: return // Should not be null on success
 
                     val newEntry = RecentEntry(newEntryId, name, quantity, unit, todayStr, currentTimeStr, isSalesMode)
 

@@ -33,6 +33,7 @@ class ForecastFragment : Fragment(R.layout.fragment_forecast) {
     companion object {
         private const val TAG = "ForecastFragment"
     }
+
     private var _binding: FragmentForecastBinding? = null
     private val binding get() = _binding!!
     private val viewModel: ForecastViewModel by viewModels()
@@ -125,14 +126,16 @@ class ForecastFragment : Fragment(R.layout.fragment_forecast) {
         val barSet = createBarDataSet(barEntries)
         val lineSet = createLineDataSet(lineEntries)
 
-        val combinedData = CombinedData().apply {
-            setData(BarData(barSet))
-            setData(LineData(lineSet))
-        }
+        val combinedData =
+            CombinedData().apply {
+                setData(BarData(barSet))
+                setData(LineData(lineSet))
+            }
 
         styleSummaryChart(labels, combinedData)
     }
 
+    @Suppress("MaxLineLength")
     private fun prepareSummaryChartData(trendData: List<ForecastDto>): Triple<List<BarEntry>, List<Entry>, List<String>> {
         val barEntries = mutableListOf<BarEntry>()
         val lineEntries = mutableListOf<Entry>()
@@ -157,6 +160,7 @@ class ForecastFragment : Fragment(R.layout.fragment_forecast) {
         }
     }
 
+    @Suppress("MagicNumber")
     private fun createLineDataSet(lineEntries: List<Entry>): LineDataSet {
         return LineDataSet(lineEntries, "Trend").apply {
             color = ContextCompat.getColor(requireContext(), R.color.forecast_trend)
@@ -169,7 +173,11 @@ class ForecastFragment : Fragment(R.layout.fragment_forecast) {
         }
     }
 
-    private fun styleSummaryChart(labels: List<String>, data: CombinedData) {
+    @Suppress("MagicNumber")
+    private fun styleSummaryChart(
+        labels: List<String>,
+        data: CombinedData,
+    ) {
         binding.summaryCombinedChart.apply {
             this.data = data
             description.isEnabled = false
@@ -227,6 +235,7 @@ class ForecastFragment : Fragment(R.layout.fragment_forecast) {
     /**
      * CHART 2: Dishes Forecast (Stacked Bar Chart)
      */
+    @Suppress("MagicNumber")
     private fun setupStackedBarChart(forecastData: List<DailyDishForecast>) {
         val (entries, labels, dishNames) = prepareStackedBarChartData(forecastData)
 
@@ -236,6 +245,7 @@ class ForecastFragment : Fragment(R.layout.fragment_forecast) {
         styleStackedBarChart(labels, dishNames, barData)
     }
 
+    @Suppress("MaxLineLength")
     private fun prepareStackedBarChartData(forecastData: List<DailyDishForecast>): Triple<List<BarEntry>, List<String>, Array<String>> {
         val entries = mutableListOf<BarEntry>()
         val labels = mutableListOf<String>()
@@ -250,28 +260,38 @@ class ForecastFragment : Fragment(R.layout.fragment_forecast) {
             labels.add(formatDate(daily.date))
         }
 
-        val dishNames = if (forecastData.isNotEmpty()) {
-            forecastData[0].dishes.map { it.name }.toTypedArray()
-        } else {
-            arrayOf()
-        }
+        val dishNames =
+            if (forecastData.isNotEmpty()) {
+                forecastData[0].dishes.map { it.name }.toTypedArray()
+            } else {
+                arrayOf()
+            }
         return Triple(entries, labels, dishNames)
     }
 
-    private fun createStackedBarDataSet(entries: List<BarEntry>, dishNames: Array<String>): BarDataSet {
+    private fun createStackedBarDataSet(
+        entries: List<BarEntry>,
+        dishNames: Array<String>,
+    ): BarDataSet {
         return BarDataSet(entries, "").apply {
-            colors = listOf(
-                ContextCompat.getColor(requireContext(), R.color.primary),
-                ContextCompat.getColor(requireContext(), R.color.wastage_primary),
-                ContextCompat.getColor(requireContext(), R.color.forecast_gold),
-            )
+            colors =
+                listOf(
+                    ContextCompat.getColor(requireContext(), R.color.primary),
+                    ContextCompat.getColor(requireContext(), R.color.wastage_primary),
+                    ContextCompat.getColor(requireContext(), R.color.forecast_gold),
+                )
             stackLabels = dishNames
             setDrawValues(false)
             highLightAlpha = 0 // Disable highlight color change
         }
     }
 
-    private fun styleStackedBarChart(labels: List<String>, dishNames: Array<String>, data: BarData) {
+    @Suppress("MagicNumber")
+    private fun styleStackedBarChart(
+        labels: List<String>,
+        dishNames: Array<String>,
+        data: BarData,
+    ) {
         binding.dishForecastStackedChart.apply {
             this.data = data
             description.isEnabled = false
@@ -331,6 +351,7 @@ class ForecastFragment : Fragment(R.layout.fragment_forecast) {
     /**
      * CHART 4: Comparison (Grouped Bar - Predicted vs Actual)
      */
+    @Suppress("ForbiddenComment", "UnusedParameter")
     private fun setupComparisonChart(comparisonData: List<ForecastDto>) {
         // TODO: This chart is disabled until SalesData is fetched and merged with ForecastData.
         // The logic below is broken because `actualQuantity` was removed from ForecastDto.

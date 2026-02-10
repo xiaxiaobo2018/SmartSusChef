@@ -15,6 +15,10 @@ import kotlinx.coroutines.runBlocking
 
 // ...
 class TokenManager(private val context: Context) {
+    companion object {
+        private const val KEY_SIZE = 256
+    }
+
     private val masterKey: MasterKey by lazy {
         val keyGenParameterSpec =
             KeyGenParameterSpec.Builder(
@@ -23,7 +27,7 @@ class TokenManager(private val context: Context) {
             )
                 .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
                 .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
-                .setKeySize(256)
+                .setKeySize(KEY_SIZE)
                 .build()
         MasterKey.Builder(context)
             .setKeyGenParameterSpec(keyGenParameterSpec)

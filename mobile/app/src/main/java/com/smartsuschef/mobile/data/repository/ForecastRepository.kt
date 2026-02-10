@@ -18,6 +18,7 @@ class ForecastRepository
         companion object {
             private const val TAG = "ForecastRepository"
         }
+
         suspend fun getForecast(days: Int): Resource<List<ForecastDto>> {
             return withContext(Dispatchers.IO) {
                 try {

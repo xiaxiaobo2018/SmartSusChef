@@ -24,6 +24,8 @@ class AuthRepository
     ) {
         companion object {
             private const val TAG = "AuthRepository"
+            private const val HTTP_UNAUTHORIZED = 401
+            private const val HTTP_BAD_REQUEST = 400
         }
 
         /**
@@ -95,9 +97,9 @@ class AuthRepository
                                     "Current password is incorrect"
                                 errorBody?.contains("invalid", ignoreCase = true) == true ->
                                     "Invalid password format"
-                                response.code() == 401 ->
+                                response.code() == HTTP_UNAUTHORIZED ->
                                     "Current password is incorrect"
-                                response.code() == 400 ->
+                                response.code() == HTTP_BAD_REQUEST ->
                                     "Password does not meet requirements"
                                 else ->
                                     "Failed to change password: ${response.message()}"

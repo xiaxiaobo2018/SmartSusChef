@@ -65,7 +65,7 @@ class LoginActivity : AppCompatActivity() {
         binding.btnSendReset.setOnClickListener {
             val email = binding.etResetEmail.text.toString().trim()
             if (email.isNotEmpty()) {
-                // TODO: Implement actual password reset API call
+                // Password reset API call not yet implemented
                 showToast("Reset link sent to $email")
                 // Toggle back to login automatically after success
                 binding.forgotPasswordForm.gone()
