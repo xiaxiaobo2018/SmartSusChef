@@ -358,6 +358,22 @@ resource "aws_lb_listener_rule" "api" {
   }
 }
 
+resource "aws_lb_listener_rule" "swagger" {
+  listener_arn = aws_lb_listener.https.arn
+  priority     = 101
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.backend.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/swagger/*"]
+    }
+  }
+}
+
 # ==========================================
 # ACM Certificate
 # ==========================================
