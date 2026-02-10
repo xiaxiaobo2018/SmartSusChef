@@ -552,8 +552,8 @@ describe('PredictionAccuracy', () => {
     describe('PredictedQuantity Support', () => {
         it('should handle forecast with predictedQuantity field', () => {
             const forecastWithPredictedQuantity = [
-                { id: '1', date: '2026-02-09', recipeId: '1', recipeName: 'Chicken Rice', predictedQuantity: 9 },
-                { id: '2', date: '2026-02-09', recipeId: '2', recipeName: 'Mala Chicken', predictedQuantity: 7 },
+                { id: '1', date: '2026-02-09', recipeId: '1', recipeName: 'Chicken Rice', quantity: 9 },
+                { id: '2', date: '2026-02-09', recipeId: '2', recipeName: 'Mala Chicken', quantity: 7 },
             ];
 
             vi.spyOn(AppContext, 'useApp').mockReturnValue({

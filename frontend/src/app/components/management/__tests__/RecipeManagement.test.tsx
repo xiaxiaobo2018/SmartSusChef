@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor, within } from '@testing-library/rea
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { RecipeManagement } from '../RecipeManagement';
 import * as AppContext from '@/app/context/AppContext';
-import { AppContextType, Recipe, Ingredient, SalesData, WastageData } from '@/app/types';
+import { Recipe, Ingredient, SalesData, WastageData } from '@/app/types';
 import { toast } from 'sonner';
 
 // Mock sonner
@@ -81,7 +81,7 @@ describe('RecipeManagement', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        vi.spyOn(AppContext, 'useApp').mockReturnValue(createMockContext() as AppContextType);
+        vi.spyOn(AppContext, 'useApp').mockReturnValue(createMockContext() as any);
     });
 
     // Helper functions
@@ -168,7 +168,7 @@ describe('RecipeManagement', () => {
 
         it('should render recipe count with singular form', () => {
             vi.spyOn(AppContext, 'useApp').mockReturnValue(
-                createMockContext({ recipes: [mockRecipes[0]] }) as AppContextType
+                createMockContext({ recipes: [mockRecipes[0]] }) as any
             );
             render(<RecipeManagement />);
             expect(screen.getByText('1 recipe in the system')).toBeInTheDocument();
@@ -711,7 +711,7 @@ describe('RecipeManagement', () => {
                 },
             ];
             vi.spyOn(AppContext, 'useApp').mockReturnValue(
-                createMockContext({ recipes: testRecipes }) as AppContextType
+                createMockContext({ recipes: testRecipes }) as any
             );
             render(<RecipeManagement />);
             clickDelete('Standalone Recipe');
@@ -730,7 +730,7 @@ describe('RecipeManagement', () => {
                 },
             ];
             vi.spyOn(AppContext, 'useApp').mockReturnValue(
-                createMockContext({ recipes: testRecipes }) as AppContextType
+                createMockContext({ recipes: testRecipes }) as any
             );
             render(<RecipeManagement />);
             clickDelete('Standalone Recipe');
@@ -750,7 +750,7 @@ describe('RecipeManagement', () => {
                 },
             ];
             vi.spyOn(AppContext, 'useApp').mockReturnValue(
-                createMockContext({ recipes: testRecipes }) as AppContextType
+                createMockContext({ recipes: testRecipes }) as any
             );
             render(<RecipeManagement />);
             clickDelete('Standalone Recipe');
@@ -769,7 +769,7 @@ describe('RecipeManagement', () => {
                 },
             ];
             vi.spyOn(AppContext, 'useApp').mockReturnValue(
-                createMockContext({ recipes: testRecipes }) as AppContextType
+                createMockContext({ recipes: testRecipes }) as any
             );
             render(<RecipeManagement />);
             clickDelete('Standalone Recipe');
@@ -788,7 +788,7 @@ describe('RecipeManagement', () => {
                 },
             ];
             vi.spyOn(AppContext, 'useApp').mockReturnValue(
-                createMockContext({ recipes: testRecipes }) as AppContextType
+                createMockContext({ recipes: testRecipes }) as any
             );
             render(<RecipeManagement />);
             clickDelete('Standalone Recipe');
@@ -796,7 +796,7 @@ describe('RecipeManagement', () => {
             fireEvent.click(confirmButton);
 
             await waitFor(() => {
-                expect(mockDeleteRecipe).toHaveBeenCalledWith('r4', false);
+                expect(mockDeleteRecipe).toHaveBeenCalledWith('r4');
             });
         });
 
@@ -812,7 +812,7 @@ describe('RecipeManagement', () => {
                 },
             ];
             vi.spyOn(AppContext, 'useApp').mockReturnValue(
-                createMockContext({ recipes: testRecipes }) as AppContextType
+                createMockContext({ recipes: testRecipes }) as any
             );
             render(<RecipeManagement />);
             clickDelete('Standalone Recipe');
@@ -836,7 +836,7 @@ describe('RecipeManagement', () => {
                 },
             ];
             vi.spyOn(AppContext, 'useApp').mockReturnValue(
-                createMockContext({ recipes: testRecipes }) as AppContextType
+                createMockContext({ recipes: testRecipes }) as any
             );
             render(<RecipeManagement />);
             clickDelete('Standalone Recipe');
@@ -860,7 +860,7 @@ describe('RecipeManagement', () => {
                 },
             ];
             vi.spyOn(AppContext, 'useApp').mockReturnValue(
-                createMockContext({ recipes: testRecipes }) as AppContextType
+                createMockContext({ recipes: testRecipes }) as any
             );
             render(<RecipeManagement />);
             clickDelete('Standalone Recipe');
@@ -886,7 +886,7 @@ describe('RecipeManagement', () => {
                 },
             ];
             vi.spyOn(AppContext, 'useApp').mockReturnValue(
-                createMockContext({ recipes: testRecipes }) as AppContextType
+                createMockContext({ recipes: testRecipes }) as any
             );
             render(<RecipeManagement />);
             clickDelete('Standalone Recipe');
@@ -940,7 +940,7 @@ describe('RecipeManagement', () => {
             fireEvent.click(confirmButton);
 
             await waitFor(() => {
-                expect(mockDeleteRecipe).toHaveBeenCalledWith('r2', true);
+                expect(mockDeleteRecipe).toHaveBeenCalledWith('r2');
             });
         });
 
@@ -951,7 +951,7 @@ describe('RecipeManagement', () => {
             fireEvent.click(confirmButton);
 
             await waitFor(() => {
-                expect(toast.success).toHaveBeenCalledWith('Recipe and 3 related records deleted successfully');
+                expect(toast.success).toHaveBeenCalledWith('Recipe deleted successfully');
             });
         });
 
@@ -963,7 +963,7 @@ describe('RecipeManagement', () => {
             fireEvent.click(confirmButton);
 
             await waitFor(() => {
-                expect(toast.error).toHaveBeenCalledWith('Failed to delete recipe and related data');
+                expect(toast.error).toHaveBeenCalledWith('Failed to delete recipe');
             });
         });
     });
@@ -1024,7 +1024,7 @@ describe('RecipeManagement', () => {
                 },
             ];
             vi.spyOn(AppContext, 'useApp').mockReturnValue(
-                createMockContext({ recipes: modifiedRecipes }) as AppContextType
+                createMockContext({ recipes: modifiedRecipes }) as any
             );
             render(<RecipeManagement />);
             clickDelete('Special Sauce');
@@ -1061,7 +1061,7 @@ describe('RecipeManagement', () => {
     describe('Integration', () => {
         it('should render without crashing with empty data', () => {
             vi.spyOn(AppContext, 'useApp').mockReturnValue(
-                createMockContext({ recipes: [], ingredients: [] }) as AppContextType
+                createMockContext({ recipes: [], ingredients: [] }) as any
             );
             render(<RecipeManagement />);
             expect(screen.getByText('Recipe Management')).toBeInTheDocument();
@@ -1115,7 +1115,7 @@ describe('RecipeManagement', () => {
                 },
             ];
             vi.spyOn(AppContext, 'useApp').mockReturnValue(
-                createMockContext({ recipes: testRecipes }) as AppContextType
+                createMockContext({ recipes: testRecipes }) as any
             );
             render(<RecipeManagement />);
             clickDelete('Standalone Recipe');
@@ -1159,7 +1159,7 @@ describe('RecipeManagement', () => {
                 },
             ];
             vi.spyOn(AppContext, 'useApp').mockReturnValue(
-                createMockContext({ recipes: testRecipes }) as AppContextType
+                createMockContext({ recipes: testRecipes }) as any
             );
             render(<RecipeManagement />);
 

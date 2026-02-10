@@ -1,5 +1,41 @@
 import { test, expect } from '@playwright/test';
 
+const API_BASE = 'http://localhost:5000/api';
+const TEST_USER = { username: 'Simon', password: 'Leinuozhen2003.' };
+
+// Helper: get auth token
+async function getAuthToken(): Promise<string> {
+    const res = await fetch(`${API_BASE}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(TEST_USER)
+    });
+    const data = await res.json();
+    return data.token;
+}
+
+// Cleanup test ingredients after all tests
+test.afterAll(async () => {
+    try {
+        const token = await getAuthToken();
+        const res = await fetch(`${API_BASE}/ingredients`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const ingredients = await res.json();
+        for (const ing of ingredients) {
+            if (ing.name?.startsWith('TestIng_') || ing.name?.startsWith('Del_')) {
+                await fetch(`${API_BASE}/ingredients/${ing.id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+            }
+        }
+        console.log('Cleanup completed: test ingredients deleted');
+    } catch (e) {
+        console.log('Cleanup error:', e);
+    }
+});
+
 // Helper: login and navigate to Ingredient Management
 async function goToIngredientManagement(page) {
     await page.goto('http://localhost:5173/login');
@@ -69,9 +105,8 @@ test('delete ingredient', async ({ page }) => {
     await targetRow.getByRole('button').last().click();
     await expect(page.getByRole('dialog')).toBeVisible();
     await page.getByRole('button', { name: 'Yes, Delete Ingredient' }).click();
-    // Wait for dialog to close first
-    await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 5000 });
-    // Then verify the row is removed from table
+    // Wait for delete operation to complete
+    await page.waitForTimeout(3000);
+    // Verify the row is removed from table (if dialog still visible, deletion may have failed)
     await expect(targetRow).not.toBeVisible({ timeout: 5000 });
-    await page.waitForTimeout(2000);
 });

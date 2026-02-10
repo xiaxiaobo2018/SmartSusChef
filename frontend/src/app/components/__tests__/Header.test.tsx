@@ -8,7 +8,7 @@ vi.mock('@/app/context/AppContext', () => ({
   useApp: () => ({
     user: { name: 'Jane Doe', role: 'Manager' },
     logout: logoutMock,
-    storeSettings: { storeName: 'SmartSus', outletLocation: 'Downtown' },
+    storeSettings: { storeName: 'SmartSus', companyName: 'Downtown' },
   }),
 }));
 

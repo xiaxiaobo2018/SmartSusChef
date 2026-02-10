@@ -9,24 +9,18 @@ import com.google.gson.annotations.SerializedName
 data class RecipeDto(
     @SerializedName("id")
     val id: String,
-
     @SerializedName("name")
     val name: String,
-
     @SerializedName("isSellable")
     val isSellable: Boolean,
-
     @SerializedName("isSubRecipe")
     val isSubRecipe: Boolean,
-
     @SerializedName("ingredients")
     val ingredients: List<RecipeIngredientDto>,
-
     @SerializedName("createdAt")
     val createdAt: String,
-
     @SerializedName("updatedAt")
-    val updatedAt: String
+    val updatedAt: String,
 )
 
 /**
@@ -36,18 +30,15 @@ data class RecipeDto(
 data class RecipeIngredientDto(
     @SerializedName("ingredientId")
     val ingredientId: String? = null,
-
     @SerializedName("childRecipeId")
     val childRecipeId: String? = null,
-
+    // Either Ingredient Name or Recipe Name
     @SerializedName("displayName")
-    val displayName: String, // Either Ingredient Name or Recipe Name
-
+    val displayName: String,
     @SerializedName("unit")
     val unit: String,
-
     @SerializedName("quantity")
-    val quantity: Double // decimal in C#
+    val quantity: Double,
 )
 
 /**
@@ -57,15 +48,12 @@ data class RecipeIngredientDto(
 data class CreateRecipeRequest(
     @SerializedName("name")
     val name: String,
-
     @SerializedName("isSellable")
     val isSellable: Boolean,
-
     @SerializedName("isSubRecipe")
     val isSubRecipe: Boolean,
-
     @SerializedName("ingredients")
-    val ingredients: List<CreateRecipeIngredientRequest>
+    val ingredients: List<CreateRecipeIngredientRequest>,
 )
 
 /**
@@ -75,12 +63,10 @@ data class CreateRecipeRequest(
 data class CreateRecipeIngredientRequest(
     @SerializedName("ingredientId")
     val ingredientId: String? = null,
-
     @SerializedName("childRecipeId")
     val childRecipeId: String? = null,
-
     @SerializedName("quantity")
-    val quantity: Double // decimal in C#
+    val quantity: Double,
 )
 
 /**
@@ -90,13 +76,10 @@ data class CreateRecipeIngredientRequest(
 data class UpdateRecipeRequest(
     @SerializedName("name")
     val name: String,
-
     @SerializedName("isSellable")
     val isSellable: Boolean,
-
     @SerializedName("isSubRecipe")
     val isSubRecipe: Boolean,
-
     @SerializedName("ingredients")
-    val ingredients: List<CreateRecipeIngredientRequest>
+    val ingredients: List<CreateRecipeIngredientRequest>,
 )

@@ -9,8 +9,11 @@ data class RecentEntry(
     val name: String,
     val quantity: Double,
     val unit: String,
-    val date: String, // format "yyyy-MM-dd"
-    val time: String, // format "HH:mm"
+    // format "yyyy-MM-dd"
+    val date: String,
+    // format "HH:mm"
+    val time: String,
     val isSales: Boolean,
-    val isEditing: Boolean = false // Added for UI state management in adapter
+    // Added for UI state management in adapter
+    val isEditing: Boolean = false,
 ) : Parcelable

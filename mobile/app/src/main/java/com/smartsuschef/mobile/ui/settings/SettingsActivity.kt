@@ -8,13 +8,12 @@ import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import com.smartsuschef.mobile.R
 import com.smartsuschef.mobile.databinding.ActivitySettingsBinding
-import com.smartsuschef.mobile.util.showToast
 import com.smartsuschef.mobile.util.PasswordValidator
+import com.smartsuschef.mobile.util.showToast
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class SettingsActivity : AppCompatActivity() {
-
     private lateinit var binding: ActivitySettingsBinding
     private val viewModel: SettingsViewModel by viewModels()
 

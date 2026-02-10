@@ -180,7 +180,7 @@ class StoreModelManager:
             self._training_in_progress[store_id] = True
 
         try:
-            logger.info("Starting training for store %d ...", store_id)
+            logger.info("Initiating training for a store (ID masked).")
 
             df, unique_days = self.fetch_store_sales(store_id)
             if df is None or df.empty:

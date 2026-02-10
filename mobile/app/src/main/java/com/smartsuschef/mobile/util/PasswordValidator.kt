@@ -12,7 +12,6 @@ package com.smartsuschef.mobile.util
  * - At least 1 special character (@$!%*?&)
  */
 object PasswordValidator {
-
     // Password validation configuration
     private const val MIN_LENGTH = 12
     private const val MAX_LENGTH = 36
@@ -27,7 +26,7 @@ object PasswordValidator {
         val hasLowerCase: Boolean = true,
         val hasNumber: Boolean = true,
         val hasSpecialChar: Boolean = true,
-        val errorMessage: String? = null
+        val errorMessage: String? = null,
     )
 
     // Validates a password and returns detailed results
@@ -39,18 +38,20 @@ object PasswordValidator {
         val hasNumber = password.any { it.isDigit() }
         val hasSpecialChar = password.any { SPECIAL_CHARS.contains(it) }
 
-        val isValid = hasMinLength && hasMaxLength && hasUpperCase &&
+        val isValid =
+            hasMinLength && hasMaxLength && hasUpperCase &&
                 hasLowerCase && hasNumber && hasSpecialChar
 
-        val errorMessage = when {
-            !hasMinLength -> "Password must be at least $MIN_LENGTH characters"
-            !hasMaxLength -> "Password must not exceed $MAX_LENGTH characters"
-            !hasUpperCase -> "Password must contain at least one uppercase letter"
-            !hasLowerCase -> "Password must contain at least one lowercase letter"
-            !hasNumber -> "Password must contain at least one number"
-            !hasSpecialChar -> "Password must contain at least one special character ($SPECIAL_CHARS)"
-            else -> null
-        }
+        val errorMessage =
+            when {
+                !hasMinLength -> "Password must be at least $MIN_LENGTH characters"
+                !hasMaxLength -> "Password must not exceed $MAX_LENGTH characters"
+                !hasUpperCase -> "Password must contain at least one uppercase letter"
+                !hasLowerCase -> "Password must contain at least one lowercase letter"
+                !hasNumber -> "Password must contain at least one number"
+                !hasSpecialChar -> "Password must contain at least one special character ($SPECIAL_CHARS)"
+                else -> null
+            }
 
         return ValidationResult(
             isValid = isValid,
@@ -60,7 +61,7 @@ object PasswordValidator {
             hasLowerCase = hasLowerCase,
             hasNumber = hasNumber,
             hasSpecialChar = hasSpecialChar,
-            errorMessage = errorMessage
+            errorMessage = errorMessage,
         )
     }
 
@@ -81,7 +82,7 @@ object PasswordValidator {
             "At least one uppercase letter (A-Z)",
             "At least one lowercase letter (a-z)",
             "At least one number (0-9)",
-            "At least one special character ($SPECIAL_CHARS)"
+            "At least one special character ($SPECIAL_CHARS)",
         )
     }
 
@@ -93,7 +94,7 @@ object PasswordValidator {
             "At least one uppercase letter (A-Z)" to result.hasUpperCase,
             "At least one lowercase letter (a-z)" to result.hasLowerCase,
             "At least one number (0-9)" to result.hasNumber,
-            "At least one special character" to result.hasSpecialChar
+            "At least one special character" to result.hasSpecialChar,
         )
     }
 }

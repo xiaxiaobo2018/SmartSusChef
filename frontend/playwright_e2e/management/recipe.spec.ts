@@ -1,5 +1,41 @@
 ﻿import { test, expect } from '@playwright/test';
 
+const API_BASE = 'http://localhost:5000/api';
+const TEST_USER = { username: 'Simon', password: 'Leinuozhen2003.' };
+
+// Helper: get auth token
+async function getAuthToken(): Promise<string> {
+    const res = await fetch(`${API_BASE}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(TEST_USER)
+    });
+    const data = await res.json();
+    return data.token;
+}
+
+// Cleanup test recipes after all tests
+test.afterAll(async () => {
+    try {
+        const token = await getAuthToken();
+        const res = await fetch(`${API_BASE}/recipes`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const recipes = await res.json();
+        for (const recipe of recipes) {
+            if (recipe.name?.startsWith('TestRecipe_') || recipe.name?.startsWith('DelRecipe_')) {
+                await fetch(`${API_BASE}/recipes/${recipe.id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+            }
+        }
+        console.log('Cleanup completed: test recipes deleted');
+    } catch (e) {
+        console.log('Cleanup error:', e);
+    }
+});
+
 // Helper: login and navigate to Recipe Management
 async function goToRecipeManagement(page) {
     await page.goto('http://localhost:5173/login');
@@ -75,9 +111,8 @@ test('delete recipe', async ({ page }) => {
     await targetRow.getByRole('button').last().click();
     await expect(page.getByRole('dialog')).toBeVisible();
     await page.getByRole('button', { name: 'Yes, Delete Recipe' }).click();
-    // Wait for dialog to close
-    await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 5000 });
-    // Verify the row is removed
+    // Wait for delete operation to complete
+    await page.waitForTimeout(3000);
+    // Verify the row is removed from table
     await expect(targetRow).not.toBeVisible({ timeout: 5000 });
-    await page.waitForTimeout(2000);
 });

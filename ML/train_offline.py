@@ -46,9 +46,9 @@ def _fetch_store_ids(manager: StoreModelManager) -> list[int]:
 
 def _train_store_ids(manager: StoreModelManager, store_ids: Iterable[int]) -> None:
     for store_id in store_ids:
-        logger.info("Training store %s ...", store_id)
+        logger.info("Initiating training for a store (ID masked).")
         result = manager.train_store_models(int(store_id))
-        logger.info("Store %s result: %s", store_id, result)
+        logger.info("Training result for store (ID masked): %s", result["status"])
 
 
 def main() -> None:

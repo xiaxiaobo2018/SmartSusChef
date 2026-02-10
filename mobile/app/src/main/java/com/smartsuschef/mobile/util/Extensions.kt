@@ -3,13 +3,16 @@ package com.smartsuschef.mobile.util
 import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
-import com.google.android.material.textfield.TextInputLayout
 import android.view.View
 import android.widget.Toast
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.textfield.TextInputLayout
 
 // Context Extensions
-fun Context.showToast(message: String, duration: Int = Toast.LENGTH_SHORT) {
+fun Context.showToast(
+    message: String,
+    duration: Int = Toast.LENGTH_SHORT,
+) {
     Toast.makeText(this, message, duration).show()
 }
 
@@ -26,15 +29,18 @@ fun View.invisible() {
     visibility = View.INVISIBLE
 }
 
-fun View.showSnackbar(message: String, duration: Int = Snackbar.LENGTH_SHORT) {
+fun View.showSnackbar(
+    message: String,
+    duration: Int = Snackbar.LENGTH_SHORT,
+) {
     Snackbar.make(this, message, duration).show()
 }
 
 /**
- * Extension functions for form validation for text input
- */
+ Extension functions for form validation for text input
+ Sets error message on TextInputLayout
+*/
 
-// Sets error message on TextInputLayout
 fun TextInputLayout.setError(message: String?) {
     error = message
     isErrorEnabled = message != null
@@ -54,18 +60,33 @@ fun TextInputLayout.getText(): String {
 // Adds a text change listener that validates on each change
 // Returns the TextWatcher so it can be removed if needed
 
-fun TextInputLayout.addValidationWatcher(
-    validator: (String) -> String?
-): TextWatcher {
-    val textWatcher = object : TextWatcher {
-        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-        override fun afterTextChanged(s: Editable?) {
-            val text = s?.toString() ?: ""
-            val errorMessage = validator(text)
-            setError(errorMessage)
+fun TextInputLayout.addValidationWatcher(validator: (String) -> String?): TextWatcher {
+    val textWatcher =
+        object : TextWatcher {
+            override fun beforeTextChanged(
+                s: CharSequence?,
+                start: Int,
+                count: Int,
+                after: Int,
+            ) {
+                // No action needed before text changes.
+            }
+
+            override fun onTextChanged(
+                s: CharSequence?,
+                start: Int,
+                before: Int,
+                count: Int,
+            ) {
+                // No action needed during text changes.
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                val text = s?.toString() ?: ""
+                val errorMessage = validator(text)
+                setError(errorMessage)
+            }
         }
-    }
     editText?.addTextChangedListener(textWatcher)
     return textWatcher
 }

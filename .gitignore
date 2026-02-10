@@ -119,6 +119,7 @@ $RECYCLE.BIN/
 *.env
 appsettings.Development.json
 appsettings.Production.json
+local.properties
 
 # =====================================================
 # Testing
@@ -180,3 +181,5 @@ tools/
 # Rider specific
 .idea/
 *.sln.DotSettings.user
+
+*.pyc
