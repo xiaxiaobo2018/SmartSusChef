@@ -219,7 +219,7 @@ jobs:
           docker run --rm -v $(pwd):/zap/wrk/:rw --network=host \
             -t ghcr.io/zaproxy/zaproxy:stable \
             zap-api-scan.py \
-            -t '${{ inputs.target_url }}/api' \
+            -t '${{ inputs.target_url }}/swagger/v1/swagger.json' \
             -f openapi \
             -J zap-reports/api-report.json \
             -w zap-reports/api-report.md \

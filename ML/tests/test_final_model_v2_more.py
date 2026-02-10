@@ -42,7 +42,9 @@ def test_get_prediction_average(monkeypatch):
 
 def test_get_prediction_missing_forecast(monkeypatch):
     monkeypatch.setattr(fm, "_get_forecast_cached", lambda lat, lon: None)
-    out = fm.get_prediction("DishA", "2024-01-01", "Addr", model="lightgbm", config=fm.PipelineConfig())
+    out = fm.get_prediction(
+        "DishA", "2024-01-01", "Addr", model="lightgbm", config=fm.PipelineConfig()
+    )
     assert "Error" in out[0]
 
 
@@ -57,7 +59,19 @@ def test_get_prediction_hybrid_path(monkeypatch):
         return None
 
     monkeypatch.setattr(fm, "_load_cached", _load)
-    monkeypatch.setattr(fm, "_get_forecast_cached", lambda lat, lon: pd.DataFrame({"date": pd.to_datetime(["2024-01-01"]), fm.WEATHER_COLS[0]: [1.0], fm.WEATHER_COLS[1]: [1.0], fm.WEATHER_COLS[2]: [1.0], fm.WEATHER_COLS[3]: [1.0]}))
+    monkeypatch.setattr(
+        fm,
+        "_get_forecast_cached",
+        lambda lat, lon: pd.DataFrame(
+            {
+                "date": pd.to_datetime(["2024-01-01"]),
+                fm.WEATHER_COLS[0]: [1.0],
+                fm.WEATHER_COLS[1]: [1.0],
+                fm.WEATHER_COLS[2]: [1.0],
+                fm.WEATHER_COLS[3]: [1.0],
+            }
+        ),
+    )
     monkeypatch.setattr(fm, "_load_hybrid_models", lambda dish, model, config: (object(), object()))
     monkeypatch.setattr(
         fm,
@@ -77,10 +91,24 @@ def test_plot_functions(monkeypatch):
     import matplotlib.pyplot as plt
 
     monkeypatch.setattr(plt, "show", lambda: None)
-    df = pd.DataFrame({"Dish": ["A"], "XGBoost MAE": [1.0], "CatBoost MAE": [2.0], "LightGBM MAE": [3.0], "Winner": ["Prophet+XGBOOST"]})
+    df = pd.DataFrame(
+        {
+            "Dish": ["A"],
+            "XGBoost MAE": [1.0],
+            "CatBoost MAE": [2.0],
+            "LightGBM MAE": [3.0],
+            "Winner": ["Prophet+XGBOOST"],
+        }
+    )
     fm.plot_mae_comparison(df)
 
     preds = [
-        {"Date": "2024-01-01", "Prediction": 1, "Prediction_Lower": 1, "Prediction_Upper": 2, "Model Used": "AVERAGE"}
+        {
+            "Date": "2024-01-01",
+            "Prediction": 1,
+            "Prediction_Lower": 1,
+            "Prediction_Upper": 2,
+            "Model Used": "AVERAGE",
+        }
     ]
     fm.plot_forecasts({"A": preds}, 1)

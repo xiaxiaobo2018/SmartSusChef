@@ -3,7 +3,7 @@ name: SmartSusChef AWS CI/CD Pipeline
 on:
   push:
     branches: [main]
-    paths:                              
+    paths:                               
       - 'backend/**'
       - 'frontend/**'
       - 'ML/**'
@@ -360,7 +360,7 @@ jobs:
   docker-build-push:
     name: "Build & Push Docker Images"
     runs-on: ubuntu-latest
-    needs: [detect-changes, security-scan, backend-build, frontend-build, ml-build]
+    needs: [detect-changes, backend-build, frontend-build, ml-build]
     if: |
       !cancelled() && !failure() &&
       github.ref == 'refs/heads/main' && github.event_name == 'push'

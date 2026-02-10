@@ -8,7 +8,9 @@ import training_logic_v2 as tl
 
 def test_get_gpu_flags_caches(monkeypatch):
     tl._GPU_AVAILABLE = None
-    monkeypatch.setattr(tl, "_detect_gpu", lambda: {"xgboost": True, "catboost": False, "lightgbm": False})
+    monkeypatch.setattr(
+        tl, "_detect_gpu", lambda: {"xgboost": True, "catboost": False, "lightgbm": False}
+    )
     first = tl.get_gpu_flags()
     second = tl.get_gpu_flags()
     assert first == second
@@ -48,6 +50,11 @@ def test_get_historical_weather_no_libs(monkeypatch):
     monkeypatch.setattr(dp, "openmeteo_requests", None)
     monkeypatch.setattr(dp, "retry", None)
     out = tl.get_historical_weather(1.0, 2.0, pd.Timestamp("2024-01-01"), pd.Timestamp("2024-01-02"))
+    monkeypatch.setattr(tl, "openmeteo_requests", None)
+    monkeypatch.setattr(tl, "retry", None)
+    out = tl.get_historical_weather(
+        1.0, 2.0, pd.Timestamp("2024-01-01"), pd.Timestamp("2024-01-02")
+    )
     assert out is None
 
 
@@ -246,17 +253,25 @@ def test_process_dish_success(monkeypatch, tmp_path):
         }
     )
 
-    import core.cv_eval as ce
-    import core.data_prep as dp
-    import core.feature_eng as fe
-    import core.model_train as mt
-    monkeypatch.setattr(fe, "add_hybrid_features", lambda d, c: d)
-    monkeypatch.setattr(ce, "_prepare_cv_fold_cache", lambda *args, **kwargs: [{"X_train": df[["sales"]], "y_train": pd.Series([0.0, 0.0, 0.0]), "X_test": df[["sales"]], "prophet_test": np.zeros(3), "sales_test": np.zeros(3)}])
-    monkeypatch.setattr(ce, "_optimize_hybrid", lambda *args, **kwargs: (1.0, {}))
-    monkeypatch.setattr(dp, "sanitize_sparse_data", lambda d, cc, config=None: d)
-    monkeypatch.setattr(mt, "_fit_prophet", lambda train, cc, config: object())
-    monkeypatch.setattr(mt, "_prophet_predict", lambda model, df: np.zeros(len(df)))
-    monkeypatch.setattr(mt, "_save_hybrid_models", lambda *args, **kwargs: None)
+    monkeypatch.setattr(tl, "add_hybrid_features", lambda d, c: d)
+    monkeypatch.setattr(
+        tl,
+        "_prepare_cv_fold_cache",
+        lambda *args, **kwargs: [
+            {
+                "X_train": df[["sales"]],
+                "y_train": pd.Series([0.0, 0.0, 0.0]),
+                "X_test": df[["sales"]],
+                "prophet_test": np.zeros(3),
+                "sales_test": np.zeros(3),
+            }
+        ],
+    )
+    monkeypatch.setattr(tl, "_optimize_hybrid", lambda *args, **kwargs: (1.0, {}))
+    monkeypatch.setattr(tl, "sanitize_sparse_data", lambda d, cc: d)
+    monkeypatch.setattr(tl, "_fit_prophet", lambda train, cc, config: object())
+    monkeypatch.setattr(tl, "_prophet_predict", lambda model, df: np.zeros(len(df)))
+    monkeypatch.setattr(tl, "_save_hybrid_models", lambda *args, **kwargs: None)
 
     class DummyModel:
         def __init__(self, **kwargs):
