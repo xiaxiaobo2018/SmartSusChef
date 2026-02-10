@@ -90,7 +90,7 @@ function createCtx(overrides?: Partial<AppContextType>): Partial<AppContextType>
     return { recipes: mockRecipes, salesData: mockSalesData, refreshData: mockRefreshData, ...overrides };
 }
 
-function useCtx(overrides?: Partial<AppContextType>) {
+function setupAppContext(overrides?: Partial<AppContextType>) {
     vi.spyOn(AppContext, 'useApp').mockReturnValue(createCtx(overrides) as AppContextType);
 }
 
@@ -154,47 +154,47 @@ describe('ImportSalesData', () => {
     // ==================== 1. Rendering ====================
     describe('Rendering', () => {
         it('should render page title and description', () => {
-            useCtx();
+            setupAppContext();
             render(<ImportSalesData />);
             expect(screen.getByText('Import Sales Data')).toBeInTheDocument();
             expect(screen.getByText('Upload CSV file from your POS system')).toBeInTheDocument();
         });
 
         it('should render Upload icon in title', () => {
-            useCtx();
+            setupAppContext();
             const { container } = render(<ImportSalesData />);
             expect(container.querySelector('svg.lucide-upload')).toBeInTheDocument();
         });
 
         it('should render Step 1 card with CalendarDays icon', () => {
-            useCtx();
+            setupAppContext();
             const { container } = render(<ImportSalesData />);
             expect(screen.getByText('Step 1: Select Date Format & Download Template')).toBeInTheDocument();
             expect(container.querySelector('svg.lucide-calendar-days')).toBeInTheDocument();
         });
 
         it('should render Step 2 card', () => {
-            useCtx();
+            setupAppContext();
             render(<ImportSalesData />);
             expect(screen.getByText('Step 2: Upload CSV File')).toBeInTheDocument();
             expect(screen.getByText('Drag and drop or click to browse')).toBeInTheDocument();
         });
 
         it('should render date format selector with label', () => {
-            useCtx();
+            setupAppContext();
             render(<ImportSalesData />);
             expect(screen.getByText('Date Format in CSV')).toBeInTheDocument();
             expect(screen.getByRole('combobox')).toBeInTheDocument();
         });
 
         it('should render download template button', () => {
-            useCtx();
+            setupAppContext();
             render(<ImportSalesData />);
             expect(screen.getByText('Download Sample Template (.csv)')).toBeInTheDocument();
         });
 
         it('should render required columns info', () => {
-            useCtx();
+            setupAppContext();
             const { container } = render(<ImportSalesData />);
             expect(screen.getByText('Required Columns:')).toBeInTheDocument();
             const bolds = Array.from(container.querySelectorAll('strong')).map(el => el.textContent);
@@ -204,14 +204,14 @@ describe('ImportSalesData', () => {
         });
 
         it('should render upload dropzone with browse button', () => {
-            useCtx();
+            setupAppContext();
             render(<ImportSalesData />);
             expect(screen.getByText('Drop your CSV file here')).toBeInTheDocument();
             expect(screen.getByText('Browse Files')).toBeInTheDocument();
         });
 
         it('should have a hidden CSV file input accepting .csv', () => {
-            useCtx();
+            setupAppContext();
             const { container } = render(<ImportSalesData />);
             const input = container.querySelector('input[type="file"]') as HTMLInputElement;
             expect(input).toBeInTheDocument();
@@ -223,13 +223,13 @@ describe('ImportSalesData', () => {
     // ==================== 2. Date Format Selection ====================
     describe('Date Format', () => {
         it('should default to M/d/yy', () => {
-            useCtx();
+            setupAppContext();
             render(<ImportSalesData />);
             expect((screen.getByRole('combobox') as HTMLSelectElement).value).toBe('M/d/yy');
         });
 
         it('should change when selecting a new option', () => {
-            useCtx();
+            setupAppContext();
             render(<ImportSalesData />);
             const select = screen.getByRole('combobox') as HTMLSelectElement;
             fireEvent.change(select, { target: { value: 'yyyy-MM-dd' } });
@@ -237,7 +237,7 @@ describe('ImportSalesData', () => {
         });
 
         it('should list all available date formats', () => {
-            useCtx();
+            setupAppContext();
             render(<ImportSalesData />);
             const options = screen.getByRole('combobox').querySelectorAll('option');
             expect(options.length).toBe(3);
@@ -248,14 +248,14 @@ describe('ImportSalesData', () => {
         });
 
         it('should toast info and clear data when format changes while CSV is loaded', () => {
-            useCtx();
+            setupAppContext();
             patchFileReader();
             setPapaResult([{ Date: '5/1/25', Dish_Name: 'Laksa', Quantity_Sold: '85' }]);
 
             const { container } = render(<ImportSalesData />);
             triggerUpload(container);
 
-            // Now change format — component should reset csvData and show info
+            // Now change format �?component should reset csvData and show info
             fireEvent.change(screen.getByRole('combobox'), { target: { value: 'yyyy-MM-dd' } });
             expect(toast.info).toHaveBeenCalledWith('Date format changed. Please re-upload your CSV file.');
         });
@@ -264,7 +264,7 @@ describe('ImportSalesData', () => {
     // ==================== 3. Template Download ====================
     describe('Template Download', () => {
         it('should create blob and trigger download', () => {
-            useCtx();
+            setupAppContext();
             render(<ImportSalesData />);
             fireEvent.click(screen.getByText('Download Sample Template (.csv)'));
             expect(global.URL.createObjectURL).toHaveBeenCalled();
@@ -272,7 +272,7 @@ describe('ImportSalesData', () => {
         });
 
         it('should generate a text/csv blob', () => {
-            useCtx();
+            setupAppContext();
             let blob: Blob | null = null;
             (global.URL.createObjectURL as ReturnType<typeof vi.fn>).mockImplementation((b: Blob) => { blob = b; return 'blob:x'; });
             render(<ImportSalesData />);
@@ -281,14 +281,14 @@ describe('ImportSalesData', () => {
         });
 
         it('should revoke blob URL after download', () => {
-            useCtx();
+            setupAppContext();
             render(<ImportSalesData />);
             fireEvent.click(screen.getByText('Download Sample Template (.csv)'));
             expect(global.URL.revokeObjectURL).toHaveBeenCalledWith('blob:mock');
         });
 
         it('should work with changed date format', () => {
-            useCtx();
+            setupAppContext();
             render(<ImportSalesData />);
             fireEvent.change(screen.getByRole('combobox'), { target: { value: 'yyyy-MM-dd' } });
             fireEvent.click(screen.getByText('Download Sample Template (.csv)'));
@@ -299,7 +299,7 @@ describe('ImportSalesData', () => {
     // ==================== 4. File Upload Basics ====================
     describe('File Upload', () => {
         it('should reject non-CSV files', () => {
-            useCtx();
+            setupAppContext();
             const { container } = render(<ImportSalesData />);
             const file = new File(['x'], 'data.txt', { type: 'text/plain' });
             triggerUpload(container, file);
@@ -307,7 +307,7 @@ describe('ImportSalesData', () => {
         });
 
         it('should trigger file input click on Browse Files', () => {
-            useCtx();
+            setupAppContext();
             const { container } = render(<ImportSalesData />);
             const input = container.querySelector('input[type="file"]') as HTMLInputElement;
             const spy = vi.spyOn(input, 'click');
@@ -316,7 +316,7 @@ describe('ImportSalesData', () => {
         });
 
         it('should show error for empty CSV', () => {
-            useCtx();
+            setupAppContext();
             patchFileReader();
             setPapaResult([]);
             const { container } = render(<ImportSalesData />);
@@ -325,7 +325,7 @@ describe('ImportSalesData', () => {
         });
 
         it('should show error when papaparse throws', () => {
-            useCtx();
+            setupAppContext();
             patchFileReader();
             setPapaError('Bad format');
             const { container } = render(<ImportSalesData />);
@@ -337,7 +337,7 @@ describe('ImportSalesData', () => {
     // ==================== 5. Drag & Drop ====================
     describe('Drag and Drop', () => {
         it('should highlight drop zone on dragOver', () => {
-            useCtx();
+            setupAppContext();
             render(<ImportSalesData />);
             const zone = screen.getByText('Drop your CSV file here').closest('div')!;
             expect(zone).not.toHaveClass('border-[#4F6F52]');
@@ -346,7 +346,7 @@ describe('ImportSalesData', () => {
         });
 
         it('should remove highlight on dragLeave', () => {
-            useCtx();
+            setupAppContext();
             render(<ImportSalesData />);
             const zone = screen.getByText('Drop your CSV file here').closest('div')!;
             fireEvent.dragOver(zone);
@@ -355,7 +355,7 @@ describe('ImportSalesData', () => {
         });
 
         it('should process dropped CSV file', () => {
-            useCtx();
+            setupAppContext();
             patchFileReader();
             setPapaResult([{ Date: '5/1/25', Dish_Name: 'Laksa', Quantity_Sold: '85' }]);
 
@@ -367,7 +367,7 @@ describe('ImportSalesData', () => {
         });
 
         it('should reject non-CSV file via drop', () => {
-            useCtx();
+            setupAppContext();
             render(<ImportSalesData />);
             const zone = screen.getByText('Drop your CSV file here').closest('div')!;
             fireEvent.drop(zone, { dataTransfer: { files: [new File(['x'], 'test.xlsx')] } });
@@ -378,7 +378,7 @@ describe('ImportSalesData', () => {
     // ==================== 6. CSV Validation ====================
     describe('CSV Validation', () => {
         it('should show success toast for valid CSV without warnings', () => {
-            useCtx();
+            setupAppContext();
             patchFileReader();
             setPapaResult([
                 { Date: '5/1/25', Dish_Name: 'Laksa', Quantity_Sold: '85' },
@@ -393,7 +393,7 @@ describe('ImportSalesData', () => {
         });
 
         it('should show success toast with warning count for auto-corrected values', () => {
-            useCtx();
+            setupAppContext();
             patchFileReader();
             setPapaResult([{ Date: '5/1/25', Dish_Name: 'Laksa', Quantity_Sold: '85' }]);
             mockValidate.mockReturnValue({
@@ -409,7 +409,7 @@ describe('ImportSalesData', () => {
         });
 
         it('should show error toast and error table for validation errors', () => {
-            useCtx();
+            setupAppContext();
             patchFileReader();
             setPapaResult([{ Date: 'bad-date', Dish_Name: 'Laksa', Quantity_Sold: '85' }]);
             mockValidate.mockReturnValue({
@@ -429,7 +429,7 @@ describe('ImportSalesData', () => {
         });
 
         it('should pluralize issue text for multiple errors', () => {
-            useCtx();
+            setupAppContext();
             patchFileReader();
             setPapaResult([
                 { Date: '', Dish_Name: 'Laksa', Quantity_Sold: '85' },
@@ -451,7 +451,7 @@ describe('ImportSalesData', () => {
         });
 
         it('should show first 10 errors and count message when >10 errors', () => {
-            useCtx();
+            setupAppContext();
             patchFileReader();
             // Unique Date+Dish_Name per row to avoid duplicate detection
             const rows = Array.from({ length: 15 }, (_, i) => ({
@@ -473,7 +473,7 @@ describe('ImportSalesData', () => {
         });
 
         it('should show Go to Recipe Management button in error panel', () => {
-            useCtx();
+            setupAppContext();
             patchFileReader();
             setPapaResult([{ Date: 'bad', Dish_Name: 'Laksa', Quantity_Sold: '85' }]);
             mockValidate.mockReturnValue({
@@ -489,7 +489,7 @@ describe('ImportSalesData', () => {
         });
 
         it('should download error log when >50 errors', () => {
-            useCtx();
+            setupAppContext();
             patchFileReader();
             // Unique rows to avoid duplicate detection
             const rows = Array.from({ length: 55 }, (_, i) => ({
@@ -512,7 +512,7 @@ describe('ImportSalesData', () => {
         });
 
         it('should show suggestion column with dash when no suggestion', () => {
-            useCtx();
+            setupAppContext();
             patchFileReader();
             setPapaResult([{ Date: 'bad', Dish_Name: 'Laksa', Quantity_Sold: '85' }]);
             mockValidate.mockReturnValue({
@@ -534,7 +534,7 @@ describe('ImportSalesData', () => {
     // ==================== 7. Duplicate Detection ====================
     describe('Duplicate Detection in CSV', () => {
         function uploadWithDuplicates() {
-            useCtx();
+            setupAppContext();
             patchFileReader();
             setPapaResult([
                 { Date: '5/1/25', Dish_Name: 'Laksa', Quantity_Sold: '85' },
@@ -573,7 +573,7 @@ describe('ImportSalesData', () => {
         });
 
         it('should merge duplicates and show preview on Merge click', () => {
-            useCtx();
+            setupAppContext();
             patchFileReader();
             setPapaResult([
                 { Date: '5/1/25', Dish_Name: 'Laksa', Quantity_Sold: '85' },
@@ -604,7 +604,7 @@ describe('ImportSalesData', () => {
     // ==================== 8. Preview Table ====================
     describe('Preview Table', () => {
         function renderWithValidData(rows?: Record<string, string>[]) {
-            useCtx();
+            setupAppContext();
             patchFileReader();
             const data = rows ?? [
                 { Date: '5/1/25', Dish_Name: 'Laksa', Quantity_Sold: '85' },
@@ -675,7 +675,7 @@ describe('ImportSalesData', () => {
     // ==================== 9. Import Flow ====================
     describe('Import Flow', () => {
         function setupImport(opts?: { salesData?: typeof mockSalesData }) {
-            useCtx({ salesData: opts?.salesData ?? [] });
+            setupAppContext({ salesData: opts?.salesData ?? [] });
             patchFileReader();
             setPapaResult([{ Date: '5/1/25', Dish_Name: 'Laksa', Quantity_Sold: '85' }]);
 
@@ -773,7 +773,7 @@ describe('ImportSalesData', () => {
         });
 
         it('should not render Import Data button when errors exist', () => {
-            useCtx({ salesData: [] });
+            setupAppContext({ salesData: [] });
             patchFileReader();
             setPapaResult([{ Date: 'bad', Dish_Name: 'Laksa', Quantity_Sold: '85' }]);
             mockValidate.mockReturnValue({
@@ -805,7 +805,7 @@ describe('ImportSalesData', () => {
         });
 
         it('should block import when there are duplicate rows in import data', async () => {
-            useCtx({ salesData: [] });
+            setupAppContext({ salesData: [] });
             patchFileReader();
             // After merge we get unique rows, but the handleImport function also checks for duplicates
             // This scenario: non-duplicate CSV + valid validation + handleImport checks pass
@@ -829,11 +829,11 @@ describe('ImportSalesData', () => {
 
     // ==================== 10. Overwrite Dialog ====================
     describe('Overwrite Confirmation Dialog', () => {
-        /** Import data that clashes with existing salesData → triggers overwrite dialog */
+        /** Import data that clashes with existing salesData �?triggers overwrite dialog */
         function setupOverwrite() {
             // Existing: Laksa on 2025-05-01
             const existingSales = [{ id: 's1', date: '2025-05-01', recipeId: 'r1', quantity: 50 }];
-            useCtx({ salesData: existingSales });
+            setupAppContext({ salesData: existingSales });
             patchFileReader();
             setPapaResult([{ Date: '5/1/25', Dish_Name: 'Laksa', Quantity_Sold: '85' }]);
 
@@ -951,7 +951,7 @@ describe('ImportSalesData', () => {
     describe('Import Only New', () => {
         function setupImportOnlyNew() {
             const existingSales = [{ id: 's1', date: '2025-05-01', recipeId: 'r1', quantity: 50 }];
-            useCtx({ salesData: existingSales });
+            setupAppContext({ salesData: existingSales });
             patchFileReader();
             setPapaResult([
                 { Date: '5/1/25', Dish_Name: 'Laksa', Quantity_Sold: '85' },
@@ -990,7 +990,7 @@ describe('ImportSalesData', () => {
 
         it('should show info toast when no new records exist', async () => {
             const existingSales = [{ id: 's1', date: '2025-05-01', recipeId: 'r1', quantity: 50 }];
-            useCtx({ salesData: existingSales });
+            setupAppContext({ salesData: existingSales });
             patchFileReader();
             setPapaResult([{ Date: '5/1/25', Dish_Name: 'Laksa', Quantity_Sold: '85' }]);
 
@@ -1018,12 +1018,12 @@ describe('ImportSalesData', () => {
     // ==================== 12. Integration ====================
     describe('Integration', () => {
         it('should render without crashing', () => {
-            useCtx();
+            setupAppContext();
             expect(() => render(<ImportSalesData />)).not.toThrow();
         });
 
         it('should have no preview, errors, or duplicates on initial render', () => {
-            useCtx();
+            setupAppContext();
             render(<ImportSalesData />);
             expect(screen.queryByText('Data Preview - Ready to Import')).not.toBeInTheDocument();
             expect(screen.queryByText(/Upload Failed/)).not.toBeInTheDocument();
@@ -1039,7 +1039,7 @@ describe('ImportSalesData', () => {
         });
 
         it('should handle full upload→preview→cancel workflow', () => {
-            useCtx();
+            setupAppContext();
             patchFileReader();
             setPapaResult([{ Date: '5/1/25', Dish_Name: 'Laksa', Quantity_Sold: '85' }]);
 
@@ -1053,7 +1053,7 @@ describe('ImportSalesData', () => {
         });
 
         it('should handle full upload→preview→import workflow', async () => {
-            useCtx({ salesData: [] });
+            setupAppContext({ salesData: [] });
             patchFileReader();
             setPapaResult([{ Date: '5/1/25', Dish_Name: 'Laksa', Quantity_Sold: '85' }]);
             (salesApi.importByName as ReturnType<typeof vi.fn>).mockResolvedValue({

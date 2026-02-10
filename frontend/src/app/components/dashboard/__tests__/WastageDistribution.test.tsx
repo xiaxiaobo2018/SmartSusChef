@@ -53,7 +53,7 @@ vi.mock('@/app/utils/recipeCalculations', () => ({
             if (ingredient) {
                 // Recipe quantities are always in grams or ml
                 // Convert to kg/L for carbon calculation
-                let stdQty = ing.quantity / 1000; // g or ml to kg or L
+                const stdQty = ing.quantity / 1000; // g or ml to kg or L
                 totalCarbon += stdQty * ingredient.carbonFootprint;
             }
         });

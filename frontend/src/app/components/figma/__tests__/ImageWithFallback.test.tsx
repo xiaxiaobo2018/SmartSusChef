@@ -249,7 +249,7 @@ describe('ImageWithFallback', () => {
             const { rerender } = render(<ImageWithFallback src="good.jpg" alt="Test" />);
 
             // Initially should show the image
-            let img = screen.getByAltText('Test');
+            const img = screen.getByAltText('Test');
             expect(img).toHaveAttribute('src', 'good.jpg');
 
             // Trigger error

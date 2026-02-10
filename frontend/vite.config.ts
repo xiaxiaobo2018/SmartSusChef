@@ -16,6 +16,12 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  server: {
+    proxy: {
+      '/api': 'http://localhost:5000',
+      '/swagger': 'http://localhost:5000',
+    },
+  },
   test: {
     globals: true,
     environment: 'happy-dom',
