@@ -879,7 +879,7 @@ jobs:
           docker run --rm -v $(pwd):/zap/wrk/:rw --network=host \
             -t ghcr.io/zaproxy/zaproxy:stable \
             zap-api-scan.py \
-            -t 'http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/api' \
+            -t 'http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/swagger/v1/swagger.json' \
             -f openapi \
             -J zap-reports/api-report.json \
             -w zap-reports/api-report.md \
