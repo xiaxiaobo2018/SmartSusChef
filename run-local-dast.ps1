@@ -42,7 +42,7 @@ if (-not (Test-Path $absReportDir)) {
 # --------------------------------------------------
 # Step 1: Login to get JWT token
 # --------------------------------------------------
-Write-Host "[1/6] Logging in as '$Username'..." -ForegroundColor Yellow
+Write-Host "[1/7] Logging in as '$Username'..." -ForegroundColor Yellow
 
 $loginBody = @{
     username = $Username
@@ -70,7 +70,7 @@ catch {
 # --------------------------------------------------
 # Step 2: Start ZAP daemon
 # --------------------------------------------------
-Write-Host "[2/6] Starting ZAP daemon on port $ZapPort..." -ForegroundColor Yellow
+Write-Host "[2/7] Starting ZAP daemon on port $ZapPort..." -ForegroundColor Yellow
 
 # Kill any existing ZAP
 Get-Process java -ErrorAction SilentlyContinue | Where-Object {
@@ -116,7 +116,7 @@ if ($waited -ge $maxWait) {
 # --------------------------------------------------
 # Step 3: Configure Replacer rule for Auth header
 # --------------------------------------------------
-Write-Host "[3/6] Configuring Bearer token via Replacer..." -ForegroundColor Yellow
+Write-Host "[3/7] Configuring Bearer token via Replacer..." -ForegroundColor Yellow
 
 try {
     $replacerUrl = "$zapApiBase/JSON/replacer/action/addRule/" +
@@ -138,7 +138,7 @@ catch {
 # --------------------------------------------------
 # Step 4: Import OpenAPI spec
 # --------------------------------------------------
-Write-Host "[4/6] Importing OpenAPI spec from Swagger..." -ForegroundColor Yellow
+Write-Host "[4/7] Importing OpenAPI spec from Swagger..." -ForegroundColor Yellow
 
 try {
     $encodedUrl = [System.Uri]::EscapeDataString("$ApiUrl/swagger/v1/swagger.json")
@@ -167,9 +167,160 @@ while ($pscanWait -lt 120) {
 Write-Host "  Passive scan done." -ForegroundColor Green
 
 # --------------------------------------------------
+# Step 4b: Seed ALL endpoints via ZAP proxy
+# --------------------------------------------------
+Write-Host "[4b/7] Seeding ALL API endpoints through ZAP proxy..." -ForegroundColor Yellow
+
+$proxyUri = "http://localhost:$ZapPort"
+$authHeaders = @{
+    "Authorization" = "Bearer $token"
+    "Content-Type"  = "application/json"
+}
+
+# Define ALL endpoints to seed (every controller + every route)
+$seedEndpoints = @(
+    # Health
+    @{ Method = "GET"; Uri = "$ApiUrl/Health" },
+    @{ Method = "GET"; Uri = "$ApiUrl/Health/detailed" },
+    @{ Method = "GET"; Uri = "$ApiUrl/Health/live" },
+    @{ Method = "GET"; Uri = "$ApiUrl/Health/ready" },
+    @{ Method = "GET"; Uri = "$ApiUrl/api/Health" },
+    @{ Method = "GET"; Uri = "$ApiUrl/api/Health/detailed" },
+    @{ Method = "GET"; Uri = "$ApiUrl/api/Health/live" },
+    @{ Method = "GET"; Uri = "$ApiUrl/api/Health/ready" },
+
+    # Auth
+    @{ Method = "GET"; Uri = "$ApiUrl/api/Auth/me" },
+    @{ Method = "GET"; Uri = "$ApiUrl/api/Auth/store-setup-required" },
+    @{ Method = "POST"; Uri = "$ApiUrl/api/Auth/login"; Body = '{"username":"test","password":"test"}' },
+    @{ Method = "POST"; Uri = "$ApiUrl/api/Auth/register"; Body = '{"username":"seedtest","password":"Seedtest12345!","name":"Seed","email":"seed@test.com"}' },
+    @{ Method = "POST"; Uri = "$ApiUrl/api/Auth/forgot-password"; Body = '{"emailOrUsername":"test@test.com"}' },
+    @{ Method = "PUT"; Uri = "$ApiUrl/api/Auth/profile"; Body = '{"name":"Test","email":"test@test.com"}' },
+    @{ Method = "PUT"; Uri = "$ApiUrl/api/Auth/password"; Body = '{"currentPassword":"OldPass123!","newPassword":"NewPass123!"}' },
+
+    # Dashboard
+    @{ Method = "GET"; Uri = "$ApiUrl/api/Dashboard/summary" },
+
+    # Export
+    @{ Method = "GET"; Uri = "$ApiUrl/api/Export/sales/csv" },
+    @{ Method = "GET"; Uri = "$ApiUrl/api/Export/wastage/csv" },
+    @{ Method = "GET"; Uri = "$ApiUrl/api/Export/forecast/csv?days=7" },
+    @{ Method = "GET"; Uri = "$ApiUrl/api/Export/sales/pdf" },
+
+    # Forecast
+    @{ Method = "GET"; Uri = "$ApiUrl/api/Forecast" },
+    @{ Method = "GET"; Uri = "$ApiUrl/api/Forecast/summary" },
+    @{ Method = "GET"; Uri = "$ApiUrl/api/Forecast/weather" },
+    @{ Method = "GET"; Uri = "$ApiUrl/api/Forecast/holidays/2026" },
+    @{ Method = "GET"; Uri = "$ApiUrl/api/Forecast/tomorrow" },
+    @{ Method = "GET"; Uri = "$ApiUrl/api/Forecast/calendar/2026-02-10" },
+    @{ Method = "GET"; Uri = "$ApiUrl/api/Forecast/calendar?startDate=2026-02-01&endDate=2026-02-28" },
+
+    # Ingredients
+    @{ Method = "GET"; Uri = "$ApiUrl/api/Ingredients" },
+    @{ Method = "GET"; Uri = "$ApiUrl/api/Ingredients/1" },
+    @{ Method = "POST"; Uri = "$ApiUrl/api/Ingredients"; Body = '{"name":"ZAP Test Ingredient","unit":"kg","carbonFootprint":1.5}' },
+    @{ Method = "PUT"; Uri = "$ApiUrl/api/Ingredients/1"; Body = '{"name":"Updated","unit":"kg","carbonFootprint":1.0}' },
+    @{ Method = "DELETE"; Uri = "$ApiUrl/api/Ingredients/99999" },
+
+    # ML
+    @{ Method = "GET"; Uri = "$ApiUrl/api/Ml/status" },
+    @{ Method = "POST"; Uri = "$ApiUrl/api/Ml/predict"; Body = '{}' },
+    @{ Method = "POST"; Uri = "$ApiUrl/api/Ml/train"; Body = '{}' },
+
+    # Recipes
+    @{ Method = "GET"; Uri = "$ApiUrl/api/Recipes" },
+    @{ Method = "GET"; Uri = "$ApiUrl/api/Recipes/1" },
+    @{ Method = "POST"; Uri = "$ApiUrl/api/Recipes"; Body = '{"dishName":"ZAP Test","ingredients":[]}' },
+    @{ Method = "PUT"; Uri = "$ApiUrl/api/Recipes/1"; Body = '{"dishName":"Updated","ingredients":[]}' },
+    @{ Method = "DELETE"; Uri = "$ApiUrl/api/Recipes/99999" },
+
+    # Sales
+    @{ Method = "GET"; Uri = "$ApiUrl/api/Sales" },
+    @{ Method = "GET"; Uri = "$ApiUrl/api/Sales/1" },
+    @{ Method = "GET"; Uri = "$ApiUrl/api/Sales/trend" },
+    @{ Method = "GET"; Uri = "$ApiUrl/api/Sales/ingredients/2026-02-10" },
+    @{ Method = "GET"; Uri = "$ApiUrl/api/Sales/recipes/2026-02-10" },
+    @{ Method = "POST"; Uri = "$ApiUrl/api/Sales"; Body = '{"date":"2026-02-10","recipeId":1,"quantity":1}' },
+    @{ Method = "POST"; Uri = "$ApiUrl/api/Sales/import"; Body = '{"salesData":[{"date":"2026-02-10","recipeId":1,"quantity":1}]}' },
+    @{ Method = "POST"; Uri = "$ApiUrl/api/Sales/import-by-name"; Body = '{"salesData":[{"date":"2026-02-10","dishName":"Test","quantity":1}],"dateFormat":"yyyy-MM-dd"}' },
+    @{ Method = "PUT"; Uri = "$ApiUrl/api/Sales/1"; Body = '{"date":"2026-02-10","recipeId":1,"quantity":2}' },
+    @{ Method = "DELETE"; Uri = "$ApiUrl/api/Sales/99999" },
+
+    # Store
+    @{ Method = "GET"; Uri = "$ApiUrl/api/Store" },
+    @{ Method = "GET"; Uri = "$ApiUrl/api/Store/status" },
+    @{ Method = "POST"; Uri = "$ApiUrl/api/Store/setup"; Body = '{"name":"ZAP Test Store","address":"Test","country":"SG","cuisine":"Test"}' },
+    @{ Method = "PUT"; Uri = "$ApiUrl/api/Store"; Body = '{"name":"Updated Store"}' },
+
+    # Users
+    @{ Method = "GET"; Uri = "$ApiUrl/api/Users" },
+    @{ Method = "POST"; Uri = "$ApiUrl/api/Users"; Body = '{"username":"zapuser","password":"ZapTest12345!","name":"ZAP User","email":"zap@test.com","role":"employee"}' },
+    @{ Method = "PUT"; Uri = "$ApiUrl/api/Users/99999"; Body = '{"name":"Updated"}' },
+    @{ Method = "DELETE"; Uri = "$ApiUrl/api/Users/99999" },
+
+    # Wastage
+    @{ Method = "GET"; Uri = "$ApiUrl/api/Wastage" },
+    @{ Method = "GET"; Uri = "$ApiUrl/api/Wastage/1" },
+    @{ Method = "GET"; Uri = "$ApiUrl/api/Wastage/trend" },
+    @{ Method = "POST"; Uri = "$ApiUrl/api/Wastage"; Body = '{"date":"2026-02-10","ingredientId":1,"recipeId":1,"quantity":0.5}' },
+    @{ Method = "PUT"; Uri = "$ApiUrl/api/Wastage/1"; Body = '{"date":"2026-02-10","ingredientId":1,"recipeId":1,"quantity":1.0}' },
+    @{ Method = "DELETE"; Uri = "$ApiUrl/api/Wastage/99999" }
+)
+
+$seeded = 0
+$failed = 0
+$controllersCovered = @{}
+
+foreach ($ep in $seedEndpoints) {
+    $controller = if ($ep.Uri -match '/api/(\w+)') { $Matches[1] } elseif ($ep.Uri -match '/(\w+)$') { $Matches[1] } else { "Other" }
+    try {
+        $params = @{
+            Uri         = $ep.Uri
+            Method      = $ep.Method
+            Headers     = $authHeaders
+            Proxy       = $proxyUri
+            TimeoutSec  = 10
+            UseBasicParsing = $true
+        }
+        if ($ep.Body) {
+            $params.Body = $ep.Body
+            $params.ContentType = "application/json"
+        }
+        Invoke-WebRequest @params -ErrorAction SilentlyContinue | Out-Null
+        $seeded++
+        $controllersCovered[$controller] = $true
+    }
+    catch {
+        # Even failures seed ZAP's site tree (4xx/5xx responses are still recorded)
+        $seeded++
+        $controllersCovered[$controller] = $true
+    }
+}
+
+Write-Host "  Seeded $seeded endpoints across $($controllersCovered.Count) controllers:" -ForegroundColor Green
+foreach ($c in ($controllersCovered.Keys | Sort-Object)) {
+    Write-Host "    - $c" -ForegroundColor Gray
+}
+
+# Wait for passive scan after seeding
+Start-Sleep -Seconds 5
+$pscanWait2 = 0
+while ($pscanWait2 -lt 60) {
+    try {
+        $recordsLeft2 = (Invoke-RestMethod -Uri "$zapApiBase/JSON/pscan/view/recordsToScan/" -TimeoutSec 5).recordsToScan
+        if ([int]$recordsLeft2 -eq 0) { break }
+        Start-Sleep -Seconds 3
+        $pscanWait2 += 3
+    }
+    catch { break }
+}
+Write-Host "  Passive scan after seeding done." -ForegroundColor Green
+
+# --------------------------------------------------
 # Step 5: Active Scan
 # --------------------------------------------------
-Write-Host "[5/6] Running active scan..." -ForegroundColor Yellow
+Write-Host "[5/7] Running active scan on ALL seeded endpoints..." -ForegroundColor Yellow
 
 try {
     $encodedUrl2 = [System.Uri]::EscapeDataString($ApiUrl)
@@ -201,7 +352,7 @@ catch {
 # --------------------------------------------------
 # Step 6: Generate Reports
 # --------------------------------------------------
-Write-Host "[6/6] Generating reports..." -ForegroundColor Yellow
+Write-Host "[6/7] Generating reports..." -ForegroundColor Yellow
 
 # Get alerts summary
 try {
@@ -238,13 +389,38 @@ Write-Host "============================================" -ForegroundColor Cyan
 Write-Host "  Scan Summary" -ForegroundColor Cyan
 Write-Host "============================================" -ForegroundColor Cyan
 
+# Controller coverage check
+$allControllers = @("Auth", "Dashboard", "Export", "Forecast", "Health", "Ingredients", "Ml", "Recipes", "Sales", "Store", "Users", "Wastage")
+
 try {
     $urls = Invoke-RestMethod -Uri "$zapApiBase/JSON/core/view/urls/?baseurl=$([System.Uri]::EscapeDataString($ApiUrl))" -TimeoutSec 10
     $urlList = $urls.urls
     Write-Host "  Total URLs discovered: $($urlList.Count)" -ForegroundColor Cyan
     Write-Host ""
-    Write-Host "  Scanned endpoints:" -ForegroundColor Gray
+
+    # Check coverage per controller
+    $coveredControllers = @{}
     foreach ($u in $urlList) {
+        if ($u -match '/api/(\w+)') { $coveredControllers[$Matches[1]] = $true }
+        elseif ($u -match 'localhost:\d+/(\w+)') { $coveredControllers[$Matches[1]] = $true }
+    }
+
+    Write-Host "  [7/7] Controller Coverage:" -ForegroundColor Yellow
+    $covered = 0
+    foreach ($c in $allControllers) {
+        if ($coveredControllers.ContainsKey($c)) {
+            Write-Host "    [+] $c" -ForegroundColor Green
+            $covered++
+        } else {
+            Write-Host "    [-] $c (MISSING)" -ForegroundColor Red
+        }
+    }
+    Write-Host ""
+    Write-Host "  Coverage: $covered / $($allControllers.Count) controllers ($([math]::Round($covered / $allControllers.Count * 100))%)" -ForegroundColor $(if ($covered -eq $allControllers.Count) { "Green" } else { "Yellow" })
+    Write-Host ""
+
+    Write-Host "  All scanned endpoints:" -ForegroundColor Gray
+    foreach ($u in ($urlList | Sort-Object)) {
         Write-Host "    - $u" -ForegroundColor Gray
     }
 }
