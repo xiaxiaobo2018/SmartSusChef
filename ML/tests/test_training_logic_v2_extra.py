@@ -241,6 +241,11 @@ def test_save_and_load_models(tmp_path):
 
 
 def test_process_dish_success(monkeypatch, tmp_path):
+    import core.cv_eval as ce
+    import core.data_prep as dp
+    import core.feature_eng as fe
+    import core.model_train as mt
+
     cfg = tl.PipelineConfig(min_train_days=1, max_workers=1, use_gpu=False)
     cfg.model_dir = str(tmp_path)
     cfg.hybrid_tree_features = ["prophet_yhat"]
@@ -253,9 +258,10 @@ def test_process_dish_success(monkeypatch, tmp_path):
         }
     )
 
-    monkeypatch.setattr(tl, "add_hybrid_features", lambda d, c: d)
+    # Patch on actual modules where process_dish resolves names
+    monkeypatch.setattr(fe, "add_hybrid_features", lambda d, c: d)
     monkeypatch.setattr(
-        tl,
+        ce,
         "_prepare_cv_fold_cache",
         lambda *args, **kwargs: [
             {
@@ -267,11 +273,12 @@ def test_process_dish_success(monkeypatch, tmp_path):
             }
         ],
     )
-    monkeypatch.setattr(tl, "_optimize_hybrid", lambda *args, **kwargs: (1.0, {}))
-    monkeypatch.setattr(tl, "sanitize_sparse_data", lambda d, cc: d)
-    monkeypatch.setattr(tl, "_fit_prophet", lambda train, cc, config: object())
-    monkeypatch.setattr(tl, "_prophet_predict", lambda model, df: np.zeros(len(df)))
-    monkeypatch.setattr(tl, "_save_hybrid_models", lambda *args, **kwargs: None)
+    monkeypatch.setattr(ce, "_optimize_hybrid", lambda *args, **kwargs: (1.0, {}))
+    monkeypatch.setattr(dp, "sanitize_sparse_data", lambda d, cc, config=None: d)
+    monkeypatch.setattr(mt, "_fit_prophet", lambda train, cc, config: object())
+    monkeypatch.setattr(mt, "_prophet_predict", lambda model, df: np.zeros(len(df)))
+    monkeypatch.setattr(mt, "_save_hybrid_models", lambda *args, **kwargs: None)
+    monkeypatch.setattr(mt, "secure_dump", lambda obj, path: None)
 
     class DummyModel:
         def __init__(self, **kwargs):
