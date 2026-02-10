@@ -31,7 +31,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.smartsuschef.mobile.HiltTestRunner"
         multiDexEnabled = true
     }
 
@@ -126,6 +126,7 @@ dependencies {
     testImplementation(libs.robolectric)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.androidx.espresso.intents)
     androidTestImplementation(libs.coroutines.test)
     androidTestImplementation(libs.mockwebserver)
     detektPlugins(libs.detekt.formatting)
