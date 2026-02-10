@@ -133,6 +133,7 @@ def _get_location_cached(address):
 def get_weather_forecast(latitude, longitude):
     """Fetch 14-day weather forecast — delegates to app.utils.fetch_weather_forecast."""
     from app.utils import fetch_weather_forecast
+
     return fetch_weather_forecast(latitude, longitude, forecast_days=16)
 
 

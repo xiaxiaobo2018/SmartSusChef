@@ -117,26 +117,30 @@ def validate_model(
             missing_files.append(tree_path.name)
 
         if missing_files:
-            dish_reports.append({
-                "dish": dish_name,
-                "champion": champion,
-                "status": "missing_files",
-                "missing": missing_files,
-                "mae": None,
-            })
+            dish_reports.append(
+                {
+                    "dish": dish_name,
+                    "champion": champion,
+                    "status": "missing_files",
+                    "missing": missing_files,
+                    "mae": None,
+                }
+            )
             continue
 
         try:
             prophet_model = secure_load(str(prophet_path))
             tree_model = secure_load(str(tree_path))
         except RuntimeError as e:
-            dish_reports.append({
-                "dish": dish_name,
-                "champion": champion,
-                "status": "integrity_error",
-                "message": str(e),
-                "mae": None,
-            })
+            dish_reports.append(
+                {
+                    "dish": dish_name,
+                    "champion": champion,
+                    "status": "integrity_error",
+                    "message": str(e),
+                    "mae": None,
+                }
+            )
             continue
 
         # Load or synthesize recent sales
@@ -167,10 +171,14 @@ def validate_model(
 
             # Get prophet prediction
             try:
-                prophet_input = pd.DataFrame([{
-                    "date": dt,
-                    **weather_vals,
-                }])
+                prophet_input = pd.DataFrame(
+                    [
+                        {
+                            "date": dt,
+                            **weather_vals,
+                        }
+                    ]
+                )
                 prophet_df = prophet_input.rename(columns={"date": "ds"})
                 cols_to_use = ["ds"] + [c for c in WEATHER_COLS if c in prophet_df.columns]
                 prophet_pred = prophet_model.predict(prophet_df[cols_to_use])
@@ -184,14 +192,25 @@ def validate_model(
 
             # Build tree feature vector
             tree_features = [
-                "day_of_week", "month", "day", "dayofyear", "is_weekend",
+                "day_of_week",
+                "month",
+                "day",
+                "dayofyear",
+                "is_weekend",
                 "is_public_holiday",
-                "temperature_2m_max", "temperature_2m_min",
-                "relative_humidity_2m_mean", "precipitation_sum",
-                "y_lag_1", "y_lag_7", "y_lag_14",
-                "y_roll_mean_7", "y_roll_std_7",
-                "y_roll_mean_14", "y_roll_std_14",
-                "y_roll_mean_28", "y_roll_std_28",
+                "temperature_2m_max",
+                "temperature_2m_min",
+                "relative_humidity_2m_mean",
+                "precipitation_sum",
+                "y_lag_1",
+                "y_lag_7",
+                "y_lag_14",
+                "y_roll_mean_7",
+                "y_roll_std_7",
+                "y_roll_mean_14",
+                "y_roll_std_14",
+                "y_roll_mean_28",
+                "y_roll_std_28",
                 "prophet_yhat",
             ]
             X_one = pd.DataFrame([{k: feat.get(k, 0.0) for k in tree_features}])
@@ -212,14 +231,16 @@ def validate_model(
         # Compute MAE
         mae = float(np.mean(np.abs(np.array(predictions) - np.array(actuals))))
 
-        dish_reports.append({
-            "dish": dish_name,
-            "champion": champion,
-            "status": "ok",
-            "stored_mae": stored_mae,
-            "validation_mae": round(mae, 4),
-            "sample_predictions": [round(p, 2) for p in predictions],
-        })
+        dish_reports.append(
+            {
+                "dish": dish_name,
+                "champion": champion,
+                "status": "ok",
+                "stored_mae": stored_mae,
+                "validation_mae": round(mae, 4),
+                "sample_predictions": [round(p, 2) for p in predictions],
+            }
+        )
 
         total_mae_sum += mae
         total_dishes += 1
@@ -237,9 +258,7 @@ def validate_model(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="Validate trained SmartSusChef ML models."
-    )
+    parser = argparse.ArgumentParser(description="Validate trained SmartSusChef ML models.")
     parser.add_argument(
         "--model-dir",
         type=str,

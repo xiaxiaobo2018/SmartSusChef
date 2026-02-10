@@ -274,6 +274,7 @@ def store_predict(
             recent_sales_path = ms.model_dir / f"recent_sales_{safe_dish}.pkl"
             if recent_sales_path.exists():
                 from app.utils.secure_io import secure_load
+
                 recent_df = secure_load(str(recent_sales_path))
                 recent_sales = recent_df["sales"].astype(float).tolist()
             else:

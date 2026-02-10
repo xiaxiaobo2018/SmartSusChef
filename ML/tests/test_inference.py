@@ -151,15 +151,18 @@ class TestPrepareFutureWeather:
     def test_insufficient_dates_filled(self, monkeypatch):
         """If forecast has fewer dates than horizon, missing dates are filled."""
         # Return forecast for only 1 day when we need 3
-        forecast_df = pd.DataFrame({
-            "date": pd.to_datetime(["2024-01-01"]),
-            "temperature_2m_max": [25.0],
-            "temperature_2m_min": [15.0],
-            "relative_humidity_2m_mean": [60.0],
-            "precipitation_sum": [0.0],
-        })
+        forecast_df = pd.DataFrame(
+            {
+                "date": pd.to_datetime(["2024-01-01"]),
+                "temperature_2m_max": [25.0],
+                "temperature_2m_min": [15.0],
+                "relative_humidity_2m_mean": [60.0],
+                "precipitation_sum": [0.0],
+            }
+        )
         monkeypatch.setattr(
-            inf, "fetch_weather_forecast",
+            inf,
+            "fetch_weather_forecast",
             lambda latitude, longitude, forecast_days=16: forecast_df,
         )
         start = pd.Timestamp("2024-01-01")
@@ -169,7 +172,8 @@ class TestPrepareFutureWeather:
     def test_empty_forecast_falls_back(self, monkeypatch):
         """If forecast returns empty DataFrame, fallback values are used."""
         monkeypatch.setattr(
-            inf, "fetch_weather_forecast",
+            inf,
+            "fetch_weather_forecast",
             lambda latitude, longitude, forecast_days=16: pd.DataFrame(),
         )
         start = pd.Timestamp("2024-01-01")
@@ -230,7 +234,8 @@ class TestPredictDishMinimal:
             }
         )
         monkeypatch.setattr(
-            inf, "fetch_weather_forecast",
+            inf,
+            "fetch_weather_forecast",
             lambda latitude, longitude, forecast_days=16: weather,
         )
 
@@ -269,7 +274,8 @@ class TestPredictDishMinimal:
             }
         )
         monkeypatch.setattr(
-            inf, "fetch_weather_forecast",
+            inf,
+            "fetch_weather_forecast",
             lambda latitude, longitude, forecast_days=16: weather,
         )
 

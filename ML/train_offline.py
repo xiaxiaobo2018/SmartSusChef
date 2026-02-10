@@ -65,15 +65,12 @@ def _train_store_ids(
     logger.info("Training %d stores with %d parallel workers.", len(ids), max_workers)
     with ProcessPoolExecutor(max_workers=max_workers) as pool:
         futures = {
-            pool.submit(_train_single_store, manager.base_model_dir, sid): sid
-            for sid in ids
+            pool.submit(_train_single_store, manager.base_model_dir, sid): sid for sid in ids
         }
         for future in as_completed(futures):
             try:
                 result = future.result()
-                logger.info(
-                    "Training result for store (ID masked): %s", result.get("status")
-                )
+                logger.info("Training result for store (ID masked): %s", result.get("status"))
             except Exception as exc:
                 logger.error("Training failed for a store (ID masked): %s", exc)
 

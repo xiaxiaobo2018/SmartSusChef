@@ -126,7 +126,9 @@ class TestGenerateCvFolds:
     def test_empty_dataframe(self):
         """Empty DataFrame should produce zero folds without error."""
         cfg = PipelineConfig(n_cv_folds=2, test_window_days=7, min_train_days=1)
-        df = pd.DataFrame({"date": pd.Series(dtype="datetime64[ns]"), "sales": pd.Series(dtype=float)})
+        df = pd.DataFrame(
+            {"date": pd.Series(dtype="datetime64[ns]"), "sales": pd.Series(dtype=float)}
+        )
         folds = list(_generate_cv_folds(df, cfg))
         assert len(folds) == 0
 
@@ -156,7 +158,10 @@ class TestPrepareCvFoldCache:
     def test_returns_correct_cache_structure(self, monkeypatch):
         """Cache should contain the expected keys per fold."""
         cfg = PipelineConfig(
-            n_cv_folds=1, test_window_days=2, min_train_days=1, min_ml_days=1,
+            n_cv_folds=1,
+            test_window_days=2,
+            min_train_days=1,
+            min_ml_days=1,
         )
         cfg.hybrid_tree_features = ["prophet_yhat"]
 
@@ -179,7 +184,10 @@ class TestPrepareCvFoldCache:
     def test_prophet_called_per_fold(self, monkeypatch):
         """_fit_prophet should be called once for each usable CV fold."""
         cfg = PipelineConfig(
-            n_cv_folds=2, test_window_days=5, min_train_days=5, min_ml_days=5,
+            n_cv_folds=2,
+            test_window_days=5,
+            min_train_days=5,
+            min_ml_days=5,
         )
         cfg.hybrid_tree_features = ["prophet_yhat"]
         df = _make_daily_df(40)
@@ -204,7 +212,9 @@ class TestPrepareCvFoldCache:
     def test_empty_folds_produce_empty_cache(self, monkeypatch):
         """When data is insufficient to produce folds, the cache should be empty."""
         cfg = PipelineConfig(
-            n_cv_folds=2, test_window_days=30, min_train_days=60,
+            n_cv_folds=2,
+            test_window_days=30,
+            min_train_days=60,
         )
         cfg.hybrid_tree_features = ["prophet_yhat"]
         df = _make_daily_df(5)  # too short
@@ -222,7 +232,9 @@ class TestPrepareCvFoldCache:
     def test_sanitize_applied_per_fold(self, monkeypatch):
         """sanitize_sparse_data is called for both train and test in each fold."""
         cfg = PipelineConfig(
-            n_cv_folds=1, test_window_days=2, min_train_days=1,
+            n_cv_folds=1,
+            test_window_days=2,
+            min_train_days=1,
         )
         cfg.hybrid_tree_features = ["prophet_yhat"]
         df = _make_daily_df(10)

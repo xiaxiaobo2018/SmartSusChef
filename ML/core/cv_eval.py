@@ -1,5 +1,6 @@
 """Cross-validation fold generation and Optuna hyperparameter optimization."""
 
+from types import ModuleType
 from typing import Any
 
 import numpy as np
@@ -14,20 +15,29 @@ from core.feature_eng import _build_residual_features
 logger = setup_logger(__name__)
 
 # Import tree frameworks (optional dependencies)
+lgb: ModuleType | None = None
 try:
-    import lightgbm as lgb
-except ImportError:
-    lgb = None
+    import lightgbm as _lgb
 
-try:
-    from catboost import CatBoostRegressor
+    lgb = _lgb
 except ImportError:
-    CatBoostRegressor = None
+    pass
 
+CatBoostRegressor: type[Any] | None = None
 try:
-    from xgboost import XGBRegressor
+    from catboost import CatBoostRegressor as _CatBoostRegressor
+
+    CatBoostRegressor = _CatBoostRegressor
 except ImportError:
-    XGBRegressor = None
+    pass
+
+XGBRegressor: type[Any] | None = None
+try:
+    from xgboost import XGBRegressor as _XGBRegressor
+
+    XGBRegressor = _XGBRegressor
+except ImportError:
+    pass
 
 
 # ---------------------------------------------------------------------------
@@ -155,7 +165,7 @@ def _eval_hybrid_mae(
         elif model_type == "lightgbm":
             if lgb is None:
                 raise ImportError("LightGBM is required but not installed.")
-            lgb_extra = {"device": "gpu"} if gpu.get("lightgbm") else {}
+            lgb_extra: dict[str, Any] = {"device": "gpu"} if gpu.get("lightgbm") else {}
             model = lgb.LGBMRegressor(
                 n_estimators=100,
                 random_state=config.random_seed,

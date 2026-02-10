@@ -18,6 +18,7 @@ os.environ.setdefault("CMDSTANPY_LOG_LEVEL", "WARNING")
 # Load environment variables from .env file
 try:
     from dotenv import load_dotenv
+
     load_dotenv()
 except ImportError:
     pass

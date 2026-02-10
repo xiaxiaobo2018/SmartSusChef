@@ -209,10 +209,17 @@ class StoreModelManager:
             # Enrich with weather + holiday context
             if lat and lon and country_code:
                 enriched_df, cc, _, _ = add_local_context(
-                    df, address=None, latitude=lat, longitude=lon, country_code=country_code
+                    df,
+                    address=None,
+                    config=config,
+                    latitude=lat,
+                    longitude=lon,
+                    country_code=country_code,
                 )
             else:
-                enriched_df, cc, lat, lon = add_local_context(df, address="Shanghai, China")
+                enriched_df, cc, lat, lon = add_local_context(
+                    df, address="Shanghai, China", config=config
+                )
 
             dishes = enriched_df["dish"].unique().tolist()
             dish_frames = {d: g.copy() for d, g in enriched_df.groupby("dish", sort=False)}
