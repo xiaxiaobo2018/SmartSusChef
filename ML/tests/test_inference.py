@@ -69,18 +69,25 @@ class TestWeatherFallbackDf:
         for col in inf.WEATHER_COLS:
             assert col in df.columns
 
-    def test_uses_configured_defaults(self):
+    def test_uses_seasonal_averages(self):
+        """June dates should use summer seasonal averages."""
+        from core.data_prep import _get_seasonal_historical_averages
+
         dates = pd.date_range("2024-06-01", periods=2, freq="D")
         df = inf._weather_fallback_df(dates)
-        assert df["temperature_2m_max"].iloc[0] == inf.WEATHER_FALLBACK["temperature_2m_max"]
-        assert df["temperature_2m_min"].iloc[0] == inf.WEATHER_FALLBACK["temperature_2m_min"]
-        assert df["relative_humidity_2m_mean"].iloc[0] == inf.WEATHER_FALLBACK["relative_humidity_2m_mean"]
-        assert df["precipitation_sum"].iloc[0] == inf.WEATHER_FALLBACK["precipitation_sum"]
+        summer = _get_seasonal_historical_averages(6)
+        assert df["temperature_2m_max"].iloc[0] == summer["temperature_2m_max"]
+        assert df["temperature_2m_min"].iloc[0] == summer["temperature_2m_min"]
+        assert df["relative_humidity_2m_mean"].iloc[0] == summer["relative_humidity_2m_mean"]
+        assert df["precipitation_sum"].iloc[0] == summer["precipitation_sum"]
 
-    def test_fallback_values_match_weather_fallback_dict(self):
-        """Ensure all WEATHER_COLS have an entry in WEATHER_FALLBACK."""
-        for col in inf.WEATHER_COLS:
-            assert col in inf.WEATHER_FALLBACK
+    def test_seasonal_values_vary_by_month(self):
+        """January (winter) and July (summer) should produce different fallbacks."""
+        jan_dates = pd.DatetimeIndex([pd.Timestamp("2024-01-15")])
+        jul_dates = pd.DatetimeIndex([pd.Timestamp("2024-07-15")])
+        jan_df = inf._weather_fallback_df(jan_dates)
+        jul_df = inf._weather_fallback_df(jul_dates)
+        assert jan_df["temperature_2m_max"].iloc[0] != jul_df["temperature_2m_max"].iloc[0]
 
     def test_single_date(self):
         dates = pd.DatetimeIndex([pd.Timestamp("2024-01-01")])
@@ -104,7 +111,8 @@ class TestPrepareFutureWeather:
             assert col in df.columns
 
     def test_api_exception_falls_back(self, monkeypatch):
-        """When fetch_weather_forecast raises, fallback values are used."""
+        """When fetch_weather_forecast raises, seasonal fallback values are used."""
+        from core.data_prep import _get_seasonal_historical_averages
 
         def _boom(latitude, longitude, forecast_days=16):
             raise RuntimeError("no api")
@@ -114,19 +122,23 @@ class TestPrepareFutureWeather:
         df = inf._prepare_future_weather(start, 3, 1.0, 2.0, weather_rows=None)
         assert len(df) == 3
         assert all(col in df.columns for col in inf.WEATHER_COLS)
-        # Verify fallback values are used
-        assert df["temperature_2m_max"].iloc[0] == inf.WEATHER_FALLBACK["temperature_2m_max"]
+        # January → winter seasonal averages
+        winter = _get_seasonal_historical_averages(1)
+        assert df["temperature_2m_max"].iloc[0] == winter["temperature_2m_max"]
 
     def test_api_returns_none_falls_back(self, monkeypatch):
-        """When fetch_weather_forecast returns None, fallback values are used."""
+        """When fetch_weather_forecast returns None, seasonal fallback values are used."""
+        from core.data_prep import _get_seasonal_historical_averages
+
         monkeypatch.setattr(inf, "fetch_weather_forecast", lambda *a, **kw: None)
         start = pd.Timestamp("2024-01-01")
         df = inf._prepare_future_weather(start, 2, 1.0, 2.0, weather_rows=None)
         assert len(df) == 2
-        assert df["precipitation_sum"].iloc[0] == inf.WEATHER_FALLBACK["precipitation_sum"]
+        winter = _get_seasonal_historical_averages(1)
+        assert df["precipitation_sum"].iloc[0] == winter["precipitation_sum"]
 
     def test_missing_columns_filled(self):
-        """If weather_rows lack some WEATHER_COLS, they are filled from WEATHER_FALLBACK."""
+        """If weather_rows lack some WEATHER_COLS, they are filled with seasonal values."""
         start = pd.Timestamp("2024-01-01")
         rows = [
             {"date": "2024-01-01", "temperature_2m_max": 30.0},

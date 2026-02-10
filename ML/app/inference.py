@@ -99,21 +99,15 @@ class ModelStore:
 # _fetch_weather_forecast → app.utils.fetch_weather_forecast
 
 
-# Configurable weather fallback values (used when API is unavailable)
-WEATHER_FALLBACK = {
-    "temperature_2m_max": 25.0,
-    "temperature_2m_min": 15.0,
-    "relative_humidity_2m_mean": 60.0,
-    "precipitation_sum": 0.0,
-}
-
-
 def _weather_fallback_df(dates: pd.DatetimeIndex) -> pd.DataFrame:
-    """Build a fallback weather DataFrame using configurable defaults."""
-    data: dict[str, Any] = {"date": dates}
-    for col in WEATHER_COLS:
-        data[col] = WEATHER_FALLBACK.get(col, 0.0)
-    return pd.DataFrame(data)
+    """Build a fallback weather DataFrame using seasonal historical averages."""
+    from core.data_prep import _get_seasonal_historical_averages
+
+    rows = []
+    for dt in dates:
+        seasonal = _get_seasonal_historical_averages(dt.month)
+        rows.append({"date": dt, **seasonal})
+    return pd.DataFrame(rows)
 
 
 def _prepare_future_weather(
@@ -141,9 +135,13 @@ def _prepare_future_weather(
     if forecast_weather.empty:
         forecast_weather = _weather_fallback_df(future_dates)
 
+    from core.data_prep import _get_seasonal_historical_averages
+
     for col in WEATHER_COLS:
         if col not in forecast_weather.columns:
-            forecast_weather[col] = WEATHER_FALLBACK.get(col, 0.0)
+            forecast_weather[col] = forecast_weather["date"].dt.month.map(
+                lambda m, c=col: _get_seasonal_historical_averages(m)[c]
+            )
 
     future_weather = forecast_weather[forecast_weather["date"].isin(future_dates)].copy()
     if len(future_weather) < len(future_dates):

@@ -116,10 +116,12 @@ class TrainingLogicV2Tests(unittest.TestCase):
         self.assertEqual(lat, config.default_fallback_lat)
         self.assertEqual(lon, config.default_fallback_lon)
 
+        # January dates → Winter seasonal averages
+        from core.data_prep import _get_seasonal_historical_averages
+        winter = _get_seasonal_historical_averages(1)
         for col in WEATHER_COLS:
             self.assertIn(col, out.columns)
-            expected = config.weather_fallback.get(col, 0.0)
-            self.assertTrue((out[col] == expected).all())
+            self.assertTrue((out[col] == winter[col]).all())
 
     def test_pipeline_config_defaults(self):
         """Verify PipelineConfig has sensible defaults."""

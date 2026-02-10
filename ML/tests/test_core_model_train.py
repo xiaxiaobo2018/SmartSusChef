@@ -141,16 +141,6 @@ class TestPipelineConfig:
         assert cfg.lags == (1, 7, 14)
         assert cfg.roll_windows == (7, 14, 28)
 
-    def test_weather_fallback_keys(self):
-        cfg = PipelineConfig()
-        expected = {
-            "temperature_2m_max",
-            "temperature_2m_min",
-            "relative_humidity_2m_mean",
-            "precipitation_sum",
-        }
-        assert set(cfg.weather_fallback.keys()) == expected
-
     def test_feature_groups_cover_tree_features(self):
         """Every feature in hybrid_tree_features should appear in exactly one feature group."""
         cfg = PipelineConfig()

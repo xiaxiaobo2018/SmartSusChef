@@ -28,6 +28,48 @@ WEATHER_COLS = [
 
 
 # ---------------------------------------------------------------------------
+# Seasonal Weather Fallback
+# ---------------------------------------------------------------------------
+def _get_seasonal_historical_averages(month: int) -> dict[str, float]:
+    """Return typical weather averages for a given month (Northern Hemisphere)."""
+    if month in [12, 1, 2]:  # Winter
+        return {
+            "temperature_2m_max": 5.0,
+            "temperature_2m_min": -5.0,
+            "relative_humidity_2m_mean": 80.0,
+            "precipitation_sum": 5.0,
+        }
+    elif month in [3, 4, 5]:  # Spring
+        return {
+            "temperature_2m_max": 15.0,
+            "temperature_2m_min": 5.0,
+            "relative_humidity_2m_mean": 70.0,
+            "precipitation_sum": 2.0,
+        }
+    elif month in [6, 7, 8]:  # Summer
+        return {
+            "temperature_2m_max": 28.0,
+            "temperature_2m_min": 18.0,
+            "relative_humidity_2m_mean": 60.0,
+            "precipitation_sum": 1.0,
+        }
+    elif month in [9, 10, 11]:  # Autumn
+        return {
+            "temperature_2m_max": 18.0,
+            "temperature_2m_min": 8.0,
+            "relative_humidity_2m_mean": 75.0,
+            "precipitation_sum": 3.0,
+        }
+    else:
+        return {
+            "temperature_2m_max": 20.0,
+            "temperature_2m_min": 10.0,
+            "relative_humidity_2m_mean": 65.0,
+            "precipitation_sum": 0.5,
+        }
+
+
+# ---------------------------------------------------------------------------
 # Geocoding
 # ---------------------------------------------------------------------------
 def get_location_details(address):
@@ -195,13 +237,14 @@ def add_local_context(
             df[col] = df[col].interpolate(method="time").bfill().ffill().fillna(0)
         df = df.reset_index()
     else:
-        fallback = getattr(config, "weather_fallback", {})
         logger.warning(
             "Failed to fetch historical weather data from both the database "
-            "and Open-Meteo API. Using configurable fallback values."
+            "and Open-Meteo API. Using seasonal historical averages."
         )
         for col in WEATHER_COLS:
-            df[col] = fallback.get(col, 0.0)
+            df[col] = df["date"].dt.month.map(
+                lambda m, c=col: _get_seasonal_historical_averages(m)[c]
+            )
 
     return df, country_code, lat, lon
 

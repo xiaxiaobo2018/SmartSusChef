@@ -111,17 +111,6 @@ class PipelineConfig:
     default_fallback_lon: float = 121.47
     default_fallback_country: str = "CN"
 
-    # Fallback weather values when both DB and API are unavailable.
-    # Keys must match WEATHER_COLS.
-    weather_fallback: dict[str, float] = field(
-        default_factory=lambda: {
-            "temperature_2m_max": 25.0,
-            "temperature_2m_min": 15.0,
-            "relative_humidity_2m_mean": 60.0,
-            "precipitation_sum": 0.0,
-        }
-    )
-
     prophet_params: dict[str, Any] = field(
         default_factory=lambda: {
             "changepoint_prior_scale": 0.5,

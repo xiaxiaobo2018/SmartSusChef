@@ -46,6 +46,7 @@ from core.cv_eval import (  # noqa: E402, F401
 )
 from core.data_prep import (  # noqa: E402, F401
     Nominatim,
+    _get_seasonal_historical_averages,
     add_local_context,
     create_engine,
     fetch_training_data,
