@@ -1,201 +1,301 @@
 timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,failureMessage,bytes,sentBytes,grpThreads,allThreads,URL,Latency,IdleTime,Connect
-1770695692542,571,POST /api/auth/login,200,OK,Main User Journey 1-1,text,true,,968,249,4,4,http://localhost:5000/api/auth/login,570,0,8
-1770695692704,504,POST /api/auth/login,200,OK,Main User Journey 1-2,text,true,,968,249,4,4,http://localhost:5000/api/auth/login,504,0,1
-1770695692901,532,POST /api/auth/login,200,OK,Main User Journey 1-3,text,true,,968,249,5,5,http://localhost:5000/api/auth/login,532,0,1
-1770695693097,490,POST /api/auth/login,200,OK,Main User Journey 1-4,text,true,,968,249,6,6,http://localhost:5000/api/auth/login,490,0,0
-1770695693298,492,POST /api/auth/login,200,OK,Main User Journey 1-5,text,true,,968,249,7,7,http://localhost:5000/api/auth/login,492,0,0
-1770695693492,484,POST /api/auth/login,200,OK,Main User Journey 1-6,text,true,,968,249,8,8,http://localhost:5000/api/auth/login,484,0,0
-1770695693694,471,POST /api/auth/login,200,OK,Main User Journey 1-7,text,true,,968,249,9,9,http://localhost:5000/api/auth/login,471,0,0
-1770695693890,448,POST /api/auth/login,200,OK,Main User Journey 1-8,text,true,,968,249,10,10,http://localhost:5000/api/auth/login,448,0,0
-1770695694091,489,POST /api/auth/login,200,OK,Main User Journey 1-9,text,true,,968,249,11,11,http://localhost:5000/api/auth/login,489,0,0
-1770695693123,1633,GET /api/dashboard,200,OK,Main User Journey 1-1,text,true,,4300,697,12,12,http://localhost:5000/api/Dashboard/summary,1633,0,0
-1770695694289,506,POST /api/auth/login,200,OK,Main User Journey 1-10,text,true,,968,249,12,12,http://localhost:5000/api/auth/login,506,0,0
-1770695693209,1681,GET /api/dashboard,200,OK,Main User Journey 1-2,text,true,,4300,697,13,13,http://localhost:5000/api/Dashboard/summary,1681,0,0
-1770695694485,511,POST /api/auth/login,200,OK,Main User Journey 1-11,text,true,,968,249,13,13,http://localhost:5000/api/auth/login,511,0,1
-1770695694756,385,GET /api/Ingredients,200,OK,Main User Journey 1-1,text,true,,1246,691,14,14,http://localhost:5000/api/Ingredients,385,0,0
-1770695693434,1713,GET /api/dashboard,200,OK,Main User Journey 1-3,text,true,,4300,697,14,14,http://localhost:5000/api/Dashboard/summary,1713,0,0
-1770695694687,486,POST /api/auth/login,200,OK,Main User Journey 1-12,text,true,,968,249,14,14,http://localhost:5000/api/auth/login,486,0,0
-1770695693588,1622,GET /api/dashboard,200,OK,Main User Journey 1-4,text,true,,4300,697,14,14,http://localhost:5000/api/Dashboard/summary,1622,0,0
-1770695694891,389,GET /api/Ingredients,200,OK,Main User Journey 1-2,text,true,,1246,691,14,14,http://localhost:5000/api/Ingredients,389,0,0
-1770695694885,496,POST /api/auth/login,200,OK,Main User Journey 1-13,text,true,,968,249,15,15,http://localhost:5000/api/auth/login,496,0,0
-1770695695147,385,GET /api/Ingredients,200,OK,Main User Journey 1-3,text,true,,1246,691,16,16,http://localhost:5000/api/Ingredients,385,0,0
-1770695693977,1591,GET /api/dashboard,200,OK,Main User Journey 1-6,text,true,,4300,697,16,16,http://localhost:5000/api/Dashboard/summary,1591,0,0
-1770695695210,386,GET /api/Ingredients,200,OK,Main User Journey 1-4,text,true,,1246,691,16,16,http://localhost:5000/api/Ingredients,386,0,0
-1770695695082,523,POST /api/auth/login,200,OK,Main User Journey 1-14,text,true,,968,249,16,16,http://localhost:5000/api/auth/login,523,0,0
-1770695693791,1818,GET /api/dashboard,200,OK,Main User Journey 1-5,text,true,,4300,697,16,16,http://localhost:5000/api/Dashboard/summary,1818,0,0
-1770695695283,497,POST /api/auth/login,200,OK,Main User Journey 1-15,text,true,,968,249,17,17,http://localhost:5000/api/auth/login,497,0,0
-1770695694166,1626,GET /api/dashboard,200,OK,Main User Journey 1-7,text,true,,4300,697,17,17,http://localhost:5000/api/Dashboard/summary,1626,0,0
-1770695695142,662,POST /api/Ingredients,201,Created,Main User Journey 1-1,text,true,,466,829,17,17,http://localhost:5000/api/Ingredients,662,0,0
-1770695695281,629,POST /api/Ingredients,201,Created,Main User Journey 1-2,text,true,,462,829,17,17,http://localhost:5000/api/Ingredients,629,0,0
-1770695695569,365,GET /api/Ingredients,200,OK,Main User Journey 1-6,text,true,,1676,691,16,16,http://localhost:5000/api/Ingredients,365,0,0
-1770695694339,1633,GET /api/dashboard,200,OK,Main User Journey 1-8,text,true,,4300,697,16,16,http://localhost:5000/api/Dashboard/summary,1633,0,0
-1770695695485,518,POST /api/auth/login,200,OK,Main User Journey 1-16,text,true,,968,249,16,16,http://localhost:5000/api/auth/login,518,0,1
-1770695695609,399,GET /api/Ingredients,200,OK,Main User Journey 1-5,text,true,,1676,691,16,16,http://localhost:5000/api/Ingredients,399,0,0
-1770695695532,638,POST /api/Ingredients,201,Created,Main User Journey 1-3,text,true,,466,829,17,17,http://localhost:5000/api/Ingredients,638,0,0
-1770695695683,487,POST /api/auth/login,200,OK,Main User Journey 1-17,text,true,,968,249,17,17,http://localhost:5000/api/auth/login,487,0,1
-1770695695792,384,GET /api/Ingredients,200,OK,Main User Journey 1-7,text,true,,1893,691,16,16,http://localhost:5000/api/Ingredients,384,0,0
-1770695695597,613,POST /api/Ingredients,201,Created,Main User Journey 1-4,text,true,,466,829,16,16,http://localhost:5000/api/Ingredients,613,0,0
-1770695694581,1723,GET /api/dashboard,200,OK,Main User Journey 1-9,text,true,,4300,697,16,16,http://localhost:5000/api/Dashboard/summary,1723,0,0
-1770695695883,486,POST /api/auth/login,200,OK,Main User Journey 1-18,text,true,,968,249,16,16,http://localhost:5000/api/auth/login,486,0,0
-1770695695973,403,GET /api/Ingredients,200,OK,Main User Journey 1-8,text,true,,2110,691,16,16,http://localhost:5000/api/Ingredients,403,0,0
-1770695694996,1498,GET /api/dashboard,200,OK,Main User Journey 1-11,text,true,,4300,697,17,17,http://localhost:5000/api/Dashboard/summary,1498,0,0
-1770695694795,1711,GET /api/dashboard,200,OK,Main User Journey 1-10,text,true,,4300,697,17,17,http://localhost:5000/api/Dashboard/summary,1711,0,0
-1770695695934,636,POST /api/Ingredients,201,Created,Main User Journey 1-6,text,true,,466,829,17,17,http://localhost:5000/api/Ingredients,636,0,0
-1770695696081,491,POST /api/auth/login,200,OK,Main User Journey 1-19,text,true,,968,249,16,16,http://localhost:5000/api/auth/login,491,0,1
-1770695696305,354,GET /api/Ingredients,200,OK,Main User Journey 1-9,text,true,,2327,691,16,16,http://localhost:5000/api/Ingredients,354,0,0
-1770695696009,661,POST /api/Ingredients,201,Created,Main User Journey 1-5,text,true,,466,829,16,16,http://localhost:5000/api/Ingredients,661,0,0
-1770695696280,530,POST /api/auth/login,200,OK,Main User Journey 1-20,text,true,,968,249,16,16,http://localhost:5000/api/auth/login,530,0,1
-1770695696176,638,POST /api/Ingredients,201,Created,Main User Journey 1-7,text,true,,466,829,16,16,http://localhost:5000/api/Ingredients,638,0,0
-1770695695174,1652,GET /api/dashboard,200,OK,Main User Journey 1-12,text,true,,4300,697,15,15,http://localhost:5000/api/Dashboard/summary,1652,0,0
-1770695696494,358,GET /api/Ingredients,200,OK,Main User Journey 1-11,text,true,,2761,691,15,15,http://localhost:5000/api/Ingredients,358,0,0
-1770695696506,384,GET /api/Ingredients,200,OK,Main User Journey 1-10,text,true,,2761,691,16,16,http://localhost:5000/api/Ingredients,384,0,0
-1770695696482,474,POST /api/auth/login,200,OK,Main User Journey 1-21,text,true,,968,249,16,16,http://localhost:5000/api/auth/login,474,0,0
-1770695696376,592,POST /api/Ingredients,201,Created,Main User Journey 1-8,text,true,,466,829,16,16,http://localhost:5000/api/Ingredients,592,0,0
-1770695695382,1644,GET /api/dashboard,200,OK,Main User Journey 1-13,text,true,,4300,697,15,15,http://localhost:5000/api/Dashboard/summary,1644,0,0
-1770695695605,1569,GET /api/dashboard,200,OK,Main User Journey 1-14,text,true,,4300,697,16,16,http://localhost:5000/api/Dashboard/summary,1569,0,0
-1770695696826,355,GET /api/Ingredients,200,OK,Main User Journey 1-12,text,true,,2978,691,16,16,http://localhost:5000/api/Ingredients,355,0,0
-1770695696683,504,POST /api/auth/login,200,OK,Main User Journey 1-22,text,true,,968,249,16,16,http://localhost:5000/api/auth/login,504,0,0
-1770695696659,669,POST /api/Ingredients,201,Created,Main User Journey 1-9,text,true,,466,829,17,17,http://localhost:5000/api/Ingredients,669,0,0
-1770695696882,470,POST /api/auth/login,200,OK,Main User Journey 1-23,text,true,,968,249,16,16,http://localhost:5000/api/auth/login,470,0,0
-1770695697026,405,GET /api/Ingredients,200,OK,Main User Journey 1-13,text,true,,3195,691,16,16,http://localhost:5000/api/Ingredients,405,0,0
-1770695696852,612,POST /api/Ingredients,201,Created,Main User Journey 1-11,text,true,,467,830,16,16,http://localhost:5000/api/Ingredients,612,0,0
-1770695697082,455,POST /api/auth/login,200,OK,Main User Journey 1-24,text,true,,968,249,16,16,http://localhost:5000/api/auth/login,455,0,0
-1770695696890,655,POST /api/Ingredients,201,Created,Main User Journey 1-10,text,true,,467,830,16,16,http://localhost:5000/api/Ingredients,655,0,0
-1770695697174,388,GET /api/Ingredients,200,OK,Main User Journey 1-14,text,true,,3631,691,15,15,http://localhost:5000/api/Ingredients,388,0,0
-1770695695781,1791,GET /api/dashboard,200,OK,Main User Journey 1-15,text,true,,4300,697,15,15,http://localhost:5000/api/Dashboard/summary,1791,0,0
-1770695696004,1587,GET /api/dashboard,200,OK,Main User Journey 1-16,text,true,,4300,697,15,15,http://localhost:5000/api/Dashboard/summary,1587,0,0
-1770695697282,486,POST /api/auth/login,200,OK,Main User Journey 1-25,text,true,,968,249,16,16,http://localhost:5000/api/auth/login,485,0,0
-1770695697182,618,POST /api/Ingredients,201,Created,Main User Journey 1-12,text,true,,467,830,16,16,http://localhost:5000/api/Ingredients,618,0,0
-1770695696170,1632,GET /api/dashboard,200,OK,Main User Journey 1-17,text,true,,4300,697,15,15,http://localhost:5000/api/Dashboard/summary,1632,0,0
-1770695697572,378,GET /api/Ingredients,200,OK,Main User Journey 1-15,text,true,,3849,691,16,16,http://localhost:5000/api/Ingredients,378,0,0
-1770695697481,494,POST /api/auth/login,200,OK,Main User Journey 1-26,text,true,,968,249,16,16,http://localhost:5000/api/auth/login,494,0,0
-1770695697592,389,GET /api/Ingredients,200,OK,Main User Journey 1-16,text,true,,3849,691,16,16,http://localhost:5000/api/Ingredients,389,0,0
-1770695696369,1707,GET /api/dashboard,200,OK,Main User Journey 1-18,text,true,,4300,697,16,16,http://localhost:5000/api/Dashboard/summary,1707,0,0
-1770695697432,650,POST /api/Ingredients,201,Created,Main User Journey 1-13,text,true,,467,830,16,16,http://localhost:5000/api/Ingredients,650,0,0
-1770695697682,453,POST /api/auth/login,200,OK,Main User Journey 1-27,text,true,,968,249,16,16,http://localhost:5000/api/auth/login,453,0,1
-1770695697802,382,GET /api/Ingredients,200,OK,Main User Journey 1-17,text,true,,4067,691,16,16,http://localhost:5000/api/Ingredients,382,0,0
-1770695697562,679,POST /api/Ingredients,201,Created,Main User Journey 1-14,text,true,,467,830,16,16,http://localhost:5000/api/Ingredients,679,0,0
-1770695696572,1786,GET /api/dashboard,200,OK,Main User Journey 1-19,text,true,,4300,697,16,16,http://localhost:5000/api/Dashboard/summary,1786,0,0
-1770695697883,518,POST /api/auth/login,200,OK,Main User Journey 1-28,text,true,,968,249,16,16,http://localhost:5000/api/auth/login,518,0,1
-1770695696811,1613,GET /api/dashboard,200,OK,Main User Journey 1-20,text,true,,4300,697,16,16,http://localhost:5000/api/Dashboard/summary,1613,0,0
-1770695698077,367,GET /api/Ingredients,200,OK,Main User Journey 1-18,text,true,,4286,691,16,16,http://localhost:5000/api/Ingredients,367,0,0
-1770695697950,568,POST /api/Ingredients,201,Created,Main User Journey 1-15,text,true,,467,830,17,17,http://localhost:5000/api/Ingredients,568,0,0
-1770695698083,512,POST /api/auth/login,200,OK,Main User Journey 1-29,text,true,,968,249,16,16,http://localhost:5000/api/auth/login,512,0,0
-1770695696956,1673,GET /api/dashboard,200,OK,Main User Journey 1-21,text,true,,4300,697,16,16,http://localhost:5000/api/Dashboard/summary,1673,0,0
-1770695697981,685,POST /api/Ingredients,201,Created,Main User Journey 1-16,text,true,,467,830,16,16,http://localhost:5000/api/Ingredients,685,0,0
-1770695698358,394,GET /api/Ingredients,200,OK,Main User Journey 1-19,text,true,,4722,691,16,16,http://localhost:5000/api/Ingredients,394,0,0
-1770695698424,376,GET /api/Ingredients,200,OK,Main User Journey 1-20,text,true,,4722,691,16,16,http://localhost:5000/api/Ingredients,376,0,0
-1770695698282,518,POST /api/auth/login,200,OK,Main User Journey 1-30,text,true,,968,249,16,16,http://localhost:5000/api/auth/login,518,0,1
-1770695697187,1621,GET /api/dashboard,200,OK,Main User Journey 1-22,text,true,,4300,697,16,16,http://localhost:5000/api/Dashboard/summary,1621,0,0
-1770695698184,639,POST /api/Ingredients,201,Created,Main User Journey 1-17,text,true,,467,830,16,16,http://localhost:5000/api/Ingredients,639,0,0
-1770695697353,1534,GET /api/dashboard,200,OK,Main User Journey 1-23,text,true,,4300,697,16,16,http://localhost:5000/api/Dashboard/summary,1534,0,0
-1770695698479,490,POST /api/auth/login,200,OK,Main User Journey 1-31,text,true,,968,249,16,16,http://localhost:5000/api/auth/login,490,0,0
-1770695698630,375,GET /api/Ingredients,200,OK,Main User Journey 1-21,text,true,,4940,691,16,16,http://localhost:5000/api/Ingredients,375,0,0
-1770695698444,617,POST /api/Ingredients,201,Created,Main User Journey 1-18,text,true,,467,830,16,16,http://localhost:5000/api/Ingredients,617,0,0
-1770695698683,505,POST /api/auth/login,200,OK,Main User Journey 1-32,text,true,,968,249,16,16,http://localhost:5000/api/auth/login,505,0,0
-1770695697537,1652,GET /api/dashboard,200,OK,Main User Journey 1-24,text,true,,4300,697,16,16,http://localhost:5000/api/Dashboard/summary,1652,0,0
-1770695698808,386,GET /api/Ingredients,200,OK,Main User Journey 1-22,text,true,,5158,691,16,16,http://localhost:5000/api/Ingredients,386,0,0
-1770695698887,374,GET /api/Ingredients,200,OK,Main User Journey 1-23,text,true,,5158,691,16,16,http://localhost:5000/api/Ingredients,374,0,0
-1770695698752,600,POST /api/Ingredients,201,Created,Main User Journey 1-19,text,true,,467,830,17,17,http://localhost:5000/api/Ingredients,600,0,0
-1770695698883,503,POST /api/auth/login,200,OK,Main User Journey 1-33,text,true,,968,249,16,16,http://localhost:5000/api/auth/login,503,0,0
-1770695698800,634,POST /api/Ingredients,201,Created,Main User Journey 1-20,text,true,,467,830,16,16,http://localhost:5000/api/Ingredients,634,0,0
-1770695697768,1684,GET /api/dashboard,200,OK,Main User Journey 1-25,text,true,,4300,697,15,15,http://localhost:5000/api/Dashboard/summary,1684,0,0
-1770695699189,391,GET /api/Ingredients,200,OK,Main User Journey 1-24,text,true,,5594,691,16,16,http://localhost:5000/api/Ingredients,391,0,0
-1770695699083,507,POST /api/auth/login,200,OK,Main User Journey 1-34,text,true,,968,249,16,16,http://localhost:5000/api/auth/login,507,0,0
-1770695697975,1663,GET /api/dashboard,200,OK,Main User Journey 1-26,text,true,,4300,697,16,16,http://localhost:5000/api/Dashboard/summary,1663,0,0
-1770695699006,638,POST /api/Ingredients,201,Created,Main User Journey 1-21,text,true,,467,830,16,16,http://localhost:5000/api/Ingredients,638,0,0
-1770695699282,482,POST /api/auth/login,200,OK,Main User Journey 1-35,text,true,,968,249,16,16,http://localhost:5000/api/auth/login,482,0,1
-1770695699452,398,GET /api/Ingredients,200,OK,Main User Journey 1-25,text,true,,5812,691,16,16,http://localhost:5000/api/Ingredients,398,0,0
-1770695699194,697,POST /api/Ingredients,201,Created,Main User Journey 1-22,text,true,,467,830,17,17,http://localhost:5000/api/Ingredients,697,0,0
-1770695699261,631,POST /api/Ingredients,201,Created,Main User Journey 1-23,text,true,,467,830,16,16,http://localhost:5000/api/Ingredients,631,0,0
-1770695698135,1759,GET /api/dashboard,200,OK,Main User Journey 1-27,text,true,,4300,697,15,15,http://localhost:5000/api/Dashboard/summary,1759,0,0
-1770695698401,1501,GET /api/dashboard,200,OK,Main User Journey 1-28,text,true,,4300,697,15,15,http://localhost:5000/api/Dashboard/summary,1501,0,0
-1770695699480,500,POST /api/auth/login,200,OK,Main User Journey 1-36,text,true,,968,249,15,15,http://localhost:5000/api/auth/login,500,0,1
-1770695699639,395,GET /api/Ingredients,200,OK,Main User Journey 1-26,text,true,,6248,691,15,15,http://localhost:5000/api/Ingredients,395,0,0
-1770695699682,494,POST /api/auth/login,200,OK,Main User Journey 1-37,text,true,,968,249,16,16,http://localhost:5000/api/auth/login,493,0,0
-1770695699580,617,POST /api/Ingredients,201,Created,Main User Journey 1-24,text,true,,467,830,16,16,http://localhost:5000/api/Ingredients,617,0,0
-1770695699894,369,GET /api/Ingredients,200,OK,Main User Journey 1-27,text,true,,6466,691,15,15,http://localhost:5000/api/Ingredients,369,0,0
-1770695699902,391,GET /api/Ingredients,200,OK,Main User Journey 1-28,text,true,,6466,691,16,16,http://localhost:5000/api/Ingredients,391,0,0
-1770695698800,1550,GET /api/dashboard,200,OK,Main User Journey 1-30,text,true,,4300,697,16,16,http://localhost:5000/api/Dashboard/summary,1550,0,0
-1770695698596,1774,GET /api/dashboard,200,OK,Main User Journey 1-29,text,true,,4300,697,16,16,http://localhost:5000/api/Dashboard/summary,1774,0,0
-1770695699878,521,POST /api/auth/login,200,OK,Main User Journey 1-38,text,true,,968,249,16,16,http://localhost:5000/api/auth/login,521,0,1
-1770695699851,641,POST /api/Ingredients,201,Created,Main User Journey 1-25,text,true,,467,830,17,17,http://localhost:5000/api/Ingredients,641,0,0
-1770695700078,475,POST /api/auth/login,200,OK,Main User Journey 1-39,text,true,,968,249,16,16,http://localhost:5000/api/auth/login,475,0,1
-1770695698969,1641,GET /api/dashboard,200,OK,Main User Journey 1-31,text,true,,4300,697,16,16,http://localhost:5000/api/Dashboard/summary,1641,0,0
-1770695700035,666,POST /api/Ingredients,201,Created,Main User Journey 1-26,text,true,,467,830,17,17,http://localhost:5000/api/Ingredients,666,0,0
-1770695700371,349,GET /api/Ingredients,200,OK,Main User Journey 1-29,text,true,,6902,691,16,16,http://localhost:5000/api/Ingredients,349,0,0
-1770695700351,409,GET /api/Ingredients,200,OK,Main User Journey 1-30,text,true,,6902,691,16,16,http://localhost:5000/api/Ingredients,409,0,0
-1770695700282,488,POST /api/auth/login,200,OK,Main User Journey 1-40,text,true,,968,249,16,16,http://localhost:5000/api/auth/login,488,0,0
-1770695699188,1696,GET /api/dashboard,200,OK,Main User Journey 1-32,text,true,,4300,697,17,17,http://localhost:5000/api/Dashboard/summary,1696,0,0
-1770695700293,631,POST /api/Ingredients,201,Created,Main User Journey 1-28,text,true,,467,830,17,17,http://localhost:5000/api/Ingredients,631,0,0
-1770695700610,347,GET /api/Ingredients,200,OK,Main User Journey 1-31,text,true,,7338,691,16,16,http://localhost:5000/api/Ingredients,347,0,0
-1770695700263,694,POST /api/Ingredients,201,Created,Main User Journey 1-27,text,true,,467,830,16,16,http://localhost:5000/api/Ingredients,694,0,0
-1770695700482,525,POST /api/auth/login,200,OK,Main User Journey 1-41,text,true,,968,249,15,15,http://localhost:5000/api/auth/login,525,0,0
-1770695699386,1628,GET /api/dashboard,200,OK,Main User Journey 1-33,text,true,,4300,697,15,15,http://localhost:5000/api/Dashboard/summary,1628,0,0
-1770695699591,1624,GET /api/dashboard,200,OK,Main User Journey 1-34,text,true,,4300,697,16,16,http://localhost:5000/api/Dashboard/summary,1624,0,0
-1770695700683,533,POST /api/auth/login,200,OK,Main User Journey 1-42,text,true,,968,249,16,16,http://localhost:5000/api/auth/login,533,0,0
-1770695700884,386,GET /api/Ingredients,200,OK,Main User Journey 1-32,text,true,,7338,691,16,16,http://localhost:5000/api/Ingredients,386,0,0
-1770695700882,473,POST /api/auth/login,200,OK,Main User Journey 1-43,text,true,,968,249,17,17,http://localhost:5000/api/auth/login,473,0,0
-1770695701014,349,GET /api/Ingredients,200,OK,Main User Journey 1-33,text,true,,7338,691,17,17,http://localhost:5000/api/Ingredients,349,0,0
-1770695700720,665,POST /api/Ingredients,201,Created,Main User Journey 1-29,text,true,,467,830,17,17,http://localhost:5000/api/Ingredients,665,0,0
-1770695699764,1628,GET /api/dashboard,200,OK,Main User Journey 1-35,text,true,,4300,697,16,16,http://localhost:5000/api/Dashboard/summary,1628,0,0
-1770695700760,634,POST /api/Ingredients,201,Created,Main User Journey 1-30,text,true,,467,830,16,16,http://localhost:5000/api/Ingredients,634,0,0
-1770695701083,493,POST /api/auth/login,200,OK,Main User Journey 1-44,text,true,,968,249,16,16,http://localhost:5000/api/auth/login,493,0,0
-1770695701216,368,GET /api/Ingredients,200,OK,Main User Journey 1-34,text,true,,7774,691,16,16,http://localhost:5000/api/Ingredients,368,0,0
-1770695699981,1605,GET /api/dashboard,200,OK,Main User Journey 1-36,text,true,,4300,697,16,16,http://localhost:5000/api/Dashboard/summary,1605,0,0
-1770695700958,668,POST /api/Ingredients,201,Created,Main User Journey 1-31,text,true,,467,830,16,16,http://localhost:5000/api/Ingredients,668,0,0
-1770695701392,375,GET /api/Ingredients,200,OK,Main User Journey 1-35,text,true,,7992,691,16,16,http://localhost:5000/api/Ingredients,375,0,0
-1770695701280,503,POST /api/auth/login,200,OK,Main User Journey 1-45,text,true,,968,249,16,16,http://localhost:5000/api/auth/login,503,0,0
-1770695701270,575,POST /api/Ingredients,201,Created,Main User Journey 1-32,text,true,,467,830,16,16,http://localhost:5000/api/Ingredients,575,0,0
-1770695700176,1674,GET /api/dashboard,200,OK,Main User Journey 1-37,text,true,,4300,697,15,15,http://localhost:5000/api/Dashboard/summary,1674,0,0
-1770695701483,488,POST /api/auth/login,200,OK,Main User Journey 1-46,text,true,,968,249,16,16,http://localhost:5000/api/auth/login,488,0,0
-1770695701586,387,GET /api/Ingredients,200,OK,Main User Journey 1-36,text,true,,8210,691,16,16,http://localhost:5000/api/Ingredients,387,0,0
-1770695700400,1628,GET /api/dashboard,200,OK,Main User Journey 1-38,text,true,,4300,697,16,16,http://localhost:5000/api/Dashboard/summary,1628,0,0
-1770695701363,675,POST /api/Ingredients,201,Created,Main User Journey 1-33,text,true,,467,830,16,16,http://localhost:5000/api/Ingredients,675,0,0
-1770695700553,1587,GET /api/dashboard,200,OK,Main User Journey 1-39,text,true,,4300,697,16,16,http://localhost:5000/api/Dashboard/summary,1587,0,0
-1770695701682,499,POST /api/auth/login,200,OK,Main User Journey 1-47,text,true,,968,249,16,16,http://localhost:5000/api/auth/login,499,0,0
-1770695701850,390,GET /api/Ingredients,200,OK,Main User Journey 1-37,text,true,,8428,691,16,16,http://localhost:5000/api/Ingredients,390,0,0
-1770695701585,726,POST /api/Ingredients,201,Created,Main User Journey 1-34,text,true,,467,830,17,17,http://localhost:5000/api/Ingredients,726,0,0
-1770695701882,455,POST /api/auth/login,200,OK,Main User Journey 1-48,text,true,,968,249,16,16,http://localhost:5000/api/auth/login,455,0,1
-1770695702028,348,GET /api/Ingredients,200,OK,Main User Journey 1-38,text,true,,8646,691,16,16,http://localhost:5000/api/Ingredients,348,0,0
-1770695701767,620,POST /api/Ingredients,201,Created,Main User Journey 1-35,text,true,,467,830,16,16,http://localhost:5000/api/Ingredients,620,0,0
-1770695700771,1694,GET /api/dashboard,200,OK,Main User Journey 1-40,text,true,,4300,697,15,15,http://localhost:5000/api/Dashboard/summary,1694,0,0
-1770695702140,361,GET /api/Ingredients,200,OK,Main User Journey 1-39,text,true,,8864,691,15,15,http://localhost:5000/api/Ingredients,361,0,0
-1770695702080,489,POST /api/auth/login,200,OK,Main User Journey 1-49,text,true,,968,249,15,15,http://localhost:5000/api/auth/login,489,0,0
-1770695701973,673,POST /api/Ingredients,201,Created,Main User Journey 1-36,text,true,,467,830,15,15,http://localhost:5000/api/Ingredients,673,0,0
-1770695701008,1745,GET /api/dashboard,200,OK,Main User Journey 1-41,text,true,,4300,697,14,14,http://localhost:5000/api/Dashboard/summary,1745,0,0
-1770695702282,475,POST /api/auth/login,200,OK,Main User Journey 1-50,text,true,,968,249,14,14,http://localhost:5000/api/auth/login,475,0,0
-1770695702465,353,GET /api/Ingredients,200,OK,Main User Journey 1-40,text,true,,9082,691,14,14,http://localhost:5000/api/Ingredients,353,0,0
-1770695701216,1680,GET /api/dashboard,200,OK,Main User Journey 1-42,text,true,,4300,697,14,14,http://localhost:5000/api/Dashboard/summary,1680,0,0
-1770695702240,674,POST /api/Ingredients,201,Created,Main User Journey 1-37,text,true,,467,830,14,14,http://localhost:5000/api/Ingredients,674,0,0
-1770695701355,1651,GET /api/dashboard,200,OK,Main User Journey 1-43,text,true,,4300,697,13,13,http://localhost:5000/api/Dashboard/summary,1651,0,0
-1770695702377,633,POST /api/Ingredients,201,Created,Main User Journey 1-38,text,true,,467,830,13,13,http://localhost:5000/api/Ingredients,633,0,0
-1770695702753,380,GET /api/Ingredients,200,OK,Main User Journey 1-41,text,true,,9518,691,12,12,http://localhost:5000/api/Ingredients,380,0,0
-1770695702501,633,POST /api/Ingredients,201,Created,Main User Journey 1-39,text,true,,465,830,12,12,http://localhost:5000/api/Ingredients,633,0,0
-1770695701577,1621,GET /api/dashboard,200,OK,Main User Journey 1-44,text,true,,4300,697,11,11,http://localhost:5000/api/Dashboard/summary,1621,0,0
-1770695702897,370,GET /api/Ingredients,200,OK,Main User Journey 1-42,text,true,,9734,691,11,11,http://localhost:5000/api/Ingredients,370,0,0
-1770695703007,367,GET /api/Ingredients,200,OK,Main User Journey 1-43,text,true,,9734,691,11,11,http://localhost:5000/api/Ingredients,367,0,0
-1770695701783,1608,GET /api/dashboard,200,OK,Main User Journey 1-45,text,true,,4300,697,11,11,http://localhost:5000/api/Dashboard/summary,1608,0,0
-1770695702818,675,POST /api/Ingredients,201,Created,Main User Journey 1-40,text,true,,467,830,11,11,http://localhost:5000/api/Ingredients,675,0,0
-1770695703199,376,GET /api/Ingredients,200,OK,Main User Journey 1-44,text,true,,9952,691,10,10,http://localhost:5000/api/Ingredients,376,0,0
-1770695702181,1469,GET /api/dashboard,200,OK,Main User Journey 1-47,text,true,,4300,697,10,10,http://localhost:5000/api/Dashboard/summary,1469,0,0
-1770695701971,1696,GET /api/dashboard,200,OK,Main User Journey 1-46,text,true,,4300,697,10,10,http://localhost:5000/api/Dashboard/summary,1696,0,0
-1770695703133,626,POST /api/Ingredients,201,Created,Main User Journey 1-41,text,true,,465,830,10,10,http://localhost:5000/api/Ingredients,626,0,0
-1770695703392,404,GET /api/Ingredients,200,OK,Main User Journey 1-45,text,true,,10168,691,9,9,http://localhost:5000/api/Ingredients,404,0,0
-1770695703268,606,POST /api/Ingredients,201,Created,Main User Journey 1-42,text,true,,467,830,9,9,http://localhost:5000/api/Ingredients,606,0,0
-1770695703651,372,GET /api/Ingredients,200,OK,Main User Journey 1-47,text,true,,10386,691,8,8,http://localhost:5000/api/Ingredients,372,0,0
-1770695703375,653,POST /api/Ingredients,201,Created,Main User Journey 1-43,text,true,,467,830,8,8,http://localhost:5000/api/Ingredients,653,0,0
-1770695702337,1726,GET /api/dashboard,200,OK,Main User Journey 1-48,text,true,,4300,697,7,7,http://localhost:5000/api/Dashboard/summary,1726,0,0
-1770695703668,405,GET /api/Ingredients,200,OK,Main User Journey 1-46,text,true,,10604,691,7,7,http://localhost:5000/api/Ingredients,405,0,0
-1770695702569,1688,GET /api/dashboard,200,OK,Main User Journey 1-49,text,true,,4300,697,7,7,http://localhost:5000/api/Dashboard/summary,1688,0,0
-1770695703576,689,POST /api/Ingredients,201,Created,Main User Journey 1-44,text,true,,467,830,7,7,http://localhost:5000/api/Ingredients,689,0,0
-1770695703797,641,POST /api/Ingredients,201,Created,Main User Journey 1-45,text,true,,467,830,6,6,http://localhost:5000/api/Ingredients,641,0,0
-1770695704064,391,GET /api/Ingredients,200,OK,Main User Journey 1-48,text,true,,11040,691,5,5,http://localhost:5000/api/Ingredients,391,0,0
-1770695702757,1700,GET /api/dashboard,200,OK,Main User Journey 1-50,text,true,,4300,697,5,5,http://localhost:5000/api/Dashboard/summary,1700,0,0
-1770695704258,393,GET /api/Ingredients,200,OK,Main User Journey 1-49,text,true,,11040,691,5,5,http://localhost:5000/api/Ingredients,393,0,0
-1770695704024,695,POST /api/Ingredients,201,Created,Main User Journey 1-47,text,true,,467,830,5,5,http://localhost:5000/api/Ingredients,695,0,0
-1770695704074,656,POST /api/Ingredients,201,Created,Main User Journey 1-46,text,true,,467,830,4,4,http://localhost:5000/api/Ingredients,656,0,0
-1770695704458,369,GET /api/Ingredients,200,OK,Main User Journey 1-50,text,true,,11476,691,3,3,http://localhost:5000/api/Ingredients,369,0,0
-1770695704456,655,POST /api/Ingredients,201,Created,Main User Journey 1-48,text,true,,467,830,3,3,http://localhost:5000/api/Ingredients,655,0,0
-1770695704652,672,POST /api/Ingredients,201,Created,Main User Journey 1-49,text,true,,467,830,2,2,http://localhost:5000/api/Ingredients,672,0,0
-1770695704828,653,POST /api/Ingredients,201,Created,Main User Journey 1-50,text,true,,467,830,1,1,http://localhost:5000/api/Ingredients,653,0,0
+1770701250313,1607,POST /api/auth/login,200,OK,Main User Journey 1-2,text,true,,968,249,10,10,http://localhost:5000/api/auth/login,1606,0,0
+1770701250154,1766,POST /api/auth/login,200,OK,Main User Journey 1-1,text,true,,968,249,10,10,http://localhost:5000/api/auth/login,1765,0,11
+1770701250510,1589,POST /api/auth/login,200,OK,Main User Journey 1-3,text,true,,968,249,11,11,http://localhost:5000/api/auth/login,1589,0,1
+1770701251104,1014,POST /api/auth/login,200,OK,Main User Journey 1-6,text,true,,968,249,11,11,http://localhost:5000/api/auth/login,1014,0,2
+1770701250702,1494,POST /api/auth/login,200,OK,Main User Journey 1-4,text,true,,968,249,11,11,http://localhost:5000/api/auth/login,1493,0,1
+1770701251691,513,POST /api/auth/login,200,OK,Main User Journey 1-9,text,true,,968,249,11,11,http://localhost:5000/api/auth/login,513,0,1
+1770701251302,920,POST /api/auth/login,200,OK,Main User Journey 1-7,text,true,,968,249,11,11,http://localhost:5000/api/auth/login,920,0,1
+1770701251892,505,POST /api/auth/login,200,OK,Main User Journey 1-10,text,true,,968,249,12,12,http://localhost:5000/api/auth/login,505,0,0
+1770701250906,1532,POST /api/auth/login,200,OK,Main User Journey 1-5,text,true,,968,249,12,12,http://localhost:5000/api/auth/login,1532,0,1
+1770701251499,990,POST /api/auth/login,200,OK,Main User Journey 1-8,text,true,,968,249,13,13,http://localhost:5000/api/auth/login,990,0,2
+1770701252090,457,POST /api/auth/login,200,OK,Main User Journey 1-11,text,true,,968,249,13,13,http://localhost:5000/api/auth/login,457,0,0
+1770701252285,481,POST /api/auth/login,200,OK,Main User Journey 1-12,text,true,,968,249,14,14,http://localhost:5000/api/auth/login,481,0,1
+1770701251934,1714,GET /api/dashboard,200,OK,Main User Journey 1-2,text,true,,4298,697,18,18,http://localhost:5000/api/Dashboard/summary,1714,0,0
+1770701252486,1195,POST /api/auth/login,200,OK,Main User Journey 1-13,text,true,,968,249,18,18,http://localhost:5000/api/auth/login,1195,0,1
+1770701252689,1003,POST /api/auth/login,200,OK,Main User Journey 1-14,text,true,,968,249,19,19,http://localhost:5000/api/auth/login,1003,0,0
+1770701251934,1764,GET /api/dashboard,200,OK,Main User Journey 1-1,text,true,,4298,697,19,19,http://localhost:5000/api/Dashboard/summary,1764,0,0
+1770701252118,1653,GET /api/dashboard,200,OK,Main User Journey 1-6,text,true,,4298,697,19,19,http://localhost:5000/api/Dashboard/summary,1653,0,0
+1770701252880,990,POST /api/auth/login,200,OK,Main User Journey 1-15,text,true,,968,249,19,19,http://localhost:5000/api/auth/login,990,0,0
+1770701252196,1688,GET /api/dashboard,200,OK,Main User Journey 1-4,text,true,,4298,697,19,19,http://localhost:5000/api/Dashboard/summary,1688,0,0
+1770701252204,1681,GET /api/dashboard,200,OK,Main User Journey 1-9,text,true,,4298,697,20,20,http://localhost:5000/api/Dashboard/summary,1681,0,0
+1770701252099,1841,GET /api/dashboard,200,OK,Main User Journey 1-3,text,true,,4298,697,20,20,http://localhost:5000/api/Dashboard/summary,1841,0,0
+1770701252398,1560,GET /api/dashboard,200,OK,Main User Journey 1-10,text,true,,4298,697,20,20,http://localhost:5000/api/Dashboard/summary,1560,0,0
+1770701253486,489,POST /api/auth/login,200,OK,Main User Journey 1-18,text,true,,968,249,20,20,http://localhost:5000/api/auth/login,489,0,1
+1770701253648,389,GET /api/Ingredients,200,OK,Main User Journey 1-2,text,true,,803,691,20,20,http://localhost:5000/api/Ingredients,389,0,0
+1770701253698,419,GET /api/Ingredients,200,OK,Main User Journey 1-1,text,true,,803,691,21,21,http://localhost:5000/api/Ingredients,419,0,0
+1770701253086,1118,POST /api/auth/login,200,OK,Main User Journey 1-16,text,true,,968,249,21,21,http://localhost:5000/api/auth/login,1118,0,1
+1770701252548,1687,GET /api/dashboard,200,OK,Main User Journey 1-11,text,true,,4298,697,21,21,http://localhost:5000/api/Dashboard/summary,1687,0,0
+1770701253685,597,POST /api/auth/login,200,OK,Main User Journey 1-19,text,true,,968,249,22,22,http://localhost:5000/api/auth/login,597,0,0
+1770701253885,417,GET /api/Ingredients,200,OK,Main User Journey 1-9,text,true,,803,691,22,22,http://localhost:5000/api/Ingredients,417,0,0
+1770701253884,433,GET /api/Ingredients,200,OK,Main User Journey 1-4,text,true,,803,691,22,22,http://localhost:5000/api/Ingredients,433,0,0
+1770701253280,1047,POST /api/auth/login,200,OK,Main User Journey 1-17,text,true,,968,249,22,22,http://localhost:5000/api/auth/login,1047,0,0
+1770701253940,417,GET /api/Ingredients,200,OK,Main User Journey 1-3,text,true,,803,691,22,22,http://localhost:5000/api/Ingredients,417,0,0
+1770701253885,548,POST /api/auth/login,200,OK,Main User Journey 1-20,text,true,,968,249,22,22,http://localhost:5000/api/auth/login,548,0,0
+1770701252222,2220,GET /api/dashboard,200,OK,Main User Journey 1-7,text,false,"The operation lasted too long: It took 2,220 milliseconds, but should not have lasted longer than 2,000 milliseconds.",4298,697,22,22,http://localhost:5000/api/Dashboard/summary,2220,0,0
+1770701254083,552,POST /api/auth/login,200,OK,Main User Journey 1-21,text,true,,968,249,23,23,http://localhost:5000/api/auth/login,552,0,1
+1770701254235,425,GET /api/Ingredients,200,OK,Main User Journey 1-11,text,true,,803,691,23,23,http://localhost:5000/api/Ingredients,425,0,0
+1770701252489,2213,GET /api/dashboard,200,OK,Main User Journey 1-8,text,false,"The operation lasted too long: It took 2,213 milliseconds, but should not have lasted longer than 2,000 milliseconds.",4298,697,24,24,http://localhost:5000/api/Dashboard/summary,2213,0,0
+1770701253771,932,GET /api/Ingredients,200,OK,Main User Journey 1-6,text,true,,803,691,24,24,http://localhost:5000/api/Ingredients,932,0,0
+1770701252438,2320,GET /api/dashboard,200,OK,Main User Journey 1-5,text,false,"The operation lasted too long: It took 2,320 milliseconds, but should not have lasted longer than 2,000 milliseconds.",4298,697,24,24,http://localhost:5000/api/Dashboard/summary,2320,0,0
+1770701254039,756,POST /api/Ingredients,201,Created,Main User Journey 1-2,text,true,,466,829,24,24,http://localhost:5000/api/Ingredients,756,0,0
+1770701254280,524,POST /api/auth/login,200,OK,Main User Journey 1-22,text,true,,968,249,24,24,http://localhost:5000/api/auth/login,524,0,1
+1770701254118,695,POST /api/Ingredients,201,Created,Main User Journey 1-1,text,true,,466,829,24,24,http://localhost:5000/api/Ingredients,695,0,0
+1770701254442,406,GET /api/Ingredients,200,OK,Main User Journey 1-7,text,true,,1237,691,24,24,http://localhost:5000/api/Ingredients,406,0,0
+1770701253959,918,GET /api/Ingredients,200,OK,Main User Journey 1-10,text,true,,1237,691,24,24,http://localhost:5000/api/Ingredients,918,0,0
+1770701252766,2170,GET /api/dashboard,200,OK,Main User Journey 1-12,text,false,"The operation lasted too long: It took 2,170 milliseconds, but should not have lasted longer than 2,000 milliseconds.",4298,697,25,25,http://localhost:5000/api/Dashboard/summary,2170,0,0
+1770701254302,658,POST /api/Ingredients,201,Created,Main User Journey 1-9,text,true,,466,829,25,25,http://localhost:5000/api/Ingredients,658,0,0
+1770701254702,384,GET /api/Ingredients,200,OK,Main User Journey 1-8,text,true,,1454,691,26,26,http://localhost:5000/api/Ingredients,384,0,0
+1770701254758,445,GET /api/Ingredients,200,OK,Main User Journey 1-5,text,true,,1454,691,26,26,http://localhost:5000/api/Ingredients,445,0,0
+1770701254685,534,POST /api/auth/login,200,OK,Main User Journey 1-24,text,true,,968,249,26,26,http://localhost:5000/api/auth/login,534,0,1
+1770701254937,388,GET /api/Ingredients,200,OK,Main User Journey 1-12,text,true,,1454,691,27,27,http://localhost:5000/api/Ingredients,388,0,0
+1770701254704,678,POST /api/Ingredients,201,Created,Main User Journey 1-6,text,true,,466,829,27,27,http://localhost:5000/api/Ingredients,678,0,0
+1770701253681,1738,GET /api/dashboard,200,OK,Main User Journey 1-13,text,true,,4298,697,27,27,http://localhost:5000/api/Dashboard/summary,1738,0,0
+1770701254661,774,POST /api/Ingredients,201,Created,Main User Journey 1-11,text,true,,466,829,27,27,http://localhost:5000/api/Ingredients,774,0,0
+1770701254317,1135,POST /api/Ingredients,201,Created,Main User Journey 1-4,text,true,,466,829,27,27,http://localhost:5000/api/Ingredients,1135,0,0
+1770701253693,1768,GET /api/dashboard,200,OK,Main User Journey 1-14,text,true,,4298,697,27,27,http://localhost:5000/api/Dashboard/summary,1768,0,0
+1770701253871,1622,GET /api/dashboard,200,OK,Main User Journey 1-15,text,true,,4298,697,28,28,http://localhost:5000/api/Dashboard/summary,1622,0,0
+1770701254480,1077,POST /api/auth/login,200,OK,Main User Journey 1-23,text,true,,968,249,28,28,http://localhost:5000/api/auth/login,1077,0,0
+1770701255081,525,POST /api/auth/login,200,OK,Main User Journey 1-26,text,true,,968,249,28,28,http://localhost:5000/api/auth/login,525,0,1
+1770701255282,525,POST /api/auth/login,200,OK,Main User Journey 1-27,text,true,,968,249,29,29,http://localhost:5000/api/auth/login,525,0,0
+1770701255087,737,POST /api/Ingredients,201,Created,Main User Journey 1-8,text,true,,467,830,29,29,http://localhost:5000/api/Ingredients,737,0,0
+1770701255462,376,GET /api/Ingredients,200,OK,Main User Journey 1-14,text,true,,2323,691,29,29,http://localhost:5000/api/Ingredients,376,0,0
+1770701255205,637,POST /api/Ingredients,201,Created,Main User Journey 1-5,text,true,,467,830,29,29,http://localhost:5000/api/Ingredients,637,0,0
+1770701255421,421,GET /api/Ingredients,200,OK,Main User Journey 1-13,text,true,,2323,691,29,29,http://localhost:5000/api/Ingredients,421,0,0
+1770701254204,1701,GET /api/dashboard,200,OK,Main User Journey 1-16,text,true,,4298,697,30,30,http://localhost:5000/api/Dashboard/summary,1701,0,0
+1770701254282,1681,GET /api/dashboard,200,OK,Main User Journey 1-19,text,true,,4298,697,30,30,http://localhost:5000/api/Dashboard/summary,1681,0,0
+1770701254882,1083,POST /api/auth/login,200,OK,Main User Journey 1-25,text,true,,968,249,30,30,http://localhost:5000/api/auth/login,1083,0,1
+1770701255485,510,POST /api/auth/login,200,OK,Main User Journey 1-28,text,true,,968,249,30,30,http://localhost:5000/api/auth/login,510,0,1
+1770701255327,669,POST /api/Ingredients,201,Created,Main User Journey 1-12,text,true,,467,830,30,30,http://localhost:5000/api/Ingredients,669,0,0
+1770701254877,1161,POST /api/Ingredients,201,Created,Main User Journey 1-10,text,true,,466,829,30,30,http://localhost:5000/api/Ingredients,1161,0,0
+1770701254358,1797,POST /api/Ingredients,201,Created,Main User Journey 1-3,text,true,,466,829,31,31,http://localhost:5000/api/Ingredients,1797,0,0
+1770701255825,376,POST /api/recipes,409,Conflict,Main User Journey 1-8,text,false,Test failed: code expected to match /201/,205,1056,31,31,http://localhost:5000/api/recipes,376,0,0
+1770701254848,1388,POST /api/Ingredients,201,Created,Main User Journey 1-7,text,true,,466,829,31,31,http://localhost:5000/api/Ingredients,1387,0,0
+1770701254796,1468,POST /api/recipes,201,Created,Main User Journey 1-2,text,true,,593,1056,31,31,http://localhost:5000/api/recipes,1468,0,0
+1770701254813,1462,POST /api/recipes,201,Created,Main User Journey 1-1,text,true,,593,1056,31,31,http://localhost:5000/api/recipes,1462,0,0
+1770701255906,399,GET /api/Ingredients,200,OK,Main User Journey 1-16,text,true,,3410,691,32,32,http://localhost:5000/api/Ingredients,399,0,0
+1770701254961,1356,POST /api/recipes,201,Created,Main User Journey 1-9,text,true,,593,1056,32,32,http://localhost:5000/api/recipes,1356,0,0
+1770701255965,364,GET /api/Ingredients,200,OK,Main User Journey 1-19,text,true,,3410,691,32,32,http://localhost:5000/api/Ingredients,364,0,0
+1770701255885,539,POST /api/auth/login,200,OK,Main User Journey 1-30,text,true,,968,249,32,32,http://localhost:5000/api/auth/login,539,0,1
+1770701256039,439,POST /api/recipes,409,Conflict,Main User Journey 1-10,text,false,Test failed: code expected to match /201/,205,1058,32,32,http://localhost:5000/api/recipes,439,0,0
+1770701255495,983,GET /api/Ingredients,200,OK,Main User Journey 1-15,text,true,,3410,691,32,32,http://localhost:5000/api/Ingredients,983,0,0
+1770701254635,1843,GET /api/dashboard,200,OK,Main User Journey 1-21,text,true,,4298,697,32,32,http://localhost:5000/api/Dashboard/summary,1843,0,0
+1770701255838,664,POST /api/Ingredients,201,Created,Main User Journey 1-14,text,true,,467,830,33,33,http://localhost:5000/api/Ingredients,664,0,0
+1770701255842,674,POST /api/Ingredients,201,Created,Main User Journey 1-13,text,true,,467,830,33,33,http://localhost:5000/api/Ingredients,674,0,0
+1770701254804,1725,GET /api/dashboard,200,OK,Main User Journey 1-22,text,true,,4298,697,33,33,http://localhost:5000/api/Dashboard/summary,1725,0,0
+1770701256086,494,POST /api/auth/login,200,OK,Main User Journey 1-31,text,true,,968,249,33,33,http://localhost:5000/api/auth/login,494,0,1
+1770701253976,2622,GET /api/dashboard,200,OK,Main User Journey 1-18,text,false,"The operation lasted too long: It took 2,622 milliseconds, but should not have lasted longer than 2,000 milliseconds.",4298,697,33,33,http://localhost:5000/api/Dashboard/summary,2622,0,0
+1770701254327,2309,GET /api/dashboard,200,OK,Main User Journey 1-17,text,false,"The operation lasted too long: It took 2,309 milliseconds, but should not have lasted longer than 2,000 milliseconds.",4298,697,33,33,http://localhost:5000/api/Dashboard/summary,2309,0,0
+1770701255436,1205,POST /api/recipes,201,Created,Main User Journey 1-11,text,true,,594,1057,33,33,http://localhost:5000/api/recipes,1205,0,0
+1770701254433,2260,GET /api/dashboard,200,OK,Main User Journey 1-20,text,false,"The operation lasted too long: It took 2,260 milliseconds, but should not have lasted longer than 2,000 milliseconds.",4298,697,34,34,http://localhost:5000/api/Dashboard/summary,2260,0,0
+1770701255687,1038,POST /api/auth/login,200,OK,Main User Journey 1-29,text,true,,968,249,34,34,http://localhost:5000/api/auth/login,1038,0,0
+1770701255383,1385,POST /api/recipes,201,Created,Main User Journey 1-6,text,true,,593,1056,34,34,http://localhost:5000/api/recipes,1385,0,0
+1770701256283,513,POST /api/auth/login,200,OK,Main User Journey 1-32,text,true,,968,249,34,34,http://localhost:5000/api/auth/login,513,0,0
+1770701256530,374,GET /api/Ingredients,200,OK,Main User Journey 1-22,text,true,,3846,691,35,35,http://localhost:5000/api/Ingredients,374,0,0
+1770701255453,1491,POST /api/recipes,201,Created,Main User Journey 1-4,text,true,,593,1056,35,35,http://localhost:5000/api/recipes,1491,0,0
+1770701256479,465,GET /api/Ingredients,200,OK,Main User Journey 1-21,text,true,,3846,691,35,35,http://localhost:5000/api/Ingredients,465,0,0
+1770701256489,530,POST /api/auth/login,200,OK,Main User Journey 1-33,text,true,,968,249,35,35,http://localhost:5000/api/auth/login,530,0,1
+1770701256599,451,GET /api/Ingredients,200,OK,Main User Journey 1-18,text,true,,3846,691,35,35,http://localhost:5000/api/Ingredients,451,0,0
+1770701256306,751,POST /api/Ingredients,201,Created,Main User Journey 1-16,text,true,,467,830,35,35,http://localhost:5000/api/Ingredients,751,0,0
+1770701256638,447,GET /api/Ingredients,200,OK,Main User Journey 1-17,text,true,,4064,691,36,36,http://localhost:5000/api/Ingredients,447,0,0
+1770701256329,768,POST /api/Ingredients,201,Created,Main User Journey 1-19,text,true,,465,830,36,36,http://localhost:5000/api/Ingredients,768,0,0
+1770701256694,444,GET /api/Ingredients,200,OK,Main User Journey 1-20,text,true,,4281,691,36,36,http://localhost:5000/api/Ingredients,444,0,0
+1770701256478,708,POST /api/Ingredients,201,Created,Main User Journey 1-15,text,true,,467,830,36,36,http://localhost:5000/api/Ingredients,708,0,0
+1770701256681,509,POST /api/auth/login,200,OK,Main User Journey 1-34,text,true,,968,249,36,36,http://localhost:5000/api/auth/login,509,0,1
+1770701255842,1404,POST /api/recipes,201,Created,Main User Journey 1-5,text,true,,593,1056,36,36,http://localhost:5000/api/recipes,1404,0,0
+1770701255558,1760,GET /api/dashboard,200,OK,Main User Journey 1-23,text,true,,4298,697,37,37,http://localhost:5000/api/Dashboard/summary,1760,0,0
+1770701256883,518,POST /api/auth/login,200,OK,Main User Journey 1-35,text,true,,968,249,37,37,http://localhost:5000/api/auth/login,518,0,1
+1770701255220,2337,GET /api/dashboard,200,OK,Main User Journey 1-24,text,false,"The operation lasted too long: It took 2,337 milliseconds, but should not have lasted longer than 2,000 milliseconds.",4298,697,38,38,http://localhost:5000/api/Dashboard/summary,2337,0,0
+1770701256157,1442,POST /api/recipes,201,Created,Main User Journey 1-3,text,true,,594,1057,38,38,http://localhost:5000/api/recipes,1442,0,0
+1770701256905,694,POST /api/Ingredients,201,Created,Main User Journey 1-22,text,true,,467,830,38,38,http://localhost:5000/api/Ingredients,694,0,0
+1770701255807,1808,GET /api/dashboard,200,OK,Main User Journey 1-27,text,true,,4298,697,38,38,http://localhost:5000/api/Dashboard/summary,1808,0,0
+1770701257085,530,POST /api/auth/login,200,OK,Main User Journey 1-36,text,true,,968,249,38,38,http://localhost:5000/api/auth/login,530,0,1
+1770701255966,1652,GET /api/dashboard,200,OK,Main User Journey 1-25,text,true,,4298,697,38,38,http://localhost:5000/api/Dashboard/summary,1652,0,0
+1770701256237,1381,POST /api/recipes,201,Created,Main User Journey 1-7,text,true,,594,1057,38,38,http://localhost:5000/api/recipes,1381,0,0
+1770701256945,676,POST /api/Ingredients,201,Created,Main User Journey 1-21,text,true,,467,830,38,38,http://localhost:5000/api/Ingredients,676,0,0
+1770701257050,669,POST /api/Ingredients,201,Created,Main User Journey 1-18,text,true,,467,830,39,39,http://localhost:5000/api/Ingredients,669,0,0
+1770701257319,407,GET /api/Ingredients,200,OK,Main User Journey 1-23,text,true,,4935,691,39,39,http://localhost:5000/api/Ingredients,407,0,0
+1770701257085,648,POST /api/Ingredients,201,Created,Main User Journey 1-17,text,true,,467,830,39,39,http://localhost:5000/api/Ingredients,648,0,0
+1770701257282,484,POST /api/auth/login,200,OK,Main User Journey 1-37,text,true,,968,249,39,39,http://localhost:5000/api/auth/login,484,0,1
+1770701257139,712,POST /api/Ingredients,201,Created,Main User Journey 1-20,text,true,,467,830,39,39,http://localhost:5000/api/Ingredients,712,0,0
+1770701255995,1866,GET /api/dashboard,200,OK,Main User Journey 1-28,text,true,,4298,697,39,39,http://localhost:5000/api/Dashboard/summary,1866,0,0
+1770701256502,1377,POST /api/recipes,201,Created,Main User Journey 1-14,text,true,,595,1058,39,39,http://localhost:5000/api/recipes,1377,0,0
+1770701256516,1363,POST /api/recipes,201,Created,Main User Journey 1-13,text,true,,595,1058,39,39,http://localhost:5000/api/recipes,1363,0,0
+1770701255996,2005,POST /api/recipes,201,Created,Main User Journey 1-12,text,false,"The operation lasted too long: It took 2,005 milliseconds, but should not have lasted longer than 2,000 milliseconds.",594,1057,40,40,http://localhost:5000/api/recipes,2005,0,0
+1770701257558,448,GET /api/Ingredients,200,OK,Main User Journey 1-24,text,true,,5589,691,40,40,http://localhost:5000/api/Ingredients,448,0,0
+1770701257615,391,GET /api/Ingredients,200,OK,Main User Journey 1-27,text,true,,5589,691,40,40,http://localhost:5000/api/Ingredients,391,0,0
+1770701257486,523,POST /api/auth/login,200,OK,Main User Journey 1-38,text,true,,968,249,40,40,http://localhost:5000/api/auth/login,523,0,1
+1770701257618,421,GET /api/Ingredients,200,OK,Main User Journey 1-25,text,true,,5589,691,40,40,http://localhost:5000/api/Ingredients,421,0,0
+1770701256425,1698,GET /api/dashboard,200,OK,Main User Journey 1-30,text,true,,4298,697,41,41,http://localhost:5000/api/Dashboard/summary,1698,0,0
+1770701255607,2552,GET /api/dashboard,200,OK,Main User Journey 1-26,text,false,"The operation lasted too long: It took 2,552 milliseconds, but should not have lasted longer than 2,000 milliseconds.",4298,697,41,41,http://localhost:5000/api/Dashboard/summary,2552,0,0
+1770701257684,577,POST /api/auth/login,200,OK,Main User Journey 1-39,text,true,,968,249,41,41,http://localhost:5000/api/auth/login,577,0,1
+1770701257861,435,GET /api/Ingredients,200,OK,Main User Journey 1-28,text,true,,5589,691,42,42,http://localhost:5000/api/Ingredients,435,0,0
+1770701257726,688,POST /api/Ingredients,201,Created,Main User Journey 1-23,text,true,,467,830,42,42,http://localhost:5000/api/Ingredients,688,0,0
+1770701257886,532,POST /api/auth/login,200,OK,Main User Journey 1-40,text,true,,968,249,42,42,http://localhost:5000/api/auth/login,532,0,1
+1770701257097,1342,POST /api/recipes,201,Created,Main User Journey 1-19,text,true,,595,1058,42,42,http://localhost:5000/api/recipes,1342,0,0
+1770701256580,1886,GET /api/dashboard,200,OK,Main User Journey 1-31,text,true,,4298,697,42,42,http://localhost:5000/api/Dashboard/summary,1886,0,0
+1770701258123,362,GET /api/Ingredients,200,OK,Main User Journey 1-30,text,true,,5807,691,43,43,http://localhost:5000/api/Ingredients,362,0,0
+1770701257057,1434,POST /api/recipes,201,Created,Main User Journey 1-16,text,true,,595,1058,43,43,http://localhost:5000/api/recipes,1434,0,0
+1770701258159,408,GET /api/Ingredients,200,OK,Main User Journey 1-26,text,true,,5807,691,43,43,http://localhost:5000/api/Ingredients,408,0,0
+1770701256725,1853,GET /api/dashboard,200,OK,Main User Journey 1-29,text,true,,4298,697,43,43,http://localhost:5000/api/Dashboard/summary,1853,0,0
+1770701258081,510,POST /api/auth/login,200,OK,Main User Journey 1-41,text,true,,968,249,43,43,http://localhost:5000/api/auth/login,510,0,1
+1770701257186,1414,POST /api/recipes,201,Created,Main User Journey 1-15,text,true,,595,1058,43,43,http://localhost:5000/api/recipes,1414,0,0
+1770701256796,1883,GET /api/dashboard,200,OK,Main User Journey 1-32,text,true,,4298,697,43,43,http://localhost:5000/api/Dashboard/summary,1883,0,0
+1770701258006,673,POST /api/Ingredients,201,Created,Main User Journey 1-24,text,true,,467,830,43,43,http://localhost:5000/api/Ingredients,673,0,0
+1770701258006,722,POST /api/Ingredients,201,Created,Main User Journey 1-27,text,true,,467,830,44,44,http://localhost:5000/api/Ingredients,722,0,0
+1770701258039,695,POST /api/Ingredients,201,Created,Main User Journey 1-25,text,true,,467,830,44,44,http://localhost:5000/api/Ingredients,695,0,0
+1770701258287,515,POST /api/auth/login,200,OK,Main User Journey 1-42,text,true,,968,249,44,44,http://localhost:5000/api/auth/login,515,0,0
+1770701257019,1805,GET /api/dashboard,200,OK,Main User Journey 1-33,text,true,,4298,697,44,44,http://localhost:5000/api/Dashboard/summary,1805,0,0
+1770701257621,1340,POST /api/recipes,201,Created,Main User Journey 1-21,text,true,,595,1058,45,45,http://localhost:5000/api/recipes,1340,0,0
+1770701258467,504,GET /api/Ingredients,200,OK,Main User Journey 1-31,text,true,,6461,691,45,45,http://localhost:5000/api/Ingredients,504,0,0
+1770701258297,677,POST /api/Ingredients,201,Created,Main User Journey 1-28,text,true,,467,830,45,45,http://localhost:5000/api/Ingredients,677,0,0
+1770701257190,1785,GET /api/dashboard,200,OK,Main User Journey 1-34,text,true,,4298,697,45,45,http://localhost:5000/api/Dashboard/summary,1785,0,0
+1770701257599,1386,POST /api/recipes,201,Created,Main User Journey 1-22,text,true,,595,1058,45,45,http://localhost:5000/api/recipes,1386,0,0
+1770701258578,421,GET /api/Ingredients,200,OK,Main User Journey 1-29,text,true,,6679,691,45,45,http://localhost:5000/api/Ingredients,421,0,0
+1770701257401,1679,GET /api/dashboard,200,OK,Main User Journey 1-35,text,true,,4298,697,45,45,http://localhost:5000/api/Dashboard/summary,1679,0,0
+1770701258482,635,POST /api/auth/login,200,OK,Main User Journey 1-43,text,true,,968,249,46,46,http://localhost:5000/api/auth/login,635,0,1
+1770701258679,439,GET /api/Ingredients,200,OK,Main User Journey 1-32,text,true,,6679,691,46,46,http://localhost:5000/api/Ingredients,439,0,0
+1770701258734,385,POST /api/recipes,409,Conflict,Main User Journey 1-25,text,false,Test failed: code expected to match /201/,205,1058,46,46,http://localhost:5000/api/recipes,385,0,0
+1770701257720,1406,POST /api/recipes,201,Created,Main User Journey 1-18,text,true,,593,1058,46,46,http://localhost:5000/api/recipes,1406,0,0
+1770701257733,1410,POST /api/recipes,201,Created,Main User Journey 1-17,text,true,,595,1058,46,46,http://localhost:5000/api/recipes,1410,0,0
+1770701258686,518,POST /api/auth/login,200,OK,Main User Journey 1-44,text,true,,968,249,46,46,http://localhost:5000/api/auth/login,518,0,0
+1770701258568,672,POST /api/Ingredients,201,Created,Main User Journey 1-26,text,true,,467,830,46,46,http://localhost:5000/api/Ingredients,672,0,0
+1770701258824,416,GET /api/Ingredients,200,OK,Main User Journey 1-33,text,true,,6679,691,46,46,http://localhost:5000/api/Ingredients,416,0,0
+1770701257851,1405,POST /api/recipes,201,Created,Main User Journey 1-20,text,true,,595,1058,46,46,http://localhost:5000/api/recipes,1405,0,0
+1770701258486,774,POST /api/Ingredients,201,Created,Main User Journey 1-30,text,true,,467,830,46,46,http://localhost:5000/api/Ingredients,774,0,0
+1770701257616,1741,GET /api/dashboard,200,OK,Main User Journey 1-36,text,true,,4298,697,47,47,http://localhost:5000/api/Dashboard/summary,1741,0,0
+1770701258976,422,GET /api/Ingredients,200,OK,Main User Journey 1-34,text,true,,7115,691,47,47,http://localhost:5000/api/Ingredients,422,0,0
+1770701258886,522,POST /api/auth/login,200,OK,Main User Journey 1-45,text,true,,968,249,47,47,http://localhost:5000/api/auth/login,522,0,0
+1770701257766,1753,GET /api/dashboard,200,OK,Main User Journey 1-37,text,true,,4298,697,48,48,http://localhost:5000/api/Dashboard/summary,1753,0,0
+1770701259081,438,GET /api/Ingredients,200,OK,Main User Journey 1-35,text,true,,7115,691,48,48,http://localhost:5000/api/Ingredients,438,0,0
+1770701259087,560,POST /api/auth/login,200,OK,Main User Journey 1-46,text,true,,968,249,48,48,http://localhost:5000/api/auth/login,560,0,0
+1770701259260,387,POST /api/recipes,409,Conflict,Main User Journey 1-30,text,false,Test failed: code expected to match /201/,205,1058,48,48,http://localhost:5000/api/recipes,387,0,0
+1770701258971,717,POST /api/Ingredients,201,Created,Main User Journey 1-31,text,true,,467,830,49,49,http://localhost:5000/api/Ingredients,717,0,0
+1770701259000,693,POST /api/Ingredients,201,Created,Main User Journey 1-29,text,true,,467,830,49,49,http://localhost:5000/api/Ingredients,693,0,0
+1770701259283,494,POST /api/auth/login,200,OK,Main User Journey 1-47,text,true,,968,249,49,49,http://localhost:5000/api/auth/login,494,0,0
+1770701259357,454,GET /api/Ingredients,200,OK,Main User Journey 1-36,text,true,,7551,691,49,49,http://localhost:5000/api/Ingredients,454,0,0
+1770701258010,1811,GET /api/dashboard,200,OK,Main User Journey 1-38,text,true,,4298,697,49,49,http://localhost:5000/api/Dashboard/summary,1811,0,0
+1770701259119,708,POST /api/Ingredients,201,Created,Main User Journey 1-32,text,true,,467,830,49,49,http://localhost:5000/api/Ingredients,708,0,0
+1770701259240,666,POST /api/Ingredients,201,Created,Main User Journey 1-33,text,true,,467,830,50,50,http://localhost:5000/api/Ingredients,666,0,0
+1770701258414,1518,POST /api/recipes,201,Created,Main User Journey 1-23,text,true,,595,1058,50,50,http://localhost:5000/api/recipes,1518,0,0
+1770701259519,415,GET /api/Ingredients,200,OK,Main User Journey 1-37,text,true,,7987,691,50,50,http://localhost:5000/api/Ingredients,415,0,0
+1770701258679,1364,POST /api/recipes,201,Created,Main User Journey 1-24,text,true,,595,1058,50,50,http://localhost:5000/api/recipes,1364,0,0
+1770701259487,560,POST /api/auth/login,200,OK,Main User Journey 1-48,text,true,,968,249,50,50,http://localhost:5000/api/auth/login,560,0,1
+1770701259399,688,POST /api/Ingredients,201,Created,Main User Journey 1-34,text,true,,465,830,50,50,http://localhost:5000/api/Ingredients,688,0,0
+1770701258728,1363,POST /api/recipes,201,Created,Main User Journey 1-27,text,true,,595,1058,50,50,http://localhost:5000/api/recipes,1363,0,0
+1770701259688,408,POST /api/recipes,409,Conflict,Main User Journey 1-31,text,false,Test failed: code expected to match /201/,205,1058,50,50,http://localhost:5000/api/recipes,408,0,0
+1770701258261,1838,GET /api/dashboard,200,OK,Main User Journey 1-39,text,true,,4298,697,50,50,http://localhost:5000/api/Dashboard/summary,1838,0,0
+1770701258418,1753,GET /api/dashboard,200,OK,Main User Journey 1-40,text,true,,4298,697,50,50,http://localhost:5000/api/Dashboard/summary,1753,0,0
+1770701259519,661,POST /api/Ingredients,201,Created,Main User Journey 1-35,text,true,,467,830,50,50,http://localhost:5000/api/Ingredients,661,0,0
+1770701259683,522,POST /api/auth/login,200,OK,Main User Journey 1-49,text,true,,968,249,50,50,http://localhost:5000/api/auth/login,522,0,1
+1770701259827,400,POST /api/recipes,409,Conflict,Main User Journey 1-32,text,false,Test failed: code expected to match /201/,205,1058,50,50,http://localhost:5000/api/recipes,400,0,0
+1770701259821,429,GET /api/Ingredients,200,OK,Main User Journey 1-38,text,true,,8421,691,50,50,http://localhost:5000/api/Ingredients,429,0,0
+1770701259907,374,POST /api/recipes,409,Conflict,Main User Journey 1-33,text,false,Test failed: code expected to match /201/,205,1058,50,50,http://localhost:5000/api/recipes,374,0,0
+1770701258591,1766,GET /api/dashboard,200,OK,Main User Journey 1-41,text,true,,4298,697,50,50,http://localhost:5000/api/Dashboard/summary,1766,0,0
+1770701258974,1397,POST /api/recipes,201,Created,Main User Journey 1-28,text,true,,595,1058,50,50,http://localhost:5000/api/recipes,1397,0,0
+1770701259884,509,POST /api/auth/login,200,OK,Main User Journey 1-50,text,true,,968,249,50,50,http://localhost:5000/api/auth/login,509,0,1
+1770701258802,1661,GET /api/dashboard,200,OK,Main User Journey 1-42,text,true,,4298,697,50,50,http://localhost:5000/api/Dashboard/summary,1661,0,0
+1770701260087,386,POST /api/recipes,409,Conflict,Main User Journey 1-34,text,false,Test failed: code expected to match /201/,205,1058,50,50,http://localhost:5000/api/recipes,386,0,0
+1770701259811,706,POST /api/Ingredients,201,Created,Main User Journey 1-36,text,true,,467,830,50,50,http://localhost:5000/api/Ingredients,705,0,0
+1770701260099,422,GET /api/Ingredients,200,OK,Main User Journey 1-39,text,true,,8639,691,50,50,http://localhost:5000/api/Ingredients,422,0,0
+1770701260179,395,POST /api/recipes,409,Conflict,Main User Journey 1-35,text,false,Test failed: code expected to match /201/,205,1058,50,50,http://localhost:5000/api/recipes,395,0,0
+1770701259934,643,POST /api/Ingredients,201,Created,Main User Journey 1-37,text,true,,467,830,50,50,http://localhost:5000/api/Ingredients,643,0,0
+1770701259240,1343,POST /api/recipes,201,Created,Main User Journey 1-26,text,true,,595,1058,50,50,http://localhost:5000/api/recipes,1343,0,0
+1770701260170,412,GET /api/Ingredients,200,OK,Main User Journey 1-40,text,true,,8639,691,50,50,http://localhost:5000/api/Ingredients,412,0,0
+1770701260356,356,GET /api/Ingredients,200,OK,Main User Journey 1-41,text,true,,8857,691,50,50,http://localhost:5000/api/Ingredients,356,0,0
+1770701259117,1725,GET /api/dashboard,200,OK,Main User Journey 1-43,text,true,,4298,697,50,50,http://localhost:5000/api/Dashboard/summary,1725,0,0
+1770701260462,383,GET /api/Ingredients,200,OK,Main User Journey 1-42,text,true,,8857,691,50,50,http://localhost:5000/api/Ingredients,383,0,0
+1770701259205,1716,GET /api/dashboard,200,OK,Main User Journey 1-44,text,true,,4298,697,50,50,http://localhost:5000/api/Dashboard/summary,1716,0,0
+1770701260516,407,POST /api/recipes,409,Conflict,Main User Journey 1-36,text,false,Test failed: code expected to match /201/,205,1058,50,50,http://localhost:5000/api/recipes,407,0,0
+1770701260250,698,POST /api/Ingredients,201,Created,Main User Journey 1-38,text,true,,467,830,50,50,http://localhost:5000/api/Ingredients,698,0,0
+1770701260576,381,POST /api/recipes,409,Conflict,Main User Journey 1-37,text,false,Test failed: code expected to match /201/,205,1058,50,50,http://localhost:5000/api/recipes,381,0,0
+1770701259693,1380,POST /api/recipes,201,Created,Main User Journey 1-29,text,true,,595,1058,50,50,http://localhost:5000/api/recipes,1380,0,0
+1770701259408,1801,GET /api/dashboard,200,OK,Main User Journey 1-45,text,true,,4298,697,50,50,http://localhost:5000/api/Dashboard/summary,1801,0,0
+1770701260582,649,POST /api/Ingredients,201,Created,Main User Journey 1-40,text,true,,465,830,50,50,http://localhost:5000/api/Ingredients,649,0,0
+1770701260521,715,POST /api/Ingredients,201,Created,Main User Journey 1-39,text,true,,465,830,50,50,http://localhost:5000/api/Ingredients,714,0,0
+1770701260842,400,GET /api/Ingredients,200,OK,Main User Journey 1-43,text,true,,9507,691,50,50,http://localhost:5000/api/Ingredients,400,0,0
+1770701260921,369,GET /api/Ingredients,200,OK,Main User Journey 1-44,text,true,,9507,691,50,50,http://localhost:5000/api/Ingredients,369,0,0
+1770701260949,380,POST /api/recipes,409,Conflict,Main User Journey 1-38,text,false,Test failed: code expected to match /201/,205,1058,50,50,http://localhost:5000/api/recipes,380,0,0
+1770701259778,1558,GET /api/dashboard,200,OK,Main User Journey 1-47,text,true,,4298,697,50,50,http://localhost:5000/api/Dashboard/summary,1558,0,0
+1770701260713,650,POST /api/Ingredients,201,Created,Main User Journey 1-41,text,true,,467,830,50,50,http://localhost:5000/api/Ingredients,650,0,0
+1770701259647,1791,GET /api/dashboard,200,OK,Main User Journey 1-46,text,true,,4298,697,50,50,http://localhost:5000/api/Dashboard/summary,1791,0,0
+1770701260846,692,POST /api/Ingredients,201,Created,Main User Journey 1-42,text,true,,467,830,50,50,http://localhost:5000/api/Ingredients,692,0,0
+1770701261209,361,GET /api/Ingredients,200,OK,Main User Journey 1-45,text,true,,9943,691,50,50,http://localhost:5000/api/Ingredients,361,0,0
+1770701261232,392,POST /api/recipes,409,Conflict,Main User Journey 1-40,text,false,Test failed: code expected to match /201/,205,1058,50,50,http://localhost:5000/api/recipes,392,0,0
+1770701260047,1607,GET /api/dashboard,200,OK,Main User Journey 1-48,text,true,,4298,697,50,50,http://localhost:5000/api/Dashboard/summary,1607,0,0
+1770701261336,398,GET /api/Ingredients,200,OK,Main User Journey 1-47,text,true,,9943,691,50,50,http://localhost:5000/api/Ingredients,398,0,0
+1770701261363,374,POST /api/recipes,409,Conflict,Main User Journey 1-41,text,false,Test failed: code expected to match /201/,205,1058,50,50,http://localhost:5000/api/recipes,374,0,0
+1770701261437,391,GET /api/Ingredients,200,OK,Main User Journey 1-46,text,true,,9943,691,50,50,http://localhost:5000/api/Ingredients,391,0,0
+1770701256202,5636,GET /api/Forecast,200,OK,Main User Journey 1-8,text,false,"The operation lasted too long: It took 5,636 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,50,50,http://localhost:5000/api/Forecast?days=7,5636,0,0
+1770701261243,606,POST /api/Ingredients,201,Created,Main User Journey 1-43,text,true,,463,830,49,49,http://localhost:5000/api/Ingredients,606,0,0
+1770701261539,367,POST /api/recipes,409,Conflict,Main User Journey 1-42,text,false,Test failed: code expected to match /201/,205,1058,49,49,http://localhost:5000/api/recipes,367,0,0
+1770701260204,1719,GET /api/dashboard,200,OK,Main User Journey 1-49,text,true,,4298,697,49,49,http://localhost:5000/api/Dashboard/summary,1719,0,0
+1770701261291,635,POST /api/Ingredients,201,Created,Main User Journey 1-44,text,true,,465,830,49,49,http://localhost:5000/api/Ingredients,635,0,0
+1770701261654,400,GET /api/Ingredients,200,OK,Main User Journey 1-48,text,true,,10373,691,49,49,http://localhost:5000/api/Ingredients,399,0,0
+1770701260393,1685,GET /api/dashboard,200,OK,Main User Journey 1-50,text,true,,4298,697,49,49,http://localhost:5000/api/Dashboard/summary,1685,0,0
+1770701261571,602,POST /api/Ingredients,201,Created,Main User Journey 1-45,text,true,,467,830,49,49,http://localhost:5000/api/Ingredients,602,0,0
+1770701261849,388,POST /api/recipes,409,Conflict,Main User Journey 1-43,text,false,Test failed: code expected to match /201/,205,1058,49,49,http://localhost:5000/api/recipes,388,0,0
+1770701261926,363,POST /api/recipes,409,Conflict,Main User Journey 1-44,text,false,Test failed: code expected to match /201/,205,1058,49,49,http://localhost:5000/api/recipes,363,0,0
+1770701261924,399,GET /api/Ingredients,200,OK,Main User Journey 1-49,text,true,,10591,691,49,49,http://localhost:5000/api/Ingredients,399,0,0
+1770701261734,592,POST /api/Ingredients,201,Created,Main User Journey 1-47,text,true,,467,830,49,49,http://localhost:5000/api/Ingredients,592,0,0
+1770701262078,358,GET /api/Ingredients,200,OK,Main User Journey 1-50,text,true,,10809,691,49,49,http://localhost:5000/api/Ingredients,358,0,0
+1770701261829,643,POST /api/Ingredients,201,Created,Main User Journey 1-46,text,true,,465,830,49,49,http://localhost:5000/api/Ingredients,643,0,0
+1770701261237,1251,POST /api/recipes,201,Created,Main User Journey 1-39,text,true,,595,1058,49,49,http://localhost:5000/api/recipes,1251,0,0
+1770701262174,383,POST /api/recipes,409,Conflict,Main User Journey 1-45,text,false,Test failed: code expected to match /201/,205,1058,49,49,http://localhost:5000/api/recipes,383,0,0
+1770701262055,635,POST /api/Ingredients,201,Created,Main User Journey 1-48,text,true,,467,830,49,49,http://localhost:5000/api/Ingredients,635,0,0
+1770701262324,618,POST /api/Ingredients,201,Created,Main User Journey 1-49,text,true,,467,830,49,49,http://localhost:5000/api/Ingredients,618,0,0
+1770701262690,372,POST /api/recipes,409,Conflict,Main User Journey 1-48,text,false,Test failed: code expected to match /201/,205,1058,49,49,http://localhost:5000/api/recipes,372,0,0
+1770701262438,631,POST /api/Ingredients,201,Created,Main User Journey 1-50,text,true,,467,830,49,49,http://localhost:5000/api/Ingredients,631,0,0
+1770701262943,398,POST /api/recipes,409,Conflict,Main User Journey 1-49,text,false,Test failed: code expected to match /201/,205,1058,49,49,http://localhost:5000/api/recipes,398,0,0
+1770701263070,376,POST /api/recipes,409,Conflict,Main User Journey 1-50,text,false,Test failed: code expected to match /201/,205,1058,49,49,http://localhost:5000/api/recipes,376,0,0
+1770701262327,1231,POST /api/recipes,201,Created,Main User Journey 1-47,text,true,,595,1058,49,49,http://localhost:5000/api/recipes,1231,0,0
+1770701262473,1191,POST /api/recipes,201,Created,Main User Journey 1-46,text,true,,595,1058,49,49,http://localhost:5000/api/recipes,1191,0,0
+1770701256266,10614,GET /api/Forecast,200,OK,Main User Journey 1-2,text,false,"The operation lasted too long: It took 10,614 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,49,49,http://localhost:5000/api/Forecast?days=7,10614,0,0
+1770701256277,15621,GET /api/Forecast,200,OK,Main User Journey 1-1,text,false,"The operation lasted too long: It took 15,621 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,48,48,http://localhost:5000/api/Forecast?days=7,15621,0,0
+1770701256478,20447,GET /api/Forecast,200,OK,Main User Journey 1-10,text,false,"The operation lasted too long: It took 20,447 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,47,47,http://localhost:5000/api/Forecast?days=7,20447,0,0
+1770701256641,25275,GET /api/Forecast,200,OK,Main User Journey 1-11,text,false,"The operation lasted too long: It took 25,275 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,46,46,http://localhost:5000/api/Forecast?days=7,25275,0,0
+1770701256768,30189,GET /api/Forecast,200,OK,Main User Journey 1-6,text,false,"The operation lasted too long: It took 30,189 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,45,45,http://localhost:5000/api/Forecast?days=7,30189,0,0
+1770701256945,34951,GET /api/Forecast,200,OK,Main User Journey 1-4,text,false,"The operation lasted too long: It took 34,951 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,44,44,http://localhost:5000/api/Forecast?days=7,34951,0,0
+1770701256319,40615,GET /api/Forecast,200,OK,Main User Journey 1-9,text,false,"The operation lasted too long: It took 40,615 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,43,43,http://localhost:5000/api/Forecast?days=7,40615,0,0
+1770701257247,44661,GET /api/Forecast,200,OK,Main User Journey 1-5,text,false,"The operation lasted too long: It took 44,661 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,42,42,http://localhost:5000/api/Forecast?days=7,44661,0,0
+1770701257599,49367,GET /api/Forecast,200,OK,Main User Journey 1-3,text,false,"The operation lasted too long: It took 49,367 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,41,41,http://localhost:5000/api/Forecast?days=7,49367,0,0
+1770701257618,54330,GET /api/Forecast,200,OK,Main User Journey 1-7,text,false,"The operation lasted too long: It took 54,330 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,40,40,http://localhost:5000/api/Forecast?days=7,54330,0,0
+1770701257879,59127,GET /api/Forecast,200,OK,Main User Journey 1-14,text,false,"The operation lasted too long: It took 59,127 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,39,39,http://localhost:5000/api/Forecast?days=7,59127,0,0
+1770701257879,64039,GET /api/Forecast,200,OK,Main User Journey 1-13,text,false,"The operation lasted too long: It took 64,039 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,38,38,http://localhost:5000/api/Forecast?days=7,64039,0,0
+1770701258002,68916,GET /api/Forecast,200,OK,Main User Journey 1-12,text,false,"The operation lasted too long: It took 68,916 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,37,37,http://localhost:5000/api/Forecast?days=7,68916,0,0
+1770701258439,73500,GET /api/Forecast,200,OK,Main User Journey 1-19,text,false,"The operation lasted too long: It took 73,500 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,36,36,http://localhost:5000/api/Forecast?days=7,73499,0,0
+1770701258491,78516,GET /api/Forecast,200,OK,Main User Journey 1-16,text,false,"The operation lasted too long: It took 78,516 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,35,35,http://localhost:5000/api/Forecast?days=7,78516,0,0
+1770701258600,83329,GET /api/Forecast,200,OK,Main User Journey 1-15,text,false,"The operation lasted too long: It took 83,329 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,34,34,http://localhost:5000/api/Forecast?days=7,83329,0,0
+1770701258985,87942,GET /api/Forecast,200,OK,Main User Journey 1-22,text,false,"The operation lasted too long: It took 87,942 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,33,33,http://localhost:5000/api/Forecast?days=7,87942,0,0
+1770701258961,92989,GET /api/Forecast,200,OK,Main User Journey 1-21,text,false,"The operation lasted too long: It took 92,989 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,32,32,http://localhost:5000/api/Forecast?days=7,92989,0,0
+1770701259126,97852,GET /api/Forecast,200,OK,Main User Journey 1-18,text,false,"The operation lasted too long: It took 97,852 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,31,31,http://localhost:5000/api/Forecast?days=7,97851,0,0
+1770701259143,102834,GET /api/Forecast,200,OK,Main User Journey 1-17,text,false,"The operation lasted too long: It took 102,834 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,30,30,http://localhost:5000/api/Forecast?days=7,102834,0,0
+1770701259119,107886,GET /api/Forecast,200,OK,Main User Journey 1-25,text,false,"The operation lasted too long: It took 107,886 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,29,29,http://localhost:5000/api/Forecast?days=7,107886,0,0
+1770701259256,112752,GET /api/Forecast,200,OK,Main User Journey 1-20,text,false,"The operation lasted too long: It took 112,752 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,28,28,http://localhost:5000/api/Forecast?days=7,112752,0,0
+1770701259647,117318,GET /api/Forecast,200,OK,Main User Journey 1-30,text,false,"The operation lasted too long: It took 117,318 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,27,27,http://localhost:5000/api/Forecast?days=7,117318,0,0
+1770701259933,120666,GET /api/Forecast,200,OK,Main User Journey 1-23,text,false,"The operation lasted too long: It took 120,666 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,26,26,http://localhost:5000/api/Forecast?days=7,120666,0,0
+1770701260044,120678,GET /api/Forecast,200,OK,Main User Journey 1-24,text,false,"The operation lasted too long: It took 120,678 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,25,25,http://localhost:5000/api/Forecast?days=7,120678,0,0
+1770701260091,120640,GET /api/Forecast,200,OK,Main User Journey 1-27,text,false,"The operation lasted too long: It took 120,640 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,24,24,http://localhost:5000/api/Forecast?days=7,120640,0,0
+1770701260096,120667,GET /api/Forecast,200,OK,Main User Journey 1-31,text,false,"The operation lasted too long: It took 120,667 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,23,23,http://localhost:5000/api/Forecast?days=7,120667,0,0
+1770701260227,120659,GET /api/Forecast,200,OK,Main User Journey 1-32,text,false,"The operation lasted too long: It took 120,659 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,22,22,http://localhost:5000/api/Forecast?days=7,120659,0,0
+1770701260280,120698,GET /api/Forecast,200,OK,Main User Journey 1-33,text,false,"The operation lasted too long: It took 120,698 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,21,21,http://localhost:5000/api/Forecast?days=7,120698,0,0
+1770701260370,120683,GET /api/Forecast,200,OK,Main User Journey 1-28,text,false,"The operation lasted too long: It took 120,683 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,20,20,http://localhost:5000/api/Forecast?days=7,120683,0,0
+1770701260473,120604,GET /api/Forecast,200,OK,Main User Journey 1-34,text,false,"The operation lasted too long: It took 120,604 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,19,19,http://localhost:5000/api/Forecast?days=7,120604,0,0
+1770701260582,120607,GET /api/Forecast,200,OK,Main User Journey 1-26,text,false,"The operation lasted too long: It took 120,607 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,18,18,http://localhost:5000/api/Forecast?days=7,120607,0,0
+1770701260574,120623,GET /api/Forecast,200,OK,Main User Journey 1-35,text,false,"The operation lasted too long: It took 120,623 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,17,17,http://localhost:5000/api/Forecast?days=7,120623,0,0
+1770701260924,120643,GET /api/Forecast,200,OK,Main User Journey 1-36,text,false,"The operation lasted too long: It took 120,643 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,16,16,http://localhost:5000/api/Forecast?days=7,120643,0,0
+1770701260958,120638,GET /api/Forecast,200,OK,Main User Journey 1-37,text,false,"The operation lasted too long: It took 120,638 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,15,15,http://localhost:5000/api/Forecast?days=7,120638,0,0
+1770701261072,120645,GET /api/Forecast,200,OK,Main User Journey 1-29,text,false,"The operation lasted too long: It took 120,645 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,14,14,http://localhost:5000/api/Forecast?days=7,120645,0,0
+1770701261330,120638,GET /api/Forecast,200,OK,Main User Journey 1-38,text,false,"The operation lasted too long: It took 120,638 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,13,13,http://localhost:5000/api/Forecast?days=7,120638,0,0
+1770701261625,120621,GET /api/Forecast,200,OK,Main User Journey 1-40,text,false,"The operation lasted too long: It took 120,621 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,12,12,http://localhost:5000/api/Forecast?days=7,120621,0,0
+1770701261738,120650,GET /api/Forecast,200,OK,Main User Journey 1-41,text,false,"The operation lasted too long: It took 120,650 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,11,11,http://localhost:5000/api/Forecast?days=7,120650,0,0
+1770701261907,120624,GET /api/Forecast,200,OK,Main User Journey 1-42,text,false,"The operation lasted too long: It took 120,624 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,10,10,http://localhost:5000/api/Forecast?days=7,120624,0,0
+1770701262238,120609,GET /api/Forecast,200,OK,Main User Journey 1-43,text,false,"The operation lasted too long: It took 120,609 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,9,9,http://localhost:5000/api/Forecast?days=7,120609,0,0
+1770701262289,120678,GET /api/Forecast,200,OK,Main User Journey 1-44,text,false,"The operation lasted too long: It took 120,678 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,8,8,http://localhost:5000/api/Forecast?days=7,120678,0,0
+1770701262489,120696,GET /api/Forecast,200,OK,Main User Journey 1-39,text,false,"The operation lasted too long: It took 120,696 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,7,7,http://localhost:5000/api/Forecast?days=7,120696,0,0
+1770701262558,120768,GET /api/Forecast,200,OK,Main User Journey 1-45,text,false,"The operation lasted too long: It took 120,768 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,6,6,http://localhost:5000/api/Forecast?days=7,120768,0,0
+1770701263062,120664,GET /api/Forecast,200,OK,Main User Journey 1-48,text,false,"The operation lasted too long: It took 120,664 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,5,5,http://localhost:5000/api/Forecast?days=7,120664,0,0
+1770701263341,120629,GET /api/Forecast,200,OK,Main User Journey 1-49,text,false,"The operation lasted too long: It took 120,629 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,4,4,http://localhost:5000/api/Forecast?days=7,120629,0,0
+1770701263446,120639,GET /api/Forecast,200,OK,Main User Journey 1-50,text,false,"The operation lasted too long: It took 120,639 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,3,3,http://localhost:5000/api/Forecast?days=7,120639,0,0
+1770701263559,120655,GET /api/Forecast,200,OK,Main User Journey 1-47,text,false,"The operation lasted too long: It took 120,655 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,2,2,http://localhost:5000/api/Forecast?days=7,120655,0,0
+1770701263665,120682,GET /api/Forecast,200,OK,Main User Journey 1-46,text,false,"The operation lasted too long: It took 120,682 milliseconds, but should not have lasted longer than 2,000 milliseconds.",160,695,1,1,http://localhost:5000/api/Forecast?days=7,120681,0,0
