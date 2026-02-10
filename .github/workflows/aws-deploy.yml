@@ -754,13 +754,23 @@ jobs:
           
           threshold_ms = 500
           satisfied = tolerating = frustrated = 0
+          total_requests = 0
+          success_count = 0
+          error_count = 0
           
           try:
               with open('results.jtl', 'r') as f:
-                  reader = csv.DictReader(f, delimiter='\t')
+                  reader = csv.DictReader(f)
                   for row in reader:
                       try:
+                          total_requests += 1
                           elapsed = int(row['elapsed'])
+                          is_success = row.get('success', 'true').lower() == 'true'
+                          if is_success:
+                              success_count += 1
+                          else:
+                              error_count += 1
+                          
                           if elapsed <= threshold_ms:
                               satisfied += 1
                           elif elapsed <= 4 * threshold_ms:
@@ -773,15 +783,29 @@ jobs:
               total = satisfied + tolerating + frustrated
               if total > 0:
                   apdex = (satisfied + tolerating/2) / total
-                  print(f"Apdex Score: {apdex:.3f}")
-                  print(f"Satisfied: {satisfied}, Tolerating: {tolerating}, Frustrated: {frustrated}")
+                  error_rate = (error_count / total_requests * 100) if total_requests > 0 else 0
+                  
+                  print(f"=== JMeter Performance Summary ===")
+                  print(f"Total Requests: {total_requests}")
+                  print(f"Successful: {success_count}, Failed: {error_count}")
+                  print(f"Error Rate: {error_rate:.1f}%")
+                  print(f"")
+                  print(f"Apdex Score: {apdex:.3f} (threshold: {threshold_ms}ms)")
+                  print(f"  Satisfied (<={threshold_ms}ms): {satisfied}")
+                  print(f"  Tolerating (<={4*threshold_ms}ms): {tolerating}")
+                  print(f"  Frustrated (>{4*threshold_ms}ms): {frustrated}")
                   
                   if apdex < 0.85:
-                      print("WARNING: Apdex score below threshold (0.85)")
+                      print(f"\nWARNING: Apdex score {apdex:.3f} below threshold (0.85)")
+                  else:
+                      print(f"\nOK: Apdex score {apdex:.3f} meets threshold (0.85)")
+                  
+                  if error_rate > 50:
+                      print(f"WARNING: High error rate {error_rate:.1f}%")
               else:
-                  print("No valid results found")
+                  print("No valid results found in results.jtl")
           except FileNotFoundError:
-              print("Results file not found")
+              print("Results file not found - JMeter may have failed to run")
           EOF
 
       - name: Upload JMeter reports
