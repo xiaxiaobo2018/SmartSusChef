@@ -4,7 +4,7 @@ scikit-learn==1.8.0
 joblib==1.5.3
 holidays==0.90
 sqlalchemy==2.0.46
-pymysql==1.4.6
+pymysql==1.1.2
 geopy==2.4.1
 openmeteo-requests==1.7.5
 retry-requests==2.0.0
