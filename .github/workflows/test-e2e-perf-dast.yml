@@ -194,26 +194,38 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Prepare ZAP workspace
+        run: |
+          mkdir -p zap-reports
+          touch zap-reports/baseline-report.html zap-reports/baseline-report.json zap-reports/baseline-report.md
+          touch zap-reports/api-report.html zap-reports/api-report.json zap-reports/api-report.md
+          chmod -R 777 zap-reports
+
       - name: ZAP Baseline Scan (Frontend)
-        uses: zaproxy/action-baseline@v0.12.0
-        with:
-          target: ${{ inputs.target_url }}
-          rules_file_name: '.zap/rules.tsv'
-          cmd_options: '-a -j -m 5 -T 60'
-          fail_action: false
-          allow_issue_writing: false
-          artifact_name: 'zap-baseline-report'
+        run: |
+          docker pull ghcr.io/zaproxy/zaproxy:stable -q
+          docker run --rm -v $(pwd):/zap/wrk/:rw --network=host \
+            -t ghcr.io/zaproxy/zaproxy:stable \
+            zap-baseline.py \
+            -t '${{ inputs.target_url }}' \
+            -c '.zap/rules.tsv' \
+            -J zap-reports/baseline-report.json \
+            -w zap-reports/baseline-report.md \
+            -r zap-reports/baseline-report.html \
+            -a -j -m 5 -T 60 || true
         continue-on-error: true
 
       - name: ZAP API Scan (Backend)
-        uses: zaproxy/action-api-scan@v0.7.0
-        with:
-          target: '${{ inputs.target_url }}/api'
-          format: 'openapi'
-          cmd_options: '-a -j -m 5 -T 60'
-          fail_action: false
-          allow_issue_writing: false
-          artifact_name: 'zap-api-report'
+        run: |
+          docker run --rm -v $(pwd):/zap/wrk/:rw --network=host \
+            -t ghcr.io/zaproxy/zaproxy:stable \
+            zap-api-scan.py \
+            -t '${{ inputs.target_url }}/api' \
+            -f openapi \
+            -J zap-reports/api-report.json \
+            -w zap-reports/api-report.md \
+            -r zap-reports/api-report.html \
+            -a -j -m 5 -T 60 || true
         continue-on-error: true
 
       - name: Upload ZAP reports
@@ -221,10 +233,7 @@ jobs:
         if: always()
         with:
           name: zap-reports
-          path: |
-            report_html.html
-            report_md.md
-            report_json.json
+          path: zap-reports/
           retention-days: 30
 
   # ==========================================
