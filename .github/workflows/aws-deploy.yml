@@ -24,11 +24,6 @@ on:
     - '!mobile/**'
   workflow_dispatch:
     inputs:
-      deploy_uat:
-        description: 'Deploy to UAT (manual approval)'
-        required: false
-        default: false
-        type: boolean
       run_jmeter:
         description: 'Run JMeter performance tests'
         required: false
@@ -545,8 +540,7 @@ jobs:
     needs: [docker-build-push, detect-changes]
     if: |
       !cancelled() && !failure() &&
-      github.ref == 'refs/heads/main' &&
-      (github.event_name == 'workflow_dispatch' && inputs.deploy_uat == 'true')
+      github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     environment:
       name: uat
       url: http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com
