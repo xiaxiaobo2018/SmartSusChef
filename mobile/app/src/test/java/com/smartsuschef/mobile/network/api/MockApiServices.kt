@@ -30,7 +30,7 @@ import com.smartsuschef.mobile.network.dto.WastageDataDto
 import com.smartsuschef.mobile.network.dto.WastageTrendDto
 import com.smartsuschef.mobile.network.dto.WeatherDto
 import kotlinx.coroutines.delay
-import okhttp3.ResponseBody
+import okhttp3.ResponseBody.Companion.toResponseBody
 import retrofit2.Response
 
 /**
@@ -66,7 +66,7 @@ class MockAuthApiService : AuthApiService {
         } else {
             // Simulate a login failure
             // The `null` body with an error code is how Retrofit signals an error
-            return Response.error(401, ResponseBody.create(null, "Invalid credentials"))
+            return Response.error(401, "Invalid credentials".toResponseBody(null))
         }
     }
 
