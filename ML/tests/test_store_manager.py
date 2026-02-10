@@ -1,5 +1,4 @@
 import pandas as pd
-import pytest
 
 from app.store_manager import StoreModelManager
 
