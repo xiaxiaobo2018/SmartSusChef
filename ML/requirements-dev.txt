@@ -3,6 +3,7 @@ pytest
 pytest-cov
 pytest-mock
 httpx
+eval-type-backport
 
 # --- Code Quality & Security ---
 ruff
