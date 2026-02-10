@@ -14,8 +14,5 @@ import dagger.hilt.android.HiltAndroidApp
 @HiltAndroidApp
 class SmartSusChefApplication : Application() {
     override fun onCreate() {
-        super.onCreate()
-        // Application initialization code here (if needed)
-        // Hilt is automatically initialized by the @HiltAndroidApp annotation
-    }
+        super.onCreate()      }
 }

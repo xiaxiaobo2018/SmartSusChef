@@ -5,7 +5,6 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.smartsuschef.mobile.BuildConfig
 import com.smartsuschef.mobile.data.TokenManager
-import com.smartsuschef.mobile.util.EmulatorDetector
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -107,7 +106,7 @@ object CoreNetworkModule {
 
     /**
      * Provides Retrofit instance.
-     * Automatically uses local URL on emulator, AWS URL on real devices.
+     * BASE_URL is determined by the product flavor (local / uat / production).
      */
     @Provides
     @Singleton
@@ -115,13 +114,8 @@ object CoreNetworkModule {
         okHttpClient: OkHttpClient,
         gson: Gson
     ): Retrofit {
-        val baseUrl = if (EmulatorDetector.isEmulator()) {
-            BuildConfig.BASE_URL        // Local backend (emulator)
-        } else {
-            BuildConfig.AWS_BASE_URL    // AWS backend (real device)
-        }
         return Retrofit.Builder()
-            .baseUrl(baseUrl)
+            .baseUrl(BuildConfig.BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
