@@ -24,8 +24,6 @@
 # In[ ]:
 
 # --- IMPORTS & SETUP ---
-from __future__ import annotations
-
 import os
 
 os.environ.setdefault("CMDSTANPY_LOG_LEVEL", "WARNING")
@@ -39,26 +37,17 @@ except ImportError:
     pass  # python-dotenv not installed, use system env vars
 
 import argparse
-import logging
 import traceback
 import warnings
 
 import holidays
-import joblib
 import numpy as np
 import pandas as pd
 
-# Set up logging for this module
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-if not logger.handlers:
-    _handler = logging.StreamHandler()
-    _handler.setFormatter(
-        logging.Formatter(
-            "%(asctime)s [%(levelname)s] %(name)s: %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
-        )
-    )
-    logger.addHandler(_handler)
+from app.utils.logging_config import setup_logger
+from app.utils.secure_io import secure_dump, secure_load
+
+logger = setup_logger(__name__)
 
 try:
     import shap
@@ -97,7 +86,6 @@ from training_logic_v2 import (
     PipelineConfig,
     _load_hybrid_models,
     _prophet_predict,
-    _silence_logs,
     add_local_context,
     compute_lag_features_from_history,
     fetch_training_data,
@@ -106,9 +94,11 @@ from training_logic_v2 import (
     safe_filename,
 )
 
-# Silence verbose logging (centralized in training_logic_v2)
+# Silence verbose logging
 warnings.filterwarnings("ignore")
-_silence_logs()
+from app.utils.logging_config import silence_noisy_loggers
+
+silence_noisy_loggers()
 
 logger.info("Libraries loaded successfully.")
 
@@ -122,7 +112,7 @@ _forecast_cache = {}
 def _load_cached(filepath):
     """Load a joblib-serialized object with caching."""
     if filepath not in _model_cache:
-        _model_cache[filepath] = joblib.load(filepath)
+        _model_cache[filepath] = secure_load(filepath)
     return _model_cache[filepath]
 
 
@@ -141,54 +131,9 @@ def _get_location_cached(address):
 
 
 def get_weather_forecast(latitude, longitude):
-    """
-    Fetch 14-day weather forecast from the Open-Meteo Forecast API.
-    Returns a DataFrame with columns: date + WEATHER_COLS, or None if the API call fails.
-    """
-    if openmeteo_requests is None or retry is None:
-        logger.warning("openmeteo_requests or retry_requests not available.")
-        return None
-
-    try:
-        session = retry(retries=3, backoff_factor=0.5)
-        om = openmeteo_requests.Client(session=session)
-
-        url = "https://api.open-meteo.com/v1/forecast"
-        params = {
-            "latitude": latitude,
-            "longitude": longitude,
-            "daily": WEATHER_COLS,
-            "forecast_days": 16,
-            "timezone": "auto",
-        }
-
-        responses = om.weather_api(url, params=params)
-        response = responses[0]
-        daily = response.Daily()
-
-        dates = pd.date_range(
-            start=pd.to_datetime(daily.Time(), unit="s", utc=True),
-            end=pd.to_datetime(daily.TimeEnd(), unit="s", utc=True),
-            freq=pd.Timedelta(seconds=daily.Interval()),
-            inclusive="left",
-        )
-
-        forecast_df = pd.DataFrame(
-            {
-                "date": dates,
-                WEATHER_COLS[0]: daily.Variables(0).ValuesAsNumpy(),
-                WEATHER_COLS[1]: daily.Variables(1).ValuesAsNumpy(),
-                WEATHER_COLS[2]: daily.Variables(2).ValuesAsNumpy(),
-                WEATHER_COLS[3]: daily.Variables(3).ValuesAsNumpy(),
-            }
-        )
-        forecast_df["date"] = forecast_df["date"].dt.tz_localize(None).dt.normalize()
-
-        logger.info("Fetched %d-day weather forecast.", len(forecast_df))
-        return forecast_df
-    except Exception as e:
-        logger.error("Failed to fetch weather forecast: %s", e)
-        return None
+    """Fetch 14-day weather forecast — delegates to app.utils.fetch_weather_forecast."""
+    from app.utils import fetch_weather_forecast
+    return fetch_weather_forecast(latitude, longitude, forecast_days=16)
 
 
 def _get_forecast_cached(lat, lon):
@@ -257,7 +202,9 @@ def _predict_hybrid_multiday(
         prophet_yhat = float(_prophet_predict(prophet_model, future_df_prophet)[0])
 
         # Compute lag features from history
-        lag_feats = compute_lag_features_from_history(sales_history, config)
+        lag_feats = compute_lag_features_from_history(
+            sales_history, lags=config.lags, roll_windows=config.roll_windows
+        )
 
         # Build feature row for tree model
         row = {
@@ -678,7 +625,7 @@ if __name__ == "__main__":
         )
 
     # Save champion registry using joblib (safer serialization)
-    joblib.dump(champion_map, f"{config.model_dir}/champion_registry.pkl")
+    secure_dump(champion_map, f"{config.model_dir}/champion_registry.pkl")
 
     clear_model_cache()
 
@@ -704,7 +651,6 @@ if __name__ == "__main__":
         forecast_date = args.forecast_date
 
         all_forecasts = {}
-        day1_summary = []
 
         for dish_name in enriched_df["dish"].unique():
             preds = get_prediction(
@@ -712,22 +658,6 @@ if __name__ == "__main__":
             )
             if preds and "Error" not in preds[0]:
                 all_forecasts[dish_name] = preds
-                p0 = preds[0]
-                expl = p0.get("Explanation", {})
-                day1_summary.append(
-                    {
-                        "Dish": p0["Dish"],
-                        "Day 1 Qty": p0["Prediction"],
-                        "Lower": p0["Prediction_Lower"],
-                        "Upper": p0["Prediction_Upper"],
-                        "Model": p0["Model Used"],
-                        "ProphetTrend": expl.get("ProphetTrend", 0),
-                        "Seasonality": expl.get("Seasonality", 0),
-                        "Holiday": expl.get("Holiday", 0),
-                        "Weather": expl.get("Weather", 0),
-                        "Lags/Trend": expl.get("Lags/Trend", 0),
-                    }
-                )
 
         # Build 14-Day Forecast Table (rows=dishes, columns=dates)
         forecast_table_rows = []

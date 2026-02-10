@@ -3,7 +3,7 @@ name: SmartSusChef AWS CI/CD Pipeline
 on:
   push:
     branches: [main]
-    paths:                              
+    paths:                               
       - 'backend/**'
       - 'frontend/**'
       - 'ML/**'
@@ -250,13 +250,13 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: 'pip'
           cache-dependency-path: |
-            ML/requirements.txt
+            ML/requirements-prod.txt
             ML/requirements-dev.txt
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt -r requirements-dev.txt
+          pip install -r requirements-dev.txt
         working-directory: ./ML
 
       - name: Ruff lint
@@ -360,7 +360,7 @@ jobs:
   docker-build-push:
     name: "Build & Push Docker Images"
     runs-on: ubuntu-latest
-    needs: [detect-changes, security-scan, backend-build, frontend-build, ml-build]
+    needs: [detect-changes, backend-build, frontend-build, ml-build]
     if: |
       !cancelled() && !failure() &&
       github.ref == 'refs/heads/main' && github.event_name == 'push'

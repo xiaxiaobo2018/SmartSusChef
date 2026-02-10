@@ -24,9 +24,9 @@ def test_get_store_when_present(tmp_path):
     mgr = StoreModelManager(base_model_dir=str(tmp_path))
     store_dir = mgr.store_model_dir(1)
     store_dir.mkdir(parents=True, exist_ok=True)
-    import joblib
+    from app.utils.secure_io import secure_dump
 
-    joblib.dump({"DishA": {"model": "xgb"}}, store_dir / "champion_registry.pkl")
+    secure_dump({"DishA": {"model": "xgb"}}, store_dir / "champion_registry.pkl")
     store = mgr.get_store(1)
     assert store is not None
     assert store.list_dishes() == ["DishA"]
@@ -36,9 +36,9 @@ def test_reload_store(tmp_path):
     mgr = StoreModelManager(base_model_dir=str(tmp_path))
     store_dir = mgr.store_model_dir(1)
     store_dir.mkdir(parents=True, exist_ok=True)
-    import joblib
+    from app.utils.secure_io import secure_dump
 
-    joblib.dump({"DishA": {"model": "xgb"}}, store_dir / "champion_registry.pkl")
+    secure_dump({"DishA": {"model": "xgb"}}, store_dir / "champion_registry.pkl")
     store1 = mgr.get_store(1)
     store2 = mgr.reload_store(1)
     assert store1 is not None

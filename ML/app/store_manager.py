@@ -8,9 +8,6 @@ This module handles:
 - Loading store-specific ModelStore instances
 """
 
-from __future__ import annotations
-
-import logging
 import os
 import threading
 from pathlib import Path
@@ -20,8 +17,9 @@ import pandas as pd
 from sqlalchemy import create_engine, text
 
 from app.inference import ModelStore
+from app.utils.logging_config import setup_logger
 
-logger = logging.getLogger(__name__)
+logger = setup_logger(__name__)
 
 
 class StoreModelManager:
@@ -138,7 +136,7 @@ class StoreModelManager:
             )
             return df, unique_days
         except Exception as e:
-            logger.error("Failed to fetch sales for store %d: %s", store_id, e)
+            logger.error("Failed to fetch sales for store %d: %s", store_id, e, exc_info=True)
             return None, 0
 
     def fetch_store_location(self, store_id: int) -> tuple[float | None, float | None, str | None]:
@@ -161,7 +159,7 @@ class StoreModelManager:
             cc = str(row.iloc[0]["CountryCode"]) if row.iloc[0]["CountryCode"] else None
             return lat, lon, cc
         except Exception as e:
-            logger.error("Failed to fetch store location for %d: %s", store_id, e)
+            logger.error("Failed to fetch store location for %d: %s", store_id, e, exc_info=True)
             return None, None, None
 
     # ------------------------------------------------------------------
@@ -196,8 +194,7 @@ class StoreModelManager:
             lat, lon, country_code = self.fetch_store_location(store_id)
 
             # Import training logic (heavy — only when needed)
-            import joblib
-
+            from app.utils.secure_io import secure_dump
             from training_logic_v2 import (
                 PipelineConfig,
                 add_local_context,
@@ -249,11 +246,12 @@ class StoreModelManager:
                     }
                     trained += 1
                 except Exception as e:
-                    logger.error("Store %d, dish '%s' failed: %s", store_id, dish, e)
+                    logger.error(
+                        "Training failed for store (ID masked), dish '%s'. Error: %s", dish, e
+                    )
                     failed += 1
                 logger.info(
-                    "Store %d training progress: %d/%d (failed: %d)",
-                    store_id,
+                    "Store (ID masked) training progress: %d/%d (failed: %d)",
                     trained + failed,
                     total,
                     failed,
@@ -261,9 +259,9 @@ class StoreModelManager:
 
             # Save registry
             registry_path = Path(model_dir) / "champion_registry.pkl"
-            joblib.dump(champion_map, str(registry_path))
+            secure_dump(champion_map, str(registry_path))
             logger.info(
-                "Store %d training complete: %d trained, %d failed.", store_id, trained, failed
+                "Store (ID masked) training complete: %d trained, %d failed.", trained, failed
             )
 
             # Reload into cache
@@ -277,7 +275,7 @@ class StoreModelManager:
             }
 
         except Exception as e:
-            logger.error("Training failed for store %d: %s", store_id, e)
+            logger.error("Training failed for store %d: %s", store_id, e, exc_info=True)
             return {"status": "error", "message": str(e)}
         finally:
             self._training_in_progress[store_id] = False

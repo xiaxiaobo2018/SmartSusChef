@@ -7,5 +7,14 @@ __pycache__/
 backup/
 catboost_info/
 outputs/
+tests/
+scripts/
 *.ipynb
 .DS_Store
+*.md
+.ruff_cache/
+.mypy_cache/
+.pytest_cache/
+requirements-dev.txt
+pyproject.toml
+train_offline.py
