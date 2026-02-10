@@ -42,6 +42,8 @@ import {
   Check,
   X,
   Loader2,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { User } from '@/app/types';
@@ -108,6 +110,10 @@ export function StoreSettings({ onBack }: StoreSettingsProps) {
     newPassword: '',
   });
 
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showUserPassword, setShowUserPassword] = useState(false);
+
   // Sync form when editing starts or dialog opens
   useEffect(() => {
     if (editingUser) {
@@ -129,6 +135,7 @@ export function StoreSettings({ onBack }: StoreSettingsProps) {
         status: 'Active'
       });
     }
+    setShowUserPassword(false);
   }, [editingUser, isUserDialogOpen]);
 
   useEffect(() => {
@@ -591,24 +598,44 @@ export function StoreSettings({ onBack }: StoreSettingsProps) {
               <CardContent className="p-6 space-y-4">
                 <div className="space-y-2">
                   <Label className="text-sm font-bold text-gray-700">Current Password</Label>
-                  <Input
-                    type="password"
-                    placeholder="••••••••"
-                    value={passwordForm.currentPassword}
-                    onChange={(e) => setPasswordForm(prev => ({ ...prev, currentPassword: e.target.value }))}
-                    className="rounded-[8px] border-gray-200"
-                  />
+                  <div className="relative">
+                    <Input
+                      type={showCurrentPassword ? 'text' : 'password'}
+                      placeholder="••••••••"
+                      value={passwordForm.currentPassword}
+                      onChange={(e) => setPasswordForm(prev => ({ ...prev, currentPassword: e.target.value }))}
+                      className="rounded-[8px] border-gray-200 pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      aria-label={showCurrentPassword ? 'Hide current password' : 'Show current password'}
+                    >
+                      {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <Label className="text-sm font-bold text-gray-700">New Password</Label>
-                  <Input
-                    type="password"
-                    placeholder="••••••••"
-                    value={passwordForm.newPassword}
-                    onChange={(e) => setPasswordForm(prev => ({ ...prev, newPassword: e.target.value }))}
-                    className="rounded-[8px] border-gray-200"
-                    maxLength={36}
-                  />
+                  <div className="relative">
+                    <Input
+                      type={showNewPassword ? 'text' : 'password'}
+                      placeholder="••••••••"
+                      value={passwordForm.newPassword}
+                      onChange={(e) => setPasswordForm(prev => ({ ...prev, newPassword: e.target.value }))}
+                      className="rounded-[8px] border-gray-200 pr-10"
+                      maxLength={36}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      aria-label={showNewPassword ? 'Hide new password' : 'Show new password'}
+                    >
+                      {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
                   {passwordForm.newPassword && (
                     <ul className="space-y-1 mt-1">
                       {getPasswordRequirements(passwordForm.newPassword).map((req) => (
@@ -709,16 +736,26 @@ export function StoreSettings({ onBack }: StoreSettingsProps) {
 
             <div className="space-y-2">
               <Label htmlFor="password" className="text-sm font-bold">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder={editingUser ? "Leave blank to keep current password" : "Set a temporary password (12-36 chars)"}
-                value={userForm.password}
-                onChange={(e) => setUserForm({ ...userForm, password: e.target.value })}
-                className="rounded-[8px]"
-                required={!editingUser}
-                maxLength={36}
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showUserPassword ? 'text' : 'password'}
+                  placeholder={editingUser ? "Leave blank to keep current password" : "Set a temporary password (12-36 chars)"}
+                  value={userForm.password}
+                  onChange={(e) => setUserForm({ ...userForm, password: e.target.value })}
+                  className="rounded-[8px] pr-10"
+                  required={!editingUser}
+                  maxLength={36}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowUserPassword(!showUserPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  aria-label={showUserPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showUserPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
               {userForm.password && (
                 <ul className="space-y-1 mt-1">
                   {getPasswordRequirements(userForm.password).map((req) => (
