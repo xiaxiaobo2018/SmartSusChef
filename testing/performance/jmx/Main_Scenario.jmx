@@ -103,12 +103,29 @@
             <stringProp name="Assertion.custom_message"></stringProp>
           </ResponseAssertion>
           <hashTree/>
+          <JSONPostProcessor guiclass="JSONPostProcessorGui" testclass="JSONPostProcessor" testname="JSON Extractor - Ingredient ID" enabled="true">
+            <stringProp name="JSONPostProcessor.referenceNames">extractedIngredientId</stringProp>
+            <stringProp name="JSONPostProcessor.jsonPathExprs">$[0].id</stringProp>
+            <stringProp name="JSONPostProcessor.matchNumbers">1</stringProp>
+            <stringProp name="JSONPostProcessor.defaultValue"></stringProp>
+            <boolProp name="JSONPostProcessor.isRegex">false</boolProp>
+            <stringProp name="JSONPostProcessor.match_numbers"></stringProp>
+          </JSONPostProcessor>
+          <hashTree/>
         </hashTree>
         <IncludeController guiclass="IncludeControllerGui" testclass="IncludeController" testname="Include Add Ingredient Fragment" enabled="true">
           <stringProp name="IncludeController.includepath">../jmx/fragments/Add_Ingredient_Fragment.jmx</stringProp>
         </IncludeController>
         <hashTree/>
-        <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true">
+        <IncludeController guiclass="IncludeControllerGui" testclass="IncludeController" testname="Include Add Recipe Fragment" enabled="true">
+          <stringProp name="IncludeController.includepath">../jmx/fragments/Add_Recipe_Fragment.jmx</stringProp>
+        </IncludeController>
+        <hashTree/>
+        <IncludeController guiclass="IncludeControllerGui" testclass="IncludeController" testname="Include Get Forecast Fragment" enabled="true">
+          <stringProp name="IncludeController.includepath">../jmx/fragments/Get_Forecast_Fragment.jmx</stringProp>
+        </IncludeController>
+        <hashTree/>
+        <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree">
           <boolProp name="ResultCollector.error_logging">false</boolProp>
           <objProp>
             <name>saveConfig</name>
