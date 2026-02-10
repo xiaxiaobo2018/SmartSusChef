@@ -96,6 +96,20 @@ echo "[OK] DB: $DB_SERVER:$DB_PORT/$DB_NAME (user: $DB_USER)"
 export DATABASE_URL="$CONN_STR"
 echo ""
 
+# -- Kill existing processes on BACKEND_PORT --------------------------------
+echo "[INFO] Checking for processes on port ${BACKEND_PORT}..."
+# Find PIDs using the BACKEND_PORT and suppress errors if none are found
+PID_ON_PORT=$(lsof -t -i ":${BACKEND_PORT}" || true)
+if [ -n "$PID_ON_PORT" ]; then
+    echo "[INFO] Killing process(es) $PID_ON_PORT on port ${BACKEND_PORT}."
+    # Force kill the process(es)
+    kill -9 "$PID_ON_PORT"
+    # Give the system a moment to release the port
+    sleep 1
+else
+    echo "[INFO] No process found on port ${BACKEND_PORT}."
+fi
+
 # -- Cleanup on exit --------------------------------------------------------
 cleanup() {
     echo ""
