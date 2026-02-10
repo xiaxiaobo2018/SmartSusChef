@@ -24,6 +24,8 @@ class DummyStore:
 
 
 class DummyManager:
+    MIN_TRAINING_DAYS = 100
+
     def __init__(self) -> None:
         self._has_models = False
         self._is_training = False

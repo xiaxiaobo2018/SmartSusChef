@@ -256,10 +256,22 @@ def add_local_context(df, address, config, latitude=None, longitude=None, countr
 # ---------------------------------------------------------------------------
 # Data Ingestion
 # ---------------------------------------------------------------------------
-def fetch_training_data():
+def fetch_training_data(store_id: int | None = None):
     """
-    Tries to connect to MySQL using DATABASE_URL env var.
-    If it fails or is not set, falls back to 'food_sales_eng.csv'.
+    Fetch training data, optionally filtered by store.
+
+    Parameters
+    ----------
+    store_id : int | None
+        When provided, only data belonging to this store is returned.
+        The SQL query filters ``SalesData`` by ``StoreId``.
+        The CSV fallback looks for a store-specific directory first
+        (``ml_data_uploads/<store_id>/food_sales_eng.csv``).
+
+    Returns
+    -------
+    pd.DataFrame
+        Columns: date, dish, sales — sorted by date.
     """
     DB_URL = os.getenv("DATABASE_URL")
 
@@ -267,18 +279,31 @@ def fetch_training_data():
     if DB_URL:
         try:
             engine = create_engine(DB_URL)
-            query = """
-            SELECT s.Date as date, r.Name as dish, s.Quantity as sales
-            FROM SalesData s JOIN Recipes r ON s.RecipeId = r.Id
-            ORDER BY s.Date ASC
-            """
-            df = pd.read_sql(query, engine)
+            if store_id is not None:
+                query = """
+                SELECT s.Date as date, r.Name as dish, s.Quantity as sales
+                FROM SalesData s JOIN Recipes r ON s.RecipeId = r.Id
+                WHERE s.StoreId = %s
+                ORDER BY s.Date ASC
+                """
+                df = pd.read_sql(query, engine, params=[store_id])
+            else:
+                query = """
+                SELECT s.Date as date, r.Name as dish, s.Quantity as sales
+                FROM SalesData s JOIN Recipes r ON s.RecipeId = r.Id
+                ORDER BY s.Date ASC
+                """
+                df = pd.read_sql(query, engine)
             if df.empty:
                 logger.warning("MySQL returned 0 rows. Falling back to CSV.")
                 df = None
             else:
                 df["date"] = pd.to_datetime(df["date"])
-                logger.info("Loaded %d rows from MySQL.", len(df))
+                logger.info(
+                    "Loaded %d rows from MySQL%s.",
+                    len(df),
+                    f" for store {store_id}" if store_id is not None else "",
+                )
         except Exception as e:
             logger.warning("MySQL connection failed: %s. Falling back to CSV.", e)
             df = None
@@ -286,7 +311,14 @@ def fetch_training_data():
         logger.info("DATABASE_URL not set. Using CSV fallback.")
 
     if df is None:
-        df = pd.read_csv("food_sales_eng.csv", encoding="utf-8-sig")
+        csv_path = "food_sales_eng.csv"
+        if store_id is not None:
+            store_csv = f"ml_data_uploads/{store_id}/food_sales_eng.csv"
+            if os.path.exists(store_csv):
+                csv_path = store_csv
+                logger.info("Using store-specific CSV: %s", store_csv)
+
+        df = pd.read_csv(csv_path, encoding="utf-8-sig")
         # Normalise column names: the CSV may use Date/Dish_Name/Quantity_Sold
         rename_map = {
             "Date": "date",

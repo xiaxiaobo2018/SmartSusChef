@@ -123,6 +123,10 @@ class StoreModelManager:
                 ORDER BY s.Date ASC
             """)
             df = pd.read_sql(query, engine, params={"store_id": store_id})
+
+            if df.empty:
+                return None, 0
+
             df["date"] = pd.to_datetime(df["date"]).dt.normalize()
             df = (
                 df.groupby(["date", "dish"])
@@ -170,7 +174,7 @@ class StoreModelManager:
         """
         Train ML models for a given store.
         This is a BLOCKING call — run it in a background thread.
-        Returns a summary dict.
+        Returns a summary dict with per-dish results.
         """
         with self._training_lock:
             if self._training_in_progress.get(store_id):
@@ -178,16 +182,26 @@ class StoreModelManager:
             self._training_in_progress[store_id] = True
 
         try:
-            logger.info("Initiating training for a store (ID masked).")
+            logger.info("Store %d: Initiating training.", store_id)
 
             df, unique_days = self.fetch_store_sales(store_id)
             if df is None or df.empty:
-                return {"status": "error", "message": "No sales data found."}
+                return {
+                    "status": "error",
+                    "store_id": store_id,
+                    "message": "No sales data found for this store.",
+                    "days_available": 0,
+                }
 
             if unique_days < self.MIN_TRAINING_DAYS:
                 return {
                     "status": "insufficient_data",
-                    "message": f"Need at least {self.MIN_TRAINING_DAYS} days of data, found {unique_days}.",
+                    "store_id": store_id,
+                    "message": (
+                        f"Store {store_id}: Insufficient data ({unique_days} days). "
+                        f"Need at least {self.MIN_TRAINING_DAYS} days of sales history "
+                        f"to train dedicated models."
+                    ),
                     "days_available": unique_days,
                 }
 
@@ -202,9 +216,9 @@ class StoreModelManager:
             )
 
             config = PipelineConfig()
-            model_dir = str(self.store_model_dir(store_id))
-            config.model_dir = model_dir
-            Path(model_dir).mkdir(parents=True, exist_ok=True)
+            config.model_dir = str(self.base_model_dir)
+            # process_dish now constructs store-specific paths internally
+            # using config.model_dir as the base and store_id for the subdirectory.
 
             # Enrich with weather + holiday context
             if lat and lon and country_code:
@@ -227,6 +241,7 @@ class StoreModelManager:
             champion_map: dict[str, dict[str, Any]] = {}
             trained = 0
             failed = 0
+            failed_dishes: dict[str, str] = {}
             total = len(dishes)
 
             # Initialize progress
@@ -237,7 +252,7 @@ class StoreModelManager:
                 "current_dish": None,
             }
 
-            for i, dish in enumerate(dishes):
+            for dish in dishes:
                 self._training_progress[store_id] = {
                     "trained": trained,
                     "failed": failed,
@@ -245,45 +260,58 @@ class StoreModelManager:
                     "current_dish": dish,
                 }
                 try:
-                    result = process_dish(dish, dish_frames[dish], cc, config)
+                    result = process_dish(
+                        dish, dish_frames[dish], cc, config, store_id=store_id
+                    )
                     champion_map[dish] = {
                         "model": result["champion"],
                         "mae": result.get("champion_mae", 0.0),
                         "all_mae": result["mae"],
                     }
                     trained += 1
+                except RuntimeError as e:
+                    # Expected failures (insufficient data, no valid features, etc.)
+                    logger.warning("Store %d, dish '%s': %s", store_id, dish, e)
+                    failed_dishes[dish] = str(e)
+                    failed += 1
                 except Exception as e:
                     logger.error(
-                        "Training failed for store (ID masked), dish '%s'. Error: %s", dish, e
+                        "Store %d, dish '%s': unexpected training error: %s",
+                        store_id, dish, e, exc_info=True,
                     )
+                    failed_dishes[dish] = str(e)
                     failed += 1
+
                 logger.info(
-                    "Store (ID masked) training progress: %d/%d (failed: %d)",
-                    trained + failed,
-                    total,
-                    failed,
+                    "Store %d training progress: %d/%d (failed: %d)",
+                    store_id, trained + failed, total, failed,
                 )
 
-            # Save registry
-            registry_path = Path(model_dir) / "champion_registry.pkl"
+            # Save registry to store-specific directory
+            store_dir = self.store_model_dir(store_id)
+            store_dir.mkdir(parents=True, exist_ok=True)
+            registry_path = store_dir / "champion_registry.pkl"
             secure_dump(champion_map, str(registry_path))
             logger.info(
-                "Store (ID masked) training complete: %d trained, %d failed.", trained, failed
+                "Store %d training complete: %d trained, %d failed.", store_id, trained, failed
             )
 
             # Reload into cache
             self.reload_store(store_id)
 
-            return {
+            result_dict: dict[str, Any] = {
                 "status": "completed",
                 "store_id": store_id,
                 "dishes_trained": trained,
                 "dishes_failed": failed,
             }
+            if failed_dishes:
+                result_dict["failed_details"] = failed_dishes
+            return result_dict
 
         except Exception as e:
             logger.error("Training failed for store %d: %s", store_id, e, exc_info=True)
-            return {"status": "error", "message": str(e)}
+            return {"status": "error", "store_id": store_id, "message": str(e)}
         finally:
             self._training_in_progress[store_id] = False
             self._training_progress.pop(store_id, None)

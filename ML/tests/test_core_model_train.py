@@ -271,8 +271,8 @@ class TestModelPersistence:
         prophet_obj = {"type": "prophet", "value": 42}
         tree_obj = {"type": "xgboost", "value": 99}
 
-        _save_hybrid_models("TestDish", prophet_obj, tree_obj, "xgboost", cfg)
-        loaded_p, loaded_t = _load_hybrid_models("TestDish", "xgboost", cfg)
+        _save_hybrid_models(None, "TestDish", prophet_obj, tree_obj, "xgboost", cfg)
+        loaded_p, loaded_t = _load_hybrid_models(None, "TestDish", "xgboost", cfg)
 
         assert loaded_p == prophet_obj
         assert loaded_t == tree_obj
@@ -283,16 +283,16 @@ class TestModelPersistence:
         for champ in ("xgboost", "catboost", "lightgbm"):
             p_obj = {"champion": champ, "p": True}
             t_obj = {"champion": champ, "t": True}
-            _save_hybrid_models("Dish", p_obj, t_obj, champ, cfg)
-            lp, lt = _load_hybrid_models("Dish", champ, cfg)
+            _save_hybrid_models(None, "Dish", p_obj, t_obj, champ, cfg)
+            lp, lt = _load_hybrid_models(None, "Dish", champ, cfg)
             assert lp == p_obj
             assert lt == t_obj
 
     def test_dish_name_with_spaces(self, tmp_path):
         """Dish names with spaces should be sanitised to underscores."""
         cfg = PipelineConfig(model_dir=str(tmp_path))
-        _save_hybrid_models("Kung Pao Chicken", {"p": 1}, {"t": 2}, "xgb", cfg)
-        lp, lt = _load_hybrid_models("Kung Pao Chicken", "xgb", cfg)
+        _save_hybrid_models(None, "Kung Pao Chicken", {"p": 1}, {"t": 2}, "xgb", cfg)
+        lp, lt = _load_hybrid_models(None, "Kung Pao Chicken", "xgb", cfg)
         assert lp == {"p": 1}
         assert lt == {"t": 2}
 
@@ -300,21 +300,21 @@ class TestModelPersistence:
         """_save_hybrid_models should create the model directory if it does not exist."""
         nested = tmp_path / "sub" / "dir"
         cfg = PipelineConfig(model_dir=str(nested))
-        _save_hybrid_models("D", {"p": 1}, {"t": 2}, "xgb", cfg)
+        _save_hybrid_models(None, "D", {"p": 1}, {"t": 2}, "xgb", cfg)
         assert nested.exists()
 
     def test_load_nonexistent_raises(self, tmp_path):
         """Loading a model that was never saved should raise an error."""
         cfg = PipelineConfig(model_dir=str(tmp_path))
         with pytest.raises((FileNotFoundError, OSError)):
-            _load_hybrid_models("NeverSaved", "xgb", cfg)
+            _load_hybrid_models(None, "NeverSaved", "xgb", cfg)
 
     def test_numpy_array_round_trip(self, tmp_path):
         """Numpy arrays should survive the save/load round-trip."""
         cfg = PipelineConfig(model_dir=str(tmp_path))
         arr = np.array([1.0, 2.0, 3.0])
-        _save_hybrid_models("NpDish", arr, arr * 2, "xgb", cfg)
-        lp, lt = _load_hybrid_models("NpDish", "xgb", cfg)
+        _save_hybrid_models(None, "NpDish", arr, arr * 2, "xgb", cfg)
+        lp, lt = _load_hybrid_models(None, "NpDish", "xgb", cfg)
         np.testing.assert_array_equal(lp, arr)
         np.testing.assert_array_equal(lt, arr * 2)
 
@@ -428,7 +428,7 @@ class TestProcessDish:
         monkeypatch.setattr(fe, "add_hybrid_features", lambda d, c: d)
         cfg = PipelineConfig(min_train_days=100, model_dir=str(tmp_path))
         df = _make_daily_df(3, dish="Short")
-        with pytest.raises(RuntimeError, match="Insufficient raw data"):
+        with pytest.raises(RuntimeError, match="Insufficient data for training"):
             process_dish("Short", df, "US", cfg)
 
     def test_empty_fold_cache_raises(self, monkeypatch, tmp_path):

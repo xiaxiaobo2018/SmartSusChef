@@ -91,10 +91,13 @@ if [ -n "$MISSING" ]; then
 fi
 echo "[OK] Python / .NET / Node.js installed"
 
-# -- Build connection string ------------------------------------------------
-CONN_STR="Server=$DB_SERVER;Port=$DB_PORT;Database=$DB_NAME;User Id=$DB_USER;Password=$DB_PASSWORD;SslMode=None;AllowPublicKeyRetrieval=true;ConnectionTimeout=30"
+# -- Build connection strings -----------------------------------------------
+# ADO.NET style for .NET backend
+DOTNET_CONN_STR="Server=$DB_SERVER;Port=$DB_PORT;Database=$DB_NAME;User Id=$DB_USER;Password=$DB_PASSWORD;SslMode=None;AllowPublicKeyRetrieval=true;ConnectionTimeout=30"
+# SQLAlchemy URL for Python ML service
+SQLALCHEMY_DB_URL="mysql+pymysql://${DB_USER}:${DB_PASSWORD}@${DB_SERVER}:${DB_PORT}/${DB_NAME}?charset=utf8mb4"
 echo "[OK] DB: $DB_SERVER:$DB_PORT/$DB_NAME (user: $DB_USER)"
-export DATABASE_URL="$CONN_STR"
+export DATABASE_URL="$SQLALCHEMY_DB_URL"
 echo ""
 
 # -- Kill existing processes on ML_PORT -------------------------------------
@@ -139,7 +142,7 @@ echo "[1/3] Starting ML Service (port 8000)..."
 (
     cd "$ROOT/ML"
     python3 -m pip install -q -r requirements-prod.txt
-    python3 -m uvicorn app.main:app --host 0.0.0.0 --port ${ML_PORT} --reload
+    python3 -m uvicorn app.main:app --host 0.0.0.0 --port ${ML_PORT} --reload --log-level warning
 ) &
 ML_PID=$!
 sleep 3
@@ -149,7 +152,7 @@ echo "[2/3] Starting Backend (port ${BACKEND_PORT})..."
 (
     cd "$ROOT/backend/SmartSusChef.Api"
     export ASPNETCORE_ENVIRONMENT=Development
-    export ConnectionStrings__DefaultConnection="$CONN_STR"
+    export ConnectionStrings__DefaultConnection="$DOTNET_CONN_STR"
     export ASPNETCORE_URLS="http://0.0.0.0:${BACKEND_PORT}"
     dotnet run
 ) &

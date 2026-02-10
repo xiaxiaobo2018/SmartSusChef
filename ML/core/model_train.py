@@ -236,21 +236,54 @@ def _prophet_predict(model: Any, df: pd.DataFrame) -> np.ndarray:
 # Model Persistence
 # ---------------------------------------------------------------------------
 def _save_hybrid_models(
-    dish: str, prophet_model: Any, tree_model: Any, champion: str, config: PipelineConfig
+    store_id: int | None,
+    dish: str,
+    prophet_model: Any,
+    tree_model: Any,
+    champion: str,
+    config: PipelineConfig,
 ) -> None:
-    """Save both Prophet and tree models for a dish using joblib."""
+    """Save both Prophet and tree models for a dish.
+
+    Parameters
+    ----------
+    store_id : int | None
+        When provided, models are saved under
+        ``<config.model_dir>/store_<store_id>/``.
+        When *None*, models are saved directly under ``config.model_dir``
+        (backward-compatible behavior for non-store usage).
+    """
     safe_name = safe_filename(dish)
-    model_dir = config.model_dir
+    if store_id is not None:
+        model_dir = os.path.join(config.model_dir, f"store_{store_id}")
+    else:
+        model_dir = config.model_dir
     os.makedirs(model_dir, exist_ok=True)
 
     secure_dump(prophet_model, f"{model_dir}/prophet_{safe_name}.pkl")
     secure_dump(tree_model, f"{model_dir}/{champion}_{safe_name}.pkl")
 
 
-def _load_hybrid_models(dish: str, champion: str, config: PipelineConfig) -> tuple[Any, Any]:
-    """Load both Prophet and tree models for a dish using joblib."""
+def _load_hybrid_models(
+    store_id: int | None,
+    dish: str,
+    champion: str,
+    config: PipelineConfig,
+) -> tuple[Any, Any]:
+    """Load both Prophet and tree models for a dish.
+
+    Parameters
+    ----------
+    store_id : int | None
+        When provided, models are loaded from
+        ``<config.model_dir>/store_<store_id>/``.
+        When *None*, loads from ``config.model_dir`` directly.
+    """
     safe_name = safe_filename(dish)
-    model_dir = config.model_dir
+    if store_id is not None:
+        model_dir = os.path.join(config.model_dir, f"store_{store_id}")
+    else:
+        model_dir = config.model_dir
 
     prophet_model = secure_load(f"{model_dir}/prophet_{safe_name}.pkl")
     tree_model = secure_load(f"{model_dir}/{champion}_{safe_name}.pkl")
@@ -261,12 +294,21 @@ def _load_hybrid_models(dish: str, champion: str, config: PipelineConfig) -> tup
 # Per-Dish Processing (Hybrid Prophet + Tree)
 # ---------------------------------------------------------------------------
 def process_dish(
-    dish_name: str, shared_df: pd.DataFrame, country_code: str, config: PipelineConfig
+    dish_name: str,
+    shared_df: pd.DataFrame,
+    country_code: str,
+    config: PipelineConfig,
+    store_id: int | None = None,
 ) -> dict[str, Any]:
     """
     Process a single dish using Prophet + Tree Residual Stacking.
 
     This function is standalone (no closures) so it can be pickled by ProcessPoolExecutor.
+
+    Parameters
+    ----------
+    store_id : int | None
+        When provided, included in log/error messages for multi-tenant debugging.
     """
     from core.cv_eval import _optimize_hybrid, _prepare_cv_fold_cache
     from core.data_prep import sanitize_sparse_data
@@ -274,28 +316,36 @@ def process_dish(
 
     silence_noisy_loggers()
     safe_name = safe_filename(dish_name)
-    os.makedirs(config.model_dir, exist_ok=True)
+    if store_id is not None:
+        _model_dir = os.path.join(config.model_dir, f"store_{store_id}")
+    else:
+        _model_dir = config.model_dir
+    os.makedirs(_model_dir, exist_ok=True)
+
+    prefix = f"Store {store_id}, " if store_id is not None else ""
 
     dish_data = shared_df[shared_df["dish"] == dish_name].copy()
 
     if len(dish_data) == 0:
-        raise RuntimeError(f"{dish_name}: No data found for this dish.")
+        raise RuntimeError(f"{prefix}{dish_name}: No data found for this dish.")
 
     if len(dish_data) < config.min_train_days:
         raise RuntimeError(
-            f"{dish_name}: Insufficient raw data ({len(dish_data)} days < {config.min_train_days} required)."
+            f"{prefix}{dish_name}: Insufficient data for training. "
+            f"Only {len(dish_data)} days available, but at least "
+            f"{config.min_train_days} days of sales history required."
         )
 
     dish_feat = add_hybrid_features(dish_data.copy(), config)
 
     if len(dish_feat) < config.min_train_days:
         raise RuntimeError(
-            f"{dish_name}: Insufficient data after feature engineering ({len(dish_feat)} rows)."
+            f"{prefix}{dish_name}: Insufficient data after feature engineering ({len(dish_feat)} rows)."
         )
 
     fold_cache = _prepare_cv_fold_cache(dish_feat, country_code, config)
     if not fold_cache:
-        raise RuntimeError(f"{dish_name}: CV folds unavailable after feature processing.")
+        raise RuntimeError(f"{prefix}{dish_name}: CV folds unavailable after feature processing.")
 
     mae_map: dict[str, float] = {}
     params_map: dict[str, dict[str, Any]] = {}
@@ -318,7 +368,7 @@ def process_dish(
 
     if len(X_full) == 0:
         raise RuntimeError(
-            f"{dish_name}: No valid training data after feature/residual processing."
+            f"{prefix}{dish_name}: No valid training data after feature/residual processing."
         )
 
     tree_n_jobs = 1 if config.max_workers > 1 else -1
@@ -362,10 +412,10 @@ def process_dish(
         )
         model.fit(X_full, y_full)
 
-    _save_hybrid_models(dish_name, pm, model, champion, config)
+    _save_hybrid_models(store_id, dish_name, pm, model, champion, config)
 
     recent_sales = dish_feat_sanitized[["date", "sales"]].tail(28).copy()
-    secure_dump(recent_sales, f"{config.model_dir}/recent_sales_{safe_name}.pkl")
+    secure_dump(recent_sales, f"{_model_dir}/recent_sales_{safe_name}.pkl")
 
     return {
         "dish": dish_name,

@@ -44,6 +44,7 @@ def mock_store() -> MagicMock:
 def mock_manager() -> MagicMock:
     """A MagicMock that behaves like a StoreModelManager."""
     mgr = MagicMock()
+    mgr.MIN_TRAINING_DAYS = 100
     mgr.has_models.return_value = False
     mgr.is_training.return_value = False
     mgr.get_store.return_value = None
