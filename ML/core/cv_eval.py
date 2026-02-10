@@ -6,10 +6,13 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
+optuna: ModuleType | None = None
 try:
-    import optuna
+    import optuna as _optuna
+
+    optuna = _optuna
 except ImportError:
-    optuna = None  # Not needed for inference
+    pass
 from sklearn.metrics import mean_absolute_error
 
 from app.utils.logging_config import setup_logger
