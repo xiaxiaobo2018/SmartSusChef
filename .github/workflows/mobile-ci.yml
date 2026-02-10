@@ -136,7 +136,7 @@ jobs:
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: debug-apk-${{ github.ref_name }}
+          name: debug-apk-${{ github.run_number }}-${{ github.event.pull_request.number || github.ref_name }}
           path: mobile/app/build/outputs/apk/uat/debug/*.apk
           retention-days: 30
 
