@@ -453,6 +453,7 @@ class TestProcessDish:
         champ = result["champion"]
 
         from pathlib import Path
+
         model_dir = Path(cfg.model_dir)
         prophet_files = list(model_dir.glob("prophet_*.pkl"))
         tree_files = list(model_dir.glob(f"{champ}_*.pkl"))

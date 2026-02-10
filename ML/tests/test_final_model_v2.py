@@ -156,22 +156,32 @@ class FinalModelV2HybridPredictionTests(unittest.TestCase):
             lags=(1,),
             roll_windows=(2,),
             hybrid_tree_features=[
-                "day_of_week", "month", "day", "dayofyear", "is_weekend",
+                "day_of_week",
+                "month",
+                "day",
+                "dayofyear",
+                "is_weekend",
                 "is_public_holiday",
-                "temperature_2m_max", "temperature_2m_min",
-                "relative_humidity_2m_mean", "precipitation_sum",
-                "y_lag_1", "y_roll_mean_2", "y_roll_std_2",
+                "temperature_2m_max",
+                "temperature_2m_min",
+                "relative_humidity_2m_mean",
+                "precipitation_sum",
+                "y_lag_1",
+                "y_roll_mean_2",
+                "y_roll_std_2",
                 "prophet_yhat",
             ],
         )
 
-        forecast_weather_df = pd.DataFrame({
-            "date": pd.to_datetime(["2024-01-01"]),
-            WEATHER_COLS[0]: [25.0],
-            WEATHER_COLS[1]: [15.0],
-            WEATHER_COLS[2]: [50.0],
-            WEATHER_COLS[3]: [0.0],
-        })
+        forecast_weather_df = pd.DataFrame(
+            {
+                "date": pd.to_datetime(["2024-01-01"]),
+                WEATHER_COLS[0]: [25.0],
+                WEATHER_COLS[1]: [15.0],
+                WEATHER_COLS[2]: [50.0],
+                WEATHER_COLS[3]: [0.0],
+            }
+        )
 
         recent_sales_df = pd.DataFrame({"date": pd.to_datetime(["2023-12-31"]), "sales": [8.0]})
 
@@ -221,7 +231,9 @@ class FinalModelV2GetPredictionTests(unittest.TestCase):
 
     def test_get_prediction_missing_forecast(self):
         with patch.object(fm, "_get_forecast_cached", lambda lat, lon: None):
-            out = fm.get_prediction("DishA", "2024-01-01", "Addr", model="lightgbm", config=PipelineConfig())
+            out = fm.get_prediction(
+                "DishA", "2024-01-01", "Addr", model="lightgbm", config=PipelineConfig()
+            )
         self.assertIn("Error", out[0])
 
     def test_get_prediction_hybrid_path(self):
@@ -234,20 +246,25 @@ class FinalModelV2GetPredictionTests(unittest.TestCase):
                 return pd.DataFrame({"sales": [1.0, 2.0]})
             return None
 
-        weather_df = pd.DataFrame({
-            "date": pd.to_datetime(["2024-01-01"]),
-            WEATHER_COLS[0]: [1.0],
-            WEATHER_COLS[1]: [1.0],
-            WEATHER_COLS[2]: [1.0],
-            WEATHER_COLS[3]: [1.0],
-        })
+        weather_df = pd.DataFrame(
+            {
+                "date": pd.to_datetime(["2024-01-01"]),
+                WEATHER_COLS[0]: [1.0],
+                WEATHER_COLS[1]: [1.0],
+                WEATHER_COLS[2]: [1.0],
+                WEATHER_COLS[3]: [1.0],
+            }
+        )
 
         with (
             patch.object(fm, "_load_cached", _load),
             patch.object(fm, "_get_forecast_cached", lambda lat, lon: weather_df),
-            patch.object(fm, "_load_hybrid_models", lambda dish, model, config: (object(), object())),
             patch.object(
-                fm, "_predict_hybrid_multiday",
+                fm, "_load_hybrid_models", lambda dish, model, config: (object(), object())
+            ),
+            patch.object(
+                fm,
+                "_predict_hybrid_multiday",
                 lambda **kwargs: [
                     {"date": "2024-01-01", "qty": 1, "lower": 1, "upper": 2, "explanation": {}}
                 ],

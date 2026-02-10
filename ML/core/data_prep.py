@@ -190,9 +190,7 @@ def fetch_weather_from_db(start_date, end_date):
 # ---------------------------------------------------------------------------
 # Context Enrichment (Holidays + Weather)
 # ---------------------------------------------------------------------------
-def add_local_context(
-    df, address, config, latitude=None, longitude=None, country_code=None
-):
+def add_local_context(df, address, config, latitude=None, longitude=None, country_code=None):
     """
     Enriches the sales data with local context features (Holidays + Weather).
     Uses geocoding to detect location and Open-Meteo for real weather data.
@@ -300,6 +298,7 @@ def sanitize_sparse_data(df, country_code, config=None):
     """
     if config is None:
         from core.model_train import CFG
+
         config = CFG
 
     all_dates = pd.date_range(start=df["date"].min(), end=df["date"].max(), freq="D")

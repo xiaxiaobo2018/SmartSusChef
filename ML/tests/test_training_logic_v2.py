@@ -56,9 +56,7 @@ class TrainingLogicV2Tests(unittest.TestCase):
 
     def test_compute_lag_features_from_history(self):
         """Test using the app.utils signature with explicit lags/roll_windows."""
-        feats = compute_lag_features_from_history(
-            [5, 7], lags=(1, 3), roll_windows=(2, 4)
-        )
+        feats = compute_lag_features_from_history([5, 7], lags=(1, 3), roll_windows=(2, 4))
 
         self.assertEqual(feats["y_lag_1"], 7.0)
         # lag_3 > len(history)=2, fallback to last value
@@ -118,6 +116,7 @@ class TrainingLogicV2Tests(unittest.TestCase):
 
         # January dates → Winter seasonal averages
         from core.data_prep import _get_seasonal_historical_averages
+
         winter = _get_seasonal_historical_averages(1)
         for col in WEATHER_COLS:
             self.assertIn(col, out.columns)

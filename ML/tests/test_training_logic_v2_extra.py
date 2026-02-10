@@ -27,6 +27,7 @@ def test_get_location_details_success(monkeypatch):
             return DummyLoc()
 
     import core.data_prep as dp
+
     monkeypatch.setattr(dp, "Nominatim", lambda user_agent=None: DummyGeo())
     lat, lon, cc = tl.get_location_details("addr")
     assert lat == 1.23
@@ -40,6 +41,7 @@ def test_get_location_details_failure(monkeypatch):
             return None
 
     import core.data_prep as dp
+
     monkeypatch.setattr(dp, "Nominatim", lambda user_agent=None: DummyGeo())
     lat, lon, cc = tl.get_location_details("addr")
     assert lat is None and lon is None and cc is None
@@ -47,9 +49,12 @@ def test_get_location_details_failure(monkeypatch):
 
 def test_get_historical_weather_no_libs(monkeypatch):
     import core.data_prep as dp
+
     monkeypatch.setattr(dp, "openmeteo_requests", None)
     monkeypatch.setattr(dp, "retry", None)
-    out = tl.get_historical_weather(1.0, 2.0, pd.Timestamp("2024-01-01"), pd.Timestamp("2024-01-02"))
+    out = tl.get_historical_weather(
+        1.0, 2.0, pd.Timestamp("2024-01-01"), pd.Timestamp("2024-01-02")
+    )
     monkeypatch.setattr(tl, "openmeteo_requests", None)
     monkeypatch.setattr(tl, "retry", None)
     out = tl.get_historical_weather(
@@ -67,6 +72,7 @@ def test_fetch_weather_from_db_no_url(monkeypatch):
 def test_fetch_weather_from_db_success(monkeypatch):
     monkeypatch.setenv("DATABASE_URL", "sqlite://")
     import core.data_prep as dp
+
     monkeypatch.setattr(dp, "create_engine", lambda url: object())
 
     def _read_sql(query, engine, params):
@@ -104,6 +110,7 @@ def test_fit_prophet_and_predict(monkeypatch):
             return pd.DataFrame({"yhat": np.ones(len(df))})
 
     import core.model_train as mt
+
     monkeypatch.setattr(mt, "Prophet", DummyProphet)
     df = pd.DataFrame(
         {
@@ -150,6 +157,7 @@ def test_prepare_cv_fold_cache(monkeypatch):
 
     import core.cv_eval as ce
     import core.model_train as mt
+
     monkeypatch.setattr(ce, "sanitize_sparse_data", lambda d, cc, config=None: d)
     monkeypatch.setattr(mt, "_fit_prophet", lambda train, cc, config: object())
     monkeypatch.setattr(mt, "_prophet_predict", lambda m, d: np.ones(len(d)))
@@ -173,6 +181,7 @@ def _dummy_model():
 
 def test_eval_hybrid_mae_xgb(monkeypatch):
     import core.cv_eval as ce
+
     monkeypatch.setattr(ce, "XGBRegressor", _dummy_model())
     cache = [
         {
@@ -189,6 +198,7 @@ def test_eval_hybrid_mae_xgb(monkeypatch):
 
 def test_eval_hybrid_mae_catboost(monkeypatch):
     import core.cv_eval as ce
+
     monkeypatch.setattr(ce, "CatBoostRegressor", _dummy_model())
     cache = [
         {
@@ -215,6 +225,7 @@ def test_eval_hybrid_mae_lightgbm(monkeypatch):
             return np.zeros(len(X))
 
     import core.cv_eval as ce
+
     monkeypatch.setattr(ce, "lgb", SimpleNamespace(LGBMRegressor=DummyLgb))
     cache = [
         {

@@ -51,6 +51,7 @@ def _detect_gpu() -> dict[str, bool]:
 
     try:
         import xgboost as _xgb
+
         _test = _xgb.XGBRegressor(tree_method="hist", device="cuda", n_estimators=1)
         _test.fit(np.array([[0]]), np.array([0]))
         gpu["xgboost"] = True
@@ -59,6 +60,7 @@ def _detect_gpu() -> dict[str, bool]:
 
     try:
         from catboost import CatBoostRegressor as _CB
+
         _test = _CB(iterations=1, task_type="GPU", verbose=False)
         _test.fit(np.array([[0]]), np.array([0]))
         gpu["catboost"] = True
@@ -67,6 +69,7 @@ def _detect_gpu() -> dict[str, bool]:
 
     try:
         import lightgbm as _lgb
+
         _test = _lgb.LGBMRegressor(n_estimators=1, device="gpu", verbose=-1)
         _test.fit(np.array([[0]]), np.array([0]))
         gpu["lightgbm"] = True
@@ -132,14 +135,25 @@ class PipelineConfig:
 
     hybrid_tree_features: list[str] = field(
         default_factory=lambda: [
-            "day_of_week", "month", "day", "dayofyear", "is_weekend",
+            "day_of_week",
+            "month",
+            "day",
+            "dayofyear",
+            "is_weekend",
             "is_public_holiday",
-            "temperature_2m_max", "temperature_2m_min",
-            "relative_humidity_2m_mean", "precipitation_sum",
-            "y_lag_1", "y_lag_7", "y_lag_14",
-            "y_roll_mean_7", "y_roll_std_7",
-            "y_roll_mean_14", "y_roll_std_14",
-            "y_roll_mean_28", "y_roll_std_28",
+            "temperature_2m_max",
+            "temperature_2m_min",
+            "relative_humidity_2m_mean",
+            "precipitation_sum",
+            "y_lag_1",
+            "y_lag_7",
+            "y_lag_14",
+            "y_roll_mean_7",
+            "y_roll_std_7",
+            "y_roll_mean_14",
+            "y_roll_std_14",
+            "y_roll_mean_28",
+            "y_roll_std_28",
             "prophet_yhat",
         ]
     )
@@ -149,14 +163,21 @@ class PipelineConfig:
             "Seasonality": ["day_of_week", "month", "day", "dayofyear", "is_weekend"],
             "Holiday": ["is_public_holiday"],
             "Weather": [
-                "temperature_2m_max", "temperature_2m_min",
-                "relative_humidity_2m_mean", "precipitation_sum",
+                "temperature_2m_max",
+                "temperature_2m_min",
+                "relative_humidity_2m_mean",
+                "precipitation_sum",
             ],
             "Lags/Trend": [
-                "y_lag_1", "y_lag_7", "y_lag_14",
-                "y_roll_mean_7", "y_roll_std_7",
-                "y_roll_mean_14", "y_roll_std_14",
-                "y_roll_mean_28", "y_roll_std_28",
+                "y_lag_1",
+                "y_lag_7",
+                "y_lag_14",
+                "y_roll_mean_7",
+                "y_roll_std_7",
+                "y_roll_mean_14",
+                "y_roll_std_14",
+                "y_roll_mean_28",
+                "y_roll_std_28",
             ],
             "ProphetTrend": ["prophet_yhat"],
         }

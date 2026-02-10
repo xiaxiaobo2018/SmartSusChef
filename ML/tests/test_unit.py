@@ -67,7 +67,9 @@ class TestComputeLagFeaturesFromHistory:
         assert features["y_lag_1"] == 70.0
         assert features["y_roll_mean_7"] == pytest.approx(40.0)
         # std(ddof=1) of [10, 20, 30, 40, 50, 60, 70]
-        assert features["y_roll_std_7"] == pytest.approx(np.std([10, 20, 30, 40, 50, 60, 70], ddof=1))
+        assert features["y_roll_std_7"] == pytest.approx(
+            np.std([10, 20, 30, 40, 50, 60, 70], ddof=1)
+        )
 
     def test_short_history_uses_fallback(self):
         """When history is shorter than lag, the fallback (last value) is used."""
@@ -317,7 +319,9 @@ class TestSecureIO:
 
         # Overwrite hash with wrong value
         hash_path = _hash_path(pkl_path)
-        hash_path.write_text("0000000000000000000000000000000000000000000000000000000000000000", encoding="utf-8")
+        hash_path.write_text(
+            "0000000000000000000000000000000000000000000000000000000000000000", encoding="utf-8"
+        )
 
         with pytest.raises(RuntimeError, match="Integrity check failed"):
             secure_load(pkl_path)

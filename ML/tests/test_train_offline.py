@@ -74,7 +74,8 @@ class TestTrainSingleStore:
         mock_mgr = DummyManager(base_model_dir=str(tmp_path))
 
         monkeypatch.setattr(
-            toff, "StoreModelManager",
+            toff,
+            "StoreModelManager",
             lambda base_model_dir=None: mock_mgr,
         )
         result = toff._train_single_store(str(tmp_path), 42)
@@ -90,7 +91,8 @@ class TestTrainSingleStore:
                 raise RuntimeError("training exploded")
 
         monkeypatch.setattr(
-            toff, "StoreModelManager",
+            toff,
+            "StoreModelManager",
             lambda base_model_dir=None: FailingManager(),
         )
         with pytest.raises(RuntimeError, match="training exploded"):
@@ -233,7 +235,8 @@ class TestMainCLI:
 
         monkeypatch.setattr(toff, "_train_store_ids", _train)
         monkeypatch.setattr(
-            sys, "argv",
+            sys,
+            "argv",
             ["train_offline.py", "--store-id", "1", "--workers", "8"],
         )
         toff.main()

@@ -65,9 +65,7 @@ def compute_lag_features_from_history(
         window = sales_history[-w:] if len(sales_history) >= w else sales_history
         if window:
             features[f"y_roll_mean_{w}"] = float(np.mean(window))
-            features[f"y_roll_std_{w}"] = (
-                float(np.std(window, ddof=1)) if len(window) >= 2 else 0.0
-            )
+            features[f"y_roll_std_{w}"] = float(np.std(window, ddof=1)) if len(window) >= 2 else 0.0
         else:
             features[f"y_roll_mean_{w}"] = 0.0
             features[f"y_roll_std_{w}"] = 0.0
