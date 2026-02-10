@@ -819,6 +819,7 @@ jobs:
           cmd_options: '-a -j -m 5 -T 60'
           fail_action: false
           allow_issue_writing: false
+          artifact_name: 'zap-baseline-report'
         continue-on-error: true
 
       - name: ZAP API Scan (Backend)
@@ -826,10 +827,10 @@ jobs:
         with:
           target: 'http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com/api'
           format: 'openapi'
-          api_spec: 'backend/swagger.json'
           cmd_options: '-a -j -m 5 -T 60'
           fail_action: false
           allow_issue_writing: false
+          artifact_name: 'zap-api-report'
         continue-on-error: true
 
       - name: Upload ZAP reports
