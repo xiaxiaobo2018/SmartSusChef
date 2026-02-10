@@ -690,6 +690,7 @@ jobs:
         run: |
           cd frontend
           npm ci
+          npm install -D @playwright/test
           npx playwright install --with-deps
 
       - name: Run Playwright tests
