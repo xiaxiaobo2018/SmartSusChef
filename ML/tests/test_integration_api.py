@@ -36,7 +36,7 @@ def mock_store() -> MagicMock:
     """A MagicMock that behaves like a ModelStore with two dishes."""
     store = MagicMock()
     store.list_dishes.return_value = ["Kung Pao Chicken", "Fried Rice"]
-    store.model_dir = Path("/tmp/fake_models")
+    store.model_dir = Path("/tmp/fake_models")  # nosec
     return store
 
 
@@ -423,7 +423,7 @@ class TestStorePredictEndpoint:
         # Set up the inner ModelStore with one dish
         inner_store = MagicMock()
         inner_store.list_dishes.return_value = ["Kung Pao Chicken"]
-        inner_store.model_dir = Path("/tmp/fake_store_42")
+        inner_store.model_dir = Path("/tmp/fake_store_42")  # nosec
 
         mock_manager.is_training.return_value = False
         mock_manager.get_store.return_value = inner_store
@@ -464,7 +464,7 @@ class TestStorePredictEndpoint:
         """If predict_dish fails for a dish, it gets an error entry, not a 500."""
         inner_store = MagicMock()
         inner_store.list_dishes.return_value = ["Good Dish", "Bad Dish"]
-        inner_store.model_dir = Path("/tmp/fake_store_42")
+        inner_store.model_dir = Path("/tmp/fake_store_42")  # nosec
 
         mock_manager.is_training.return_value = False
         mock_manager.get_store.return_value = inner_store
@@ -559,7 +559,7 @@ class TestStorePredictEndpoint:
         """When lat/lon are provided in the request, DB location is not fetched."""
         inner_store = MagicMock()
         inner_store.list_dishes.return_value = ["Fried Rice"]
-        inner_store.model_dir = Path("/tmp/fake_store_42")
+        inner_store.model_dir = Path("/tmp/fake_store_42")  # nosec
 
         mock_manager.is_training.return_value = False
         mock_manager.get_store.return_value = inner_store
@@ -600,7 +600,7 @@ class TestStorePredictEndpoint:
         """Weather API failure is non-fatal: predictions still proceed with fallback."""
         inner_store = MagicMock()
         inner_store.list_dishes.return_value = ["Spring Rolls"]
-        inner_store.model_dir = Path("/tmp/fake_store_42")
+        inner_store.model_dir = Path("/tmp/fake_store_42")  # nosec
 
         mock_manager.is_training.return_value = False
         mock_manager.get_store.return_value = inner_store
@@ -653,7 +653,7 @@ class TestStorePredictEndpoint:
         """Prediction iterates over all dishes from the store."""
         inner_store = MagicMock()
         inner_store.list_dishes.return_value = ["Dish A", "Dish B", "Dish C"]
-        inner_store.model_dir = Path("/tmp/fake_store")
+        inner_store.model_dir = Path("/tmp/fake_store")  # nosec
 
         mock_manager.is_training.return_value = False
         mock_manager.get_store.return_value = inner_store

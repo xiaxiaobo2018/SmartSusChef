@@ -1,0 +1,201 @@
+{
+    "status": "success",
+    "model_dir": "models",
+    "total_dishes": 16,
+    "validated_dishes": 16,
+    "average_validation_mae": 15.6031,
+    "dishes": [
+        {
+            "dish": "Chicken knee cartilage",
+            "champion": "xgboost",
+            "status": "ok",
+            "stored_mae": 15.4243,
+            "validation_mae": 8.1693,
+            "sample_predictions": [
+                40.88,
+                37.55,
+                16.98
+            ]
+        },
+        {
+            "dish": "Pickled mustard greens flavor - Jiangtuan",
+            "champion": "xgboost",
+            "status": "ok",
+            "stored_mae": 0.5684,
+            "validation_mae": 0.2649,
+            "sample_predictions": [
+                1.19,
+                1.22,
+                0.8
+            ]
+        },
+        {
+            "dish": "Pickled mustard greens flavor - Sea bass",
+            "champion": "xgboost",
+            "status": "ok",
+            "stored_mae": 0.588,
+            "validation_mae": 8.0258,
+            "sample_predictions": [
+                10.0,
+                9.87,
+                9.25
+            ]
+        },
+        {
+            "dish": "Pickled mustard greens flavor - Qian fish",
+            "champion": "catboost",
+            "status": "ok",
+            "stored_mae": 0.7113,
+            "validation_mae": 1.3286,
+            "sample_predictions": [
+                0.0,
+                0.0,
+                0.0
+            ]
+        },
+        {
+            "dish": "Old-jar pickled mustard greens flavor - Sea bass",
+            "champion": "catboost",
+            "status": "ok",
+            "stored_mae": 0.6723,
+            "validation_mae": 1.1402,
+            "sample_predictions": [
+                1.69,
+                1.53,
+                0.0
+            ]
+        },
+        {
+            "dish": "Mala flavor - Sea bass",
+            "champion": "catboost",
+            "status": "ok",
+            "stored_mae": 2.9078,
+            "validation_mae": 12.7995,
+            "sample_predictions": [
+                7.23,
+                2.57,
+                0.0
+            ]
+        },
+        {
+            "dish": "Old-jar pickled mustard greens flavor - Jiangtuan",
+            "champion": "catboost",
+            "status": "ok",
+            "stored_mae": 0.6723,
+            "validation_mae": 1.1402,
+            "sample_predictions": [
+                1.69,
+                1.53,
+                0.0
+            ]
+        },
+        {
+            "dish": "Mala flavor - Qian fish",
+            "champion": "catboost",
+            "status": "ok",
+            "stored_mae": 3.3303,
+            "validation_mae": 15.6676,
+            "sample_predictions": [
+                0.0,
+                0.0,
+                0.0
+            ]
+        },
+        {
+            "dish": "Old-jar pickled mustard greens flavor - Qian fish",
+            "champion": "catboost",
+            "status": "ok",
+            "stored_mae": 0.6723,
+            "validation_mae": 1.1402,
+            "sample_predictions": [
+                1.69,
+                1.53,
+                0.0
+            ]
+        },
+        {
+            "dish": "Green pepper flavor - Sea bass",
+            "champion": "xgboost",
+            "status": "ok",
+            "stored_mae": 1.353,
+            "validation_mae": 3.3789,
+            "sample_predictions": [
+                10.1,
+                10.17,
+                5.0
+            ]
+        },
+        {
+            "dish": "Grilled lamb skewers",
+            "champion": "catboost",
+            "status": "ok",
+            "stored_mae": 20.2588,
+            "validation_mae": 157.0365,
+            "sample_predictions": [
+                266.6,
+                248.95,
+                194.9
+            ]
+        },
+        {
+            "dish": "Green pepper flavor - Jiangtuan",
+            "champion": "catboost",
+            "status": "ok",
+            "stored_mae": 1.368,
+            "validation_mae": 4.371,
+            "sample_predictions": [
+                0.72,
+                0.95,
+                0.0
+            ]
+        },
+        {
+            "dish": "Garlic flavor - Sea bass",
+            "champion": "catboost",
+            "status": "ok",
+            "stored_mae": 1.4723,
+            "validation_mae": 4.1873,
+            "sample_predictions": [
+                12.45,
+                11.75,
+                6.78
+            ]
+        },
+        {
+            "dish": "Garlic flavor - Jiangtuan",
+            "champion": "catboost",
+            "status": "ok",
+            "stored_mae": 1.7196,
+            "validation_mae": 3.4946,
+            "sample_predictions": [
+                3.51,
+                3.01,
+                0.0
+            ]
+        },
+        {
+            "dish": "Mala flavor - Jiangtuan",
+            "champion": "catboost",
+            "status": "ok",
+            "stored_mae": 3.0071,
+            "validation_mae": 15.6331,
+            "sample_predictions": [
+                0.0,
+                0.0,
+                0.0
+            ]
+        },
+        {
+            "dish": "Garlic flavor - Qian fish",
+            "champion": "catboost",
+            "status": "ok",
+            "stored_mae": 3.3236,
+            "validation_mae": 11.8715,
+            "sample_predictions": [
+                0.0,
+                0.0,
+                0.0
+            ]
+        }
+    ]
+}

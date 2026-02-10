@@ -111,14 +111,14 @@ class TestPipelineConfig:
             random_seed=99,
             max_workers=1,
             use_gpu=False,
-            model_dir="/tmp/my_models",
+            model_dir="/tmp/my_models",  # nosec
         )
         assert cfg.n_cv_folds == 5
         assert cfg.test_window_days == 14
         assert cfg.random_seed == 99
         assert cfg.max_workers == 1
         assert cfg.use_gpu is False
-        assert cfg.model_dir == "/tmp/my_models"
+        assert cfg.model_dir == "/tmp/my_models"  # nosec
 
     def test_prophet_params_defaults(self):
         cfg = PipelineConfig()
