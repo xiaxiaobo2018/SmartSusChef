@@ -137,6 +137,23 @@ jobs:
           path: codeql-results/*.sarif
           retention-days: 30
 
+      - name: Generate CodeQL HTML report
+        if: always()
+        run: |
+          python3 tools/sarif_to_html.py \
+            --title "CodeQL Security Report (${{ matrix.language }})" \
+            -o codeql-report-${{ matrix.language }}.html \
+            codeql-results/*.sarif || echo "No SARIF files to process"
+
+      - name: Upload CodeQL HTML report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: codeql-html-report-${{ matrix.language }}
+          path: codeql-report-${{ matrix.language }}.html
+          if-no-files-found: warn
+          retention-days: 30
+
       - name: CodeQL scan summary
         if: always()
         run: |
@@ -572,7 +589,7 @@ jobs:
         working-directory: ./ML
 
       - name: Model validation
-        run: python scripts/model_validation.py
+        run: python scripts/model_validation.py --output model-validation-report.txt
         working-directory: ./ML
 
       - name: Verify FastAPI app imports
@@ -889,6 +906,31 @@ jobs:
         with:
           name: trivy-filesystem-report
           path: trivy-fs-results.sarif
+          retention-days: 30
+
+      - name: Generate Trivy HTML report
+        if: always()
+        run: |
+          SARIF_FILES=""
+          for f in trivy-backend-image.sarif trivy-frontend-image.sarif trivy-ml-image.sarif trivy-fs-results.sarif; do
+            [ -f "$f" ] && SARIF_FILES="$SARIF_FILES $f"
+          done
+          if [ -n "$SARIF_FILES" ]; then
+            python3 tools/sarif_to_html.py \
+              --title "Trivy Container & Filesystem Scan Report" \
+              -o trivy-scan-report.html \
+              $SARIF_FILES
+          else
+            echo "No Trivy SARIF files found"
+          fi
+
+      - name: Upload Trivy HTML report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: trivy-html-report
+          path: trivy-scan-report.html
+          if-no-files-found: warn
           retention-days: 30
 
       - name: Trivy scan summary
