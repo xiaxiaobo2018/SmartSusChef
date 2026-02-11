@@ -180,15 +180,16 @@ jobs:
 
       - name: Run JMeter tests
         run: |
-          RESULTS_DIR="testing/performance/results"
-          REPORT_DIR="testing/performance/reports/Final_Run_Report"
+          RESULTS_DIR="$(pwd)/testing/performance/results"
+          REPORT_DIR="$(pwd)/testing/performance/reports/Final_Run_Report"
           RESULTS_FILE="$RESULTS_DIR/Final_Run_UAT.jtl"
 
           rm -rf "$REPORT_DIR" "$RESULTS_FILE"
           mkdir -p "$REPORT_DIR" "$RESULTS_DIR"
 
+          cd testing/performance
           jmeter -n \
-            -t testing/performance/jmx/Main_Scenario.jmx \
+            -t jmx/Main_Scenario.jmx \
             -l "$RESULTS_FILE" \
             -e -o "$REPORT_DIR" \
             -Jtarget_host=${{ steps.parse-url.outputs.host }} \

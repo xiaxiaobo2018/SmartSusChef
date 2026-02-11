@@ -35,7 +35,7 @@
         <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Set Config" enabled="true">
           <stringProp name="delimiter">,</stringProp>
           <stringProp name="fileEncoding">UTF-8</stringProp>
-          <stringProp name="filename">../data/user.csv</stringProp>
+          <stringProp name="filename">data/user.csv</stringProp>
           <boolProp name="ignoreFirstLine">true</boolProp>
           <boolProp name="quotedData">false</boolProp>
           <boolProp name="recycle">true</boolProp>
@@ -49,7 +49,7 @@
         </DurationAssertion>
         <hashTree/>
         <IncludeController guiclass="IncludeControllerGui" testclass="IncludeController" testname="Include Login Fragment" enabled="true">
-          <stringProp name="IncludeController.includepath">../jmx/fragments/Login_Fragment.jmx</stringProp>
+          <stringProp name="IncludeController.includepath">jmx/fragments/Login_Fragment.jmx</stringProp>
         </IncludeController>
         <hashTree/>
         <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET /api/dashboard" enabled="true">
@@ -114,11 +114,11 @@
           <hashTree/>
         </hashTree>
         <IncludeController guiclass="IncludeControllerGui" testclass="IncludeController" testname="Include Add Ingredient Fragment" enabled="true">
-          <stringProp name="IncludeController.includepath">../jmx/fragments/Add_Ingredient_Fragment.jmx</stringProp>
+          <stringProp name="IncludeController.includepath">jmx/fragments/Add_Ingredient_Fragment.jmx</stringProp>
         </IncludeController>
         <hashTree/>
         <IncludeController guiclass="IncludeControllerGui" testclass="IncludeController" testname="Include Add Recipe Fragment" enabled="true">
-          <stringProp name="IncludeController.includepath">../jmx/fragments/Add_Recipe_Fragment.jmx</stringProp>
+          <stringProp name="IncludeController.includepath">jmx/fragments/Add_Recipe_Fragment.jmx</stringProp>
         </IncludeController>
         <hashTree/>
         <DebugSampler guiclass="TestBeanGUI" testclass="DebugSampler" testname="Debug Sampler">
@@ -128,23 +128,23 @@
         </DebugSampler>
         <hashTree/>
         <IncludeController guiclass="IncludeControllerGui" testclass="IncludeController" testname="Include Update Recipe Fragment" enabled="true">
-          <stringProp name="IncludeController.includepath">../jmx/fragments/Update_Recipe_Fragment.jmx</stringProp>
+          <stringProp name="IncludeController.includepath">jmx/fragments/Update_Recipe_Fragment.jmx</stringProp>
         </IncludeController>
         <hashTree/>
         <IncludeController guiclass="IncludeControllerGui" testclass="IncludeController" testname="Include Delete Recipe Fragment" enabled="true">
-          <stringProp name="IncludeController.includepath">../jmx/fragments/Delete_Recipe_Fragment.jmx</stringProp>
+          <stringProp name="IncludeController.includepath">jmx/fragments/Delete_Recipe_Fragment.jmx</stringProp>
         </IncludeController>
         <hashTree/>
         <IncludeController guiclass="IncludeControllerGui" testclass="IncludeController" testname="Include Update Ingredient Fragment" enabled="true">
-          <stringProp name="IncludeController.includepath">../jmx/fragments/Update_Ingredient_Fragment.jmx</stringProp>
+          <stringProp name="IncludeController.includepath">jmx/fragments/Update_Ingredient_Fragment.jmx</stringProp>
         </IncludeController>
         <hashTree/>
         <IncludeController guiclass="IncludeControllerGui" testclass="IncludeController" testname="Include Delete Ingredient Fragment" enabled="true">
-          <stringProp name="IncludeController.includepath">../jmx/fragments/Delete_Ingredient_Fragment.jmx</stringProp>
+          <stringProp name="IncludeController.includepath">jmx/fragments/Delete_Ingredient_Fragment.jmx</stringProp>
         </IncludeController>
         <hashTree/>
         <IncludeController guiclass="IncludeControllerGui" testclass="IncludeController" testname="Include Get Forecast Fragment" enabled="false">
-          <stringProp name="IncludeController.includepath">../jmx/fragments/Get_Forecast_Fragment.jmx</stringProp>
+          <stringProp name="IncludeController.includepath">jmx/fragments/Get_Forecast_Fragment.jmx</stringProp>
         </IncludeController>
         <hashTree/>
         <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree">
