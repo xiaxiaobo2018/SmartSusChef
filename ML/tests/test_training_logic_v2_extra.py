@@ -245,8 +245,8 @@ def test_save_and_load_models(tmp_path):
     cfg.model_dir = str(tmp_path)
     prophet_obj = {"p": 1}
     tree_obj = {"t": 2}
-    tl._save_hybrid_models("DishA", prophet_obj, tree_obj, "xgb", cfg)
-    pm, tm = tl._load_hybrid_models("DishA", "xgb", cfg)
+    tl._save_hybrid_models(None, "DishA", prophet_obj, tree_obj, "xgb", cfg)
+    pm, tm = tl._load_hybrid_models(None, "DishA", "xgb", cfg)
     assert pm == prophet_obj
     assert tm == tree_obj
 

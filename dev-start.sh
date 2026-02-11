@@ -48,6 +48,7 @@ echo "[OK] Python / .NET / Node.js installed"
 # -- Build connection string ------------------------------------------------
 CONN_STR="Server=$DB_SERVER;Port=$DB_PORT;Database=$DB_NAME;User Id=$DB_USER;Password=$DB_PASSWORD;SslMode=None;AllowPublicKeyRetrieval=true;ConnectionTimeout=30"
 echo "[OK] DB: $DB_SERVER:$DB_PORT/$DB_NAME (user: $DB_USER)"
+export DATABASE_URL="$CONN_STR"
 echo ""
 
 # -- Cleanup on exit --------------------------------------------------------

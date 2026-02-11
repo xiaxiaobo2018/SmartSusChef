@@ -260,7 +260,7 @@ class FinalModelV2GetPredictionTests(unittest.TestCase):
             patch.object(fm, "_load_cached", _load),
             patch.object(fm, "_get_forecast_cached", lambda lat, lon: weather_df),
             patch.object(
-                fm, "_load_hybrid_models", lambda dish, model, config: (object(), object())
+                fm, "_load_hybrid_models", lambda store_id, dish, model, config: (object(), object())
             ),
             patch.object(
                 fm,

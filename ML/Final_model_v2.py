@@ -355,7 +355,7 @@ def get_prediction(
     try:
         if model in ("catboost", "xgboost", "lightgbm"):
             # Load both Prophet and tree models
-            prophet_model, tree_model = _load_hybrid_models(dish, model, config)
+            prophet_model, tree_model = _load_hybrid_models(None, dish, model, config)
             recent = _load_cached(f"{config.model_dir}/recent_sales_{safe_name}.pkl")
 
             multiday = _predict_hybrid_multiday(

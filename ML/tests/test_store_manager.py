@@ -151,7 +151,7 @@ def test_train_store_models_success(monkeypatch, tmp_path):
     def _add_local_context(data, **kwargs):
         return data, "US", 1.0, 2.0
 
-    def _process_dish(dish, frame, cc, config):
+    def _process_dish(dish, frame, cc, config, store_id=None):
         return {"champion": "xgb", "mae": {}, "champion_mae": 1.0}
 
     fake_module = SimpleNamespace(

@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/app
 import { Button } from '@/app/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/app/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/app/components/ui/dialog';
-import { Upload, Download, AlertCircle, CheckCircle, ArrowRight, ChefHat, AlertTriangle, CalendarDays } from 'lucide-react';
+import { Upload, Download, AlertCircle, CheckCircle, ArrowRight, ChefHat, AlertTriangle, CalendarDays, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { parse } from 'papaparse';
 import { format } from 'date-fns';
@@ -27,6 +27,7 @@ export function ImportSalesData() {
   const [showPreview, setShowPreview] = useState(false);
   const [duplicates, setDuplicates] = useState<{ date: string; dish: string; rows: number[] }[]>([]);
   const [isImporting, setIsImporting] = useState(false);
+  const [importStatus, setImportStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [isOverwriteDialogSubmitting, setIsOverwriteDialogSubmitting] = useState(false);
   const [dateFormat, setDateFormat] = useState(DATE_FORMATS[0].value);
 
@@ -270,6 +271,7 @@ export function ImportSalesData() {
   };
 
   const handleFileUpload = (file: File) => {
+    setImportStatus(null);
     if (!file.name.endsWith('.csv')) {
       toast.error('Please upload a CSV file');
       return;
@@ -446,6 +448,7 @@ export function ImportSalesData() {
         msg += `. Auto-created ${result.newDishesCreated} new dish(es): ${result.newDishes.join(', ')}`;
       }
       toast.success(msg);
+      setImportStatus({ type: 'success', message: msg });
 
       // Clear form data
       setCsvData([]);
@@ -466,11 +469,14 @@ export function ImportSalesData() {
         toast.warning('Data imported successfully, but failed to refresh. Please reload the page.');
       }
     } catch (error: unknown) {
+      let errorMsg: string;
       if (error instanceof Error && error.message?.includes('duplicate')) {
-        toast.error('Duplicate records detected. The system prevents duplicate entries for the same date and recipe.');
+        errorMsg = 'Duplicate records detected. The system prevents duplicate entries for the same date and recipe.';
       } else {
-        toast.error(`Failed to import sales data: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        errorMsg = `Failed to import sales data: ${error instanceof Error ? error.message : 'Unknown error'}`;
       }
+      toast.error(errorMsg);
+      setImportStatus({ type: 'error', message: errorMsg });
     } finally {
       setIsImporting(false);
     }
@@ -886,6 +892,33 @@ export function ImportSalesData() {
         </DialogContent>
       </Dialog>
 
+      {/* Import Status Message */}
+      {importStatus && (
+        <Card className={importStatus.type === 'success' ? 'border-green-300 bg-green-50' : 'border-red-300 bg-red-50'}>
+          <CardContent className="flex items-center gap-3 py-4">
+            {importStatus.type === 'success' ? (
+              <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+            ) : (
+              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+            )}
+            <p className={`text-sm font-medium ${importStatus.type === 'success' ? 'text-green-800' : 'text-red-800'}`}>
+              {importStatus.message}
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Loading Spinner Overlay */}
+      {isImporting && !showPreview && (
+        <Card className="border-[#4F6F52]/20">
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <Loader2 className="w-10 h-10 animate-spin text-[#4F6F52] mb-4" />
+            <p className="text-lg font-medium text-gray-700">Importing sales data...</p>
+            <p className="text-sm text-gray-500 mt-1">Please wait while your data is being processed</p>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Preview Table */}
       {showPreview && csvData.length > 0 && errors.length === 0 && (
         <Card className="border-[#4F6F52]/20">
@@ -905,8 +938,17 @@ export function ImportSalesData() {
                   Cancel
                 </Button>
                 <Button onClick={handleImport} disabled={isImporting} className="gap-2 bg-[#4F6F52] hover:bg-[#3A4D39]">
-                  <ArrowRight className="w-4 h-4" />
-                  Import Data
+                  {isImporting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Importing...
+                    </>
+                  ) : (
+                    <>
+                      <ArrowRight className="w-4 h-4" />
+                      Import Data
+                    </>
+                  )}
                 </Button>
               </div>
             </div>

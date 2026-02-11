@@ -16,12 +16,27 @@ test.describe('Data Management Tests', () => {
     await page.getByRole('button', { name: 'Manage Store' }).click();
     await page.getByRole('button', { name: 'Import Sales Data' }).click();
 
+    // Assert initial state: no loading spinner, no status message
+    await expect(page.getByText('Importing sales data...')).not.toBeVisible();
+    await expect(page.getByText('Successfully imported')).not.toBeVisible();
+
     const fileChooserPromise = page.waitForEvent('filechooser');
     await page.getByRole('button', { name: 'Browse Files' }).click();
     const fileChooser = await fileChooserPromise;
     await fileChooser.setFiles(path.join(__dirname, '../../test_data.csv'));
 
-    await page.getByRole('button', { name: 'Import Data' }).click();
+    const importButton = page.getByRole('button', { name: 'Import Data' });
+
+    // Assert button is enabled before clicking
+    await expect(importButton).toBeEnabled();
+
+    await importButton.click();
+
+    // Assert loading state: button should be disabled and show "Importing..."
+    await expect(page.getByRole('button', { name: 'Importing...' })).toBeVisible();
+
+    // Wait for import to complete - success message should appear
+    await expect(page.getByText('Successfully imported')).toBeVisible({ timeout: 30000 });
   });
 
   test.afterAll(async ({ browser }) => {

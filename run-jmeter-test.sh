@@ -29,11 +29,17 @@ mkdir -p testing/performance/results
 mkdir -p testing/performance/reports
 
 # --- Step 2: Clear test ingredients from the database ---
-echo "--- Clearing test ingredients from the database ---"
+echo "--- Clearing test ingredients and recipes from the database ---"
 if mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASSWORD" "$DB_NAME" -e "DELETE FROM WastageData WHERE IngredientId IN (SELECT Id FROM Ingredients WHERE Name LIKE 'Test Ingredient %');"; then
     echo "Successfully cleared related WastageData."
 else
     echo "Warning: Failed to clear related WastageData. Continuing. Check credentials or connection."
+fi
+
+if mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASSWORD" "$DB_NAME" -e "DELETE FROM Recipes WHERE Name LIKE 'Test Recipe %';"; then
+    echo "Successfully deleted test recipes."
+else
+    echo "Warning: Failed to delete test recipes from the database. Continuing. Check credentials or connection."
 fi
 
 if mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASSWORD" "$DB_NAME" -e "DELETE FROM Ingredients WHERE Name LIKE 'Test Ingredient %';"; then

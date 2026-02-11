@@ -27,6 +27,7 @@ DB_PASSWORD="${DB_PASSWORD:?DB_PASSWORD not set in .env}"
 DB_NAME="${DB_NAME:?DB_NAME not set in .env}"
 
 BACKEND_PORT=5001
+ML_PORT=8000
 START_FRONTEND=${START_FRONTEND:-true}
 
 # -- Detect local Wi-Fi IP (for physical mobile devices) -------------------
@@ -90,10 +91,39 @@ if [ -n "$MISSING" ]; then
 fi
 echo "[OK] Python / .NET / Node.js installed"
 
-# -- Build connection string ------------------------------------------------
-CONN_STR="Server=$DB_SERVER;Port=$DB_PORT;Database=$DB_NAME;User Id=$DB_USER;Password=$DB_PASSWORD;SslMode=None;AllowPublicKeyRetrieval=true;ConnectionTimeout=30"
+# -- Build connection strings -----------------------------------------------
+# ADO.NET style for .NET backend
+DOTNET_CONN_STR="Server=$DB_SERVER;Port=$DB_PORT;Database=$DB_NAME;User Id=$DB_USER;Password=$DB_PASSWORD;SslMode=None;AllowPublicKeyRetrieval=true;ConnectionTimeout=30"
+# SQLAlchemy URL for Python ML service
+SQLALCHEMY_DB_URL="mysql+pymysql://${DB_USER}:${DB_PASSWORD}@${DB_SERVER}:${DB_PORT}/${DB_NAME}?charset=utf8mb4"
 echo "[OK] DB: $DB_SERVER:$DB_PORT/$DB_NAME (user: $DB_USER)"
+export DATABASE_URL="$SQLALCHEMY_DB_URL"
 echo ""
+
+# -- Kill existing processes on ML_PORT -------------------------------------
+echo "[INFO] Checking for processes on port ${ML_PORT}..."
+# Find PIDs using the ML_PORT and process them with xargs to handle multiple PIDs
+lsof -t -i ":${ML_PORT}" | xargs -r kill -9
+if [ $? -eq 0 ]; then
+    echo "[INFO] Killed existing process(es) on port ${ML_PORT}."
+    sleep 1 # Give a moment for the port to release
+else
+    echo "[INFO] No process found or unable to kill processes on port ${ML_PORT}."
+fi
+
+# -- Kill existing processes on BACKEND_PORT --------------------------------
+echo "[INFO] Checking for processes on port ${BACKEND_PORT}..."
+# Find PIDs using the BACKEND_PORT and suppress errors if none are found
+PID_ON_PORT=$(lsof -t -i ":${BACKEND_PORT}" || true)
+if [ -n "$PID_ON_PORT" ]; then
+    echo "[INFO] Killing process(es) $PID_ON_PORT on port ${BACKEND_PORT}."
+    # Force kill the process(es)
+    kill -9 "$PID_ON_PORT"
+    # Give the system a moment to release the port
+    sleep 1
+else
+    echo "[INFO] No process found on port ${BACKEND_PORT}."
+fi
 
 # -- Cleanup on exit --------------------------------------------------------
 cleanup() {
@@ -111,8 +141,8 @@ trap cleanup EXIT INT TERM
 echo "[1/3] Starting ML Service (port 8000)..."
 (
     cd "$ROOT/ML"
-    python3 -m pip install -q -r requirements.txt
-    python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    python3 -m pip install -q -r requirements-prod.txt
+    python3 -m uvicorn app.main:app --host 0.0.0.0 --port ${ML_PORT} --reload --log-level warning
 ) &
 ML_PID=$!
 sleep 3
@@ -122,7 +152,7 @@ echo "[2/3] Starting Backend (port ${BACKEND_PORT})..."
 (
     cd "$ROOT/backend/SmartSusChef.Api"
     export ASPNETCORE_ENVIRONMENT=Development
-    export ConnectionStrings__DefaultConnection="$CONN_STR"
+    export ConnectionStrings__DefaultConnection="$DOTNET_CONN_STR"
     export ASPNETCORE_URLS="http://0.0.0.0:${BACKEND_PORT}"
     dotnet run
 ) &

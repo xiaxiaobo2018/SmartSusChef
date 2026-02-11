@@ -1,8 +1,9 @@
 import functools
 import os
+import threading
 from typing import Any
 
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
 from app.inference import ModelStore, create_store_from_env, predict_dish
@@ -93,6 +94,16 @@ class StoreStatusResponse(BaseModel):
     dishes: list[str] | None = None
     days_available: int | None = None
     training_progress: TrainingProgressResponse | None = None
+
+
+class StoreTrainResponse(BaseModel):
+    store_id: int
+    status: str  # "started" | "already_training" | "completed" | "error" | "insufficient_data"
+    message: str | None = None
+    days_available: int | None = None
+    dishes_trained: int | None = None
+    dishes_failed: int | None = None
+    failed_details: dict[str, str] | None = None
 
 
 # ---------------------------------------------------------------------------
@@ -221,10 +232,26 @@ def store_predict(
                 "days_available": 0,
             }
 
+        if days_available is not None and days_available < manager.MIN_TRAINING_DAYS:
+            return {
+                "store_id": store_id,
+                "status": "missing_models",
+                "message": (
+                    f"No trained models for store {store_id}. "
+                    f"Insufficient historical data ({days_available} days). "
+                    f"At least {manager.MIN_TRAINING_DAYS} days of sales history "
+                    f"are required to train dedicated models."
+                ),
+                "days_available": days_available,
+            }
+
         return {
             "store_id": store_id,
             "status": "missing_models",
-            "message": "No trained models for this store. Please run offline training.",
+            "message": (
+                f"No trained models for store {store_id}. "
+                "Please trigger training via POST /store/{store_id}/train."
+            ),
             "days_available": days_available,
         }
 
@@ -300,12 +327,78 @@ def store_predict(
                 weather_rows=shared_weather_rows,
             )
             all_predictions[dish] = result
+        except FileNotFoundError as e:
+            logger.warning(
+                "Store %d, dish '%s': model files missing: %s", store_id, dish, e
+            )
+            all_predictions[dish] = {
+                "error": f"Model files missing for '{dish}'. The model may not have been "
+                "trained successfully due to insufficient data for this dish.",
+            }
         except Exception as e:
-            logger.error("Prediction failed for dish '%s': %s", dish, e, exc_info=True)
+            logger.error(
+                "Store %d, prediction failed for dish '%s': %s",
+                store_id, dish, e, exc_info=True,
+            )
             all_predictions[dish] = {"error": str(e)}
 
     return {
         "store_id": store_id,
         "status": "ok",
         "predictions": all_predictions,
+    }
+
+
+@app.post("/store/{store_id}/train", response_model=StoreTrainResponse)
+def store_train(
+    store_id: int,
+    background_tasks: BackgroundTasks,
+    manager: StoreModelManager = Depends(get_model_manager),
+) -> dict[str, Any]:
+    """
+    Trigger model training for a specific store.
+
+    Training runs in a background thread. Poll ``GET /store/{store_id}/status``
+    to track progress.
+    """
+    if manager.is_training(store_id):
+        return {
+            "store_id": store_id,
+            "status": "already_training",
+            "message": "Training is already in progress for this store.",
+        }
+
+    # Quick data availability check before kicking off background training
+    try:
+        _, days_available = manager.fetch_store_sales(store_id)
+    except Exception as e:
+        return {
+            "store_id": store_id,
+            "status": "error",
+            "message": f"Cannot connect to database: {e}",
+            "days_available": 0,
+        }
+
+    if days_available < manager.MIN_TRAINING_DAYS:
+        return {
+            "store_id": store_id,
+            "status": "insufficient_data",
+            "message": (
+                f"Store {store_id}: Insufficient data ({days_available} days). "
+                f"Need at least {manager.MIN_TRAINING_DAYS} days of sales history."
+            ),
+            "days_available": days_available,
+        }
+
+    def _run_training() -> None:
+        result = manager.train_store_models(store_id)
+        logger.info("Store %d background training result: %s", store_id, result.get("status"))
+
+    background_tasks.add_task(_run_training)
+
+    return {
+        "store_id": store_id,
+        "status": "started",
+        "message": "Training started in background. Poll /store/{store_id}/status for progress.",
+        "days_available": days_available,
     }
