@@ -237,7 +237,15 @@ public class AuthService : IAuthService
 
         user.UpdatedAt = DateTime.UtcNow;
 
-        await _context.SaveChangesAsync();
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateException ex) when (ex.InnerException?.Message.Contains("Duplicate entry") == true)
+        {
+            // Handle race condition where username was taken between check and save
+            return null;
+        }
 
         return new UserListDto(
             user.Id.ToString(),
@@ -298,7 +306,9 @@ public class AuthService : IAuthService
 
         if (user == null) return null;
 
-        var tempPassword = Guid.NewGuid().ToString("N")[..8];
+        // Generate a 16-char temp password meeting all complexity requirements:
+        // uppercase, lowercase, digit, and special character
+        var tempPassword = Guid.NewGuid().ToString("N")[..12] + "A1!a";
         user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(tempPassword);
         user.UpdatedAt = DateTime.UtcNow;
         await _context.SaveChangesAsync();

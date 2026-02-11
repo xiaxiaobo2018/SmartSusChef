@@ -46,11 +46,11 @@ else {
 }
 
 # CLI params override .env
-if (-not $DbServer)   { $DbServer   = $env:DB_SERVER }
-if (-not $DbPort)     { $DbPort     = [int]$env:DB_PORT }
-if (-not $DbUser)     { $DbUser     = $env:DB_USER }
+if (-not $DbServer) { $DbServer = $env:DB_SERVER }
+if (-not $DbPort) { $DbPort = [int]$env:DB_PORT }
+if (-not $DbUser) { $DbUser = $env:DB_USER }
 if (-not $DbPassword) { $DbPassword = $env:DB_PASSWORD }
-if (-not $DbName)     { $DbName     = $env:DB_NAME }
+if (-not $DbName) { $DbName = $env:DB_NAME }
 
 Write-Host ""
 Write-Host "==========================================" -ForegroundColor Green
@@ -63,8 +63,8 @@ $WifiIP = Get-NetIPAddress `
     -AddressFamily IPv4 `
     -InterfaceAlias "Wi-Fi*" `
     -ErrorAction SilentlyContinue |
-    Where-Object { $_.IPAddress -notlike "169.254*" } |
-    Select-Object -First 1 -ExpandProperty IPAddress
+Where-Object { $_.IPAddress -notlike "169.254*" } |
+Select-Object -First 1 -ExpandProperty IPAddress
 
 if ($WifiIP) {
     Write-Host "[OK] Wi-Fi IP detected: $WifiIP" -ForegroundColor Green
@@ -161,9 +161,7 @@ Write-Host "  Swagger          -> http://localhost:$BackendPort/swagger" -Foregr
 Write-Host "  ML API           -> http://localhost:8000" -ForegroundColor White
 Write-Host ""
 Write-Host "  Android Emulator -> http://10.0.2.2:$BackendPort/api/" -ForegroundColor Cyan
-if ($WifiIP) {
-    Write-Host "  Physical Device  -> http://$WifiIP:$BackendPort/api/" -ForegroundColor Cyan
-}
+
 Write-Host ""
 Write-Host "  Stop services: close each PowerShell window" -ForegroundColor Gray
 Write-Host "==========================================" -ForegroundColor Green
