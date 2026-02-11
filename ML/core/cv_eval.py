@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from types import ModuleType
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Optional
 
 if TYPE_CHECKING:
     import optuna as _optuna_type
@@ -19,14 +19,14 @@ from core.feature_eng import _build_residual_features
 logger = setup_logger(__name__)
 
 # Import optional dependencies
-optuna: ModuleType | None = None
+optuna: Optional[ModuleType] = None
 try:
     import optuna as _optuna
 
     optuna = _optuna
 except ImportError:
     pass
-lgb: ModuleType | None = None
+lgb: Optional[ModuleType] = None
 try:
     import lightgbm as _lgb
 
@@ -34,7 +34,7 @@ try:
 except ImportError:
     pass
 
-CatBoostRegressor: type[Any] | None = None
+CatBoostRegressor: Optional[type[Any]] = None
 try:
     from catboost import CatBoostRegressor as _CatBoostRegressor
 
@@ -42,7 +42,7 @@ try:
 except ImportError:
     pass
 
-XGBRegressor: type[Any] | None = None
+XGBRegressor: Optional[type[Any]] = None
 try:
     from xgboost import XGBRegressor as _XGBRegressor
 

@@ -3,6 +3,7 @@
 import hashlib
 import logging
 from pathlib import Path
+from typing import Union
 
 import joblib
 
@@ -23,7 +24,7 @@ def _hash_path(pkl_path: Path) -> Path:
     return pkl_path.with_suffix(".pkl.sha256")
 
 
-def secure_dump(obj, path: str | Path) -> None:
+def secure_dump(obj, path: Union[str, Path]) -> None:
     """Dump *obj* via joblib and write a companion SHA-256 hash file."""
     path = Path(path)
     joblib.dump(obj, str(path))
@@ -32,7 +33,7 @@ def secure_dump(obj, path: str | Path) -> None:
     logger.debug("Saved %s (sha256=%s)", path.name, digest[:12])
 
 
-def secure_load(path: str | Path):
+def secure_load(path: Union[str, Path]):
     """Load a .pkl file after verifying its SHA-256 hash.
 
     If no companion hash file exists the load proceeds with a warning

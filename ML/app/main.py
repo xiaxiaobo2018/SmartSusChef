@@ -1,6 +1,7 @@
 import functools
 import os
-from typing import Any
+import threading
+from typing import Any, Optional
 
 from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException
 from pydantic import BaseModel, Field
@@ -17,7 +18,7 @@ logger = setup_logger(__name__)
 # Dependency providers (singletons via lru_cache)
 # ---------------------------------------------------------------------------
 @functools.lru_cache(maxsize=1)
-def get_model_store() -> ModelStore | None:
+def get_model_store() -> Optional[ModelStore]:
     try:
         return create_store_from_env()
     except FileNotFoundError:
@@ -42,12 +43,12 @@ class PredictRequest(BaseModel):
     dish: str = Field(..., description="Dish name that exists in champion_registry.pkl")
     recent_sales: list[float] = Field(..., min_length=1, description="Recent daily sales history")
     horizon_days: int = Field(14, ge=1, le=30)
-    start_date: str | None = Field(None, description="YYYY-MM-DD; default is tomorrow")
+    start_date: Optional[str] = Field(None, description="YYYY-MM-DD; default is tomorrow")
     address: str = Field("Shanghai, China", description="Used when lat/lon are not provided")
-    latitude: float | None = None
-    longitude: float | None = None
-    country_code: str | None = None
-    weather_rows: list[dict[str, Any]] | None = Field(
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    country_code: Optional[str] = None
+    weather_rows: Optional[list[dict[str, Any]]] = Field(
         None,
         description="Optional custom weather list for horizon dates",
     )
@@ -65,44 +66,44 @@ class PredictResponse(BaseModel):
 class StorePredictRequest(BaseModel):
     store_id: int = Field(..., description="Store ID from the .NET database")
     horizon_days: int = Field(14, ge=1, le=30)
-    address: str | None = None
-    latitude: float | None = None
-    longitude: float | None = None
-    country_code: str | None = None
+    address: Optional[str] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    country_code: Optional[str] = None
 
 
 class StorePredictResponse(BaseModel):
     store_id: int
     status: str  # "ok" | "missing_models" | "error"
-    message: str | None = None
-    days_available: int | None = None
-    predictions: dict[str, Any] | None = None
+    message: Optional[str] = None
+    days_available: Optional[int] = None
+    predictions: Optional[dict[str, Any]] = None
 
 
 class TrainingProgressResponse(BaseModel):
     trained: int
     failed: int
     total: int
-    current_dish: str | None = None
+    current_dish: Optional[str] = None
 
 
 class StoreStatusResponse(BaseModel):
     store_id: int
     has_models: bool
     is_training: bool
-    dishes: list[str] | None = None
-    days_available: int | None = None
-    training_progress: TrainingProgressResponse | None = None
+    dishes: Optional[list[str]] = None
+    days_available: Optional[int] = None
+    training_progress: Optional[TrainingProgressResponse] = None
 
 
 class StoreTrainResponse(BaseModel):
     store_id: int
     status: str  # "started" | "already_training" | "completed" | "error" | "insufficient_data"
-    message: str | None = None
-    days_available: int | None = None
-    dishes_trained: int | None = None
-    dishes_failed: int | None = None
-    failed_details: dict[str, str] | None = None
+    message: Optional[str] = None
+    days_available: Optional[int] = None
+    dishes_trained: Optional[int] = None
+    dishes_failed: Optional[int] = None
+    failed_details: Optional[dict[str, str]] = None
 
 
 # ---------------------------------------------------------------------------
@@ -110,7 +111,7 @@ class StoreTrainResponse(BaseModel):
 # ---------------------------------------------------------------------------
 @app.get("/health")
 def health(
-    store: ModelStore | None = Depends(get_model_store),
+    store: Optional[ModelStore] = Depends(get_model_store),
     manager: StoreModelManager = Depends(get_model_manager),
 ) -> dict[str, Any]:
     """Health check endpoint for ALB/ECS."""
@@ -123,7 +124,7 @@ def health(
 
 
 @app.get("/dishes")
-def dishes(store: ModelStore | None = Depends(get_model_store)) -> dict[str, list[str]]:
+def dishes(store: Optional[ModelStore] = Depends(get_model_store)) -> dict[str, list[str]]:
     if store is None:
         raise HTTPException(status_code=503, detail="Model store not initialized")
     return {"dishes": store.list_dishes()}
@@ -132,7 +133,7 @@ def dishes(store: ModelStore | None = Depends(get_model_store)) -> dict[str, lis
 @app.post("/predict", response_model=PredictResponse)
 def predict(
     req: PredictRequest,
-    store: ModelStore | None = Depends(get_model_store),
+    store: Optional[ModelStore] = Depends(get_model_store),
 ) -> dict[str, Any]:
     if store is None:
         raise HTTPException(status_code=503, detail="Model store not initialized")
@@ -327,7 +328,9 @@ def store_predict(
             )
             all_predictions[dish] = result
         except FileNotFoundError as e:
-            logger.warning("Store %d, dish '%s': model files missing: %s", store_id, dish, e)
+            logger.warning(
+                "Store %d, dish '%s': model files missing: %s", store_id, dish, e
+            )
             all_predictions[dish] = {
                 "error": f"Model files missing for '{dish}'. The model may not have been "
                 "trained successfully due to insufficient data for this dish.",
@@ -335,10 +338,7 @@ def store_predict(
         except Exception as e:
             logger.error(
                 "Store %d, prediction failed for dish '%s': %s",
-                store_id,
-                dish,
-                e,
-                exc_info=True,
+                store_id, dish, e, exc_info=True,
             )
             all_predictions[dish] = {"error": str(e)}
 

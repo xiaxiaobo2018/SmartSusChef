@@ -11,7 +11,7 @@ This module handles:
 import os
 import threading
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional, Tuple
 
 import pandas as pd
 from sqlalchemy import create_engine, text
@@ -53,11 +53,11 @@ class StoreModelManager:
     def is_training(self, store_id: int) -> bool:
         return self._training_in_progress.get(store_id, False)
 
-    def get_training_progress(self, store_id: int) -> dict[str, Any] | None:
+    def get_training_progress(self, store_id: int) -> Optional[dict[str, Any]]:
         """Return current training progress for a store, or None if not training."""
         return self._training_progress.get(store_id)
 
-    def get_store(self, store_id: int) -> ModelStore | None:
+    def get_store(self, store_id: int) -> Optional[ModelStore]:
         """Return a loaded ModelStore for the given store, or None."""
         if store_id in self._stores:
             return self._stores[store_id]
@@ -70,7 +70,7 @@ class StoreModelManager:
         self._stores[store_id] = store
         return store
 
-    def reload_store(self, store_id: int) -> ModelStore | None:
+    def reload_store(self, store_id: int) -> Optional[ModelStore]:
         """Force-reload models for a store (e.g. after training)."""
         self._stores.pop(store_id, None)
         return self.get_store(store_id)
@@ -80,7 +80,7 @@ class StoreModelManager:
     # ------------------------------------------------------------------
 
     @staticmethod
-    def _get_db_url() -> str | None:
+    def _get_db_url() -> Optional[str]:
         return os.getenv("DATABASE_URL")
 
     def _get_engine(self):
@@ -99,7 +99,7 @@ class StoreModelManager:
             )
         return self._engine
 
-    def fetch_store_sales(self, store_id: int) -> tuple[pd.DataFrame | None, int]:
+    def fetch_store_sales(self, store_id: int) -> Tuple[Optional[pd.DataFrame], int]:
         """
         Fetch sales data for a specific store from the database.
         Returns (dataframe_or_none, total_unique_days).
@@ -143,7 +143,7 @@ class StoreModelManager:
             logger.error("Failed to fetch sales for store %d: %s", store_id, e, exc_info=True)
             return None, 0
 
-    def fetch_store_location(self, store_id: int) -> tuple[float | None, float | None, str | None]:
+    def fetch_store_location(self, store_id: int) -> Tuple[Optional[float], Optional[float], Optional[str]]:
         """Fetch store lat/lon/country_code from the database."""
         engine = self._get_engine()
         if not engine:

@@ -1,7 +1,7 @@
 import os
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 import holidays
 import pandas as pd
@@ -115,7 +115,7 @@ def _prepare_future_weather(
     horizon_days: int,
     latitude: float,
     longitude: float,
-    weather_rows: list[dict[str, Any]] | None = None,
+    weather_rows: Optional[list[dict[str, Any]]] = None,
 ) -> pd.DataFrame:
     future_dates = pd.date_range(start=start_date, periods=horizon_days, freq="D")
 
@@ -160,12 +160,12 @@ def predict_dish(
     dish: str,
     recent_sales: list[float],
     horizon_days: int,
-    start_date: str | None = None,
+    start_date: Optional[str] = None,
     address: str = "Shanghai, China",
-    latitude: float | None = None,
-    longitude: float | None = None,
-    country_code: str | None = None,
-    weather_rows: list[dict[str, Any]] | None = None,
+    latitude: Optional[float] = None,
+    longitude: Optional[float] = None,
+    country_code: Optional[str] = None,
+    weather_rows: Optional[list[dict[str, Any]]] = None,
 ) -> dict[str, Any]:
     if not recent_sales:
         raise ValueError("recent_sales cannot be empty")

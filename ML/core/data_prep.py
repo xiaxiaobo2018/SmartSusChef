@@ -2,7 +2,7 @@
 
 import os
 from types import ModuleType
-from typing import Any
+from typing import Any, Optional
 
 import holidays
 import pandas as pd
@@ -11,7 +11,7 @@ from sqlalchemy import create_engine
 
 from app.utils.logging_config import setup_logger
 
-openmeteo_requests: ModuleType | None = None
+openmeteo_requests: Optional[ModuleType] = None
 retry: Any = None
 try:
     import openmeteo_requests as _openmeteo_requests
@@ -256,7 +256,7 @@ def add_local_context(df, address, config, latitude=None, longitude=None, countr
 # ---------------------------------------------------------------------------
 # Data Ingestion
 # ---------------------------------------------------------------------------
-def fetch_training_data(store_id: int | None = None):
+def fetch_training_data(store_id: Optional[int] = None):
     """
     Fetch training data, optionally filtered by store.
 
