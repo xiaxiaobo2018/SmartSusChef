@@ -423,7 +423,7 @@ describe('SalesInputForm', () => {
         });
 
         it('should handle API error gracefully when adding sales data', async () => {
-            await import('sonner');
+            const { toast } = await import('sonner');
             vi.mocked(api.salesApi.create).mockRejectedValue(new Error('API Error'));
 
             renderWithProviders();
