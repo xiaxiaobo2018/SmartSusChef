@@ -37,19 +37,41 @@ public class MlForecastService : IForecastService
     {
         var storeId = CurrentStoreId;
         var today = DateTime.UtcNow.Date;
+        _logger.LogInformation("Store {StoreId}: GetForecastAsync called (days={Days}, pastDays={PastDays}, today={Today})",
+            storeId, days, includePastDays, today.ToString("yyyy-MM-dd"));
 
         // 1. Try to get ML predictions
         try
         {
-            var store = await _storeService.GetStoreAsync();
+            // Fetch store details separately so a failure here won't skip the ML call
+            decimal? lat = null;
+            decimal? lon = null;
+            string? cc = null;
+            try
+            {
+                var store = await _storeService.GetStoreAsync();
+                lat = store?.Latitude;
+                lon = store?.Longitude;
+                cc = store?.CountryCode;
+            }
+            catch (Exception storeEx)
+            {
+                _logger.LogWarning(storeEx, "Store {StoreId}: Failed to fetch store details, proceeding without location data.", storeId);
+            }
+
+            _logger.LogInformation("Store {StoreId}: Calling ML predict (horizonDays={H}, lat={Lat}, lon={Lon}, cc={Cc})",
+                storeId, days + 2, lat, lon, cc);
 
             var mlResponse = await _mlService.GetStorePredictionsAsync(
                 storeId,
                 horizonDays: days + 2, // Extra buffer for timezone
-                latitude: store?.Latitude,
-                longitude: store?.Longitude,
-                countryCode: store?.CountryCode
+                latitude: lat,
+                longitude: lon,
+                countryCode: cc
             );
+
+            _logger.LogInformation("Store {StoreId}: ML predict returned status='{Status}', predictions={HasPredictions}",
+                storeId, mlResponse.Status, mlResponse.Predictions != null ? mlResponse.Predictions.Count.ToString() : "null");
 
             switch (mlResponse.Status)
             {

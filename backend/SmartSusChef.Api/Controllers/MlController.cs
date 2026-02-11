@@ -186,6 +186,142 @@ public class MlController : ControllerBase
             return StatusCode(503, new { message = "ML service is unavailable. Please try again later." });
         }
     }
+
+    /// <summary>
+    /// Diagnostic endpoint to test ML connectivity and forecast pipeline.
+    /// Access directly: GET /api/ml/diag?storeId=1 (no auth required)
+    /// </summary>
+    [HttpGet("diag")]
+    [AllowAnonymous]
+    public async Task<ActionResult> Diagnostics([FromQuery] int storeId = 1)
+    {
+        var result = new Dictionary<string, object?>
+        {
+            ["storeId"] = storeId,
+            ["timestamp"] = DateTime.UtcNow.ToString("o"),
+        };
+
+        // 1. DB data check
+        try
+        {
+            var salesDays = await _dbContext.SalesData
+                .Where(s => s.StoreId == storeId)
+                .Select(s => s.Date.Date)
+                .Distinct()
+                .CountAsync();
+            result["dbSalesDays"] = salesDays;
+
+            var recipeCount = await _dbContext.Recipes
+                .Where(r => r.StoreId == storeId)
+                .CountAsync();
+            result["dbRecipeCount"] = recipeCount;
+
+            var dishNames = await _dbContext.Recipes
+                .Where(r => r.StoreId == storeId)
+                .Select(r => r.Name)
+                .Distinct()
+                .Take(5)
+                .ToListAsync();
+            result["sampleDishes"] = dishNames;
+        }
+        catch (Exception ex)
+        {
+            result["dbError"] = ex.Message;
+        }
+
+        // 2. ML API base URL (from config)
+        var mlUrl = HttpContext.RequestServices.GetService<IConfiguration>()?["ExternalApis:MlApiUrl"];
+        result["mlApiUrl"] = mlUrl ?? "(not configured, using default http://localhost:8000)";
+
+        // 3. Direct HTTP test to ML health endpoint
+        try
+        {
+            var baseUrl = (mlUrl ?? "http://localhost:8000").TrimEnd('/');
+            result["mlTestUrl"] = $"{baseUrl}/health";
+
+            using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(15) };
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+            var healthResp = await client.GetAsync($"{baseUrl}/health");
+            sw.Stop();
+            result["mlHealthStatus"] = (int)healthResp.StatusCode;
+            result["mlHealthElapsedMs"] = sw.ElapsedMilliseconds;
+            var healthBody = await healthResp.Content.ReadAsStringAsync();
+            result["mlHealthBody"] = healthBody.Length > 500 ? healthBody[..500] : healthBody;
+        }
+        catch (Exception ex)
+        {
+            result["mlHealthError"] = $"{ex.GetType().Name}: {ex.Message}";
+            if (ex.InnerException != null)
+                result["mlHealthInnerError"] = $"{ex.InnerException.GetType().Name}: {ex.InnerException.Message}";
+        }
+
+        // 4. ML status call via service
+        try
+        {
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+            var status = await _mlService.GetStoreStatusAsync(storeId);
+            sw.Stop();
+            result["mlStatus"] = new
+            {
+                status.StoreId,
+                status.HasModels,
+                status.IsTraining,
+                status.DaysAvailable,
+                status.ServiceAvailable,
+                DishCount = status.Dishes?.Count ?? 0,
+                ElapsedMs = sw.ElapsedMilliseconds,
+            };
+        }
+        catch (Exception ex)
+        {
+            result["mlStatusError"] = $"{ex.GetType().Name}: {ex.Message}";
+        }
+
+        // 5. ML predict call (small horizon for speed)
+        try
+        {
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+            var mlResponse = await _mlService.GetStorePredictionsAsync(
+                storeId, horizonDays: 2, latitude: null, longitude: null, countryCode: null);
+            sw.Stop();
+
+            result["mlPredict"] = new
+            {
+                mlResponse.Status,
+                mlResponse.Message,
+                mlResponse.DaysAvailable,
+                PredictionDishes = mlResponse.Predictions?.Count ?? 0,
+                PredictionSample = mlResponse.Predictions?.Take(2).Select(p => new
+                {
+                    Dish = p.Key,
+                    Error = p.Value.Error,
+                    DayCount = p.Value.Predictions?.Count ?? 0,
+                }),
+                ElapsedMs = sw.ElapsedMilliseconds,
+            };
+        }
+        catch (Exception ex)
+        {
+            result["mlPredictError"] = $"{ex.GetType().Name}: {ex.Message}";
+            if (ex.InnerException != null)
+                result["mlPredictInnerError"] = $"{ex.InnerException.GetType().Name}: {ex.InnerException.Message}";
+        }
+
+        // 6. Cached forecasts in DB
+        try
+        {
+            var cachedCount = await _dbContext.ForecastData
+                .Where(f => f.StoreId == storeId && f.UpdatedAt >= DateTime.UtcNow.AddHours(-24))
+                .CountAsync();
+            result["cachedForecastCount24h"] = cachedCount;
+        }
+        catch (Exception ex)
+        {
+            result["cachedForecastError"] = ex.Message;
+        }
+
+        return Ok(result);
+    }
 }
 
 /// <summary>
