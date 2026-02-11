@@ -33,6 +33,7 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 
 # Copy only production-essential files
 COPY app/ ./app/
+COPY core/ ./core/
 COPY training_logic_v2.py .
 COPY Final_model_v2.py .
 COPY models/ ./models/
