@@ -187,6 +187,10 @@ jobs:
           rm -rf "$REPORT_DIR" "$RESULTS_FILE"
           mkdir -p "$REPORT_DIR" "$RESULTS_DIR"
 
+          # Generate credentials CSV from secrets
+          echo "username,password" > testing/performance/data/user.csv
+          echo "${{ secrets.ZAP_DAST_USERNAME }},${{ secrets.ZAP_DAST_PASSWORD }}" >> testing/performance/data/user.csv
+
           cd testing/performance
           jmeter -n \
             -t jmx/Main_Scenario.jmx \
