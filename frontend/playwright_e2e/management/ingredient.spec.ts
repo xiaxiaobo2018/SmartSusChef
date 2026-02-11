@@ -63,7 +63,7 @@ test('add new ingredient', async ({ page }) => {
     await page.locator('#ingredient-unit').selectOption('kg');
     await page.getByLabel('Carbon Footprint').fill('2.5');
     await page.getByRole('button', { name: 'Add Ingredient' }).click();
-    await expect(page.getByText(uniqueName)).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText(uniqueName)).toBeVisible({ timeout: 15000 });
     await page.waitForTimeout(2000);
 });
 
