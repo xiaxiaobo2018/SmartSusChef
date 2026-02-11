@@ -107,28 +107,127 @@ jobs:
         run: |
           URL="${{ inputs.target_url }}"
           HOST=$(echo "$URL" | sed -E 's|https?://||' | sed 's|:[0-9]*||' | sed 's|/.*||')
-          # Extract port: explicit port from URL, or default 443 for https, 80 for http
           PORT=$(echo "$URL" | grep -oP ':\K[0-9]+' || true)
           if [ -z "$PORT" ]; then
-            if echo "$URL" | grep -q "^https"; then
-              PORT=443
-            else
-              PORT=80
-            fi
+            if echo "$URL" | grep -q "^https"; then PORT=443; else PORT=80; fi
           fi
           echo "host=$HOST" >> $GITHUB_OUTPUT
           echo "port=$PORT" >> $GITHUB_OUTPUT
           echo "Parsed host=$HOST, port=$PORT from $URL"
 
-      - name: Run JMeter tests
+      - name: Install MySQL client
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq mysql-client > /dev/null 2>&1
+
+      - name: Clean test data from database
+        if: ${{ secrets.DB_PASSWORD != '' }}
         env:
-          TARGET_URL: ${{ inputs.target_url }}
-          TARGET_PORT: ${{ steps.parse-url.outputs.port }}
+          DB_HOST: oversea.zyh111.icu
+          DB_PORT: "33333"
+          DB_USER: grp4
+          DB_NAME: smartsuschef
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         run: |
-          chmod +x ./run-jmeter-test.sh
-          ./run-jmeter-test.sh
-        continue-on-error: false # Let the script's exit code determine failure
+          echo "--- Clearing test data from database ---"
+          MYSQL_CMD="mysql -h $DB_HOST -P $DB_PORT -u $DB_USER -p$DB_PASSWORD $DB_NAME"
+
+          $MYSQL_CMD -e "DELETE FROM WastageData WHERE IngredientId IN (SELECT Id FROM Ingredients WHERE Name LIKE 'Test Ingredient %');" 2>/dev/null \
+            && echo "✅ Cleared related WastageData." \
+            || echo "::warning::Failed to clear WastageData. Continuing."
+
+          $MYSQL_CMD -e "DELETE FROM Recipes WHERE Name LIKE 'Test Recipe %';" 2>/dev/null \
+            && echo "✅ Deleted test recipes." \
+            || echo "::warning::Failed to delete test recipes. Continuing."
+
+          $MYSQL_CMD -e "DELETE FROM Ingredients WHERE Name LIKE 'Test Ingredient %';" 2>/dev/null \
+            && echo "✅ Deleted test ingredients." \
+            || echo "::warning::Failed to delete test ingredients. Continuing."
+        continue-on-error: true
+
+      - name: Run JMeter tests
+        run: |
+          RESULTS_DIR="testing/performance/results"
+          REPORT_DIR="testing/performance/reports/Final_Run_Report"
+          RESULTS_FILE="$RESULTS_DIR/Final_Run_UAT.jtl"
+
+          rm -rf "$REPORT_DIR" "$RESULTS_FILE"
+          mkdir -p "$REPORT_DIR" "$RESULTS_DIR"
+
+          jmeter -n \
+            -t testing/performance/jmx/Main_Scenario.jmx \
+            -l "$RESULTS_FILE" \
+            -e -o "$REPORT_DIR" \
+            -Jtarget_url=${{ inputs.target_url }} \
+            -Jtarget_port=${{ steps.parse-url.outputs.port }} \
+            -f
+        continue-on-error: true
+
+      - name: JMeter results summary
+        if: always()
+        run: |
+          RESULTS_FILE="testing/performance/results/Final_Run_UAT.jtl"
+          echo "## Performance Tests (JMeter)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ ! -f "$RESULTS_FILE" ]; then
+            echo "⚠️ Results file not found — JMeter may have failed to run." >> $GITHUB_STEP_SUMMARY
+            exit 0
+          fi
+
+          python3 << 'PYEOF'
+          import csv, os
+
+          threshold_ms = 500
+          satisfied = tolerating = frustrated = 0
+          total_requests = success_count = error_count = 0
+
+          try:
+              with open("testing/performance/results/Final_Run_UAT.jtl", "r") as f:
+                  for row in csv.DictReader(f):
+                      try:
+                          total_requests += 1
+                          elapsed = int(row["elapsed"])
+                          if row.get("success", "true").lower() == "true":
+                              success_count += 1
+                          else:
+                              error_count += 1
+                          if elapsed <= threshold_ms:
+                              satisfied += 1
+                          elif elapsed <= 4 * threshold_ms:
+                              tolerating += 1
+                          else:
+                              frustrated += 1
+                      except (KeyError, ValueError):
+                          continue
+
+              total = satisfied + tolerating + frustrated
+              if total > 0:
+                  apdex = (satisfied + tolerating / 2) / total
+                  error_rate = error_count / total_requests * 100 if total_requests else 0
+                  summary = os.environ.get("GITHUB_STEP_SUMMARY", "/dev/null")
+                  with open(summary, "a") as s:
+                      s.write("| Metric | Value |\n|--------|-------|\n")
+                      s.write(f"| Total Requests | {total_requests} |\n")
+                      s.write(f"| ✅ Successful | {success_count} |\n")
+                      s.write(f"| ❌ Failed | {error_count} |\n")
+                      s.write(f"| Error Rate | {error_rate:.1f}% |\n")
+                      s.write(f"| **Apdex Score** | **{apdex:.3f}** (threshold: {threshold_ms}ms) |\n")
+                      s.write(f"| Satisfied (<={threshold_ms}ms) | {satisfied} |\n")
+                      s.write(f"| Tolerating (<={4*threshold_ms}ms) | {tolerating} |\n")
+                      s.write(f"| Frustrated (>{4*threshold_ms}ms) | {frustrated} |\n\n")
+                      if apdex < 0.85:
+                          s.write(f"⚠️ Apdex score {apdex:.3f} below threshold (0.85)\n")
+                      else:
+                          s.write(f"✅ Apdex score {apdex:.3f} meets threshold (0.85)\n")
+                      if error_rate > 50:
+                          s.write(f"⚠️ High error rate {error_rate:.1f}%\n")
+                  print(f"Apdex: {apdex:.3f}, Total: {total_requests}, Errors: {error_count}")
+              else:
+                  print("No valid results found")
+          except FileNotFoundError:
+              print("Results file not found")
+          PYEOF
 
       - name: Upload JMeter reports
         uses: actions/upload-artifact@v4
