@@ -2,6 +2,7 @@
 
 import logging
 from collections.abc import Sequence
+from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -80,8 +81,8 @@ def fetch_weather_forecast(
     latitude: float,
     longitude: float,
     forecast_days: int = 16,
-    weather_cols: list[str] | None = None,
-) -> pd.DataFrame | None:
+    weather_cols: Optional[list[str]] = None,
+) -> Optional[pd.DataFrame]:
     """Fetch a weather forecast from the Open-Meteo Forecast API.
 
     Parameters

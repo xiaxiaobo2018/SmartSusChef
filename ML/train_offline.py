@@ -2,6 +2,7 @@ import argparse
 import os
 from collections.abc import Iterable
 from concurrent.futures import ProcessPoolExecutor, as_completed
+from typing import Optional
 
 import pandas as pd
 
@@ -23,7 +24,7 @@ def _fetch_store_ids(manager: StoreModelManager) -> list[int]:
         "SELECT id FROM Store",
     ]
 
-    last_err: Exception | None = None
+    last_err: Optional[Exception] = None
     for q in queries:
         try:
             df = pd.read_sql(q, engine)
