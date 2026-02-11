@@ -547,7 +547,7 @@ describe('csvValidator', () => {
 
     describe('Error Summary Generation', () => {
         it('should generate grouped error summary for high-volume failures', () => {
-            const manyInvalidRows = Array.from({ length: 55 }, (_, i) => ({
+            const manyInvalidRows = Array.from({ length: 55 }, (_) => ({
                 Date: 'invalid',
                 Dish_Name: '',
                 Quantity_Sold: 'abc',
