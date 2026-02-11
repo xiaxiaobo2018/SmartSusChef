@@ -107,30 +107,31 @@ class WastageViewModelTest {
 
     @Test
     fun `setWastageBreakdown should correctly transform and set data`() {
-        val itemWastageDtos = listOf(
-            ItemWastageDto(
-                ingredientId = "ing-1",
-                displayName = "Tomato",
-                quantity = 1.0,
-                unit = "kg",
-                carbonFootprint = 0.5,
-                recipeId = null,
-            ),
-            ItemWastageDto(
-                displayName = "Soup",
-                quantity = 2.0,
-                unit = "l",
-                carbonFootprint = 1.5,
-                recipeId = "recipe-123",
-            ),
-            ItemWastageDto(
-                displayName = "Sauce",
-                quantity = 0.5,
-                unit = "kg",
-                carbonFootprint = 0.8,
-                recipeId = "sub-recipe-456",
-            ),
-        )
+        val itemWastageDtos =
+            listOf(
+                ItemWastageDto(
+                    ingredientId = "ing-1",
+                    displayName = "Tomato",
+                    quantity = 1.0,
+                    unit = "kg",
+                    carbonFootprint = 0.5,
+                    recipeId = null,
+                ),
+                ItemWastageDto(
+                    displayName = "Soup",
+                    quantity = 2.0,
+                    unit = "l",
+                    carbonFootprint = 1.5,
+                    recipeId = "recipe-123",
+                ),
+                ItemWastageDto(
+                    displayName = "Sauce",
+                    quantity = 0.5,
+                    unit = "kg",
+                    carbonFootprint = 0.8,
+                    recipeId = "sub-recipe-456",
+                ),
+            )
 
         viewModel.setWastageBreakdown(itemWastageDtos)
 
