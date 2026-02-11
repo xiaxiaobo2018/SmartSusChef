@@ -171,8 +171,9 @@ terraform.rc
 *.db
 *.sqlite
 
-# Tools
-tools/
+# Tools - ignore everything except scripts needed by CI
+tools/*
+!tools/sarif_to_html.py
 
 # Ignore local database files
 *.mdf
