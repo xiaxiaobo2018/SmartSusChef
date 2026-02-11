@@ -44,7 +44,6 @@ import javax.inject.Inject
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 class SettingsActivityTest {
-
     @get:Rule(order = 0)
     val hiltRule = HiltAndroidRule(this)
 
@@ -177,37 +176,40 @@ class SettingsActivityTest {
     @Test
     fun changePassword_serverError_buttonReEnabled() {
         // Override dispatcher for this test to return error
-        mockWebServer.dispatcher = object : Dispatcher() {
-            override fun dispatch(request: RecordedRequest): MockResponse {
-                val path = request.path ?: return MockResponse().setResponseCode(404)
-                return when {
-                    path.contains("/api/auth/password") -> MockResponse()
-                        .setResponseCode(400)
-                        .setBody("""{"message": "Current password is incorrect"}""")
-                        .addHeader("Content-Type", "application/json")
+        mockWebServer.dispatcher =
+            object : Dispatcher() {
+                override fun dispatch(request: RecordedRequest): MockResponse {
+                    val path = request.path ?: return MockResponse().setResponseCode(404)
+                    return when {
+                        path.contains("/api/auth/password") ->
+                            MockResponse()
+                                .setResponseCode(400)
+                                .setBody("""{"message": "Current password is incorrect"}""")
+                                .addHeader("Content-Type", "application/json")
 
-                    path.contains("/api/auth/me") -> MockResponse()
-                        .setResponseCode(200)
-                        .setBody(
-                            """
-                            {
-                                "id": "user-001",
-                                "username": "admin",
-                                "name": "Admin User",
-                                "email": "admin@smartsuschef.com",
-                                "role": "manager",
-                                "status": "Active",
-                                "createdAt": "2026-01-01T00:00:00Z",
-                                "updatedAt": "2026-01-01T00:00:00Z"
-                            }
-                            """.trimIndent(),
-                        )
-                        .addHeader("Content-Type", "application/json")
+                        path.contains("/api/auth/me") ->
+                            MockResponse()
+                                .setResponseCode(200)
+                                .setBody(
+                                    """
+                                    {
+                                        "id": "user-001",
+                                        "username": "admin",
+                                        "name": "Admin User",
+                                        "email": "admin@smartsuschef.com",
+                                        "role": "manager",
+                                        "status": "Active",
+                                        "createdAt": "2026-01-01T00:00:00Z",
+                                        "updatedAt": "2026-01-01T00:00:00Z"
+                                    }
+                                    """.trimIndent(),
+                                )
+                                .addHeader("Content-Type", "application/json")
 
-                    else -> MockResponse().setResponseCode(404)
+                        else -> MockResponse().setResponseCode(404)
+                    }
                 }
             }
-        }
 
         ActivityScenario.launch(SettingsActivity::class.java)
         Thread.sleep(1000)
@@ -287,47 +289,50 @@ class SettingsActivityTest {
 
                 return when {
                     // GET current user
-                    path.contains("/api/auth/me") && request.method == "GET" -> MockResponse()
-                        .setResponseCode(200)
-                        .setBody(
-                            """
-                            {
-                                "id": "user-001",
-                                "username": "admin",
-                                "name": "Admin User",
-                                "email": "admin@smartsuschef.com",
-                                "role": "manager",
-                                "status": "Active",
-                                "createdAt": "2026-01-01T00:00:00Z",
-                                "updatedAt": "2026-01-01T00:00:00Z"
-                            }
-                            """.trimIndent(),
-                        )
-                        .addHeader("Content-Type", "application/json")
+                    path.contains("/api/auth/me") && request.method == "GET" ->
+                        MockResponse()
+                            .setResponseCode(200)
+                            .setBody(
+                                """
+                                {
+                                    "id": "user-001",
+                                    "username": "admin",
+                                    "name": "Admin User",
+                                    "email": "admin@smartsuschef.com",
+                                    "role": "manager",
+                                    "status": "Active",
+                                    "createdAt": "2026-01-01T00:00:00Z",
+                                    "updatedAt": "2026-01-01T00:00:00Z"
+                                }
+                                """.trimIndent(),
+                            )
+                            .addHeader("Content-Type", "application/json")
 
                     // PUT password change
-                    path.contains("/api/auth/password") && request.method == "PUT" -> MockResponse()
-                        .setResponseCode(204)
-                        .addHeader("Content-Type", "application/json")
+                    path.contains("/api/auth/password") && request.method == "PUT" ->
+                        MockResponse()
+                            .setResponseCode(204)
+                            .addHeader("Content-Type", "application/json")
 
                     // PUT profile update
-                    path.contains("/api/auth/profile") && request.method == "PUT" -> MockResponse()
-                        .setResponseCode(200)
-                        .setBody(
-                            """
-                            {
-                                "id": "user-001",
-                                "username": "admin",
-                                "name": "Updated Name",
-                                "email": "updated@smartsuschef.com",
-                                "role": "manager",
-                                "status": "Active",
-                                "createdAt": "2026-01-01T00:00:00Z",
-                                "updatedAt": "2026-02-11T00:00:00Z"
-                            }
-                            """.trimIndent(),
-                        )
-                        .addHeader("Content-Type", "application/json")
+                    path.contains("/api/auth/profile") && request.method == "PUT" ->
+                        MockResponse()
+                            .setResponseCode(200)
+                            .setBody(
+                                """
+                                {
+                                    "id": "user-001",
+                                    "username": "admin",
+                                    "name": "Updated Name",
+                                    "email": "updated@smartsuschef.com",
+                                    "role": "manager",
+                                    "status": "Active",
+                                    "createdAt": "2026-01-01T00:00:00Z",
+                                    "updatedAt": "2026-02-11T00:00:00Z"
+                                }
+                                """.trimIndent(),
+                            )
+                            .addHeader("Content-Type", "application/json")
 
                     else -> MockResponse().setResponseCode(404)
                 }

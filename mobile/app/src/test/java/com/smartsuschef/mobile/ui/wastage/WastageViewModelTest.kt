@@ -30,7 +30,6 @@ import java.util.Locale
 @ExperimentalCoroutinesApi
 @RunWith(MockitoJUnitRunner::class)
 class WastageViewModelTest {
-
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
@@ -55,61 +54,72 @@ class WastageViewModelTest {
     }
 
     @Test
-    fun `fetchWastageTrend with LAST_7_DAYS filter should return success`() = runTest {
-        val calendar = Calendar.getInstance()
-        val endDate = dateFormat.format(calendar.time)
-        calendar.add(Calendar.DAY_OF_YEAR, -6)
-        val startDate = dateFormat.format(calendar.time)
+    fun `fetchWastageTrend with LAST_7_DAYS filter should return success`() =
+        runTest {
+            val calendar = Calendar.getInstance()
+            val endDate = dateFormat.format(calendar.time)
+            calendar.add(Calendar.DAY_OF_YEAR, -6)
+            val startDate = dateFormat.format(calendar.time)
 
-        val mockWastageTrend = listOf(WastageTrendDto(endDate, 10.0, 1.0, emptyList()))
-        val expectedResult = Resource.Success(mockWastageTrend)
+            val mockWastageTrend = listOf(WastageTrendDto(endDate, 10.0, 1.0, emptyList()))
+            val expectedResult = Resource.Success(mockWastageTrend)
 
-        whenever(wastageRepository.getTrend(startDate, endDate)).thenReturn(expectedResult)
+            whenever(wastageRepository.getTrend(startDate, endDate)).thenReturn(expectedResult)
 
-        viewModel.setFilter(WastageFilter.LAST_7_DAYS)
+            viewModel.setFilter(WastageFilter.LAST_7_DAYS)
 
-        val actualResult = viewModel.wastageTrend.value
-        assertTrue(actualResult is Resource.Success)
-        assertEquals(1, (actualResult as Resource.Success).data?.size)
-        assertEquals(endDate, actualResult.data?.get(0)?.date)
-    }
-
-    @Test
-    fun `fetchWastageTrend with TODAY filter should return success`() = runTest {
-        val today = dateFormat.format(Calendar.getInstance().time)
-        val mockWastageTrend = listOf(WastageTrendDto(today, 5.0, 0.5, emptyList()))
-        val expectedResult = Resource.Success(mockWastageTrend)
-
-        whenever(wastageRepository.getTrend(today, today)).thenReturn(expectedResult)
-
-        viewModel.setFilter(WastageFilter.TODAY)
-
-        val actualResult = viewModel.wastageTrend.value
-        assertTrue(actualResult is Resource.Success)
-        assertEquals(1, (actualResult as Resource.Success).data?.size)
-        assertEquals(today, actualResult.data?.get(0)?.date)
-    }
+            val actualResult = viewModel.wastageTrend.value
+            assertTrue(actualResult is Resource.Success)
+            assertEquals(1, (actualResult as Resource.Success).data?.size)
+            assertEquals(endDate, actualResult.data?.get(0)?.date)
+        }
 
     @Test
-    fun `fetchWastageTrend should return error`() = runTest {
-        val errorMessage = "Test error"
-        val expectedResult = Resource.Error<List<WastageTrendDto>>(errorMessage)
-        whenever(wastageRepository.getTrend(any(), any())).thenReturn(expectedResult)
+    fun `fetchWastageTrend with TODAY filter should return success`() =
+        runTest {
+            val today = dateFormat.format(Calendar.getInstance().time)
+            val mockWastageTrend = listOf(WastageTrendDto(today, 5.0, 0.5, emptyList()))
+            val expectedResult = Resource.Success(mockWastageTrend)
 
-        viewModel.setFilter(WastageFilter.LAST_7_DAYS)
+            whenever(wastageRepository.getTrend(today, today)).thenReturn(expectedResult)
 
-        val actualResult = viewModel.wastageTrend.value
-        assertTrue(actualResult is Resource.Error)
-        assertEquals(errorMessage, (actualResult as Resource.Error).message)
-    }
+            viewModel.setFilter(WastageFilter.TODAY)
+
+            val actualResult = viewModel.wastageTrend.value
+            assertTrue(actualResult is Resource.Success)
+            assertEquals(1, (actualResult as Resource.Success).data?.size)
+            assertEquals(today, actualResult.data?.get(0)?.date)
+        }
+
+    @Test
+    fun `fetchWastageTrend should return error`() =
+        runTest {
+            val errorMessage = "Test error"
+            val expectedResult = Resource.Error<List<WastageTrendDto>>(errorMessage)
+            whenever(wastageRepository.getTrend(any(), any())).thenReturn(expectedResult)
+
+            viewModel.setFilter(WastageFilter.LAST_7_DAYS)
+
+            val actualResult = viewModel.wastageTrend.value
+            assertTrue(actualResult is Resource.Error)
+            assertEquals(errorMessage, (actualResult as Resource.Error).message)
+        }
 
     @Test
     fun `setWastageBreakdown should correctly transform and set data`() {
-        val itemWastageDtos = listOf(
-            ItemWastageDto(ingredientId = "ing-1", displayName = "Tomato", quantity = 1.0, unit = "kg", carbonFootprint = 0.5, recipeId = null),
-            ItemWastageDto(displayName = "Soup", quantity = 2.0, unit = "l", carbonFootprint = 1.5, recipeId = "recipe-123"),
-            ItemWastageDto(displayName = "Sauce", quantity = 0.5, unit = "kg", carbonFootprint = 0.8, recipeId = "sub-recipe-456")
-        )
+        val itemWastageDtos =
+            listOf(
+                ItemWastageDto(
+                    ingredientId = "ing-1",
+                    displayName = "Tomato",
+                    quantity = 1.0,
+                    unit = "kg",
+                    carbonFootprint = 0.5,
+                    recipeId = null,
+                ),
+                ItemWastageDto(displayName = "Soup", quantity = 2.0, unit = "l", carbonFootprint = 1.5, recipeId = "recipe-123"),
+                ItemWastageDto(displayName = "Sauce", quantity = 0.5, unit = "kg", carbonFootprint = 0.8, recipeId = "sub-recipe-456"),
+            )
 
         viewModel.setWastageBreakdown(itemWastageDtos)
 

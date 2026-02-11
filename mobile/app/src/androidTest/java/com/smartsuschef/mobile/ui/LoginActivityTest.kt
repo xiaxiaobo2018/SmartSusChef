@@ -45,7 +45,6 @@ import javax.inject.Inject
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 class LoginActivityTest {
-
     @get:Rule(order = 0)
     val hiltRule = HiltAndroidRule(this)
 
@@ -151,21 +150,76 @@ class LoginActivityTest {
     fun signIn_withValidCredentials_navigatesToDashboard() {
         // Use a Dispatcher to handle both login POST and all Dashboard concurrent API calls
         var loginHandled = false
-        mockWebServer.dispatcher = object : Dispatcher() {
-            override fun dispatch(request: RecordedRequest): MockResponse {
-                val path = request.path ?: return MockResponse().setResponseCode(404)
+        mockWebServer.dispatcher =
+            object : Dispatcher() {
+                override fun dispatch(request: RecordedRequest): MockResponse {
+                    val path = request.path ?: return MockResponse().setResponseCode(404)
 
-                return when {
-                    // Login POST
-                    path.contains("/api/auth/login") && request.method == "POST" -> {
-                        loginHandled = true
-                        MockResponse()
-                            .setResponseCode(200)
-                            .setBody(
-                                """
-                                {
-                                    "token": "test-jwt-token-12345",
-                                    "user": {
+                    return when {
+                        // Login POST
+                        path.contains("/api/auth/login") && request.method == "POST" -> {
+                            loginHandled = true
+                            MockResponse()
+                                .setResponseCode(200)
+                                .setBody(
+                                    """
+                                    {
+                                        "token": "test-jwt-token-12345",
+                                        "user": {
+                                            "id": "user-001",
+                                            "username": "admin",
+                                            "name": "Admin User",
+                                            "email": "admin@smartsuschef.com",
+                                            "role": "manager",
+                                            "status": "Active",
+                                            "createdAt": "2026-01-01T00:00:00Z",
+                                            "updatedAt": "2026-01-01T00:00:00Z"
+                                        },
+                                        "storeSetupRequired": false
+                                    }
+                                    """.trimIndent(),
+                                )
+                                .addHeader("Content-Type", "application/json")
+                        }
+
+                        // Store status
+                        path.contains("/api/store/status") ->
+                            MockResponse()
+                                .setResponseCode(200)
+                                .setBody("""{"isSetupComplete": true}""")
+                                .addHeader("Content-Type", "application/json")
+
+                        // Store info
+                        path.contains("/api/store") && !path.contains("status") ->
+                            MockResponse()
+                                .setResponseCode(200)
+                                .setBody(
+                                    """
+                                    {
+                                        "id": 1,
+                                        "companyName": "SmartSus Chef Demo",
+                                        "uen": "REG-001",
+                                        "storeName": "SmartSus Chef Demo",
+                                        "outletLocation": "Singapore",
+                                        "contactNumber": "+65-12345678",
+                                        "openingDate": "2025-01-01",
+                                        "latitude": 1.3521,
+                                        "longitude": 103.8198,
+                                        "isActive": true,
+                                        "createdAt": "2026-01-01T00:00:00Z",
+                                        "updatedAt": "2026-01-01T00:00:00Z"
+                                    }
+                                    """.trimIndent(),
+                                )
+                                .addHeader("Content-Type", "application/json")
+
+                        // Current user
+                        path.contains("/api/auth/me") ->
+                            MockResponse()
+                                .setResponseCode(200)
+                                .setBody(
+                                    """
+                                    {
                                         "id": "user-001",
                                         "username": "admin",
                                         "name": "Admin User",
@@ -174,92 +228,46 @@ class LoginActivityTest {
                                         "status": "Active",
                                         "createdAt": "2026-01-01T00:00:00Z",
                                         "updatedAt": "2026-01-01T00:00:00Z"
-                                    },
-                                    "storeSetupRequired": false
-                                }
-                                """.trimIndent(),
-                            )
-                            .addHeader("Content-Type", "application/json")
+                                    }
+                                    """.trimIndent(),
+                                )
+                                .addHeader("Content-Type", "application/json")
+
+                        // All other Dashboard endpoints return empty arrays or objects
+                        path.contains("/api/sales") ->
+                            MockResponse()
+                                .setResponseCode(200)
+                                .setBody("[]")
+                                .addHeader("Content-Type", "application/json")
+
+                        path.contains("/api/wastage") ->
+                            MockResponse()
+                                .setResponseCode(200)
+                                .setBody("[]")
+                                .addHeader("Content-Type", "application/json")
+
+                        path.contains("/api/forecast") ->
+                            MockResponse()
+                                .setResponseCode(200)
+                                .setBody("[]")
+                                .addHeader("Content-Type", "application/json")
+
+                        path.contains("/api/recipes") ->
+                            MockResponse()
+                                .setResponseCode(200)
+                                .setBody("[]")
+                                .addHeader("Content-Type", "application/json")
+
+                        path.contains("/api/ingredients") ->
+                            MockResponse()
+                                .setResponseCode(200)
+                                .setBody("[]")
+                                .addHeader("Content-Type", "application/json")
+
+                        else -> MockResponse().setResponseCode(404)
                     }
-
-                    // Store status
-                    path.contains("/api/store/status") -> MockResponse()
-                        .setResponseCode(200)
-                        .setBody("""{"isSetupComplete": true}""")
-                        .addHeader("Content-Type", "application/json")
-
-                    // Store info
-                    path.contains("/api/store") && !path.contains("status") -> MockResponse()
-                        .setResponseCode(200)
-                        .setBody(
-                            """
-                            {
-                                "id": 1,
-                                "companyName": "SmartSus Chef Demo",
-                                "uen": "REG-001",
-                                "storeName": "SmartSus Chef Demo",
-                                "outletLocation": "Singapore",
-                                "contactNumber": "+65-12345678",
-                                "openingDate": "2025-01-01",
-                                "latitude": 1.3521,
-                                "longitude": 103.8198,
-                                "isActive": true,
-                                "createdAt": "2026-01-01T00:00:00Z",
-                                "updatedAt": "2026-01-01T00:00:00Z"
-                            }
-                            """.trimIndent(),
-                        )
-                        .addHeader("Content-Type", "application/json")
-
-                    // Current user
-                    path.contains("/api/auth/me") -> MockResponse()
-                        .setResponseCode(200)
-                        .setBody(
-                            """
-                            {
-                                "id": "user-001",
-                                "username": "admin",
-                                "name": "Admin User",
-                                "email": "admin@smartsuschef.com",
-                                "role": "manager",
-                                "status": "Active",
-                                "createdAt": "2026-01-01T00:00:00Z",
-                                "updatedAt": "2026-01-01T00:00:00Z"
-                            }
-                            """.trimIndent(),
-                        )
-                        .addHeader("Content-Type", "application/json")
-
-                    // All other Dashboard endpoints return empty arrays or objects
-                    path.contains("/api/sales") -> MockResponse()
-                        .setResponseCode(200)
-                        .setBody("[]")
-                        .addHeader("Content-Type", "application/json")
-
-                    path.contains("/api/wastage") -> MockResponse()
-                        .setResponseCode(200)
-                        .setBody("[]")
-                        .addHeader("Content-Type", "application/json")
-
-                    path.contains("/api/forecast") -> MockResponse()
-                        .setResponseCode(200)
-                        .setBody("[]")
-                        .addHeader("Content-Type", "application/json")
-
-                    path.contains("/api/recipes") -> MockResponse()
-                        .setResponseCode(200)
-                        .setBody("[]")
-                        .addHeader("Content-Type", "application/json")
-
-                    path.contains("/api/ingredients") -> MockResponse()
-                        .setResponseCode(200)
-                        .setBody("[]")
-                        .addHeader("Content-Type", "application/json")
-
-                    else -> MockResponse().setResponseCode(404)
                 }
             }
-        }
 
         ActivityScenario.launch(LoginActivity::class.java)
 
@@ -396,5 +404,4 @@ class LoginActivityTest {
         // Should still be on forgot password form
         onView(withId(R.id.forgotPasswordForm)).check(matches(isDisplayed()))
     }
-
 }

@@ -31,7 +31,6 @@ import java.util.Locale
 @ExperimentalCoroutinesApi
 @RunWith(MockitoJUnitRunner::class)
 class SalesViewModelTest {
-
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
@@ -56,113 +55,120 @@ class SalesViewModelTest {
     }
 
     @Test
-    fun `fetchOverviewData with LAST_7_DAYS filter should return success`() = runTest {
-        val calendar = Calendar.getInstance()
-        val endDate = dateFormat.format(calendar.time)
-        calendar.add(Calendar.DAY_OF_YEAR, -6)
-        val startDate = dateFormat.format(calendar.time)
+    fun `fetchOverviewData with LAST_7_DAYS filter should return success`() =
+        runTest {
+            val calendar = Calendar.getInstance()
+            val endDate = dateFormat.format(calendar.time)
+            calendar.add(Calendar.DAY_OF_YEAR, -6)
+            val startDate = dateFormat.format(calendar.time)
 
-        val mockSalesTrend = listOf(SalesTrendDto(endDate, 100, emptyList()))
-        val expectedResult = Resource.Success(mockSalesTrend)
+            val mockSalesTrend = listOf(SalesTrendDto(endDate, 100, emptyList()))
+            val expectedResult = Resource.Success(mockSalesTrend)
 
-        whenever(salesRepository.getTrend(startDate, endDate)).thenReturn(expectedResult)
+            whenever(salesRepository.getTrend(startDate, endDate)).thenReturn(expectedResult)
 
-        viewModel.fetchOverviewData(SalesFilter.LAST_7_DAYS)
+            viewModel.fetchOverviewData(SalesFilter.LAST_7_DAYS)
 
-        val actualResult = viewModel.salesTrend.value
-        assertTrue(actualResult is Resource.Success)
-        assertEquals(1, (actualResult as Resource.Success).data?.size)
-        assertEquals(endDate, actualResult.data?.get(0)?.date)
-    }
-
-    @Test
-    fun `fetchOverviewData with TODAY filter should return success`() = runTest {
-        val today = dateFormat.format(Calendar.getInstance().time)
-        val mockSalesTrend = listOf(SalesTrendDto(today, 50, emptyList()))
-        val expectedResult = Resource.Success(mockSalesTrend)
-
-        whenever(salesRepository.getTrend(today, today)).thenReturn(expectedResult)
-
-        viewModel.setFilter(SalesFilter.TODAY)
-
-        val actualResult = viewModel.salesTrend.value
-        assertTrue(actualResult is Resource.Success)
-        assertEquals(1, (actualResult as Resource.Success).data?.size)
-        assertEquals(today, actualResult.data?.get(0)?.date)
-    }
+            val actualResult = viewModel.salesTrend.value
+            assertTrue(actualResult is Resource.Success)
+            assertEquals(1, (actualResult as Resource.Success).data?.size)
+            assertEquals(endDate, actualResult.data?.get(0)?.date)
+        }
 
     @Test
-    fun `fetchOverviewData should return error`() = runTest {
-        val errorMessage = "Test error"
-        val expectedResult = Resource.Error<List<SalesTrendDto>>(errorMessage)
-        whenever(salesRepository.getTrend(any(), any())).thenReturn(expectedResult)
+    fun `fetchOverviewData with TODAY filter should return success`() =
+        runTest {
+            val today = dateFormat.format(Calendar.getInstance().time)
+            val mockSalesTrend = listOf(SalesTrendDto(today, 50, emptyList()))
+            val expectedResult = Resource.Success(mockSalesTrend)
 
-        viewModel.fetchOverviewData()
+            whenever(salesRepository.getTrend(today, today)).thenReturn(expectedResult)
 
-        val actualResult = viewModel.salesTrend.value
-        assertTrue(actualResult is Resource.Error)
-        assertEquals(errorMessage, (actualResult as Resource.Error).message)
-    }
+            viewModel.setFilter(SalesFilter.TODAY)
 
-    @Test
-    fun `fetchIngredientsForDate should return success`() = runTest {
-        val date = "2026-02-10"
-        val mockIngredients = listOf(IngredientUsageDto("ing-1", "Tomato", "kg", 10.0))
-        val expectedResult = Resource.Success(mockIngredients)
-
-        whenever(salesRepository.getIngredientUsageByDate(date)).thenReturn(expectedResult)
-
-        viewModel.fetchIngredientsForDate(date)
-
-        val actualResult = viewModel.ingredientBreakdown.value
-        assertTrue(actualResult is Resource.Success)
-        assertEquals(1, (actualResult as Resource.Success).data?.size)
-        assertEquals("Tomato", actualResult.data?.get(0)?.name)
-    }
+            val actualResult = viewModel.salesTrend.value
+            assertTrue(actualResult is Resource.Success)
+            assertEquals(1, (actualResult as Resource.Success).data?.size)
+            assertEquals(today, actualResult.data?.get(0)?.date)
+        }
 
     @Test
-    fun `fetchIngredientsForDate should return error`() = runTest {
-        val date = "2026-02-10"
-        val errorMessage = "Error fetching ingredients"
-        val expectedResult = Resource.Error<List<IngredientUsageDto>>(errorMessage)
+    fun `fetchOverviewData should return error`() =
+        runTest {
+            val errorMessage = "Test error"
+            val expectedResult = Resource.Error<List<SalesTrendDto>>(errorMessage)
+            whenever(salesRepository.getTrend(any(), any())).thenReturn(expectedResult)
 
-        whenever(salesRepository.getIngredientUsageByDate(date)).thenReturn(expectedResult)
+            viewModel.fetchOverviewData()
 
-        viewModel.fetchIngredientsForDate(date)
-
-        val actualResult = viewModel.ingredientBreakdown.value
-        assertTrue(actualResult is Resource.Error)
-        assertEquals(errorMessage, (actualResult as Resource.Error).message)
-    }
-
-    @Test
-    fun `fetchRecipeSalesForDate should return success`() = runTest {
-        val date = "2026-02-10"
-        val mockRecipeSales = listOf(RecipeSalesDto("rec-1", "Pizza", 20))
-        val expectedResult = Resource.Success(mockRecipeSales)
-
-        whenever(salesRepository.getRecipeSalesByDate(date)).thenReturn(expectedResult)
-
-        viewModel.fetchRecipeSalesForDate(date)
-
-        val actualResult = viewModel.recipeSales.value
-        assertTrue(actualResult is Resource.Success)
-        assertEquals(1, (actualResult as Resource.Success).data?.size)
-        assertEquals("Pizza", actualResult.data?.get(0)?.name)
-    }
+            val actualResult = viewModel.salesTrend.value
+            assertTrue(actualResult is Resource.Error)
+            assertEquals(errorMessage, (actualResult as Resource.Error).message)
+        }
 
     @Test
-    fun `fetchRecipeSalesForDate should return error`() = runTest {
-        val date = "2026-02-10"
-        val errorMessage = "Error fetching recipe sales"
-        val expectedResult = Resource.Error<List<RecipeSalesDto>>(errorMessage)
+    fun `fetchIngredientsForDate should return success`() =
+        runTest {
+            val date = "2026-02-10"
+            val mockIngredients = listOf(IngredientUsageDto("ing-1", "Tomato", "kg", 10.0))
+            val expectedResult = Resource.Success(mockIngredients)
 
-        whenever(salesRepository.getRecipeSalesByDate(date)).thenReturn(expectedResult)
+            whenever(salesRepository.getIngredientUsageByDate(date)).thenReturn(expectedResult)
 
-        viewModel.fetchRecipeSalesForDate(date)
+            viewModel.fetchIngredientsForDate(date)
 
-        val actualResult = viewModel.recipeSales.value
-        assertTrue(actualResult is Resource.Error)
-        assertEquals(errorMessage, (actualResult as Resource.Error).message)
-    }
+            val actualResult = viewModel.ingredientBreakdown.value
+            assertTrue(actualResult is Resource.Success)
+            assertEquals(1, (actualResult as Resource.Success).data?.size)
+            assertEquals("Tomato", actualResult.data?.get(0)?.name)
+        }
+
+    @Test
+    fun `fetchIngredientsForDate should return error`() =
+        runTest {
+            val date = "2026-02-10"
+            val errorMessage = "Error fetching ingredients"
+            val expectedResult = Resource.Error<List<IngredientUsageDto>>(errorMessage)
+
+            whenever(salesRepository.getIngredientUsageByDate(date)).thenReturn(expectedResult)
+
+            viewModel.fetchIngredientsForDate(date)
+
+            val actualResult = viewModel.ingredientBreakdown.value
+            assertTrue(actualResult is Resource.Error)
+            assertEquals(errorMessage, (actualResult as Resource.Error).message)
+        }
+
+    @Test
+    fun `fetchRecipeSalesForDate should return success`() =
+        runTest {
+            val date = "2026-02-10"
+            val mockRecipeSales = listOf(RecipeSalesDto("rec-1", "Pizza", 20))
+            val expectedResult = Resource.Success(mockRecipeSales)
+
+            whenever(salesRepository.getRecipeSalesByDate(date)).thenReturn(expectedResult)
+
+            viewModel.fetchRecipeSalesForDate(date)
+
+            val actualResult = viewModel.recipeSales.value
+            assertTrue(actualResult is Resource.Success)
+            assertEquals(1, (actualResult as Resource.Success).data?.size)
+            assertEquals("Pizza", actualResult.data?.get(0)?.name)
+        }
+
+    @Test
+    fun `fetchRecipeSalesForDate should return error`() =
+        runTest {
+            val date = "2026-02-10"
+            val errorMessage = "Error fetching recipe sales"
+            val expectedResult = Resource.Error<List<RecipeSalesDto>>(errorMessage)
+
+            whenever(salesRepository.getRecipeSalesByDate(date)).thenReturn(expectedResult)
+
+            viewModel.fetchRecipeSalesForDate(date)
+
+            val actualResult = viewModel.recipeSales.value
+            assertTrue(actualResult is Resource.Error)
+            assertEquals(errorMessage, (actualResult as Resource.Error).message)
+        }
 }

@@ -47,7 +47,6 @@ import javax.inject.Inject
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 class DataInputFragmentTest {
-
     @get:Rule(order = 0)
     val hiltRule = HiltAndroidRule(this)
 
@@ -325,147 +324,159 @@ class DataInputFragmentTest {
 
                 return when {
                     // Store
-                    path.contains("/api/store/status") -> MockResponse()
-                        .setResponseCode(200)
-                        .setBody("""{"isSetupComplete": true}""")
-                        .addHeader("Content-Type", "application/json")
+                    path.contains("/api/store/status") ->
+                        MockResponse()
+                            .setResponseCode(200)
+                            .setBody("""{"isSetupComplete": true}""")
+                            .addHeader("Content-Type", "application/json")
 
-                    path.contains("/api/store") && !path.contains("status") -> MockResponse()
-                        .setResponseCode(200)
-                        .setBody(
-                            """
-                            {
-                                "id": 1,
-                                "companyName": "SmartSus Chef Demo",
-                                "uen": "REG-001",
-                                "storeName": "SmartSus Chef Demo",
-                                "outletLocation": "Singapore",
-                                "contactNumber": "+65-12345678",
-                                "openingDate": "2025-01-01",
-                                "latitude": 1.3521,
-                                "longitude": 103.8198,
-                                "isActive": true,
-                                "createdAt": "2026-01-01T00:00:00Z",
-                                "updatedAt": "2026-01-01T00:00:00Z"
-                            }
-                            """.trimIndent(),
-                        )
-                        .addHeader("Content-Type", "application/json")
+                    path.contains("/api/store") && !path.contains("status") ->
+                        MockResponse()
+                            .setResponseCode(200)
+                            .setBody(
+                                """
+                                {
+                                    "id": 1,
+                                    "companyName": "SmartSus Chef Demo",
+                                    "uen": "REG-001",
+                                    "storeName": "SmartSus Chef Demo",
+                                    "outletLocation": "Singapore",
+                                    "contactNumber": "+65-12345678",
+                                    "openingDate": "2025-01-01",
+                                    "latitude": 1.3521,
+                                    "longitude": 103.8198,
+                                    "isActive": true,
+                                    "createdAt": "2026-01-01T00:00:00Z",
+                                    "updatedAt": "2026-01-01T00:00:00Z"
+                                }
+                                """.trimIndent(),
+                            )
+                            .addHeader("Content-Type", "application/json")
 
                     // Auth
-                    path.contains("/api/auth/me") -> MockResponse()
-                        .setResponseCode(200)
-                        .setBody(
-                            """
-                            {
-                                "id": "user-001",
-                                "username": "admin",
-                                "name": "Admin User",
-                                "email": "admin@smartsuschef.com",
-                                "role": "manager",
-                                "status": "Active",
-                                "createdAt": "2026-01-01T00:00:00Z",
-                                "updatedAt": "2026-01-01T00:00:00Z"
-                            }
-                            """.trimIndent(),
-                        )
-                        .addHeader("Content-Type", "application/json")
+                    path.contains("/api/auth/me") ->
+                        MockResponse()
+                            .setResponseCode(200)
+                            .setBody(
+                                """
+                                {
+                                    "id": "user-001",
+                                    "username": "admin",
+                                    "name": "Admin User",
+                                    "email": "admin@smartsuschef.com",
+                                    "role": "manager",
+                                    "status": "Active",
+                                    "createdAt": "2026-01-01T00:00:00Z",
+                                    "updatedAt": "2026-01-01T00:00:00Z"
+                                }
+                                """.trimIndent(),
+                            )
+                            .addHeader("Content-Type", "application/json")
 
                     // Recipes (main dishes + sub recipes)
-                    path.contains("/api/recipes") -> MockResponse()
-                        .setResponseCode(200)
-                        .setBody(
-                            """
-                            [
-                                {"id": "r1", "name": "Chicken Rice", "isSellable": true, "isSubRecipe": false, "ingredients": [], "createdAt": "2026-01-01T00:00:00Z", "updatedAt": "2026-01-01T00:00:00Z"},
-                                {"id": "r2", "name": "Nasi Lemak", "isSellable": true, "isSubRecipe": false, "ingredients": [], "createdAt": "2026-01-01T00:00:00Z", "updatedAt": "2026-01-01T00:00:00Z"},
-                                {"id": "r3", "name": "Sambal Sauce", "isSellable": false, "isSubRecipe": true, "ingredients": [], "createdAt": "2026-01-01T00:00:00Z", "updatedAt": "2026-01-01T00:00:00Z"}
-                            ]
-                            """.trimIndent(),
-                        )
-                        .addHeader("Content-Type", "application/json")
+                    path.contains("/api/recipes") ->
+                        MockResponse()
+                            .setResponseCode(200)
+                            .setBody(
+                                """
+                                [
+                                    {"id": "r1", "name": "Chicken Rice", "isSellable": true, "isSubRecipe": false, "ingredients": [], "createdAt": "2026-01-01T00:00:00Z", "updatedAt": "2026-01-01T00:00:00Z"},
+                                    {"id": "r2", "name": "Nasi Lemak", "isSellable": true, "isSubRecipe": false, "ingredients": [], "createdAt": "2026-01-01T00:00:00Z", "updatedAt": "2026-01-01T00:00:00Z"},
+                                    {"id": "r3", "name": "Sambal Sauce", "isSellable": false, "isSubRecipe": true, "ingredients": [], "createdAt": "2026-01-01T00:00:00Z", "updatedAt": "2026-01-01T00:00:00Z"}
+                                ]
+                                """.trimIndent(),
+                            )
+                            .addHeader("Content-Type", "application/json")
 
                     // Ingredients
-                    path.contains("/api/ingredients") -> MockResponse()
-                        .setResponseCode(200)
-                        .setBody(
-                            """
-                            [
-                                {"id": "i1", "name": "Rice", "unit": "kg", "carbonFootprint": 1.2, "createdAt": "2026-01-01T00:00:00Z", "updatedAt": "2026-01-01T00:00:00Z"},
-                                {"id": "i2", "name": "Chicken", "unit": "kg", "carbonFootprint": 5.0, "createdAt": "2026-01-01T00:00:00Z", "updatedAt": "2026-01-01T00:00:00Z"},
-                                {"id": "i3", "name": "Coconut Milk", "unit": "litre", "carbonFootprint": 2.5, "createdAt": "2026-01-01T00:00:00Z", "updatedAt": "2026-01-01T00:00:00Z"}
-                            ]
-                            """.trimIndent(),
-                        )
-                        .addHeader("Content-Type", "application/json")
+                    path.contains("/api/ingredients") ->
+                        MockResponse()
+                            .setResponseCode(200)
+                            .setBody(
+                                """
+                                [
+                                    {"id": "i1", "name": "Rice", "unit": "kg", "carbonFootprint": 1.2, "createdAt": "2026-01-01T00:00:00Z", "updatedAt": "2026-01-01T00:00:00Z"},
+                                    {"id": "i2", "name": "Chicken", "unit": "kg", "carbonFootprint": 5.0, "createdAt": "2026-01-01T00:00:00Z", "updatedAt": "2026-01-01T00:00:00Z"},
+                                    {"id": "i3", "name": "Coconut Milk", "unit": "litre", "carbonFootprint": 2.5, "createdAt": "2026-01-01T00:00:00Z", "updatedAt": "2026-01-01T00:00:00Z"}
+                                ]
+                                """.trimIndent(),
+                            )
+                            .addHeader("Content-Type", "application/json")
 
                     // POST sales data (create)
-                    path.contains("/api/sales") && request.method == "POST" -> MockResponse()
-                        .setResponseCode(201)
-                        .setBody(
-                            """
-                            {
-                                "id": "s1",
-                                "date": "2026-02-11",
-                                "recipeId": "r1",
-                                "recipeName": "Chicken Rice",
-                                "quantity": 50,
-                                "createdAt": "2026-02-11T10:00:00Z",
-                                "updatedAt": "2026-02-11T10:00:00Z"
-                            }
-                            """.trimIndent(),
-                        )
-                        .addHeader("Content-Type", "application/json")
+                    path.contains("/api/sales") && request.method == "POST" ->
+                        MockResponse()
+                            .setResponseCode(201)
+                            .setBody(
+                                """
+                                {
+                                    "id": "s1",
+                                    "date": "2026-02-11",
+                                    "recipeId": "r1",
+                                    "recipeName": "Chicken Rice",
+                                    "quantity": 50,
+                                    "createdAt": "2026-02-11T10:00:00Z",
+                                    "updatedAt": "2026-02-11T10:00:00Z"
+                                }
+                                """.trimIndent(),
+                            )
+                            .addHeader("Content-Type", "application/json")
 
                     // GET sales (for loading recent entries)
-                    path.contains("/api/sales") && request.method == "GET" -> MockResponse()
-                        .setResponseCode(200)
-                        .setBody("[]")
-                        .addHeader("Content-Type", "application/json")
+                    path.contains("/api/sales") && request.method == "GET" ->
+                        MockResponse()
+                            .setResponseCode(200)
+                            .setBody("[]")
+                            .addHeader("Content-Type", "application/json")
 
                     // POST wastage data (create)
-                    path.contains("/api/wastage") && request.method == "POST" -> MockResponse()
-                        .setResponseCode(201)
-                        .setBody(
-                            """
-                            {
-                                "id": "w1",
-                                "date": "2026-02-11",
-                                "ingredientId": "i1",
-                                "displayName": "Rice",
-                                "unit": "kg",
-                                "quantity": 5.0,
-                                "carbonFootprint": 6.0,
-                                "createdAt": "2026-02-11T10:00:00Z",
-                                "updatedAt": "2026-02-11T10:00:00Z"
-                            }
-                            """.trimIndent(),
-                        )
-                        .addHeader("Content-Type", "application/json")
+                    path.contains("/api/wastage") && request.method == "POST" ->
+                        MockResponse()
+                            .setResponseCode(201)
+                            .setBody(
+                                """
+                                {
+                                    "id": "w1",
+                                    "date": "2026-02-11",
+                                    "ingredientId": "i1",
+                                    "displayName": "Rice",
+                                    "unit": "kg",
+                                    "quantity": 5.0,
+                                    "carbonFootprint": 6.0,
+                                    "createdAt": "2026-02-11T10:00:00Z",
+                                    "updatedAt": "2026-02-11T10:00:00Z"
+                                }
+                                """.trimIndent(),
+                            )
+                            .addHeader("Content-Type", "application/json")
 
                     // GET wastage (for loading recent entries)
-                    path.contains("/api/wastage") && request.method == "GET" -> MockResponse()
-                        .setResponseCode(200)
-                        .setBody("[]")
-                        .addHeader("Content-Type", "application/json")
+                    path.contains("/api/wastage") && request.method == "GET" ->
+                        MockResponse()
+                            .setResponseCode(200)
+                            .setBody("[]")
+                            .addHeader("Content-Type", "application/json")
 
                     // Sales trend (loaded by SalesOverview on dashboard creation)
-                    path.contains("/api/sales/trend") -> MockResponse()
-                        .setResponseCode(200)
-                        .setBody("[]")
-                        .addHeader("Content-Type", "application/json")
+                    path.contains("/api/sales/trend") ->
+                        MockResponse()
+                            .setResponseCode(200)
+                            .setBody("[]")
+                            .addHeader("Content-Type", "application/json")
 
                     // Forecast
-                    path.contains("/api/forecast") -> MockResponse()
-                        .setResponseCode(200)
-                        .setBody("[]")
-                        .addHeader("Content-Type", "application/json")
+                    path.contains("/api/forecast") ->
+                        MockResponse()
+                            .setResponseCode(200)
+                            .setBody("[]")
+                            .addHeader("Content-Type", "application/json")
 
                     // Wastage trend
-                    path.contains("/api/wastage/trend") -> MockResponse()
-                        .setResponseCode(200)
-                        .setBody("[]")
-                        .addHeader("Content-Type", "application/json")
+                    path.contains("/api/wastage/trend") ->
+                        MockResponse()
+                            .setResponseCode(200)
+                            .setBody("[]")
+                            .addHeader("Content-Type", "application/json")
 
                     else -> MockResponse().setResponseCode(404)
                 }

@@ -21,10 +21,9 @@ import javax.inject.Singleton
 @Module
 @TestInstallIn(
     components = [SingletonComponent::class],
-    replaces = [CoreNetworkModule::class]
+    replaces = [CoreNetworkModule::class],
 )
 object TestNetworkModule {
-
     var mockWebServerUrl: String = "http://localhost:8080/"
     private const val TIMEOUT_SECONDS = 30L
 
