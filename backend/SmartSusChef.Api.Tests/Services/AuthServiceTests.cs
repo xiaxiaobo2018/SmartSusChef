@@ -70,11 +70,11 @@ public class AuthServiceTests
         // Create a user with a known password hash
         var password = "password123";
         var passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
-        
+
         // A store must exist for the user
         var store = new Store { Id = 1, StoreName = "Test Store" };
         context.Store.Add(store);
-        
+
         var user = new User
         {
             Id = Guid.NewGuid(),
@@ -169,7 +169,7 @@ public class AuthServiceTests
         var context = GetDbContext();
         var config = GetConfiguration();
         var service = new AuthService(context, config);
-        var request = new CreateUserRequest("newuser", "password", "New User", "new@example.com", "Employee");
+        var request = new CreateUserRequest { Username = "newuser", Password = "password", Name = "New User", Email = "new@example.com", Role = "Employee" };
 
         // Act
         var result = await service.CreateUserAsync(request, 1);
@@ -192,7 +192,7 @@ public class AuthServiceTests
         context.Users.Add(new User { Id = Guid.NewGuid(), Username = "existinguser", StoreId = storeId });
         await context.SaveChangesAsync();
 
-        var request = new CreateUserRequest("existinguser", "password", "New User", "new@example.com", "Employee");
+        var request = new CreateUserRequest { Username = "existinguser", Password = "password", Name = "New User", Email = "new@example.com", Role = "Employee" };
 
         // Act
         var result = await service.CreateUserAsync(request, storeId);
@@ -212,7 +212,7 @@ public class AuthServiceTests
         context.Users.Add(new User { Id = Guid.NewGuid(), Username = "ExistingUser", StoreId = storeId });
         await context.SaveChangesAsync();
 
-        var request = new CreateUserRequest("existinguser", "password", "New User", "new@example.com", "Employee");
+        var request = new CreateUserRequest { Username = "existinguser", Password = "password", Name = "New User", Email = "new@example.com", Role = "Employee" };
 
         // Act
         var result = await service.CreateUserAsync(request, storeId);
@@ -294,7 +294,7 @@ public class AuthServiceTests
         var userId = Guid.NewGuid();
         context.Users.Add(new User { Id = userId, Username = "olduser", StoreId = 1 });
         await context.SaveChangesAsync();
-        var request = new UpdateUserRequest("newuser", null, "New Name", null, null, null);
+        var request = new UpdateUserRequest { Username = "newuser", Password = null, Name = "New Name", Email = null, Role = null, Status = null };
 
         // Act
         var result = await service.UpdateUserAsync(userId, request);
@@ -314,7 +314,7 @@ public class AuthServiceTests
         var service = new AuthService(context, config);
 
         // Act
-        var result = await service.UpdateUserAsync(Guid.NewGuid(), new UpdateUserRequest("x", null, null, null, null, null));
+        var result = await service.UpdateUserAsync(Guid.NewGuid(), new UpdateUserRequest { Username = "x" });
 
         // Assert
         Assert.Null(result);
@@ -333,7 +333,7 @@ public class AuthServiceTests
         await context.SaveChangesAsync();
 
         // Act
-        var result = await service.UpdateUserAsync(targetId, new UpdateUserRequest("user2", null, null, null, null, null));
+        var result = await service.UpdateUserAsync(targetId, new UpdateUserRequest { Username = "user2" });
 
         // Assert
         Assert.Null(result);
@@ -384,7 +384,7 @@ public class AuthServiceTests
         var userId = Guid.NewGuid();
         context.Users.Add(new User { Id = userId, Name = "Old Name", Email = "old@example.com", StoreId = 1 });
         await context.SaveChangesAsync();
-        var request = new UpdateProfileRequest("New Name", "new@example.com");
+        var request = new UpdateProfileRequest { Name = "New Name", Email = "new@example.com" };
 
         // Act
         var result = await service.UpdateProfileAsync(userId, request);
@@ -404,7 +404,7 @@ public class AuthServiceTests
         var service = new AuthService(context, config);
 
         // Act
-        var result = await service.UpdateProfileAsync(Guid.NewGuid(), new UpdateProfileRequest("New", "new@example.com"));
+        var result = await service.UpdateProfileAsync(Guid.NewGuid(), new UpdateProfileRequest { Name = "New", Email = "new@example.com" });
 
         // Assert
         Assert.Null(result);

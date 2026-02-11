@@ -50,12 +50,12 @@ public class UsersControllerTests
         var value = Assert.IsAssignableFrom<List<UserListDto>>(actionResult.Value);
         Assert.Single(value);
     }
-    
+
     [Fact]
     public async Task CreateUser_ShouldReturnCreatedAtAction_WhenSuccessful()
     {
         // Arrange
-        var request = new CreateUserRequest("test", "ValidPass1@xyz", "test", "test", "test");
+        var request = new CreateUserRequest { Username = "test", Password = "ValidPass1@xyz", Name = "test", Email = "test", Role = "test" };
         var user = new UserListDto(Guid.NewGuid().ToString(), "test", "test", "test", "test", "test", DateTime.UtcNow, DateTime.UtcNow);
         _mockAuthService.Setup(s => s.CreateUserAsync(request, 1)).ReturnsAsync(user);
 
@@ -77,7 +77,7 @@ public class UsersControllerTests
     [Fact]
     public void CreateUser_DtoValidation_ShouldFail_WhenPasswordIsMissing()
     {
-        var request = new CreateUserRequest("test", "", "test", "test@test.com", "employee");
+        var request = new CreateUserRequest { Username = "test", Password = "", Name = "test", Email = "test@test.com", Role = "employee" };
         var isValid = ValidateModel(request, out var results);
         Assert.False(isValid);
     }
@@ -86,7 +86,7 @@ public class UsersControllerTests
     public void CreateUser_DtoValidation_ShouldFail_WhenPasswordIsTooShort()
     {
         // 11 chars, meets complexity but too short
-        var request = new CreateUserRequest("test", "Abcdefgh1@!", "test", "test@test.com", "employee");
+        var request = new CreateUserRequest { Username = "test", Password = "Abcdefgh1@!", Name = "test", Email = "test@test.com", Role = "employee" };
         var isValid = ValidateModel(request, out var results);
         Assert.False(isValid);
     }
@@ -95,7 +95,7 @@ public class UsersControllerTests
     public void CreateUser_DtoValidation_ShouldFail_WhenPasswordIsTooLong()
     {
         // 37 chars, exceeds max of 36
-        var request = new CreateUserRequest("test", "Abcdefghijklmnopqrstuvwxyz12345@!!!!!", "test", "test@test.com", "employee");
+        var request = new CreateUserRequest { Username = "test", Password = "Abcdefghijklmnopqrstuvwxyz12345@!!!!!", Name = "test", Email = "test@test.com", Role = "employee" };
         var isValid = ValidateModel(request, out var results);
         Assert.False(isValid);
     }
@@ -103,7 +103,7 @@ public class UsersControllerTests
     [Fact]
     public void CreateUser_DtoValidation_ShouldFail_WhenPasswordMissingUppercase()
     {
-        var request = new CreateUserRequest("test", "abcdefgh123@", "test", "test@test.com", "employee");
+        var request = new CreateUserRequest { Username = "test", Password = "abcdefgh123@", Name = "test", Email = "test@test.com", Role = "employee" };
         var isValid = ValidateModel(request, out var results);
         Assert.False(isValid);
     }
@@ -111,7 +111,7 @@ public class UsersControllerTests
     [Fact]
     public void CreateUser_DtoValidation_ShouldFail_WhenPasswordMissingLowercase()
     {
-        var request = new CreateUserRequest("test", "ABCDEFGH123@", "test", "test@test.com", "employee");
+        var request = new CreateUserRequest { Username = "test", Password = "ABCDEFGH123@", Name = "test", Email = "test@test.com", Role = "employee" };
         var isValid = ValidateModel(request, out var results);
         Assert.False(isValid);
     }
@@ -119,7 +119,7 @@ public class UsersControllerTests
     [Fact]
     public void CreateUser_DtoValidation_ShouldFail_WhenPasswordMissingNumber()
     {
-        var request = new CreateUserRequest("test", "Abcdefghijk@", "test", "test@test.com", "employee");
+        var request = new CreateUserRequest { Username = "test", Password = "Abcdefghijk@", Name = "test", Email = "test@test.com", Role = "employee" };
         var isValid = ValidateModel(request, out var results);
         Assert.False(isValid);
     }
@@ -127,7 +127,7 @@ public class UsersControllerTests
     [Fact]
     public void CreateUser_DtoValidation_ShouldFail_WhenPasswordMissingSpecialChar()
     {
-        var request = new CreateUserRequest("test", "Abcdefghij12", "test", "test@test.com", "employee");
+        var request = new CreateUserRequest { Username = "test", Password = "Abcdefghij12", Name = "test", Email = "test@test.com", Role = "employee" };
         var isValid = ValidateModel(request, out var results);
         Assert.False(isValid);
     }
@@ -136,7 +136,7 @@ public class UsersControllerTests
     public async Task CreateUser_ShouldReturnConflict_WhenUsernameExists()
     {
         // Arrange
-        var request = new CreateUserRequest("test", "ValidPass1@xyz", "test", "test", "test");
+        var request = new CreateUserRequest { Username = "test", Password = "ValidPass1@xyz", Name = "test", Email = "test", Role = "test" };
         _mockAuthService.Setup(s => s.CreateUserAsync(request, 1)).ReturnsAsync((UserListDto?)null);
 
         // Act
@@ -145,13 +145,13 @@ public class UsersControllerTests
         // Assert
         var actionResult = Assert.IsType<ConflictObjectResult>(result.Result);
     }
-    
+
     [Fact]
     public async Task UpdateUser_ShouldReturnOk_WhenSuccessful()
     {
         // Arrange
         var userId = Guid.NewGuid();
-        var request = new UpdateUserRequest("test", "password", "test", "test", "test", "test");
+        var request = new UpdateUserRequest { Username = "test", Password = "password", Name = "test", Email = "test", Role = "test", Status = "test" };
         var user = new UserListDto(userId.ToString(), "test", "test", "test", "test", "test", DateTime.UtcNow, DateTime.UtcNow);
         _mockAuthService.Setup(s => s.UpdateUserAsync(userId, request)).ReturnsAsync(user);
 
@@ -168,7 +168,7 @@ public class UsersControllerTests
     public async Task UpdateUser_ShouldReturnBadRequest_WhenIdIsInvalid()
     {
         // Act
-        var result = await _controller.UpdateUser("invalid-id", new UpdateUserRequest("test", "password", "test", "test", "test", "test"));
+        var result = await _controller.UpdateUser("invalid-id", new UpdateUserRequest { Username = "test", Password = "password", Name = "test", Email = "test", Role = "test", Status = "test" });
 
         // Assert
         var actionResult = Assert.IsType<BadRequestObjectResult>(result.Result);
@@ -179,7 +179,7 @@ public class UsersControllerTests
     {
         // Arrange
         var userId = Guid.NewGuid();
-        var request = new UpdateUserRequest("test", "password", "test", "test", "test", "test");
+        var request = new UpdateUserRequest { Username = "test", Password = "password", Name = "test", Email = "test", Role = "test", Status = "test" };
         _mockAuthService.Setup(s => s.UpdateUserAsync(userId, request)).ReturnsAsync((UserListDto?)null);
 
         // Act
@@ -188,7 +188,7 @@ public class UsersControllerTests
         // Assert
         var actionResult = Assert.IsType<NotFoundObjectResult>(result.Result);
     }
-    
+
     [Fact]
     public async Task DeleteUser_ShouldReturnNoContent_WhenSuccessful()
     {

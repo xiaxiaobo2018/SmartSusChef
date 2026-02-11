@@ -240,7 +240,7 @@ public class AuthControllerTests
     {
         // Arrange
         var userId = Guid.NewGuid();
-        var request = new UpdateProfileRequest("New Name", "new@example.com");
+        var request = new UpdateProfileRequest { Name = "New Name", Email = "new@example.com" };
         var updatedUser = new UserDto(userId.ToString(), "testuser", "New Name", "new@example.com", "Manager", "Active", DateTime.UtcNow, DateTime.UtcNow);
         SetupUserClaims(userId);
         _mockAuthService.Setup(s => s.UpdateProfileAsync(userId, request)).ReturnsAsync(updatedUser);
@@ -259,7 +259,7 @@ public class AuthControllerTests
     {
         // Arrange
         var userId = Guid.NewGuid();
-        var request = new ChangePasswordRequest("currentPassword", "newPassword");
+        var request = new ChangePasswordRequest { CurrentPassword = "currentPassword", NewPassword = "newPassword" };
         SetupUserClaims(userId);
         _mockAuthService.Setup(s => s.ChangePasswordAsync(userId, request.CurrentPassword, request.NewPassword)).ReturnsAsync(true);
 
@@ -275,7 +275,7 @@ public class AuthControllerTests
     {
         // Arrange
         var userId = Guid.NewGuid();
-        var request = new ChangePasswordRequest("wrongPassword", "newPassword");
+        var request = new ChangePasswordRequest { CurrentPassword = "wrongPassword", NewPassword = "newPassword" };
         SetupUserClaims(userId);
         _mockAuthService.Setup(s => s.ChangePasswordAsync(userId, request.CurrentPassword, request.NewPassword)).ReturnsAsync(false);
 
