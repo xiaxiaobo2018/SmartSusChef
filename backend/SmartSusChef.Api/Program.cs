@@ -13,7 +13,25 @@ using System.Runtime.CompilerServices;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+    {
+        // Suppress validation metadata errors for record types
+        options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
+    })
+    .AddJsonOptions(options =>
+    {
+        // Use camelCase for JSON serialization to match frontend conventions
+        options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+        // Make property name matching case-insensitive for deserialization
+        options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+    });
+
+// Configure model validation to suppress record validation exceptions
+builder.Services.Configure<Microsoft.AspNetCore.Mvc.MvcOptions>(options =>
+{
+    options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
+});
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
