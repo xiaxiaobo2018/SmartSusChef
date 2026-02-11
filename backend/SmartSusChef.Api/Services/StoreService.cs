@@ -123,7 +123,16 @@ public class StoreService : IStoreService
 
     private async Task<StoreDto> UpdateStoreInternal(Store store, UpdateStoreRequest request)
     {
-        // Update only provided fields
+        ApplyStoreUpdates(store, request);
+        store.UpdatedAt = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync();
+
+        return MapToDto(store);
+    }
+
+    private void ApplyStoreUpdates(Store store, UpdateStoreRequest request)
+    {
         if (request.CompanyName != null)
             store.CompanyName = request.CompanyName;
         if (request.UEN != null)
@@ -146,12 +155,6 @@ public class StoreService : IStoreService
             store.Address = request.Address;
         if (request.IsActive.HasValue)
             store.IsActive = request.IsActive.Value;
-
-        store.UpdatedAt = DateTime.UtcNow;
-
-        await _context.SaveChangesAsync();
-
-        return MapToDto(store);
     }
 
     public async Task<bool> IsStoreInitializedAsync()

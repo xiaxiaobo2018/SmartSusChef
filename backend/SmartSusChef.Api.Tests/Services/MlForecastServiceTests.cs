@@ -150,4 +150,151 @@ public class MlForecastServiceTests
         Assert.Single(result[0].Ingredients);
         Assert.Equal("Cheese", result[0].Ingredients[0].IngredientName);
     }
+
+    [Fact]
+    public async Task GetForecastAsync_ShouldReturnEmpty_WhenMlReturnsTrainingStatus()
+    {
+        // Arrange
+        var mlResponse = new MlStorePredictResponseDto(1, "training", null, 150, null);
+        _mockMlService.Setup(s => s.GetStorePredictionsAsync(1, It.IsAny<int>(), It.IsAny<decimal?>(), It.IsAny<decimal?>(), It.IsAny<string>()))
+            .ReturnsAsync(mlResponse);
+
+        // Act
+        var result = await _service.GetForecastAsync();
+
+        // Assert
+        Assert.Empty(result);
+        _mockLogger.Verify(
+            x => x.Log(
+                LogLevel.Information,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("ML models are being trained. Returning cached or mock data.")),
+                It.IsAny<Exception>(),
+                It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetForecastAsync_ShouldReturnEmpty_WhenMlReturnsInsufficientDataStatus()
+    {
+        // Arrange
+        var mlResponse = new MlStorePredictResponseDto(1, "insufficient_data", null, 50, null);
+        _mockMlService.Setup(s => s.GetStorePredictionsAsync(1, It.IsAny<int>(), It.IsAny<decimal?>(), It.IsAny<decimal?>(), It.IsAny<string>()))
+            .ReturnsAsync(mlResponse);
+
+        // Act
+        var result = await _service.GetForecastAsync();
+
+        // Assert
+        Assert.Empty(result);
+        _mockLogger.Verify(
+            x => x.Log(
+                LogLevel.Information,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Insufficient data")),
+                It.IsAny<Exception>(),
+                It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetForecastAsync_ShouldReturnEmpty_WhenMlReturnsUnknownStatus()
+    {
+        // Arrange
+        var mlResponse = new MlStorePredictResponseDto(1, "unknown_status", "Some message", 0, null);
+        _mockMlService.Setup(s => s.GetStorePredictionsAsync(1, It.IsAny<int>(), It.IsAny<decimal?>(), It.IsAny<decimal?>(), It.IsAny<string>()))
+            .ReturnsAsync(mlResponse);
+
+        // Act
+        var result = await _service.GetForecastAsync();
+
+        // Assert
+        Assert.Empty(result);
+        _mockLogger.Verify(
+            x => x.Log(
+                LogLevel.Warning,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("ML returned status 'unknown_status'")),
+                It.IsAny<Exception>(),
+                It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetForecastAsync_ShouldReturnEmpty_WhenMlReturnsOkButNoPredictions()
+    {
+        // Arrange
+        var mlResponse = new MlStorePredictResponseDto(1, "ok", null, 150, new Dictionary<string, MlDishPredictionDto>());
+        _mockMlService.Setup(s => s.GetStorePredictionsAsync(1, It.IsAny<int>(), It.IsAny<decimal?>(), It.IsAny<decimal?>(), It.IsAny<string>()))
+            .ReturnsAsync(mlResponse);
+
+        // Act
+        var result = await _service.GetForecastAsync();
+
+        // Assert
+        Assert.Empty(result);
+        _mockLogger.Verify(
+            x => x.Log(
+                LogLevel.Warning,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("ML returned 'ok' but no forecasts matched date range.")),
+                It.IsAny<Exception>(),
+                It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)), Times.Once);
+    }
+
+    [Fact]
+    public async Task SaveAndConvertPredictions_ShouldHandleDishNotFoundInDb()
+    {
+        // Arrange
+        var storeId = 1;
+        var recipe = new Recipe { Id = Guid.NewGuid(), StoreId = storeId, Name = "Existing Dish" };
+        await _context.Recipes.AddAsync(recipe);
+        await _context.SaveChangesAsync();
+
+        var mlResponse = new MlStorePredictResponseDto(storeId, "ok", null, 150, new Dictionary<string, MlDishPredictionDto>
+        {
+            ["Non-existent Dish"] = new MlDishPredictionDto("Non-existent Dish", "model", "combo", 7, DateTime.UtcNow.Date.ToString("yyyy-MM-dd"), new List<MlDayPredictionDto>
+            {
+                new(DateTime.UtcNow.Date.ToString("yyyy-MM-dd"), 10, 10, 0)
+            }, null)
+        });
+        _mockMlService.Setup(s => s.GetStorePredictionsAsync(storeId, It.IsAny<int>(), It.IsAny<decimal?>(), It.IsAny<decimal?>(), It.IsAny<string>()))
+            .ReturnsAsync(mlResponse);
+
+        // Act
+        var result = await _service.GetForecastAsync();
+
+        // Assert
+        Assert.Empty(result); // Should not return forecasts for non-existent dish
+        _mockLogger.Verify(
+            x => x.Log(
+                LogLevel.Warning,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("ML dish 'Non-existent Dish' not found in store 1 recipes, skipping.")),
+                It.IsAny<Exception>(),
+                It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)), Times.Once);
+    }
+
+    [Fact]
+    public async Task SaveAndConvertPredictions_ShouldHandleInvalidPredictionDate()
+    {
+        // Arrange
+        var storeId = 1;
+        var recipe = new Recipe { Id = Guid.NewGuid(), StoreId = storeId, Name = "Pizza" };
+        await _context.Recipes.AddAsync(recipe);
+        await _context.SaveChangesAsync();
+
+        var mlResponse = new MlStorePredictResponseDto(storeId, "ok", null, 150, new Dictionary<string, MlDishPredictionDto>
+        {
+            ["Pizza"] = new MlDishPredictionDto("Pizza", "model", "combo", 7, "Invalid-Date", new List<MlDayPredictionDto>
+            {
+                new("Invalid-Date", 10, 10, 0) // Invalid date string
+            }, null)
+        });
+        _mockMlService.Setup(s => s.GetStorePredictionsAsync(storeId, It.IsAny<int>(), It.IsAny<decimal?>(), It.IsAny<decimal?>(), It.IsAny<string>()))
+            .ReturnsAsync(mlResponse);
+
+        // Act
+        var result = await _service.GetForecastAsync();
+
+        // Assert
+        Assert.Empty(result); // No valid predictions should be processed
+    }
 }

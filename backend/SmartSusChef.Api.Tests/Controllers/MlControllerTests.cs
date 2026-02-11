@@ -172,4 +172,17 @@ public class MlControllerTests
         var actionResult = Assert.IsType<ObjectResult>(result.Result);
         Assert.Equal(503, actionResult.StatusCode);
     }
+
+    [Fact]
+    public async Task Predict_ShouldReturnBadRequest_WhenDaysIsInvalid()
+    {
+        // Act & Assert
+        var resultTooLow = await _controller.Predict(0);
+        var actionResultTooLow = Assert.IsType<BadRequestObjectResult>(resultTooLow.Result);
+        Assert.NotNull(actionResultTooLow.Value);
+
+        var resultTooHigh = await _controller.Predict(31);
+        var actionResultTooHigh = Assert.IsType<BadRequestObjectResult>(resultTooHigh.Result);
+        Assert.NotNull(actionResultTooHigh.Value);
+    }
 }

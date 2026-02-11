@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 
 // Allow the test project to access internal members
 [assembly: InternalsVisibleTo("SmartSusChef.Api.Tests")]
+[assembly: InternalsVisibleTo("Microsoft.AspNetCore.Mvc.Testing")]
 
 var builder = WebApplication.CreateBuilder(args);
 

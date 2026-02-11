@@ -160,6 +160,11 @@ public class MlController : ControllerBase
     [HttpPost("predict")]
     public async Task<ActionResult<MlStorePredictResponseDto>> Predict([FromQuery] int days = 7)
     {
+        if (days < 1 || days > 30)
+        {
+            return BadRequest(new { message = "Prediction horizon (days) must be between 1 and 30." });
+        }
+
         try
         {
             var storeId = _currentUserService.StoreId;

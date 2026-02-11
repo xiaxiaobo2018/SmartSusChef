@@ -291,4 +291,113 @@ public class RecipeServiceTests
         // Assert
         Assert.Null(result);
     }
+
+    [Fact]
+    public void RecipeIngredientDto_ShouldInstantiateCorrectlyWithVariousInputs()
+    {
+        // Arrange
+        var ingredientId = Guid.NewGuid().ToString();
+        var childRecipeId = Guid.NewGuid().ToString();
+        var quantity = 10.5m;
+        var displayName = "Test Item";
+        var unit = "kg";
+
+        // Act - Valid ingredient ID
+        var dto1 = new DTOs.RecipeIngredientDto(ingredientId, null, displayName, unit, quantity);
+
+        // Assert
+        Assert.Equal(ingredientId, dto1.IngredientId);
+        Assert.Null(dto1.ChildRecipeId);
+        Assert.Equal(displayName, dto1.DisplayName);
+        Assert.Equal(unit, dto1.Unit);
+        Assert.Equal(quantity, dto1.Quantity);
+
+        // Act - Valid child recipe ID
+        var dto2 = new DTOs.RecipeIngredientDto(null, childRecipeId, displayName, unit, quantity);
+
+        // Assert
+        Assert.Null(dto2.IngredientId);
+        Assert.Equal(childRecipeId, dto2.ChildRecipeId);
+        Assert.Equal(displayName, dto2.DisplayName);
+        Assert.Equal(unit, dto2.Unit);
+        Assert.Equal(quantity, dto2.Quantity);
+
+        // Act - Both null IDs, null DisplayName and Unit
+        var dto3 = new DTOs.RecipeIngredientDto(null, null, string.Empty, string.Empty, quantity);
+
+        // Assert
+        Assert.Null(dto3.IngredientId);
+        Assert.Null(dto3.ChildRecipeId);
+        Assert.Equal(string.Empty, dto3.DisplayName);
+        Assert.Equal(string.Empty, dto3.Unit);
+        Assert.Equal(quantity, dto3.Quantity);
+    }
+
+    [Fact]
+    public async Task CalculateTotalCarbonFootprintAsync_ShouldHandleZeroFootprintIngredient()
+    {
+        // Arrange
+        var context = GetDbContext();
+        var storeId = 1;
+
+        var zeroFootprintIngredient = new Ingredient
+        {
+            Id = Guid.NewGuid(), Name = "Water", CarbonFootprint = 0m, StoreId = storeId, Unit = "L"
+        };
+        context.Ingredients.Add(zeroFootprintIngredient);
+
+        var highFootprintIngredient = new Ingredient
+        {
+            Id = Guid.NewGuid(), Name = "Beef", CarbonFootprint = 27m, StoreId = storeId, Unit = "kg"
+        };
+        context.Ingredients.Add(highFootprintIngredient);
+
+        var recipeId = Guid.NewGuid();
+        var recipe = new Recipe { Id = recipeId, Name = "Soup", StoreId = storeId, IsSellable = true };
+        recipe.RecipeIngredients.Add(new RecipeIngredient { Id = Guid.NewGuid(), RecipeId = recipeId, IngredientId = zeroFootprintIngredient.Id, Quantity = 1.0m });
+        recipe.RecipeIngredients.Add(new RecipeIngredient { Id = Guid.NewGuid(), RecipeId = recipeId, IngredientId = highFootprintIngredient.Id, Quantity = 0.1m }); // 0.1kg beef
+        context.Recipes.Add(recipe);
+        await context.SaveChangesAsync();
+
+        var mockCurrentUserService = new Mock<ICurrentUserService>();
+        mockCurrentUserService.Setup(s => s.StoreId).Returns(storeId);
+        var service = new RecipeService(context, mockCurrentUserService.Object);
+
+        // Act
+        var totalFootprint = await service.CalculateTotalCarbonFootprintAsync(recipeId);
+
+        // Assert
+        Assert.Equal(2.7m, totalFootprint); // 0.1kg * 27m = 2.7m
+    }
+
+    [Fact]
+    public async Task CalculateTotalCarbonFootprintAsync_ShouldHandleZeroQuantityIngredient()
+    {
+        // Arrange
+        var context = GetDbContext();
+        var storeId = 1;
+
+        var ingredient = new Ingredient
+        {
+            Id = Guid.NewGuid(), Name = "Spice", CarbonFootprint = 1m, StoreId = storeId, Unit = "g"
+        };
+        context.Ingredients.Add(ingredient);
+
+        var recipeId = Guid.NewGuid();
+        var recipe = new Recipe { Id = recipeId, Name = "Dish", StoreId = storeId, IsSellable = true };
+        // Add ingredient with zero quantity
+        recipe.RecipeIngredients.Add(new RecipeIngredient { Id = Guid.NewGuid(), RecipeId = recipeId, IngredientId = ingredient.Id, Quantity = 0m });
+        context.Recipes.Add(recipe);
+        await context.SaveChangesAsync();
+
+        var mockCurrentUserService = new Mock<ICurrentUserService>();
+        mockCurrentUserService.Setup(s => s.StoreId).Returns(storeId);
+        var service = new RecipeService(context, mockCurrentUserService.Object);
+
+        // Act
+        var totalFootprint = await service.CalculateTotalCarbonFootprintAsync(recipeId);
+
+        // Assert
+        Assert.Equal(0m, totalFootprint); // Zero quantity should result in zero contribution
+    }
 }

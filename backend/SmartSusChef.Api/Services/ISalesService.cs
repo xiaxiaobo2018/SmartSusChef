@@ -9,7 +9,7 @@ public interface ISalesService
     Task<SalesDataDto> CreateAsync(CreateSalesDataRequest request);
     Task<SalesDataDto?> UpdateAsync(Guid id, UpdateSalesDataRequest request);
     Task<bool> DeleteAsync(Guid id);
-    Task<List<SalesWithSignalsDto>> GetTrendAsync(DateTime startDate, DateTime endDate);
+    Task<List<SalesTrendDto>> GetTrendAsync(DateTime startDate, DateTime endDate);
     Task<List<IngredientUsageDto>> GetIngredientUsageByDateAsync(DateTime date);
     Task<List<RecipeSalesDto>> GetRecipeSalesByDateAsync(DateTime date);
     Task ImportAsync(List<CreateSalesDataRequest> salesData);

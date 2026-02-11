@@ -136,7 +136,7 @@ public class SalesService : ISalesService
         return true;
     }
 
-    public async Task<List<SalesWithSignalsDto>> GetTrendAsync(DateTime startDate, DateTime endDate)
+    public async Task<List<SalesTrendDto>> GetTrendAsync(DateTime startDate, DateTime endDate)
     {
         // 1. Fetch data from DB filtered by Store
         var salesData = await _context.SalesData
@@ -162,13 +162,9 @@ public class SalesService : ISalesService
             // Check if we have signals for this day, otherwise use defaults
             signals.TryGetValue(date, out var signal);
 
-            return new SalesWithSignalsDto(
+            return new SalesTrendDto(
                 date.ToString("yyyy-MM-dd"),
                 daySales.Sum(s => s.Quantity),
-                signal?.IsHoliday ?? false,
-                signal?.HolidayName ?? "None",
-                signal?.RainMm ?? 0m,
-                signal?.WeatherDesc ?? "No Data",
                 daySales.GroupBy(s => s.RecipeId)
                     .Select(rg => new RecipeSalesDto(
                         rg.Key.ToString(),
@@ -244,10 +240,49 @@ public class SalesService : ISalesService
             .ToList();
     }
 
-    // Link the interface method to implementation
     public async Task<List<SalesWithSignalsDto>> GetSalesTrendsWithSignalsAsync(DateTime startDate, DateTime endDate)
     {
-        return await GetTrendAsync(startDate, endDate);
+        // 1. Fetch data from DB filtered by Store
+        var salesData = await _context.SalesData
+            .AsNoTracking()
+            .Include(s => s.Recipe)
+            .Where(s => s.StoreId == CurrentStoreId && s.Date.Date >= startDate.Date && s.Date.Date <= endDate.Date)
+            .ToListAsync();
+        // 2. Fetch external signals (weather/holidays) for the same period
+        var signals = await _context.GlobalCalendarSignals
+            .AsNoTracking()
+            .Where(sig => sig.Date.Date >= startDate.Date && sig.Date.Date <= endDate.Date)
+            .ToDictionaryAsync(sig => sig.Date.Date);
+
+        // 3. Generate the full range of dates to ensure exactly N data points for your unit test
+        var allDates = Enumerable.Range(0, (endDate.Date - startDate.Date).Days + 1)
+            .Select(d => startDate.AddDays(d).Date);
+
+        // 4. Map everything to the new SalesWithSignalsDto
+        var trendWithSignals = allDates.Select(date =>
+        {
+            var daySales = salesData.Where(s => s.Date.Date == date).ToList();
+
+            // Check if we have signals for this day, otherwise use defaults
+            signals.TryGetValue(date, out var signal);
+
+            return new SalesWithSignalsDto(
+                date.ToString("yyyy-MM-dd"),
+                daySales.Sum(s => s.Quantity),
+                signal?.IsHoliday ?? false,
+                signal?.HolidayName ?? "None",
+                signal?.RainMm ?? 0m,
+                signal?.WeatherDesc ?? "No Data",
+                daySales.GroupBy(s => s.RecipeId)
+                    .Select(rg => new RecipeSalesDto(
+                        rg.Key.ToString(),
+                        rg.First().Recipe.Name,
+                        rg.Sum(s => s.Quantity)
+                    )).ToList()
+            );
+        }).ToList();
+
+        return trendWithSignals;
     }
 
 

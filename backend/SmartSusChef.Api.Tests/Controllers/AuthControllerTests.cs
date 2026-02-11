@@ -285,4 +285,82 @@ public class AuthControllerTests
         // Assert
         Assert.IsType<BadRequestObjectResult>(result);
     }
+
+    private void SetupInvalidUserClaims()
+    {
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = new ClaimsPrincipal(new ClaimsIdentity()) }
+        };
+    }
+
+    [Fact]
+    public async Task CheckStoreSetupRequired_ShouldReturnUnauthorized_WhenUserIdIsInvalid()
+    {
+        // Arrange
+        SetupInvalidUserClaims();
+
+        // Act
+        var result = await _controller.CheckStoreSetupRequired();
+
+        // Assert
+        Assert.IsType<UnauthorizedResult>(result.Result);
+    }
+
+    [Fact]
+    public async Task GetCurrentUser_ShouldReturnUnauthorized_WhenUserIdIsInvalid()
+    {
+        // Arrange
+        SetupInvalidUserClaims();
+
+        // Act
+        var result = await _controller.GetCurrentUser();
+
+        // Assert
+        Assert.IsType<UnauthorizedResult>(result.Result);
+    }
+
+    [Fact]
+    public async Task UpdateProfile_ShouldReturnUnauthorized_WhenUserIdIsInvalid()
+    {
+        // Arrange
+        SetupInvalidUserClaims();
+        var request = new UpdateProfileRequest { Name = "New Name", Email = "new@example.com" };
+
+        // Act
+        var result = await _controller.UpdateProfile(request);
+
+        // Assert
+        Assert.IsType<UnauthorizedResult>(result.Result);
+    }
+
+    [Fact]
+    public async Task UpdateProfile_ShouldReturnNotFound_WhenUpdateFails()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var request = new UpdateProfileRequest { Name = "New Name", Email = "new@example.com" };
+        SetupUserClaims(userId);
+        _mockAuthService.Setup(s => s.UpdateProfileAsync(userId, request)).ReturnsAsync((UserDto?)null);
+
+        // Act
+        var result = await _controller.UpdateProfile(request);
+
+        // Assert
+        Assert.IsType<NotFoundResult>(result.Result);
+    }
+
+    [Fact]
+    public async Task ChangePassword_ShouldReturnUnauthorized_WhenUserIdIsInvalid()
+    {
+        // Arrange
+        SetupInvalidUserClaims();
+        var request = new ChangePasswordRequest { CurrentPassword = "currentPassword", NewPassword = "newPassword" };
+
+        // Act
+        var result = await _controller.ChangePassword(request);
+
+        // Assert
+        Assert.IsType<UnauthorizedResult>(result);
+    }
 }

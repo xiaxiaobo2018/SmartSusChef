@@ -41,16 +41,21 @@ public class SalesControllerTests
     public async Task GetTrend_ShouldReturnOk_WithSalesTrend()
     {
         // Arrange
-        var trend = new List<SalesWithSignalsDto> { new(DateTime.UtcNow.ToString("yyyy-MM-dd"), 100, false, string.Empty, 0, "Sunny", new List<RecipeSalesDto>()) };
-        _mockSalesService.Setup(s => s.GetTrendAsync(It.IsAny<DateTime>(), It.IsAny<DateTime>())).ReturnsAsync(trend);
+        var today = DateTime.UtcNow.Date;
+        var trend = new List<SalesTrendDto> { new(today.ToString("yyyy-MM-dd"), 100, new List<RecipeSalesDto>()) };
+        _mockSalesService.Setup(s => s.GetTrendAsync(It.IsAny<DateTime>(), It.IsAny<DateTime>())).ReturnsAsync(new List<SalesTrendDto> { new(today.ToString("yyyy-MM-dd"), 100, new List<RecipeSalesDto>()) });
 
         // Act
         var result = await _controller.GetTrend(DateTime.UtcNow, DateTime.UtcNow);
 
         // Assert
         var actionResult = Assert.IsType<OkObjectResult>(result.Result);
-        var value = Assert.IsAssignableFrom<List<SalesWithSignalsDto>>(actionResult.Value);
+        var value = Assert.IsAssignableFrom<List<SalesTrendDto>>(actionResult.Value);
         Assert.Single(value);
+        Assert.Equal(today.ToString("yyyy-MM-dd"), value[0].Date);
+        Assert.Equal(100, value[0].TotalQuantity);
+        Assert.NotNull(value[0].RecipeBreakdown);
+        Assert.Empty(value[0].RecipeBreakdown);
     }
 
     [Fact]
@@ -173,5 +178,58 @@ public class SalesControllerTests
 
         // Assert
         Assert.IsType<NotFoundResult>(result);
+    }
+
+    [Fact]
+    public async Task GetIngredientUsageByDate_ShouldReturnOk_WithListOfIngredientUsageDto()
+    {
+        // Arrange
+        var date = DateTime.UtcNow.Date;
+        var ingredientUsage = new List<IngredientUsageDto> { new(Guid.NewGuid().ToString(), "Ingredient1", "kg", 100m) };
+        _mockSalesService.Setup(s => s.GetIngredientUsageByDateAsync(date)).ReturnsAsync(ingredientUsage);
+
+        // Act
+        var result = await _controller.GetIngredientUsageByDate(date);
+
+        // Assert
+        var actionResult = Assert.IsType<OkObjectResult>(result.Result);
+        var value = Assert.IsAssignableFrom<List<IngredientUsageDto>>(actionResult.Value);
+        Assert.Single(value);
+    }
+
+    [Fact]
+    public async Task GetRecipeSalesByDate_ShouldReturnOk_WithListOfRecipeSalesDto()
+    {
+        // Arrange
+        var date = DateTime.UtcNow.Date;
+        var recipeSales = new List<RecipeSalesDto> { new(Guid.NewGuid().ToString(), "Recipe1", 50) };
+        _mockSalesService.Setup(s => s.GetRecipeSalesByDateAsync(date)).ReturnsAsync(recipeSales);
+
+        // Act
+        var result = await _controller.GetRecipeSalesByDate(date);
+
+        // Assert
+        var actionResult = Assert.IsType<OkObjectResult>(result.Result);
+        var value = Assert.IsAssignableFrom<List<RecipeSalesDto>>(actionResult.Value);
+        Assert.Single(value);
+    }
+
+    [Fact]
+    public async Task ImportByName_ShouldReturnOk_WhenSuccessful()
+    {
+        // Arrange
+        var request = new ImportSalesByNameRequest(new List<ImportSalesByNameItem>(), "yyyy-MM-dd");
+        var importResult = new ImportSalesByNameResponse(10, 2, new List<string> { "New Dish 1", "New Dish 2" });
+        _mockSalesService.Setup(s => s.ImportByNameAsync(request.SalesData, request.DateFormat)).ReturnsAsync(importResult);
+
+        // Act
+        var result = await _controller.ImportByName(request);
+
+        // Assert
+        var actionResult = Assert.IsType<OkObjectResult>(result);
+        var value = Assert.IsAssignableFrom<dynamic>(actionResult.Value);
+        Assert.Equal("Sales data imported successfully", value.message);
+        Assert.Equal(10, value.imported);
+        Assert.Equal(2, value.newDishesCreated);
     }
 }

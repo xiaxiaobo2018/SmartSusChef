@@ -328,4 +328,77 @@ public class StoreServiceTests
         // Assert
         Assert.Null(result);
     }
+
+    [Fact]
+    public async Task UpdateStoreAsync_ShouldUpdateAllFields_WhenAllProvided()
+    {
+        // Arrange
+        var context = GetDbContext();
+        var storeId = 1;
+        var store = new Store
+        {
+            Id = storeId,
+            CompanyName = "Old Company",
+            UEN = "Old UEN",
+            StoreName = "Old Store Name",
+            OutletLocation = "Old Location",
+            ContactNumber = "Old Contact",
+            OpeningDate = new DateTime(2020, 1, 1),
+            Latitude = 10.0m,
+            Longitude = 20.0m,
+            CountryCode = "OC",
+            Address = "Old Address",
+            IsActive = false
+        };
+        context.Store.Add(store);
+        await context.SaveChangesAsync();
+
+        var newOpeningDate = new DateTime(2021, 2, 2);
+        var request = new UpdateStoreRequest(
+            "New Company",
+            "New UEN",
+            "New Store Name",
+            "New Location",
+            "New Contact",
+            newOpeningDate,
+            11.1m,
+            22.2m,
+            "NC",
+            "New Address",
+            true
+        );
+        var mockCurrentUserService = GetMockCurrentUserService(storeId);
+        var service = new StoreService(context, mockCurrentUserService.Object);
+
+        // Act
+        var result = await service.UpdateStoreAsync(request);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal("New Company", result.CompanyName);
+        Assert.Equal("New UEN", result.UEN);
+        Assert.Equal("New Store Name", result.StoreName);
+        Assert.Equal("New Location", result.OutletLocation);
+        Assert.Equal("New Contact", result.ContactNumber);
+        Assert.Equal(newOpeningDate, result.OpeningDate);
+        Assert.Equal(11.1m, result.Latitude);
+        Assert.Equal(22.2m, result.Longitude);
+        Assert.Equal("NC", result.CountryCode);
+        Assert.Equal("New Address", result.Address);
+        Assert.True(result.IsActive);
+
+        var updatedStore = await context.Store.FindAsync(storeId);
+        Assert.NotNull(updatedStore);
+        Assert.Equal("New Company", updatedStore.CompanyName);
+        Assert.Equal("New UEN", updatedStore.UEN);
+        Assert.Equal("New Store Name", updatedStore.StoreName);
+        Assert.Equal("New Location", updatedStore.OutletLocation);
+        Assert.Equal("New Contact", updatedStore.ContactNumber);
+        Assert.Equal(newOpeningDate, updatedStore.OpeningDate);
+        Assert.Equal(11.1m, updatedStore.Latitude);
+        Assert.Equal(22.2m, updatedStore.Longitude);
+        Assert.Equal("NC", updatedStore.CountryCode);
+        Assert.Equal("New Address", updatedStore.Address);
+        Assert.True(updatedStore.IsActive);
+    }
 }

@@ -35,7 +35,7 @@ public class DashboardControllerTests
     public async Task GetDashboardSummary_ShouldReturnOk_WithSummaryData()
     {
         // Arrange
-        var salesTrend = new List<SalesWithSignalsDto> { new SalesWithSignalsDto(DateTime.UtcNow.ToString(), 1, true, "Test Holiday", 0, "test", new List<RecipeSalesDto>()) };
+        var salesTrend = new List<SalesTrendDto> { new SalesTrendDto(DateTime.UtcNow.ToString(), 1, new List<RecipeSalesDto>()) };
         _mockSalesService.Setup(s => s.GetTrendAsync(It.IsAny<DateTime>(), It.IsAny<DateTime>())).ReturnsAsync(salesTrend);
         _mockWastageService.Setup(s => s.GetTotalWastageImpactAsync(It.IsAny<DateTime>(), It.IsAny<DateTime>())).ReturnsAsync(10.5m);
         _mockHolidayService.Setup(s => s.IsHolidayAsync(It.IsAny<DateTime>())).ReturnsAsync(true);

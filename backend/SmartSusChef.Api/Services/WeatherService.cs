@@ -278,55 +278,70 @@ public class WeatherService : IWeatherService
     }
 
     // Changed from private to internal to allow testing via InternalsVisibleTo
+    internal static readonly Dictionary<int, (string Condition, string Description)> WeatherCodeMap = new()
+    {
+        { 0, ("Clear", "Clear sky") },
+        { 1, ("Partly Cloudy", "Partly cloudy to cloudy") },
+        { 2, ("Partly Cloudy", "Partly cloudy to cloudy") },
+        { 3, ("Partly Cloudy", "Partly cloudy to cloudy") },
+        { 45, ("Foggy", "Foggy conditions") },
+        { 48, ("Foggy", "Foggy conditions") },
+        { 51, ("Drizzle", "Light to moderate drizzle") },
+        { 53, ("Drizzle", "Light to moderate drizzle") },
+        { 55, ("Drizzle", "Light to moderate drizzle") },
+        { 61, ("Rainy", "Light to heavy rain") },
+        { 63, ("Rainy", "Light to heavy rain") },
+        { 65, ("Rainy", "Light to heavy rain") },
+        { 71, ("Snowy", "Light to heavy snow") },
+        { 73, ("Snowy", "Light to heavy snow") },
+        { 75, ("Snowy", "Light to heavy snow") },
+        { 80, ("Rain Showers", "Rain showers") },
+        { 81, ("Rain Showers", "Rain showers") },
+        { 82, ("Rain Showers", "Rain showers") },
+        { 95, ("Thunderstorm", "Thunderstorm") },
+        { 96, ("Thunderstorm", "Thunderstorm") },
+        { 99, ("Thunderstorm", "Thunderstorm") }
+    };
+
     internal static (string Condition, string Description) MapWeatherCode(int code)
     {
-        return code switch
-        {
-            0 => ("Clear", "Clear sky"),
-            1 or 2 or 3 => ("Partly Cloudy", "Partly cloudy to cloudy"),
-            45 or 48 => ("Foggy", "Foggy conditions"),
-            51 or 53 or 55 => ("Drizzle", "Light to moderate drizzle"),
-            61 or 63 or 65 => ("Rainy", "Light to heavy rain"),
-            71 or 73 or 75 => ("Snowy", "Light to heavy snow"),
-            80 or 81 or 82 => ("Rain Showers", "Rain showers"),
-            95 or 96 or 99 => ("Thunderstorm", "Thunderstorm"),
-            _ => ("Unknown", "Weather condition unknown")
-        };
+        return WeatherCodeMap.GetValueOrDefault(code, ("Unknown", "Weather condition unknown"));
     }
 
     /// <summary>
     /// Convert WMO weather code to description (matching Python script logic)
     /// </summary>
     // Changed from private to internal to allow testing via InternalsVisibleTo
+    internal static readonly Dictionary<int, string> WeatherCodeDescriptions = new()
+    {
+        { 0, "Sunny" },
+        { 1, "Mainly Clear" },
+        { 2, "Partly Cloudy" },
+        { 3, "Overcast" },
+        { 45, "Foggy" },
+        { 48, "Depositing Rime Fog" },
+        { 51, "Light Drizzle" },
+        { 53, "Moderate Drizzle" },
+        { 55, "Dense Drizzle" },
+        { 61, "Slight Rain" },
+        { 63, "Moderate Rain" },
+        { 65, "Heavy Rain" },
+        { 71, "Slight Snow" },
+        { 73, "Moderate Snow" },
+        { 75, "Heavy Snow" },
+        { 77, "Snow Grains" },
+        { 80, "Slight Rain Showers" },
+        { 81, "Moderate Rain Showers" },
+        { 82, "Violent Rain Showers" },
+        { 85, "Slight Snow Showers" },
+        { 86, "Heavy Snow Showers" },
+        { 95, "Thunderstorm" },
+        { 96, "Thunderstorm with Slight Hail" },
+        { 99, "Thunderstorm with Heavy Hail" }
+    };
+
     internal static string GetWeatherDescription(int code)
     {
-        return code switch
-        {
-            0 => "Sunny",
-            1 => "Mainly Clear",
-            2 => "Partly Cloudy",
-            3 => "Overcast",
-            45 => "Foggy",
-            48 => "Depositing Rime Fog",
-            51 => "Light Drizzle",
-            53 => "Moderate Drizzle",
-            55 => "Dense Drizzle",
-            61 => "Slight Rain",
-            63 => "Moderate Rain",
-            65 => "Heavy Rain",
-            71 => "Slight Snow",
-            73 => "Moderate Snow",
-            75 => "Heavy Snow",
-            77 => "Snow Grains",
-            80 => "Slight Rain Showers",
-            81 => "Moderate Rain Showers",
-            82 => "Violent Rain Showers",
-            85 => "Slight Snow Showers",
-            86 => "Heavy Snow Showers",
-            95 => "Thunderstorm",
-            96 => "Thunderstorm with Slight Hail",
-            99 => "Thunderstorm with Heavy Hail",
-            _ => "Unknown"
-        };
+        return WeatherCodeDescriptions.GetValueOrDefault(code, "Unknown");
     }
 }
