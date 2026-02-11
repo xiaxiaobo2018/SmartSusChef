@@ -191,3 +191,6 @@ tools/
 .venv/
 __pycache__/
 
+# Machine Learning models
+ML/models/
+

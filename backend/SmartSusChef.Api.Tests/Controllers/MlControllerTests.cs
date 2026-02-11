@@ -76,7 +76,7 @@ public class MlControllerTests
         // Arrange
         var status = new MlStoreStatusDto(1, false, false, null, 0, null, false);
         _mockMlService.Setup(s => s.GetStoreStatusAsync(1)).ReturnsAsync(status);
-        
+
         await _dbContext.SalesData.AddAsync(new SalesData { StoreId = 1, Date = DateTime.Now.AddDays(-1) });
         await _dbContext.SaveChangesAsync();
 
@@ -89,13 +89,13 @@ public class MlControllerTests
         Assert.False(value.HasModels);
         Assert.Equal(1, value.DaysAvailable);
     }
-    
+
     [Fact]
     public async Task GetStatus_ShouldReturnOk_WhenServiceThrowsException()
     {
         // Arrange
         _mockMlService.Setup(s => s.GetStoreStatusAsync(1)).ThrowsAsync(new Exception());
-        
+
         await _dbContext.SalesData.AddAsync(new SalesData { StoreId = 1, Date = DateTime.Now.AddDays(-1) });
         await _dbContext.SaveChangesAsync();
 
@@ -156,13 +156,13 @@ public class MlControllerTests
         var value = Assert.IsType<MlStorePredictResponseDto>(actionResult.Value);
         Assert.Equal(1, value.StoreId);
     }
-    
+
     [Fact]
     public async Task Predict_ShouldReturnStatusCode503_WhenServiceThrowsException()
     {
         // Arrange
         var store = new StoreDto(1, "Company", "UEN", "Test Store", "Location", "12345", DateTime.UtcNow, 1.0m, 1.0m, "US", "Address", true, DateTime.UtcNow, DateTime.UtcNow);
-         _mockStoreService.Setup(s => s.GetStoreAsync()).ReturnsAsync(store);
+        _mockStoreService.Setup(s => s.GetStoreAsync()).ReturnsAsync(store);
         _mockMlService.Setup(s => s.GetStorePredictionsAsync(1, 7, 1.0m, 1.0m, "US")).ThrowsAsync(new Exception());
 
         // Act
