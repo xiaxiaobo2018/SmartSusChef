@@ -59,6 +59,7 @@ vi.mock('@/app/services/api', () => ({
         getAll: vi.fn(() => Promise.resolve([])),
     },
     forecastApi: {
+        get: vi.fn(() => Promise.resolve([])),
         getAll: vi.fn(() => Promise.resolve([])),
         getHolidays: vi.fn(() => Promise.resolve([])),
         getWeather: vi.fn(() => Promise.resolve(null)),
