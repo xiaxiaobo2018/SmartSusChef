@@ -101,74 +101,14 @@ jobs:
           echo "host=$HOST" >> $GITHUB_OUTPUT
 
       - name: Run JMeter tests
+        env:
+          TARGET_URL: ${{ inputs.target_url }}
+          TARGET_PORT: 5001 # Assuming 5001 is the default port for backend in CI
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }} # Ensure this secret is set in GitHub
         run: |
-          jmeter -n \
-            -t tests/jmeter/load-test.jmx \
-            -l results.jtl \
-            -e -o reports/ \
-            -Jhost=${{ steps.parse-url.outputs.host }} \
-            -Jport=80 \
-            -Jthreads=10 \
-            -Jduration=60
-        continue-on-error: true
-
-      - name: Check Apdex score
-        run: |
-          python3 << 'EOF'
-          import csv
-          
-          threshold_ms = 500
-          satisfied = tolerating = frustrated = 0
-          total_requests = 0
-          success_count = 0
-          error_count = 0
-          
-          try:
-              with open('results.jtl', 'r') as f:
-                  reader = csv.DictReader(f)
-                  for row in reader:
-                      try:
-                          total_requests += 1
-                          elapsed = int(row['elapsed'])
-                          is_success = row.get('success', 'true').lower() == 'true'
-                          if is_success:
-                              success_count += 1
-                          else:
-                              error_count += 1
-                          
-                          if elapsed <= threshold_ms:
-                              satisfied += 1
-                          elif elapsed <= 4 * threshold_ms:
-                              tolerating += 1
-                          else:
-                              frustrated += 1
-                      except (KeyError, ValueError):
-                          continue
-              
-              total = satisfied + tolerating + frustrated
-              if total > 0:
-                  apdex = (satisfied + tolerating/2) / total
-                  error_rate = (error_count / total_requests * 100) if total_requests > 0 else 0
-                  
-                  print(f"=== JMeter Performance Summary ===")
-                  print(f"Total Requests: {total_requests}")
-                  print(f"Successful: {success_count}, Failed: {error_count}")
-                  print(f"Error Rate: {error_rate:.1f}%")
-                  print(f"")
-                  print(f"Apdex Score: {apdex:.3f} (threshold: {threshold_ms}ms)")
-                  print(f"  Satisfied (<={threshold_ms}ms): {satisfied}")
-                  print(f"  Tolerating (<={4*threshold_ms}ms): {tolerating}")
-                  print(f"  Frustrated (>{4*threshold_ms}ms): {frustrated}")
-                  
-                  if apdex < 0.85:
-                      print(f"\nWARNING: Apdex score {apdex:.3f} below threshold (0.85)")
-                  else:
-                      print(f"\nOK: Apdex score {apdex:.3f} meets threshold (0.85)")
-              else:
-                  print("No valid results found in results.jtl")
-          except FileNotFoundError:
-              print("Results file not found - JMeter may have failed to run")
-          EOF
+          chmod +x ./run-jmeter-test.sh
+          ./run-jmeter-test.sh
+        continue-on-error: false # Let the script's exit code determine failure
 
       - name: Upload JMeter reports
         uses: actions/upload-artifact@v4
@@ -176,8 +116,8 @@ jobs:
         with:
           name: jmeter-reports
           path: |
-            results.jtl
-            reports/
+            testing/performance/results/Final_Run_UAT.jtl
+            testing/performance/reports/Final_Run_Report/
           retention-days: 30
 
   # ==========================================
