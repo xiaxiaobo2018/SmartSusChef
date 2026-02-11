@@ -93,13 +93,16 @@ jobs:
         working-directory: ./mobile
         continue-on-error: true
 
+      - name: Install Snyk CLI
+        run: npm install -g snyk
+        continue-on-error: true
+
       - name: Run Snyk scan
-        uses: snyk/actions/gradle@master
         continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          args: --file=mobile/build.gradle.kts --severity-threshold=high --sub-project=app --sarif-file-output=snyk-mobile.sarif
+        working-directory: ./mobile
+        run: snyk test --file=build.gradle.kts --severity-threshold=high --sub-project=app --sarif-file-output=../snyk-mobile.sarif || true
 
       - name: Upload Snyk SARIF to GitHub Security
         uses: github/codeql-action/upload-sarif@v3
