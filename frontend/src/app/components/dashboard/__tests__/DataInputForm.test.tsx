@@ -174,7 +174,7 @@ describe('DataInputForm', () => {
             });
 
             // Check for date selector
-            expect(screen.getByRole('button', { name: /10 feb 2026/i })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: /11 feb 2026/i })).toBeInTheDocument();
 
             // Check for tabs
             expect(screen.getByRole('tab', { name: /sales data/i })).toBeInTheDocument();
@@ -227,7 +227,7 @@ describe('DataInputForm', () => {
             renderComponent();
 
             await waitFor(() => {
-                const dateButton = screen.getByRole('button', { name: /10 feb 2026/i });
+                const dateButton = screen.getByRole('button', { name: /11 feb 2026/i });
                 expect(dateButton).toBeInTheDocument();
             });
         });
@@ -236,10 +236,10 @@ describe('DataInputForm', () => {
             renderComponent();
 
             await waitFor(() => {
-                expect(screen.getByRole('button', { name: /10 feb 2026/i })).toBeInTheDocument();
+                expect(screen.getByRole('button', { name: /11 feb 2026/i })).toBeInTheDocument();
             });
 
-            const dateButton = screen.getByRole('button', { name: /10 feb 2026/i });
+            const dateButton = screen.getByRole('button', { name: /11 feb 2026/i });
             await userEvent.click(dateButton);
 
             // Calendar should open (checking for grid role which calendar uses)
@@ -605,7 +605,7 @@ describe('DataInputForm', () => {
             renderComponent({ maxDaysBack: 0 });
 
             await waitFor(() => {
-                expect(screen.getByRole('button', { name: /10 feb 2026/i })).toBeInTheDocument();
+                expect(screen.getByRole('button', { name: /11 feb 2026/i })).toBeInTheDocument();
             });
 
             // This tests that the prop is passed correctly
@@ -616,7 +616,7 @@ describe('DataInputForm', () => {
             renderComponent({ maxDaysBack: undefined });
 
             await waitFor(() => {
-                expect(screen.getByRole('button', { name: /10 feb 2026/i })).toBeInTheDocument();
+                expect(screen.getByRole('button', { name: /11 feb 2026/i })).toBeInTheDocument();
             });
 
             // This tests that the prop is passed correctly
@@ -626,7 +626,7 @@ describe('DataInputForm', () => {
             renderComponent({ maxDaysBack: 7 });
 
             await waitFor(() => {
-                expect(screen.getByRole('button', { name: /10 feb 2026/i })).toBeInTheDocument();
+                expect(screen.getByRole('button', { name: /11 feb 2026/i })).toBeInTheDocument();
             });
 
             // This tests that the prop is passed correctly
