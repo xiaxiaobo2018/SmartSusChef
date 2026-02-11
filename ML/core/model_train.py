@@ -20,7 +20,7 @@ try:
     import lightgbm as _lgb
 
     lgb = _lgb
-except ImportError:
+except Exception:
     pass
 
 CatBoostRegressor: type[Any] | None = None
@@ -28,7 +28,7 @@ try:
     from catboost import CatBoostRegressor as _CatBoostRegressor
 
     CatBoostRegressor = _CatBoostRegressor
-except ImportError:
+except Exception:
     pass
 
 XGBRegressor: type[Any] | None = None
@@ -36,7 +36,7 @@ try:
     from xgboost import XGBRegressor as _XGBRegressor
 
     XGBRegressor = _XGBRegressor
-except ImportError:
+except Exception:
     pass
 
 Prophet: type[Any] | None = None
@@ -44,7 +44,7 @@ try:
     from prophet import Prophet as _Prophet
 
     Prophet = _Prophet
-except ImportError:
+except Exception:
     pass
 
 WEATHER_COLS = [

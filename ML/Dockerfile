@@ -23,8 +23,10 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# Install curl for healthcheck
-RUN apt-get update && apt-get install -y --no-install-recommends curl \
+# Install curl (healthcheck) + libgomp1 (LightGBM OpenMP runtime)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy installed Python packages from builder
@@ -42,11 +44,12 @@ COPY model[s]/ ./models/
 
 # Non-root user
 RUN addgroup --system app && adduser --system --ingroup app app
+RUN chown -R app:app /app
 USER app
 
 EXPOSE 8000
 
-HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=5 \
     CMD curl --fail http://localhost:8000/health || exit 1
 
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -19,7 +19,7 @@ try:
 
     openmeteo_requests = _openmeteo_requests
     retry = _retry
-except ImportError:
+except Exception:
     pass
 
 logger = setup_logger(__name__)
