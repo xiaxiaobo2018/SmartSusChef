@@ -66,6 +66,72 @@ jobs:
           retention-days: 30
 
   # ==========================================
+  # STAGE 1b: Snyk Dependency Scan (Mobile)
+  # ==========================================
+  snyk-scan:
+    name: Snyk Dependency Scan
+    runs-on: ubuntu-latest
+    continue-on-error: true
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+        working-directory: ./mobile
+
+      - name: Build for dependency resolution
+        run: ./gradlew dependencies --no-daemon
+        working-directory: ./mobile
+        continue-on-error: true
+
+      - name: Run Snyk scan
+        uses: snyk/actions/gradle@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --file=mobile/build.gradle.kts --severity-threshold=high --sub-project=app --sarif-file-output=snyk-mobile.sarif
+
+      - name: Upload Snyk SARIF to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: snyk-mobile.sarif
+          category: snyk-mobile
+        continue-on-error: true
+
+      - name: Snyk scan summary
+        if: always()
+        run: |
+          echo "## Snyk Mobile Dependency Scan" >> $GITHUB_STEP_SUMMARY
+          if [ -f snyk-mobile.sarif ]; then
+            RESULTS=$(python3 -c "import json; d=json.load(open('snyk-mobile.sarif')); runs=d.get('runs',[]); total=sum(len(r.get('results',[])) for r in runs); print(total)" 2>/dev/null || echo 'N/A')
+            echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+            echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+            echo "| Vulnerabilities Found | $RESULTS |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No SARIF report generated" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Upload Snyk report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: snyk-mobile-report
+          path: snyk-mobile.sarif
+          if-no-files-found: warn
+          retention-days: 30
+
+  # ==========================================
   # STAGE 2: Unit Tests
   # ==========================================
   unit-test:

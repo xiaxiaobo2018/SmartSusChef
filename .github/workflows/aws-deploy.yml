@@ -138,6 +138,132 @@ jobs:
           retention-days: 30
 
   # ==========================================
+  # STAGE 1b: Snyk Dependency Scanning
+  # ==========================================
+  snyk-scan:
+    name: "Snyk Dependency Scan"
+    needs: [detect-changes]
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+    continue-on-error: true
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # --- Backend (.NET) ---
+      - name: Setup .NET
+        if: needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.infra == 'true'
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore .NET dependencies
+        if: needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.infra == 'true'
+        run: dotnet restore backend/SmartSusChef.sln
+
+      - name: Snyk .NET scan
+        if: needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.infra == 'true'
+        uses: snyk/actions/dotnet@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --file=backend/SmartSusChef.sln --sarif-file-output=snyk-backend.sarif --severity-threshold=high
+
+      - name: Upload Snyk Backend SARIF
+        if: always() && (needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.infra == 'true')
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: snyk-backend.sarif
+          category: snyk-backend
+        continue-on-error: true
+
+      # --- Frontend (npm) ---
+      - name: Setup Node.js
+        if: needs.detect-changes.outputs.frontend == 'true' || needs.detect-changes.outputs.infra == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        if: needs.detect-changes.outputs.frontend == 'true' || needs.detect-changes.outputs.infra == 'true'
+        run: npm ci
+        working-directory: ./frontend
+
+      - name: Snyk npm scan
+        if: needs.detect-changes.outputs.frontend == 'true' || needs.detect-changes.outputs.infra == 'true'
+        uses: snyk/actions/node@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --file=frontend/package.json --sarif-file-output=snyk-frontend.sarif --severity-threshold=high
+
+      - name: Upload Snyk Frontend SARIF
+        if: always() && (needs.detect-changes.outputs.frontend == 'true' || needs.detect-changes.outputs.infra == 'true')
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: snyk-frontend.sarif
+          category: snyk-frontend
+        continue-on-error: true
+
+      # --- ML (pip) ---
+      - name: Setup Python
+        if: needs.detect-changes.outputs.ml == 'true' || needs.detect-changes.outputs.infra == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install ML dependencies
+        if: needs.detect-changes.outputs.ml == 'true' || needs.detect-changes.outputs.infra == 'true'
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-prod.txt
+        working-directory: ./ML
+
+      - name: Snyk Python scan
+        if: needs.detect-changes.outputs.ml == 'true' || needs.detect-changes.outputs.infra == 'true'
+        uses: snyk/actions/python-3.10@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --file=ML/requirements-prod.txt --sarif-file-output=snyk-ml.sarif --severity-threshold=high --package-manager=pip
+
+      - name: Upload Snyk ML SARIF
+        if: always() && (needs.detect-changes.outputs.ml == 'true' || needs.detect-changes.outputs.infra == 'true')
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: snyk-ml.sarif
+          category: snyk-ml
+        continue-on-error: true
+
+      # --- Upload combined artifacts ---
+      - name: Upload Snyk reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: snyk-dependency-reports
+          path: snyk-*.sarif
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Snyk scan summary
+        if: always()
+        run: |
+          echo "## Snyk Dependency Scan" >> $GITHUB_STEP_SUMMARY
+          echo "| Component | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
+          [ -f snyk-backend.sarif ]  && echo "| Backend (.NET) | :white_check_mark: Scanned |" >> $GITHUB_STEP_SUMMARY  || echo "| Backend (.NET) | :yellow_circle: Skipped |" >> $GITHUB_STEP_SUMMARY
+          [ -f snyk-frontend.sarif ] && echo "| Frontend (npm) | :white_check_mark: Scanned |" >> $GITHUB_STEP_SUMMARY  || echo "| Frontend (npm) | :yellow_circle: Skipped |" >> $GITHUB_STEP_SUMMARY
+          [ -f snyk-ml.sarif ]       && echo "| ML (pip) | :white_check_mark: Scanned |" >> $GITHUB_STEP_SUMMARY       || echo "| ML (pip) | :yellow_circle: Skipped |" >> $GITHUB_STEP_SUMMARY
+
+  # ==========================================
   # STAGE 2: Backend Build & Test
   # ==========================================
   backend-build:
