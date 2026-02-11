@@ -335,10 +335,18 @@ class DataInputFragmentTest {
                         .setBody(
                             """
                             {
-                                "id": "store-001",
-                                "name": "SmartSus Chef Demo",
-                                "location": "Singapore",
-                                "registrationNumber": "REG-001"
+                                "id": 1,
+                                "companyName": "SmartSus Chef Demo",
+                                "uen": "REG-001",
+                                "storeName": "SmartSus Chef Demo",
+                                "outletLocation": "Singapore",
+                                "contactNumber": "+65-12345678",
+                                "openingDate": "2025-01-01",
+                                "latitude": 1.3521,
+                                "longitude": 103.8198,
+                                "isActive": true,
+                                "createdAt": "2026-01-01T00:00:00Z",
+                                "updatedAt": "2026-01-01T00:00:00Z"
                             }
                             """.trimIndent(),
                         )
@@ -369,9 +377,9 @@ class DataInputFragmentTest {
                         .setBody(
                             """
                             [
-                                {"id": "r1", "name": "Chicken Rice", "type": "MainDish", "subRecipes": [], "ingredients": []},
-                                {"id": "r2", "name": "Nasi Lemak", "type": "MainDish", "subRecipes": [], "ingredients": []},
-                                {"id": "r3", "name": "Sambal Sauce", "type": "SubRecipe", "subRecipes": [], "ingredients": []}
+                                {"id": "r1", "name": "Chicken Rice", "isSellable": true, "isSubRecipe": false, "ingredients": [], "createdAt": "2026-01-01T00:00:00Z", "updatedAt": "2026-01-01T00:00:00Z"},
+                                {"id": "r2", "name": "Nasi Lemak", "isSellable": true, "isSubRecipe": false, "ingredients": [], "createdAt": "2026-01-01T00:00:00Z", "updatedAt": "2026-01-01T00:00:00Z"},
+                                {"id": "r3", "name": "Sambal Sauce", "isSellable": false, "isSubRecipe": true, "ingredients": [], "createdAt": "2026-01-01T00:00:00Z", "updatedAt": "2026-01-01T00:00:00Z"}
                             ]
                             """.trimIndent(),
                         )
@@ -383,9 +391,9 @@ class DataInputFragmentTest {
                         .setBody(
                             """
                             [
-                                {"id": "i1", "name": "Rice", "unit": "kg", "carbonFootprintPerKg": 1.2},
-                                {"id": "i2", "name": "Chicken", "unit": "kg", "carbonFootprintPerKg": 5.0},
-                                {"id": "i3", "name": "Coconut Milk", "unit": "litre", "carbonFootprintPerKg": 2.5}
+                                {"id": "i1", "name": "Rice", "unit": "kg", "carbonFootprint": 1.2, "createdAt": "2026-01-01T00:00:00Z", "updatedAt": "2026-01-01T00:00:00Z"},
+                                {"id": "i2", "name": "Chicken", "unit": "kg", "carbonFootprint": 5.0, "createdAt": "2026-01-01T00:00:00Z", "updatedAt": "2026-01-01T00:00:00Z"},
+                                {"id": "i3", "name": "Coconut Milk", "unit": "litre", "carbonFootprint": 2.5, "createdAt": "2026-01-01T00:00:00Z", "updatedAt": "2026-01-01T00:00:00Z"}
                             ]
                             """.trimIndent(),
                         )
@@ -398,11 +406,12 @@ class DataInputFragmentTest {
                             """
                             {
                                 "id": "s1",
+                                "date": "2026-02-11",
                                 "recipeId": "r1",
                                 "recipeName": "Chicken Rice",
                                 "quantity": 50,
-                                "date": "2026-02-11",
-                                "createdAt": "2026-02-11T10:00:00Z"
+                                "createdAt": "2026-02-11T10:00:00Z",
+                                "updatedAt": "2026-02-11T10:00:00Z"
                             }
                             """.trimIndent(),
                         )
@@ -421,11 +430,14 @@ class DataInputFragmentTest {
                             """
                             {
                                 "id": "w1",
-                                "itemType": "Ingredient",
-                                "itemId": "i1",
-                                "itemName": "Rice",
-                                "quantity": 5,
-                                "date": "2026-02-11"
+                                "date": "2026-02-11",
+                                "ingredientId": "i1",
+                                "displayName": "Rice",
+                                "unit": "kg",
+                                "quantity": 5.0,
+                                "carbonFootprint": 6.0,
+                                "createdAt": "2026-02-11T10:00:00Z",
+                                "updatedAt": "2026-02-11T10:00:00Z"
                             }
                             """.trimIndent(),
                         )

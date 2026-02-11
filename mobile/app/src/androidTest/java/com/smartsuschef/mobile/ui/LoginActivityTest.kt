@@ -20,8 +20,10 @@ import com.smartsuschef.mobile.ui.auth.LoginActivity
 import com.smartsuschef.mobile.ui.dashboard.DashboardActivity
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
+import okhttp3.mockwebserver.RecordedRequest
 import org.hamcrest.Matchers.not
 import org.junit.After
 import org.junit.Before
@@ -147,33 +149,117 @@ class LoginActivityTest {
 
     @Test
     fun signIn_withValidCredentials_navigatesToDashboard() {
-        // Enqueue a successful login response
-        val loginResponseJson = """
-            {
-                "token": "test-jwt-token-12345",
-                "user": {
-                    "id": "user-001",
-                    "username": "admin",
-                    "name": "Admin User",
-                    "email": "admin@smartsuschef.com",
-                    "role": "manager",
-                    "status": "Active",
-                    "createdAt": "2026-01-01T00:00:00Z",
-                    "updatedAt": "2026-01-01T00:00:00Z"
-                },
-                "storeSetupRequired": false
+        // Use a Dispatcher to handle both login POST and all Dashboard concurrent API calls
+        var loginHandled = false
+        mockWebServer.dispatcher = object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest): MockResponse {
+                val path = request.path ?: return MockResponse().setResponseCode(404)
+
+                return when {
+                    // Login POST
+                    path.contains("/api/auth/login") && request.method == "POST" -> {
+                        loginHandled = true
+                        MockResponse()
+                            .setResponseCode(200)
+                            .setBody(
+                                """
+                                {
+                                    "token": "test-jwt-token-12345",
+                                    "user": {
+                                        "id": "user-001",
+                                        "username": "admin",
+                                        "name": "Admin User",
+                                        "email": "admin@smartsuschef.com",
+                                        "role": "manager",
+                                        "status": "Active",
+                                        "createdAt": "2026-01-01T00:00:00Z",
+                                        "updatedAt": "2026-01-01T00:00:00Z"
+                                    },
+                                    "storeSetupRequired": false
+                                }
+                                """.trimIndent(),
+                            )
+                            .addHeader("Content-Type", "application/json")
+                    }
+
+                    // Store status
+                    path.contains("/api/store/status") -> MockResponse()
+                        .setResponseCode(200)
+                        .setBody("""{"isSetupComplete": true}""")
+                        .addHeader("Content-Type", "application/json")
+
+                    // Store info
+                    path.contains("/api/store") && !path.contains("status") -> MockResponse()
+                        .setResponseCode(200)
+                        .setBody(
+                            """
+                            {
+                                "id": 1,
+                                "companyName": "SmartSus Chef Demo",
+                                "uen": "REG-001",
+                                "storeName": "SmartSus Chef Demo",
+                                "outletLocation": "Singapore",
+                                "contactNumber": "+65-12345678",
+                                "openingDate": "2025-01-01",
+                                "latitude": 1.3521,
+                                "longitude": 103.8198,
+                                "isActive": true,
+                                "createdAt": "2026-01-01T00:00:00Z",
+                                "updatedAt": "2026-01-01T00:00:00Z"
+                            }
+                            """.trimIndent(),
+                        )
+                        .addHeader("Content-Type", "application/json")
+
+                    // Current user
+                    path.contains("/api/auth/me") -> MockResponse()
+                        .setResponseCode(200)
+                        .setBody(
+                            """
+                            {
+                                "id": "user-001",
+                                "username": "admin",
+                                "name": "Admin User",
+                                "email": "admin@smartsuschef.com",
+                                "role": "manager",
+                                "status": "Active",
+                                "createdAt": "2026-01-01T00:00:00Z",
+                                "updatedAt": "2026-01-01T00:00:00Z"
+                            }
+                            """.trimIndent(),
+                        )
+                        .addHeader("Content-Type", "application/json")
+
+                    // All other Dashboard endpoints return empty arrays or objects
+                    path.contains("/api/sales") -> MockResponse()
+                        .setResponseCode(200)
+                        .setBody("[]")
+                        .addHeader("Content-Type", "application/json")
+
+                    path.contains("/api/wastage") -> MockResponse()
+                        .setResponseCode(200)
+                        .setBody("[]")
+                        .addHeader("Content-Type", "application/json")
+
+                    path.contains("/api/forecast") -> MockResponse()
+                        .setResponseCode(200)
+                        .setBody("[]")
+                        .addHeader("Content-Type", "application/json")
+
+                    path.contains("/api/recipes") -> MockResponse()
+                        .setResponseCode(200)
+                        .setBody("[]")
+                        .addHeader("Content-Type", "application/json")
+
+                    path.contains("/api/ingredients") -> MockResponse()
+                        .setResponseCode(200)
+                        .setBody("[]")
+                        .addHeader("Content-Type", "application/json")
+
+                    else -> MockResponse().setResponseCode(404)
+                }
             }
-        """.trimIndent()
-
-        mockWebServer.enqueue(
-            MockResponse()
-                .setResponseCode(200)
-                .setBody(loginResponseJson)
-                .addHeader("Content-Type", "application/json"),
-        )
-
-        // Also enqueue responses the DashboardActivity will need
-        enqueueDashboardResponses()
+        }
 
         ActivityScenario.launch(LoginActivity::class.java)
 
@@ -311,46 +397,4 @@ class LoginActivityTest {
         onView(withId(R.id.forgotPasswordForm)).check(matches(isDisplayed()))
     }
 
-    // ============================================================
-    // Helpers
-    // ============================================================
-
-    private fun enqueueDashboardResponses() {
-        // Store info response
-        mockWebServer.enqueue(
-            MockResponse()
-                .setResponseCode(200)
-                .setBody(
-                    """
-                    {
-                        "id": "store-001",
-                        "name": "SmartSus Chef Demo",
-                        "location": "Singapore",
-                        "registrationNumber": "REG-001"
-                    }
-                    """.trimIndent(),
-                )
-                .addHeader("Content-Type", "application/json"),
-        )
-        // Current user response
-        mockWebServer.enqueue(
-            MockResponse()
-                .setResponseCode(200)
-                .setBody(
-                    """
-                    {
-                        "id": "user-001",
-                        "username": "admin",
-                        "name": "Admin User",
-                        "email": "admin@smartsuschef.com",
-                        "role": "manager",
-                        "status": "Active",
-                        "createdAt": "2026-01-01T00:00:00Z",
-                        "updatedAt": "2026-01-01T00:00:00Z"
-                    }
-                    """.trimIndent(),
-                )
-                .addHeader("Content-Type", "application/json"),
-        )
-    }
 }

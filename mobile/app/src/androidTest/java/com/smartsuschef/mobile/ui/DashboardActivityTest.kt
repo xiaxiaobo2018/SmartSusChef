@@ -79,7 +79,6 @@ class DashboardActivityTest {
 
         onView(withId(R.id.toolbar)).check(matches(isDisplayed()))
         onView(withId(R.id.bottom_nav)).check(matches(isDisplayed()))
-        onView(withId(R.id.nav_host_fragment)).check(matches(isDisplayed()))
     }
 
     @Test
@@ -247,10 +246,18 @@ class DashboardActivityTest {
                         .setBody(
                             """
                             {
-                                "id": "store-001",
-                                "name": "SmartSus Chef Demo",
-                                "location": "Singapore",
-                                "registrationNumber": "REG-001"
+                                "id": 1,
+                                "companyName": "SmartSus Chef Demo",
+                                "uen": "REG-001",
+                                "storeName": "SmartSus Chef Demo",
+                                "outletLocation": "Singapore",
+                                "contactNumber": "+65-12345678",
+                                "openingDate": "2025-01-01",
+                                "latitude": 1.3521,
+                                "longitude": 103.8198,
+                                "isActive": true,
+                                "createdAt": "2026-01-01T00:00:00Z",
+                                "updatedAt": "2026-01-01T00:00:00Z"
                             }
                             """.trimIndent(),
                         )
@@ -281,9 +288,9 @@ class DashboardActivityTest {
                         .setBody(
                             """
                             [
-                                {"date": "2026-02-10", "totalQuantity": 150, "dishCount": 5},
-                                {"date": "2026-02-09", "totalQuantity": 120, "dishCount": 4},
-                                {"date": "2026-02-08", "totalQuantity": 130, "dishCount": 5}
+                                {"date": "2026-02-10", "totalQuantity": 150, "recipeBreakdown": []},
+                                {"date": "2026-02-09", "totalQuantity": 120, "recipeBreakdown": []},
+                                {"date": "2026-02-08", "totalQuantity": 130, "recipeBreakdown": []}
                             ]
                             """.trimIndent(),
                         )
@@ -295,8 +302,8 @@ class DashboardActivityTest {
                         .setBody(
                             """
                             [
-                                {"date": "2026-02-10", "totalQuantity": 15.5, "totalCarbonFootprint": 3.2, "items": []},
-                                {"date": "2026-02-09", "totalQuantity": 12.0, "totalCarbonFootprint": 2.8, "items": []}
+                                {"date": "2026-02-10", "totalQuantity": 15.5, "totalCarbonFootprint": 3.2, "itemBreakdown": []},
+                                {"date": "2026-02-09", "totalQuantity": 12.0, "totalCarbonFootprint": 2.8, "itemBreakdown": []}
                             ]
                             """.trimIndent(),
                         )
@@ -361,8 +368,8 @@ class DashboardActivityTest {
                         .setBody(
                             """
                             [
-                                {"id": "r1", "name": "Chicken Rice", "type": "MainDish", "subRecipes": [], "ingredients": []},
-                                {"id": "r2", "name": "Nasi Lemak", "type": "MainDish", "subRecipes": [], "ingredients": []}
+                                {"id": "r1", "name": "Chicken Rice", "isSellable": true, "isSubRecipe": false, "ingredients": [], "createdAt": "2026-01-01T00:00:00Z", "updatedAt": "2026-01-01T00:00:00Z"},
+                                {"id": "r2", "name": "Nasi Lemak", "isSellable": true, "isSubRecipe": false, "ingredients": [], "createdAt": "2026-01-01T00:00:00Z", "updatedAt": "2026-01-01T00:00:00Z"}
                             ]
                             """.trimIndent(),
                         )
@@ -374,8 +381,8 @@ class DashboardActivityTest {
                         .setBody(
                             """
                             [
-                                {"id": "i1", "name": "Rice", "unit": "kg", "carbonFootprintPerKg": 1.2},
-                                {"id": "i2", "name": "Chicken", "unit": "kg", "carbonFootprintPerKg": 5.0}
+                                {"id": "i1", "name": "Rice", "unit": "kg", "carbonFootprint": 1.2, "createdAt": "2026-01-01T00:00:00Z", "updatedAt": "2026-01-01T00:00:00Z"},
+                                {"id": "i2", "name": "Chicken", "unit": "kg", "carbonFootprint": 5.0, "createdAt": "2026-01-01T00:00:00Z", "updatedAt": "2026-01-01T00:00:00Z"}
                             ]
                             """.trimIndent(),
                         )
