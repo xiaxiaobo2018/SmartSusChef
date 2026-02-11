@@ -160,7 +160,18 @@ public class RecipeService : IRecipeService
         {
             if (ri.Ingredient != null)
             {
-                totalFootprint += ri.Ingredient.CarbonFootprint * ri.Quantity;
+                decimal effectiveQuantity = ri.Quantity;
+
+                if (ri.Ingredient.Unit.Equals("g", StringComparison.OrdinalIgnoreCase))
+                {
+                    effectiveQuantity = ri.Quantity / 1000m; // Convert grams to kilograms
+                }
+                else if (ri.Ingredient.Unit.Equals("ml", StringComparison.OrdinalIgnoreCase))
+                {
+                    effectiveQuantity = ri.Quantity / 1000m; // Convert milliliters to liters
+                }
+
+                totalFootprint += ri.Ingredient.CarbonFootprint * effectiveQuantity;
             }
             else if (ri.ChildRecipeId.HasValue)
             {

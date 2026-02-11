@@ -223,11 +223,22 @@ public class WastageService : IWastageService
 
     private async Task<decimal> GetTotalImpactAsync(WastageData w)
     {
-        if (w.Ingredient != null)
-        {
-            return w.Quantity * w.Ingredient.CarbonFootprint;
-        }
-        if (w.RecipeId.HasValue)
+                    if (w.Ingredient != null)
+                    {
+                        decimal effectiveQuantity = w.Quantity;
+        
+                        if (w.Ingredient.Unit.Equals("g", StringComparison.OrdinalIgnoreCase))
+                        {
+                            effectiveQuantity = w.Quantity / 1000m; // Convert grams to kilograms
+                        }
+                        else if (w.Ingredient.Unit.Equals("ml", StringComparison.OrdinalIgnoreCase))
+                        {
+                            effectiveQuantity = w.Quantity / 1000m; // Convert milliliters to liters
+                        }
+                        // Add more unit conversions here if necessary
+        
+                        return effectiveQuantity * w.Ingredient.CarbonFootprint;
+                    }        if (w.RecipeId.HasValue)
         {
             // Use the recursive service you just built!
             var footprintPerUnit = await _recipeService.CalculateTotalCarbonFootprintAsync(w.RecipeId.Value);
