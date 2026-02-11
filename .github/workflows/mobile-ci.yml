@@ -218,19 +218,47 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           disable-animations: true
-          script: |
-            cd mobile
-            ./gradlew connectedUatDebugAndroidTest --stacktrace
+          script: cd mobile && chmod +x gradlew && ./gradlew connectedUatDebugAndroidTest --stacktrace
         continue-on-error: true
 
-      - name: Upload Espresso test report
+      - name: Upload Espresso HTML report
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: espresso-test-report
+          name: espresso-html-report
           path: mobile/app/build/reports/androidTests/
           if-no-files-found: warn
           retention-days: 30
+
+      - name: Upload Espresso JUnit XML results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: espresso-test-results
+          path: mobile/app/build/outputs/androidTest-results/
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Espresso test summary
+        if: always()
+        run: |
+          echo "## Espresso UI Test Results" >> $GITHUB_STEP_SUMMARY
+          REPORT_DIR="mobile/app/build/outputs/androidTest-results/connected"
+          if [ -d "$REPORT_DIR" ]; then
+            TOTAL=$(find "$REPORT_DIR" -name "*.xml" -exec grep -h 'testsuite' {} \; | grep -oP 'tests="\K[0-9]+' | awk '{s+=$1} END {print s+0}')
+            FAILURES=$(find "$REPORT_DIR" -name "*.xml" -exec grep -h 'testsuite' {} \; | grep -oP 'failures="\K[0-9]+' | awk '{s+=$1} END {print s+0}')
+            ERRORS=$(find "$REPORT_DIR" -name "*.xml" -exec grep -h 'testsuite' {} \; | grep -oP 'errors="\K[0-9]+' | awk '{s+=$1} END {print s+0}')
+            SKIPPED=$(find "$REPORT_DIR" -name "*.xml" -exec grep -h 'testsuite' {} \; | grep -oP 'skipped="\K[0-9]+' | awk '{s+=$1} END {print s+0}')
+            echo "| Metric | Count |" >> $GITHUB_STEP_SUMMARY
+            echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+            echo "| Total Tests | $TOTAL |" >> $GITHUB_STEP_SUMMARY
+            echo "| Passed | $((TOTAL - FAILURES - ERRORS - SKIPPED)) |" >> $GITHUB_STEP_SUMMARY
+            echo "| Failed | $FAILURES |" >> $GITHUB_STEP_SUMMARY
+            echo "| Errors | $ERRORS |" >> $GITHUB_STEP_SUMMARY
+            echo "| Skipped | $SKIPPED |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No test results found." >> $GITHUB_STEP_SUMMARY
+          fi
 
   # ==========================================
   # STAGE 3: Build APK (Conditional)
@@ -277,14 +305,6 @@ jobs:
     if: github.ref != 'refs/heads/mobile-release'
     timeout-minutes: 30
 
-    services:
-      mobsf:
-        image: opensecurity/mobile-security-framework-mobsf:latest
-        ports:
-          - 8000:8000
-        env:
-          MOBSF_API_KEY: ${{ secrets.MOBSF_API_KEY || '7e3ad7070ad234f5fb1b73f498b7c3e4db78dad46327e0a0dee53f2b9484e995' }}
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -295,17 +315,26 @@ jobs:
           name: debug-apk-${{ github.run_number }}-${{ github.event.pull_request.number || github.ref_name }}
           path: ./apk
 
-      - name: Wait for MobSF to start
+      - name: Start MobSF container
         run: |
-          echo "Waiting for MobSF to be ready..."
-          for i in $(seq 1 60); do
-            if curl -s http://localhost:8000/api/v1/scans -H "Authorization:${{ secrets.MOBSF_API_KEY || '7e3ad7070ad234f5fb1b73f498b7c3e4db78dad46327e0a0dee53f2b9484e995' }}" > /dev/null 2>&1; then
-              echo "MobSF is ready!"
-              break
+          MOBSF_API_KEY="${{ secrets.MOBSF_API_KEY || '7e3ad7070ad234f5fb1b73f498b7c3e4db78dad46327e0a0dee53f2b9484e995' }}"
+          docker run -d --name mobsf \
+            -p 8000:8000 \
+            -e "MOBSF_API_KEY=${MOBSF_API_KEY}" \
+            --health-cmd="none" \
+            opensecurity/mobile-security-framework-mobsf:latest
+          echo "MobSF container started, waiting for API..."
+          for i in $(seq 1 90); do
+            if curl -s -o /dev/null -w '%{http_code}' http://localhost:8000/api/v1/scans -H "Authorization:${MOBSF_API_KEY}" | grep -q '200'; then
+              echo "MobSF API is ready! (attempt $i)"
+              exit 0
             fi
-            echo "Attempt $i/60 - waiting..."
+            echo "Attempt $i/90 - waiting 5s..."
             sleep 5
           done
+          echo "MobSF failed to start in time. Container logs:"
+          docker logs mobsf
+          exit 1
 
       - name: Find APK file
         id: find-apk
@@ -384,6 +413,10 @@ jobs:
             mobsf-report.pdf
           if-no-files-found: warn
           retention-days: 30
+
+      - name: Stop MobSF container
+        if: always()
+        run: docker rm -f mobsf || true
 
   # ==========================================
   # STAGE 4: Build Production APK (mobile-release only)
@@ -479,14 +512,6 @@ jobs:
     if: github.ref == 'refs/heads/mobile-release'
     timeout-minutes: 30
 
-    services:
-      mobsf:
-        image: opensecurity/mobile-security-framework-mobsf:latest
-        ports:
-          - 8000:8000
-        env:
-          MOBSF_API_KEY: ${{ secrets.MOBSF_API_KEY || '7e3ad7070ad234f5fb1b73f498b7c3e4db78dad46327e0a0dee53f2b9484e995' }}
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -497,17 +522,26 @@ jobs:
           name: production-apk
           path: ./apk
 
-      - name: Wait for MobSF to start
+      - name: Start MobSF container
         run: |
-          echo "Waiting for MobSF to be ready..."
-          for i in $(seq 1 60); do
-            if curl -s http://localhost:8000/api/v1/scans -H "Authorization:${{ secrets.MOBSF_API_KEY || '7e3ad7070ad234f5fb1b73f498b7c3e4db78dad46327e0a0dee53f2b9484e995' }}" > /dev/null 2>&1; then
-              echo "MobSF is ready!"
-              break
+          MOBSF_API_KEY="${{ secrets.MOBSF_API_KEY || '7e3ad7070ad234f5fb1b73f498b7c3e4db78dad46327e0a0dee53f2b9484e995' }}"
+          docker run -d --name mobsf \
+            -p 8000:8000 \
+            -e "MOBSF_API_KEY=${MOBSF_API_KEY}" \
+            --health-cmd="none" \
+            opensecurity/mobile-security-framework-mobsf:latest
+          echo "MobSF container started, waiting for API..."
+          for i in $(seq 1 90); do
+            if curl -s -o /dev/null -w '%{http_code}' http://localhost:8000/api/v1/scans -H "Authorization:${MOBSF_API_KEY}" | grep -q '200'; then
+              echo "MobSF API is ready! (attempt $i)"
+              exit 0
             fi
-            echo "Attempt $i/60 - waiting..."
+            echo "Attempt $i/90 - waiting 5s..."
             sleep 5
           done
+          echo "MobSF failed to start in time. Container logs:"
+          docker logs mobsf
+          exit 1
 
       - name: Find APK file
         id: find-apk
@@ -586,3 +620,7 @@ jobs:
             mobsf-report.pdf
           if-no-files-found: warn
           retention-days: 90
+
+      - name: Stop MobSF container
+        if: always()
+        run: docker rm -f mobsf || true
