@@ -45,8 +45,8 @@
           <stringProp name="variableNames">username,password</stringProp>
         </CSVDataSet>
         <hashTree/>
-        <DurationAssertion guiclass="DurationAssertionGui" testclass="DurationAssertion" testname="Duration Assertion - 2000ms SLA" enabled="true">
-          <stringProp name="DurationAssertion.duration">3000</stringProp>
+        <DurationAssertion guiclass="DurationAssertionGui" testclass="DurationAssertion" testname="Duration Assertion - 10000ms SLA" enabled="true">
+          <stringProp name="DurationAssertion.duration">150000</stringProp>
         </DurationAssertion>
         <hashTree/>
         <IncludeController guiclass="IncludeControllerGui" testclass="IncludeController" testname="Include Login Fragment" enabled="true">

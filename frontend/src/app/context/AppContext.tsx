@@ -207,48 +207,33 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setDataLoading(true);
     try {
       console.log('[AppContext] Loading all data...');
-      // Load all data in parallel
+
+      // Phase 1: Load core data (blocking) — these are essential for UI readiness
       const [
         ingredientsData,
         recipesData,
         salesDataResult,
         wastageDataResult,
-        forecastDataResult,
-        weatherData,
-        holidaysData,
         storeData,
       ] = await Promise.all([
         ingredientsApi.getAll().catch((err) => { console.error('[AppContext] Failed to load ingredients:', err); return []; }),
         recipesApi.getAll().catch((err) => { console.error('[AppContext] Failed to load recipes:', err); return []; }),
         salesApi.getAll().catch((err) => { console.error('[AppContext] Failed to load sales:', err); return []; }),
         wastageApi.getAll().catch((err) => { console.error('[AppContext] Failed to load wastage:', err); return []; }),
-        forecastApi.get(7, 7).catch((err) => { console.error('[AppContext] Failed to load forecast:', err); return []; }), // Get 7 days future + 7 days past (including today)
-        forecastApi.getWeather().catch((err) => { console.error('[AppContext] Failed to load weather:', err); return null; }),
-        forecastApi.getHolidays(new Date().getFullYear()).catch((err) => { console.error('[AppContext] Failed to load holidays:', err); return []; }),
         storeApi.get().catch((err) => { console.error('[AppContext] Failed to load store:', err); return null; }),
       ]);
 
-      console.log('[AppContext] Data loaded successfully:', {
+      console.log('[AppContext] Core data loaded successfully:', {
         ingredients: ingredientsData.length,
         recipes: recipesData.length,
         sales: salesDataResult.length,
         wastage: wastageDataResult.length,
-        forecast: forecastDataResult.length
       });
 
       setIngredients(ingredientsData.map(mapIngredientDto));
       setRecipes(recipesData.map(mapRecipeDto));
       setSalesData(salesDataResult.map(mapSalesDataDto));
       setWastageData(wastageDataResult.map(mapWastageDataDto));
-
-      const mappedForecast = forecastDataResult.map(mapForecastDto);
-      console.log('[AppContext] Raw forecast data from API:', forecastDataResult.length);
-      console.log('[AppContext] Mapped forecast data:', mappedForecast.length);
-      console.log('[AppContext] Sample forecast dates:', mappedForecast.slice(0, 5).map(f => f.date));
-      setForecastData(mappedForecast);
-
-      setWeather(mapWeatherDto(weatherData));
-      setHolidays(holidaysData.map(mapHolidayDto));
 
       if (storeData) {
         setStoreSettings(mapStoreDto(storeData));
@@ -259,6 +244,26 @@ export function AppProvider({ children }: { children: ReactNode }) {
         const usersData = await usersApi.getAll().catch(() => []);
         setStoreUsers(usersData.map(u => mapUserDto(u)));
       }
+
+      // Phase 2: Load forecast/weather/holidays asynchronously (non-blocking)
+      // These are slow external API calls and should NOT block the main UI loading
+      console.log('[AppContext] Starting async forecast/weather/holidays loading...');
+      Promise.all([
+        forecastApi.get(7, 7).catch((err) => { console.error('[AppContext] Failed to load forecast:', err); return []; }),
+        forecastApi.getWeather().catch((err) => { console.error('[AppContext] Failed to load weather:', err); return null; }),
+        forecastApi.getHolidays(new Date().getFullYear()).catch((err) => { console.error('[AppContext] Failed to load holidays:', err); return []; }),
+      ]).then(([forecastDataResult, weatherData, holidaysData]) => {
+        const mappedForecast = forecastDataResult.map(mapForecastDto);
+        console.log('[AppContext] Forecast/weather/holidays loaded:', {
+          forecast: mappedForecast.length,
+          weather: weatherData ? 'available' : 'null',
+          holidays: holidaysData.length,
+        });
+        setForecastData(mappedForecast);
+        setWeather(mapWeatherDto(weatherData));
+        setHolidays(holidaysData.map(mapHolidayDto));
+      });
+
     } catch (error) {
       console.error('Failed to load data:', error);
     } finally {
