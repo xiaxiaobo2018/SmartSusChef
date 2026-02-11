@@ -76,6 +76,14 @@
             <intProp name="Assertion.test_type">1</intProp>
           </ResponseAssertion>
           <hashTree/>
+          <JSONPostProcessor guiclass="JSONPostProcessorGui" testclass="JSONPostProcessor" testname="JSON Extractor - Recipe ID" enabled="true">
+            <stringProp name="JSONPostProcessor.referenceNames">extractedRecipeId</stringProp>
+            <stringProp name="JSONPostProcessor.jsonPathExprs">$.id</stringProp>
+            <stringProp name="JSONPostProcessor.matchNumbers">1</stringProp>
+            <stringProp name="JSONPostProcessor.defaultValue"></stringProp>
+            <boolProp name="JSONPostProcessor.isRegex">false</boolProp>
+          </JSONPostProcessor>
+          <hashTree/>
         </hashTree>
       </hashTree>
     </hashTree>

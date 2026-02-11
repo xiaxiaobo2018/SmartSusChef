@@ -2,7 +2,6 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { PredictionAccuracy } from '../PredictionAccuracy';
 import * as AppContext from '@/app/context/AppContext';
-import { format, subDays } from 'date-fns';
 
 // Mock recharts components
 vi.mock('recharts', () => ({
