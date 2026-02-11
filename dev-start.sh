@@ -111,6 +111,7 @@ DB_PASSWORD="$(strip_crlf "$DB_PASSWORD")"
 DB_NAME="$(strip_crlf "$DB_NAME")"
 
 CONN_STR="Server=$DB_SERVER;Port=$DB_PORT;Database=$DB_NAME;User Id=$DB_USER;Password=$DB_PASSWORD;SslMode=None;AllowPublicKeyRetrieval=true;ConnectionTimeout=30"
+SQLALCHEMY_DB_URL="mysql+pymysql://${DB_USER}:${DB_PASSWORD}@${DB_SERVER}:${DB_PORT}/${DB_NAME}?charset=utf8mb4"
 echo "[OK] DB: $DB_SERVER:$DB_PORT/$DB_NAME (user: $DB_USER)"
 echo ""
 
@@ -154,14 +155,14 @@ TITLE_ML="echo -ne '\\033]0;SmartSusChef - ML (8000)\\007'"
 TITLE_BACKEND="echo -ne '\\033]0;SmartSusChef - Backend (5000)\\007'"
 TITLE_FRONTEND="echo -ne '\\033]0;SmartSusChef - Frontend (5173)\\007'"
 
-ML_CMD="$TITLE_ML; cd \"$ROOT/ML\"; echo 'Installing Python dependencies...'; \"$PYTHON_BIN\" -m pip install -q -r requirements-prod.txt; echo 'ML service starting...'; \"$PYTHON_BIN\" -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+ML_CMD="$TITLE_ML; cd \"$ROOT/ML\"; export DATABASE_URL=\"$SQLALCHEMY_DB_URL\"; echo 'Installing Python dependencies...'; \"$PYTHON_BIN\" -m pip install -q -r requirements-prod.txt; echo 'ML service starting...'; \"$PYTHON_BIN\" -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
 BACKEND_CMD="$TITLE_BACKEND; cd \"$ROOT/backend/SmartSusChef.Api\"; export ASPNETCORE_ENVIRONMENT=Development; export ConnectionStrings__DefaultConnection=\"$CONN_STR\"; echo 'Backend starting (Development)...'; dotnet run"
 FRONTEND_CMD="$TITLE_FRONTEND; cd \"$ROOT/frontend\"; echo 'Installing npm dependencies...'; npm install --silent; echo 'Frontend starting...'; npm run dev"
 
 echo "[1/3] Starting ML Service (port 8000)..."
 run_in_new_terminal "$ML_CMD" || {
     echo "[WARN] Could not open a new terminal. Falling back to current terminal."
-    ( cd "$ROOT/ML" && "$PYTHON_BIN" -m pip install -q -r requirements-prod.txt && "$PYTHON_BIN" -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload ) &
+    ( cd "$ROOT/ML" && export DATABASE_URL="$SQLALCHEMY_DB_URL" && "$PYTHON_BIN" -m pip install -q -r requirements-prod.txt && "$PYTHON_BIN" -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload ) &
 }
 
 sleep 3
