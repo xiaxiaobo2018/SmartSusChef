@@ -30,7 +30,6 @@ on:
 env:
   NODE_VERSION: '20.x'
   JAVA_VERSION: '17'
-  AWS_REGION: ap-southeast-1
 
 permissions:
   contents: read
@@ -116,49 +115,63 @@ jobs:
           echo "port=$PORT" >> $GITHUB_OUTPUT
           echo "Parsed host=$HOST, port=$PORT from $URL"
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Load RDS endpoint
-        id: env-config
+      - name: Clean test data via API
         run: |
-          RDS_EP=$(aws rds describe-db-instances --db-instance-identifier smartsuschef-uat-db \
-            --query 'DBInstances[0].Endpoint.Address' --output text 2>/dev/null \
-            || echo "smartsuschef-uat-db.cluster.ap-southeast-1.rds.amazonaws.com")
-          echo "rds_endpoint=$RDS_EP" >> $GITHUB_OUTPUT
-          echo "RDS endpoint: $RDS_EP"
+          echo "--- Clearing test data via backend API ---"
+          TARGET_URL="${{ inputs.target_url }}"
 
-      - name: Install MySQL client
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq mysql-client > /dev/null 2>&1
+          # Login to get JWT token (Manager role required for delete)
+          RESPONSE=$(curl -sf -X POST "$TARGET_URL/api/Auth/login" \
+            -H "Content-Type: application/json" \
+            -d '{"username":"${{ secrets.ZAP_DAST_USERNAME }}","password":"${{ secrets.ZAP_DAST_PASSWORD }}"}' 2>&1) || true
+          TOKEN=$(echo "$RESPONSE" | jq -r '.token // empty')
 
-      - name: Clean test data from database
-        env:
-          DB_HOST: ${{ steps.env-config.outputs.rds_endpoint }}
-          DB_PORT: "3306"
-          DB_USER: smartsuschef
-          DB_NAME: smartsuschef
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-        run: |
-          echo "--- Clearing test data from database ---"
-          MYSQL_CMD="mysql -h $DB_HOST -P $DB_PORT -u $DB_USER -p$DB_PASSWORD $DB_NAME"
+          if [ -z "$TOKEN" ]; then
+            echo "::warning::Login failed — skipping test data cleanup"
+            exit 0
+          fi
+          echo "✅ Login successful"
+          AUTH="Authorization: Bearer $TOKEN"
 
-          $MYSQL_CMD -e "DELETE FROM WastageData WHERE IngredientId IN (SELECT Id FROM Ingredients WHERE Name LIKE 'Test Ingredient %');" 2>/dev/null \
-            && echo "✅ Cleared related WastageData." \
-            || echo "::warning::Failed to clear WastageData. Continuing."
+          # 1) Delete wastage data linked to test ingredients
+          echo "--- Fetching ingredients to find test data ---"
+          INGREDIENTS=$(curl -sf -H "$AUTH" "$TARGET_URL/api/Ingredients" 2>/dev/null || echo "[]")
+          TEST_ING_IDS=$(echo "$INGREDIENTS" | jq -r '.[] | select(.name | test("^Test Ingredient ")) | .id' 2>/dev/null)
 
-          $MYSQL_CMD -e "DELETE FROM Recipes WHERE Name LIKE 'Test Recipe %';" 2>/dev/null \
-            && echo "✅ Deleted test recipes." \
-            || echo "::warning::Failed to delete test recipes. Continuing."
+          if [ -n "$TEST_ING_IDS" ]; then
+            WASTAGE=$(curl -sf -H "$AUTH" "$TARGET_URL/api/Wastage" 2>/dev/null || echo "[]")
+            for ing_id in $TEST_ING_IDS; do
+              WASTE_IDS=$(echo "$WASTAGE" | jq -r --arg iid "$ing_id" '.[] | select(.ingredientId == $iid) | .id' 2>/dev/null)
+              for wid in $WASTE_IDS; do
+                curl -sf -X DELETE -H "$AUTH" "$TARGET_URL/api/Wastage/$wid" -o /dev/null 2>/dev/null && echo "  Deleted wastage $wid" || true
+              done
+            done
+            echo "✅ Cleared related wastage data"
 
-          $MYSQL_CMD -e "DELETE FROM Ingredients WHERE Name LIKE 'Test Ingredient %';" 2>/dev/null \
-            && echo "✅ Deleted test ingredients." \
-            || echo "::warning::Failed to delete test ingredients. Continuing."
+            # 2) Delete test ingredients
+            for id in $TEST_ING_IDS; do
+              curl -sf -X DELETE -H "$AUTH" "$TARGET_URL/api/Ingredients/$id" -o /dev/null 2>/dev/null && echo "  Deleted ingredient $id" || true
+            done
+            echo "✅ Deleted test ingredients"
+          else
+            echo "No test ingredients found"
+          fi
+
+          # 3) Delete test recipes
+          echo "--- Fetching recipes to find test data ---"
+          RECIPES=$(curl -sf -H "$AUTH" "$TARGET_URL/api/Recipes" 2>/dev/null || echo "[]")
+          TEST_REC_IDS=$(echo "$RECIPES" | jq -r '.[] | select(.name | test("^Test Recipe ")) | .id' 2>/dev/null)
+
+          if [ -n "$TEST_REC_IDS" ]; then
+            for id in $TEST_REC_IDS; do
+              curl -sf -X DELETE -H "$AUTH" "$TARGET_URL/api/Recipes/$id" -o /dev/null 2>/dev/null && echo "  Deleted recipe $id" || true
+            done
+            echo "✅ Deleted test recipes"
+          else
+            echo "No test recipes found"
+          fi
+
+          echo "--- Test data cleanup complete ---"
         continue-on-error: true
 
       - name: Run JMeter tests
