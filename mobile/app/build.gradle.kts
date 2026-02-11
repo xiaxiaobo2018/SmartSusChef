@@ -197,7 +197,7 @@ tasks.withType<Test> {
 }
 
 tasks.register<JacocoReport>("jacocoTestReportDebug") {
-    dependsOn("testDebugUnitTest")
+    dependsOn("testUatDebugUnitTest")
     reports {
         xml.required.set(true)
         html.required.set(true)
@@ -213,7 +213,7 @@ tasks.register<JacocoReport>("jacocoTestReportDebug") {
             "**/di/**",
         )
     val debugTree =
-        fileTree("${layout.buildDirectory.get().asFile}/tmp/kotlin-classes/debug") {
+        fileTree("${layout.buildDirectory.get().asFile}/tmp/kotlin-classes/uatDebug") {
             exclude(fileFilter)
         }
     val mainSrc = "${project.projectDir}/src/main/java"
@@ -221,7 +221,7 @@ tasks.register<JacocoReport>("jacocoTestReportDebug") {
     classDirectories.setFrom(files(debugTree))
     executionData.setFrom(
         fileTree(layout.buildDirectory.get().asFile) {
-            include("jacoco/testDebugUnitTest.exec")
+            include("jacoco/testUatDebugUnitTest.exec")
         },
     )
 }

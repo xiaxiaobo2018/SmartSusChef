@@ -18,6 +18,11 @@ on:
   
   workflow_dispatch:
 
+permissions:
+  contents: write
+  security-events: write
+  actions: read
+
 jobs:
   # ==========================================
   # STAGE 1: Static Analysis
@@ -29,6 +34,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -51,7 +59,24 @@ jobs:
         working-directory: ./mobile
         continue-on-error: true
 
-      - name: Ktlint
+      - name: Ktlint auto-format
+        run: ./gradlew ktlintFormat
+        working-directory: ./mobile
+        continue-on-error: true
+
+      - name: Commit Ktlint fixes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A mobile/
+          if git diff --cached --quiet; then
+            echo "No Ktlint fixes needed"
+          else
+            git commit -m "style(mobile): auto-fix ktlint format [skip ci]"
+            git push
+          fi
+
+      - name: Ktlint check
         run: ./gradlew ktlintCheck
         working-directory: ./mobile
         continue-on-error: true
