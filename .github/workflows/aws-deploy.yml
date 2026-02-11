@@ -203,23 +203,23 @@ jobs:
         if: needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.infra == 'true'
         run: dotnet restore backend/SmartSusChef.sln
 
+      - name: Install Snyk CLI
+        if: needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.infra == 'true'
+        run: npm install -g snyk
+
       - name: Snyk .NET scan (Api)
         if: needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.infra == 'true'
-        uses: snyk/actions/dotnet@master
         continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          args: --file=backend/SmartSusChef.Api/SmartSusChef.Api.csproj --sarif-file-output=snyk-backend-api.sarif --severity-threshold=high
+        run: snyk test --file=backend/SmartSusChef.Api/SmartSusChef.Api.csproj --sarif-file-output=snyk-backend-api.sarif --severity-threshold=high
 
       - name: Snyk .NET scan (Tests)
         if: needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.infra == 'true'
-        uses: snyk/actions/dotnet@master
         continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          args: --file=backend/SmartSusChef.Api.Tests/SmartSusChef.Api.Tests.csproj --sarif-file-output=snyk-backend-tests.sarif --severity-threshold=high
+        run: snyk test --file=backend/SmartSusChef.Api.Tests/SmartSusChef.Api.Tests.csproj --sarif-file-output=snyk-backend-tests.sarif --severity-threshold=high
 
       - name: Upload Snyk Backend Api SARIF
         if: always() && (needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.infra == 'true')
