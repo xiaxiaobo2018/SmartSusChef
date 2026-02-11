@@ -2,7 +2,9 @@ package com.smartsuschef.mobile.ui.sales
 
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.View
+import android.widget.TextView
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -22,12 +24,14 @@ import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.smartsuschef.mobile.R
 import com.smartsuschef.mobile.databinding.FragmentSalesOverviewBinding
+import com.smartsuschef.mobile.network.dto.HolidayDto
 import com.smartsuschef.mobile.util.Resource
 import com.smartsuschef.mobile.util.gone
 import com.smartsuschef.mobile.util.showToast
 import com.smartsuschef.mobile.util.visible
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
 @AndroidEntryPoint
@@ -45,9 +49,10 @@ class SalesOverviewFragment : Fragment(R.layout.fragment_sales_overview) {
 
         setupCombinedChart()
         observeViewModel()
+        observeWeather()
+        observeHolidays()
         observeFilter()
         binding.tvDateContext.setOnClickListener { v -> showFilterMenu(v) }
-        setWeatherIcon("cloudy")
     }
 
     @Suppress("MagicNumber")
@@ -250,14 +255,105 @@ class SalesOverviewFragment : Fragment(R.layout.fragment_sales_overview) {
         }
     }
 
-    private fun setWeatherIcon(condition: String) {
+    private fun observeWeather() {
+        viewModel.weather.observe(viewLifecycleOwner) { result ->
+            when (result) {
+                is Resource.Success -> {
+                    val weather = result.data
+                    if (weather != null) {
+                        binding.tvWeatherCondition.text = weather.condition
+                        binding.tvWeatherDescription.text =
+                            "${weather.temperature.toInt()}°C | ${weather.description}"
+                        binding.tvWeatherHumidity.text = "${weather.humidity}%"
+                        setWeatherIcon(weather.condition)
+                    } else {
+                        binding.tvWeatherCondition.text = "Unavailable"
+                        binding.tvWeatherDescription.text = "Weather data not available"
+                        binding.tvWeatherHumidity.text = "--"
+                    }
+                }
+                is Resource.Error -> {
+                    binding.tvWeatherCondition.text = "Unavailable"
+                    binding.tvWeatherDescription.text = "Could not load weather"
+                    binding.tvWeatherHumidity.text = "--"
+                }
+                is Resource.Loading -> {
+                    binding.tvWeatherCondition.text = "Loading..."
+                    binding.tvWeatherDescription.text = ""
+                    binding.tvWeatherHumidity.text = "--"
+                }
+            }
+        }
+    }
+
+    @Suppress("MagicNumber")
+    private fun observeHolidays() {
+        viewModel.holidays.observe(viewLifecycleOwner) { result ->
+            when (result) {
+                is Resource.Success -> {
+                    val holidays = result.data ?: emptyList()
+                    val upcoming = getUpcomingHolidays(holidays)
+                    binding.llHolidaysList.removeAllViews()
+
+                    if (upcoming.isNotEmpty()) {
+                        binding.llHolidaysList.visible()
+                        binding.tvNoHolidays.gone()
+                        upcoming.forEach { holiday ->
+                            val formattedDate = formatHolidayDate(holiday.date)
+                            val tv =
+                                TextView(requireContext()).apply {
+                                    text = "\u2022 $formattedDate: ${holiday.name}"
+                                    setPadding(0, 4, 0, 4)
+                                }
+                            binding.llHolidaysList.addView(tv)
+                        }
+                    } else {
+                        binding.llHolidaysList.gone()
+                        binding.tvNoHolidays.visible()
+                    }
+                }
+                is Resource.Error -> {
+                    binding.llHolidaysList.gone()
+                    binding.tvNoHolidays.text = "Could not load events"
+                    binding.tvNoHolidays.visible()
+                }
+                is Resource.Loading -> {
+                    binding.llHolidaysList.gone()
+                    binding.tvNoHolidays.text = "Loading events..."
+                    binding.tvNoHolidays.visible()
+                }
+            }
+        }
+    }
+
+    @Suppress("MagicNumber")
+    private fun getUpcomingHolidays(holidays: List<HolidayDto>): List<HolidayDto> {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val today = dateFormat.format(Date())
+        return holidays
+            .filter { it.date >= today }
+            .take(3)
+    }
+
+    private fun formatHolidayDate(dateStr: String): String {
+        val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val outputFormat = SimpleDateFormat("MMM d", Locale.getDefault())
+        return try {
+            inputFormat.parse(dateStr)?.let { outputFormat.format(it) } ?: dateStr
+        } catch (e: Exception) {
+            Log.e(TAG, "Error formatting holiday date: ${e.message}", e)
+            dateStr
+        }
+    }
+
+    private fun setWeatherIcon(condition: String?) {
         val drawableRes =
-            when (condition.lowercase()) {
-                "cloudy", "partly cloudy" -> R.drawable.cloud
-                "rain", "showers" -> R.drawable.cloud_rain
-                "storm" -> R.drawable.cloud_hail
-                "sunny" -> R.drawable.sun
-                else -> R.drawable.cloud // Default
+            when (condition?.lowercase()) {
+                "clear" -> R.drawable.sun
+                "partly cloudy" -> R.drawable.cloud
+                "drizzle", "rainy", "rain showers" -> R.drawable.cloud_rain
+                "thunderstorm" -> R.drawable.cloud_hail
+                else -> R.drawable.cloud
             }
         binding.ivWeatherIcon.setImageResource(drawableRes)
     }
@@ -265,5 +361,9 @@ class SalesOverviewFragment : Fragment(R.layout.fragment_sales_overview) {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        private const val TAG = "SalesOverviewFragment"
     }
 }

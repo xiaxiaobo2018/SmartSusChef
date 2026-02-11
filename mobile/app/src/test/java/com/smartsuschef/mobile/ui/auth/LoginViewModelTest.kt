@@ -24,6 +24,7 @@ import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.io.IOException
 
 /**
  * Unit tests for the LoginViewModel.
@@ -149,4 +150,22 @@ class LoginViewModelTest {
         // Verify that the repository's method was called
         verify(mockAuthRepository).isUserLoggedIn()
     }
+
+    @Test
+    fun `login with network error should return error resource`() =
+        runTest {
+            // ARRANGE
+            val loginRequest = LoginRequest("user", "pass")
+            val networkException = IOException("Network unavailable")
+            val expectedErrorMessage = networkException.localizedMessage ?: "An unexpected error occurred"
+            whenever(mockAuthRepository.login(loginRequest)).thenAnswer { throw networkException }
+
+            // ACT
+            viewModel.login(loginRequest)
+
+            // ASSERT
+            val actualResult = viewModel.loginResponse.value
+            assertTrue(actualResult is Resource.Error)
+            assertEquals(expectedErrorMessage, (actualResult as Resource.Error).message)
+        }
 }

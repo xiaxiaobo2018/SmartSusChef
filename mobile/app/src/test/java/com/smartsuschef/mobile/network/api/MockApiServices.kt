@@ -178,7 +178,10 @@ class MockWastageApiService : WastageApiService {
 }
 
 class MockForecastApiService : ForecastApiService {
-    override suspend fun getForecast(days: Int): Response<List<ForecastDto>> {
+    override suspend fun getForecast(
+        days: Int,
+        includePastDays: Int,
+    ): Response<List<ForecastDto>> {
         TODO("Not yet implemented")
     }
 

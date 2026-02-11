@@ -18,6 +18,7 @@ import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.any
 import org.mockito.kotlin.whenever
+import retrofit2.HttpException
 import retrofit2.Response
 import java.io.IOException
 
@@ -142,5 +143,60 @@ class RecipesRepositoryTest {
             // Assert
             assertTrue(result is Resource.Error)
             assertEquals("Failed to add recipe: $errorMessage", result.message)
+        }
+
+    // --- HttpException Tests ---
+
+    @Test
+    fun `getAll HttpException should return error resource`() =
+        runTest(testDispatcher) {
+            val httpException =
+                HttpException(Response.error<List<RecipeDto>>(500, "{}".toResponseBody(null)))
+            whenever(mockRecipeApiService.getAll()).thenAnswer { throw httpException }
+
+            val result = recipesRepository.getAll()
+
+            assertTrue(result is Resource.Error)
+            assertEquals("An unexpected error occurred: ${httpException.message()}", result.message)
+        }
+
+    @Test
+    fun `create network error should return error resource`() =
+        runTest(testDispatcher) {
+            val createRequest =
+                CreateRecipeRequest(
+                    name = "Fish Curry",
+                    isSellable = true,
+                    isSubRecipe = false,
+                    ingredients = emptyList(),
+                )
+            whenever(mockRecipeApiService.create(any()))
+                .thenAnswer { throw IOException("No internet") }
+
+            val result = recipesRepository.create(createRequest)
+
+            assertTrue(result is Resource.Error)
+            assertEquals("Couldn't reach the server. Check your internet connection.", result.message)
+        }
+
+    @Test
+    fun `create HttpException should return error resource`() =
+        runTest(testDispatcher) {
+            val createRequest =
+                CreateRecipeRequest(
+                    name = "Fish Curry",
+                    isSellable = true,
+                    isSubRecipe = false,
+                    ingredients = emptyList(),
+                )
+            val httpException =
+                HttpException(Response.error<RecipeDto>(500, "{}".toResponseBody(null)))
+            whenever(mockRecipeApiService.create(any()))
+                .thenAnswer { throw httpException }
+
+            val result = recipesRepository.create(createRequest)
+
+            assertTrue(result is Resource.Error)
+            assertEquals("An unexpected error occurred: ${httpException.message()}", result.message)
         }
 }

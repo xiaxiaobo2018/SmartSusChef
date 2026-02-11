@@ -26,8 +26,13 @@ class LoginViewModel
         fun login(request: LoginRequest) {
             _loginResponse.value = Resource.Loading()
             viewModelScope.launch {
-                val result = repository.login(request)
-                _loginResponse.value = result
+                try {
+                    val result = repository.login(request)
+                    _loginResponse.value = result
+                } catch (e: Exception) {
+                    _loginResponse.value =
+                        Resource.Error(e.localizedMessage ?: "An unexpected error occurred")
+                }
             }
         }
 

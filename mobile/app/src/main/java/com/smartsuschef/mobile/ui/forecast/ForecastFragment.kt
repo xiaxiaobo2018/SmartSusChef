@@ -21,17 +21,18 @@ import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.smartsuschef.mobile.R
 import com.smartsuschef.mobile.databinding.FragmentForecastBinding
-import com.smartsuschef.mobile.network.dto.ForecastDto
 import com.smartsuschef.mobile.util.Resource
 import com.smartsuschef.mobile.util.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.Locale
+import kotlin.math.abs
 
 @AndroidEntryPoint
 class ForecastFragment : Fragment(R.layout.fragment_forecast) {
     companion object {
         private const val TAG = "ForecastFragment"
+        private const val HUNDRED_PERCENT = 100.0
     }
 
     private var _binding: FragmentForecastBinding? = null
@@ -120,8 +121,8 @@ class ForecastFragment : Fragment(R.layout.fragment_forecast) {
     /**
      * CHART 1: Prediction Summary (Combined Bar + Line)
      */
-    private fun setupSummaryChart(trendData: List<ForecastDto>) {
-        val (barEntries, lineEntries, labels) = prepareSummaryChartData(trendData)
+    private fun setupSummaryChart(summaryData: List<DailySummary>) {
+        val (barEntries, lineEntries, labels) = prepareSummaryChartData(summaryData)
 
         val barSet = createBarDataSet(barEntries)
         val lineSet = createLineDataSet(lineEntries)
@@ -136,17 +137,17 @@ class ForecastFragment : Fragment(R.layout.fragment_forecast) {
     }
 
     @Suppress("MaxLineLength")
-    private fun prepareSummaryChartData(trendData: List<ForecastDto>): Triple<List<BarEntry>, List<Entry>, List<String>> {
+    private fun prepareSummaryChartData(summaryData: List<DailySummary>): Triple<List<BarEntry>, List<Entry>, List<String>> {
         val barEntries = mutableListOf<BarEntry>()
         val lineEntries = mutableListOf<Entry>()
         val labels = mutableListOf<String>()
         var totalDishes = 0
 
-        trendData.forEachIndexed { index, dto ->
-            barEntries.add(BarEntry(index.toFloat(), dto.quantity.toFloat()))
-            lineEntries.add(Entry(index.toFloat(), dto.quantity.toFloat()))
-            labels.add(formatDate(dto.date))
-            totalDishes += dto.quantity
+        summaryData.forEachIndexed { index, summary ->
+            barEntries.add(BarEntry(index.toFloat(), summary.totalQuantity.toFloat()))
+            lineEntries.add(Entry(index.toFloat(), summary.totalQuantity.toFloat()))
+            labels.add(formatDate(summary.date))
+            totalDishes += summary.totalQuantity
         }
 
         binding.tvTotalWeeklyDishes.text = totalDishes.toString()
@@ -184,14 +185,12 @@ class ForecastFragment : Fragment(R.layout.fragment_forecast) {
             setDrawGridBackground(false)
             setExtraOffsets(10f, 10f, 10f, 20f)
 
-            // Add marker for interactivity
             val markerView = ForecastMarkerView(requireContext(), R.layout.marker_view)
             markerView.chartView = this
             markerView.chartType = ForecastMarkerView.ChartType.SIMPLE
-            markerView.labels = labels // Pass date labels
+            markerView.labels = labels
             marker = markerView
 
-            // Disable highlight color change
             isHighlightPerTapEnabled = true
             isHighlightPerDragEnabled = false
 
@@ -247,26 +246,31 @@ class ForecastFragment : Fragment(R.layout.fragment_forecast) {
 
     @Suppress("MaxLineLength")
     private fun prepareStackedBarChartData(forecastData: List<DailyDishForecast>): Triple<List<BarEntry>, List<String>, Array<String>> {
-        val entries = mutableListOf<BarEntry>()
         val labels = mutableListOf<String>()
         val totalDishes = forecastData.sumOf { it.dishes.sumOf { d -> d.predictedSales } }
         val avg = if (forecastData.isNotEmpty()) totalDishes / forecastData.size else 0
 
-        binding.tvDishesSubtitle.text = "AI-predicted main dishes breakdown for next 7 days · Avg: $avg dishes/day"
+        binding.tvDishesSubtitle.text =
+            "AI-predicted main dishes breakdown for next 7 days · Avg: $avg dishes/day"
 
-        forecastData.forEachIndexed { index, daily ->
-            val values = daily.dishes.map { it.predictedSales.toFloat() }.toFloatArray()
-            entries.add(BarEntry(index.toFloat(), values))
-            labels.add(formatDate(daily.date))
-        }
+        // Collect all unique dish names across all days
+        val allDishNames =
+            forecastData
+                .flatMap { it.dishes }
+                .map { it.name }
+                .distinct()
 
-        val dishNames =
-            if (forecastData.isNotEmpty()) {
-                forecastData[0].dishes.map { it.name }.toTypedArray()
-            } else {
-                arrayOf()
+        val entries =
+            forecastData.mapIndexed { index, daily ->
+                val values =
+                    allDishNames.map { dishName ->
+                        daily.dishes.find { it.name == dishName }?.predictedSales?.toFloat() ?: 0f
+                    }.toFloatArray()
+                labels.add(formatDate(daily.date))
+                BarEntry(index.toFloat(), values)
             }
-        return Triple(entries, labels, dishNames)
+
+        return Triple(entries, labels, allDishNames.toTypedArray())
     }
 
     private fun createStackedBarDataSet(
@@ -274,16 +278,28 @@ class ForecastFragment : Fragment(R.layout.fragment_forecast) {
         dishNames: Array<String>,
     ): BarDataSet {
         return BarDataSet(entries, "").apply {
-            colors =
-                listOf(
-                    ContextCompat.getColor(requireContext(), R.color.primary),
-                    ContextCompat.getColor(requireContext(), R.color.wastage_primary),
-                    ContextCompat.getColor(requireContext(), R.color.forecast_gold),
-                )
+            colors = getChartColors()
             stackLabels = dishNames
             setDrawValues(false)
-            highLightAlpha = 0 // Disable highlight color change
+            highLightAlpha = 0
         }
+    }
+
+    private fun getChartColors(): List<Int> {
+        val colorIds =
+            listOf(
+                R.color.chart_1,
+                R.color.chart_2,
+                R.color.chart_3,
+                R.color.chart_4,
+                R.color.chart_5,
+                R.color.chart_6,
+                R.color.chart_7,
+                R.color.chart_8,
+                R.color.chart_9,
+                R.color.chart_10,
+            )
+        return colorIds.map { ContextCompat.getColor(requireContext(), it) }
     }
 
     @Suppress("MagicNumber")
@@ -296,17 +312,15 @@ class ForecastFragment : Fragment(R.layout.fragment_forecast) {
             this.data = data
             description.isEnabled = false
             setDrawGridBackground(false)
-            setExtraOffsets(5f, 10f, 10f, 20f) // Reduced left offset from 10f to 5f
+            setExtraOffsets(5f, 10f, 10f, 20f)
 
-            // Add marker
             val markerView = ForecastMarkerView(requireContext(), R.layout.marker_view)
             markerView.chartView = this
             markerView.chartType = ForecastMarkerView.ChartType.STACKED
-            markerView.dishNames = dishNames // Pass dish names for breakdown
-            markerView.labels = labels // Pass date labels
+            markerView.dishNames = dishNames
+            markerView.labels = labels
             marker = markerView
 
-            // Enable tap but disable drag
             isHighlightPerTapEnabled = true
             isHighlightPerDragEnabled = false
 
@@ -331,7 +345,7 @@ class ForecastFragment : Fragment(R.layout.fragment_forecast) {
                 textColor = ContextCompat.getColor(requireContext(), R.color.muted_text)
                 axisLineColor = Color.TRANSPARENT
                 axisMinimum = 0f
-                textSize = 8f // Reduce Y-axis label size
+                textSize = 8f
             }
 
             axisRight.isEnabled = false
@@ -351,13 +365,136 @@ class ForecastFragment : Fragment(R.layout.fragment_forecast) {
     /**
      * CHART 4: Comparison (Grouped Bar - Predicted vs Actual)
      */
-    @Suppress("ForbiddenComment", "UnusedParameter")
-    private fun setupComparisonChart(comparisonData: List<ForecastDto>) {
-        // TODO: This chart is disabled until SalesData is fetched and merged with ForecastData.
-        // The logic below is broken because `actualQuantity` was removed from ForecastDto.
-        // The ViewModel now provides an empty list here.
-        binding.comparisonBarChart.clear()
-        binding.comparisonBarChart.invalidate()
+    @Suppress("MagicNumber")
+    private fun setupComparisonChart(comparisonData: List<ComparisonDay>) {
+        if (comparisonData.isEmpty()) {
+            binding.comparisonBarChart.clear()
+            binding.comparisonBarChart.invalidate()
+            binding.tvAccuracy.text = "—"
+            binding.tvAccuracyDiff.text = "No prediction data available"
+            return
+        }
+
+        updateAccuracyDisplay(comparisonData)
+
+        val labels = comparisonData.map { formatDate(it.date) }
+        val predictedEntries = mutableListOf<BarEntry>()
+        val actualEntries = mutableListOf<BarEntry>()
+
+        comparisonData.forEachIndexed { index, day ->
+            val compData =
+                ForecastMarkerView.ComparisonData(day.predicted, day.actual)
+            predictedEntries.add(
+                BarEntry(index.toFloat(), day.predicted.toFloat()).apply { data = compData },
+            )
+            actualEntries.add(
+                BarEntry(index.toFloat(), day.actual.toFloat()).apply { data = compData },
+            )
+        }
+
+        val predictedSet =
+            BarDataSet(predictedEntries, "Predicted").apply {
+                color = ContextCompat.getColor(requireContext(), R.color.forecast_gold)
+                setDrawValues(false)
+            }
+        val actualSet =
+            BarDataSet(actualEntries, "Actual Sales").apply {
+                color = ContextCompat.getColor(requireContext(), R.color.primary)
+                setDrawValues(false)
+            }
+
+        val groupSpace = 0.3f
+        val barSpace = 0.05f
+        val barWidth = 0.3f
+
+        val barData =
+            BarData(predictedSet, actualSet).apply {
+                this.barWidth = barWidth
+            }
+
+        styleComparisonChart(labels, barData, groupSpace, barSpace)
+    }
+
+    private fun updateAccuracyDisplay(comparisonData: List<ComparisonDay>) {
+        val totalPredicted = comparisonData.sumOf { it.predicted }
+        val totalActual = comparisonData.sumOf { it.actual }
+        val accuracy =
+            if (totalPredicted > 0) {
+                (1 - abs(totalActual - totalPredicted).toDouble() / totalPredicted) * HUNDRED_PERCENT
+            } else {
+                0.0
+            }
+        val difference = totalActual - totalPredicted
+
+        binding.tvAccuracy.text = String.format(Locale.getDefault(), "%.1f%%", accuracy)
+
+        val diffText = "${abs(difference)} dishes ${if (difference >= 0) "above" else "below"} prediction"
+        binding.tvAccuracyDiff.text = diffText
+        val diffColor =
+            if (difference >= 0) R.color.success_green else R.color.destructive
+        binding.tvAccuracyDiff.setTextColor(ContextCompat.getColor(requireContext(), diffColor))
+    }
+
+    @Suppress("MagicNumber")
+    private fun styleComparisonChart(
+        labels: List<String>,
+        data: BarData,
+        groupSpace: Float,
+        barSpace: Float,
+    ) {
+        val chart = binding.comparisonBarChart
+        chart.apply {
+            this.data = data
+            description.isEnabled = false
+            setDrawGridBackground(false)
+            setExtraOffsets(10f, 10f, 10f, 20f)
+
+            val markerView = ForecastMarkerView(requireContext(), R.layout.marker_view)
+            markerView.chartView = this
+            markerView.chartType = ForecastMarkerView.ChartType.COMPARISON
+            markerView.labels = labels
+            marker = markerView
+
+            isHighlightPerTapEnabled = true
+            isHighlightPerDragEnabled = false
+
+            val groupWidth = data.getGroupWidth(groupSpace, barSpace)
+
+            xAxis.apply {
+                position = XAxis.XAxisPosition.BOTTOM
+                valueFormatter = IndexAxisValueFormatter(labels)
+                labelRotationAngle = -45f
+                textSize = 8f
+                granularity = 1f
+                setDrawGridLines(false)
+                textColor = ContextCompat.getColor(requireContext(), R.color.muted_text)
+                axisLineColor = Color.TRANSPARENT
+                setCenterAxisLabels(true)
+                axisMinimum = 0f
+                axisMaximum = groupWidth * labels.size
+            }
+
+            axisLeft.apply {
+                setDrawGridLines(true)
+                gridColor = ContextCompat.getColor(requireContext(), R.color.border_grey)
+                textColor = ContextCompat.getColor(requireContext(), R.color.muted_text)
+                axisLineColor = Color.TRANSPARENT
+                axisMinimum = 0f
+            }
+
+            axisRight.isEnabled = false
+
+            legend.apply {
+                verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM
+                horizontalAlignment = Legend.LegendHorizontalAlignment.CENTER
+                orientation = Legend.LegendOrientation.HORIZONTAL
+                setDrawInside(false)
+                textColor = ContextCompat.getColor(requireContext(), R.color.muted_text)
+            }
+
+            groupBars(0f, groupSpace, barSpace)
+            invalidate()
+        }
     }
 
     private fun formatDate(dateStr: String): String {

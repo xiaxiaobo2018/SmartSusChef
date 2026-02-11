@@ -3,7 +3,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.smartsuschef.mobile.data.repository.ForecastRepository
 import com.smartsuschef.mobile.data.repository.SalesRepository
+import com.smartsuschef.mobile.network.dto.HolidayDto
+import com.smartsuschef.mobile.network.dto.WeatherDto
 import com.smartsuschef.mobile.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -19,6 +22,7 @@ class SalesViewModel
     @Inject
     constructor(
         private val salesRepository: SalesRepository,
+        private val forecastRepository: ForecastRepository,
     ) : ViewModel() {
         // Sales Trend (7 days)
         private val _salesTrend = MutableLiveData<Resource<List<SalesTrendItem>>>()
@@ -34,8 +38,18 @@ class SalesViewModel
         private val _recipeSales = MutableLiveData<Resource<List<RecipeSalesItem>>>()
         val recipeSales: LiveData<Resource<List<RecipeSalesItem>>> = _recipeSales
 
+        // Weather
+        private val _weather = MutableLiveData<Resource<WeatherDto?>>()
+        val weather: LiveData<Resource<WeatherDto?>> = _weather
+
+        // Holidays
+        private val _holidays = MutableLiveData<Resource<List<HolidayDto>>>()
+        val holidays: LiveData<Resource<List<HolidayDto>>> = _holidays
+
         init {
             fetchOverviewData()
+            fetchWeather()
+            fetchHolidays()
         }
 
         fun setFilter(filter: SalesFilter) {
@@ -109,6 +123,29 @@ class SalesViewModel
                     is Resource.Error -> {
                         _recipeSales.value = Resource.Error(result.message ?: "Failed to load recipe sales breakdown")
                     }
+                    else -> { /* Loading state is already set */ }
+                }
+            }
+        }
+
+        private fun fetchWeather() {
+            viewModelScope.launch {
+                _weather.value = Resource.Loading()
+                when (val result = forecastRepository.getWeather()) {
+                    is Resource.Success -> _weather.value = Resource.Success(result.data)
+                    is Resource.Error -> _weather.value = Resource.Error(result.message ?: "Failed to load weather")
+                    else -> { /* Loading state is already set */ }
+                }
+            }
+        }
+
+        private fun fetchHolidays() {
+            viewModelScope.launch {
+                _holidays.value = Resource.Loading()
+                val year = Calendar.getInstance().get(Calendar.YEAR)
+                when (val result = forecastRepository.getHolidays(year)) {
+                    is Resource.Success -> _holidays.value = Resource.Success(result.data ?: emptyList())
+                    is Resource.Error -> _holidays.value = Resource.Error(result.message ?: "Failed to load holidays")
                     else -> { /* Loading state is already set */ }
                 }
             }

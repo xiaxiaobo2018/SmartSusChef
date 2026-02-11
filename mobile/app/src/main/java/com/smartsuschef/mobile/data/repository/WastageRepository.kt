@@ -22,6 +22,29 @@ class WastageRepository
             private const val TAG = "WastageRepository"
         }
 
+        suspend fun getAll(
+            startDate: String?,
+            endDate: String?,
+        ): Resource<List<WastageDataDto>> {
+            return withContext(Dispatchers.IO) {
+                try {
+                    val response = wastageApiService.getAll(startDate, endDate)
+                    if (response.isSuccessful) {
+                        Resource.Success(response.body() ?: emptyList())
+                    } else {
+                        val errorBody = response.errorBody()?.string()
+                        Resource.Error("Failed to fetch wastage data: ${errorBody ?: response.message()}")
+                    }
+                } catch (e: HttpException) {
+                    Log.e(TAG, "HTTP error in repository: ${e.message()}", e)
+                    Resource.Error("An unexpected error occurred: ${e.message()}")
+                } catch (e: IOException) {
+                    Log.e(TAG, "Network error in repository: ${e.message}", e)
+                    Resource.Error("Couldn't reach the server. Check your internet connection.")
+                }
+            }
+        }
+
         suspend fun getTrend(
             startDate: String,
             endDate: String,

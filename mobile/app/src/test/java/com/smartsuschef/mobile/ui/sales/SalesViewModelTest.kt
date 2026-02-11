@@ -1,6 +1,7 @@
 package com.smartsuschef.mobile.ui.sales
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.smartsuschef.mobile.data.repository.ForecastRepository
 import com.smartsuschef.mobile.data.repository.SalesRepository
 import com.smartsuschef.mobile.network.dto.IngredientUsageDto
 import com.smartsuschef.mobile.network.dto.RecipeSalesDto
@@ -15,6 +16,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -37,6 +39,9 @@ class SalesViewModelTest {
     @Mock
     private lateinit var salesRepository: SalesRepository
 
+    @Mock
+    private lateinit var forecastRepository: ForecastRepository
+
     private lateinit var viewModel: SalesViewModel
 
     private val testDispatcher: TestDispatcher = UnconfinedTestDispatcher()
@@ -46,7 +51,7 @@ class SalesViewModelTest {
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        viewModel = SalesViewModel(salesRepository)
+        viewModel = SalesViewModel(salesRepository, forecastRepository)
     }
 
     @After
@@ -170,5 +175,69 @@ class SalesViewModelTest {
             val actualResult = viewModel.recipeSales.value
             assertTrue(actualResult is Resource.Error)
             assertEquals(errorMessage, (actualResult as Resource.Error).message)
+        }
+
+    @Test
+    fun `setFilter should update currentFilter LiveData`() {
+        // Default is LAST_7_DAYS
+        assertEquals(SalesFilter.LAST_7_DAYS, viewModel.currentFilter.value)
+
+        viewModel.setFilter(SalesFilter.TODAY)
+        assertEquals(SalesFilter.TODAY, viewModel.currentFilter.value)
+    }
+
+    @Test
+    fun `fetchOverviewData with empty trend list should return success with empty list`() =
+        runTest {
+            val today = dateFormat.format(Calendar.getInstance().time)
+            whenever(salesRepository.getTrend(any(), any()))
+                .thenReturn(Resource.Success(emptyList()))
+
+            viewModel.fetchOverviewData(SalesFilter.TODAY)
+
+            val actualResult = viewModel.salesTrend.value
+            assertTrue(actualResult is Resource.Success)
+            assertTrue((actualResult as Resource.Success).data?.isEmpty() == true)
+        }
+
+    @Test
+    fun `weather LiveData should be populated from init`() {
+        // Weather is fetched during init, so it should have a value
+        // It will be in Loading or Error state since the mock isn't stubbed for weather
+        assertNotNull(viewModel.weather.value)
+    }
+
+    @Test
+    fun `holidays LiveData should be populated from init`() {
+        // Holidays are fetched during init, so it should have a value
+        assertNotNull(viewModel.holidays.value)
+    }
+
+    @Test
+    fun `fetchIngredientsForDate with empty data should return success with empty list`() =
+        runTest {
+            val date = "2026-02-10"
+            whenever(salesRepository.getIngredientUsageByDate(date))
+                .thenReturn(Resource.Success(emptyList()))
+
+            viewModel.fetchIngredientsForDate(date)
+
+            val actualResult = viewModel.ingredientBreakdown.value
+            assertTrue(actualResult is Resource.Success)
+            assertTrue((actualResult as Resource.Success).data?.isEmpty() == true)
+        }
+
+    @Test
+    fun `fetchRecipeSalesForDate with empty data should return success with empty list`() =
+        runTest {
+            val date = "2026-02-10"
+            whenever(salesRepository.getRecipeSalesByDate(date))
+                .thenReturn(Resource.Success(emptyList()))
+
+            viewModel.fetchRecipeSalesForDate(date)
+
+            val actualResult = viewModel.recipeSales.value
+            assertTrue(actualResult is Resource.Success)
+            assertTrue((actualResult as Resource.Success).data?.isEmpty() == true)
         }
 }

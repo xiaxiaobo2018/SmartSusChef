@@ -51,7 +51,8 @@ class ForecastRepositoryTest {
         runTest(testDispatcher) {
             // Arrange
             val forecastList = listOf(sampleForecastDto)
-            whenever(mockForecastApiService.getForecast(any())).thenReturn(Response.success(forecastList))
+            whenever(mockForecastApiService.getForecast(any(), any()))
+                .thenReturn(Response.success(forecastList))
 
             // Act
             val result = forecastRepository.getForecast(7)
@@ -66,8 +67,10 @@ class ForecastRepositoryTest {
         runTest(testDispatcher) {
             // Arrange
             val errorMessage = "Unauthorized"
-            val errorResponse = Response.error<List<ForecastDto>>(401, errorMessage.toResponseBody(null))
-            whenever(mockForecastApiService.getForecast(any())).thenReturn(errorResponse)
+            val errorResponse =
+                Response.error<List<ForecastDto>>(401, errorMessage.toResponseBody(null))
+            whenever(mockForecastApiService.getForecast(any(), any()))
+                .thenReturn(errorResponse)
 
             // Act
             val result = forecastRepository.getForecast(7)
@@ -81,7 +84,8 @@ class ForecastRepositoryTest {
     fun `getForecast network error should return error resource with network message`() =
         runTest(testDispatcher) {
             // Arrange
-            whenever(mockForecastApiService.getForecast(any())).thenAnswer { throw IOException("No internet") }
+            whenever(mockForecastApiService.getForecast(any(), any()))
+                .thenAnswer { throw IOException("No internet") }
 
             // Act
             val result = forecastRepository.getForecast(7)
@@ -96,7 +100,8 @@ class ForecastRepositoryTest {
         runTest(testDispatcher) {
             // Arrange
             val httpException = HttpException(Response.error<List<ForecastDto>>(500, "{}".toResponseBody(null)))
-            whenever(mockForecastApiService.getForecast(any())).thenAnswer { throw httpException }
+            whenever(mockForecastApiService.getForecast(any(), any()))
+                .thenAnswer { throw httpException }
 
             // Act
             val result = forecastRepository.getForecast(7)

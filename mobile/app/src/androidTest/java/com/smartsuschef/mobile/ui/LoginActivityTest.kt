@@ -2,6 +2,7 @@ package com.smartsuschef.mobile.ui
 
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.closeSoftKeyboard
 import androidx.test.espresso.action.ViewActions.replaceText
@@ -18,8 +19,10 @@ import com.smartsuschef.mobile.data.TokenManager
 import com.smartsuschef.mobile.di.TestNetworkModule
 import com.smartsuschef.mobile.ui.auth.LoginActivity
 import com.smartsuschef.mobile.ui.dashboard.DashboardActivity
+import com.smartsuschef.mobile.util.OkHttp3IdlingResource
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -51,7 +54,11 @@ class LoginActivityTest {
     @Inject
     lateinit var tokenManager: TokenManager
 
+    @Inject
+    lateinit var okHttpClient: OkHttpClient
+
     private lateinit var mockWebServer: MockWebServer
+    private lateinit var okHttp3IdlingResource: OkHttp3IdlingResource
 
     @Before
     fun setup() {
@@ -65,12 +72,17 @@ class LoginActivityTest {
         mockWebServer.start(8080)
         TestNetworkModule.mockWebServerUrl = mockWebServer.url("/api/").toString()
 
+        // Register OkHttp IdlingResource so Espresso waits for network calls
+        okHttp3IdlingResource = OkHttp3IdlingResource.create("OkHttp", okHttpClient)
+        IdlingRegistry.getInstance().register(okHttp3IdlingResource)
+
         Intents.init()
     }
 
     @After
     fun tearDown() {
         Intents.release()
+        IdlingRegistry.getInstance().unregister(okHttp3IdlingResource)
         mockWebServer.shutdown()
     }
 
@@ -149,7 +161,6 @@ class LoginActivityTest {
     @Test
     fun signIn_withValidCredentials_navigatesToDashboard() {
         // Use a Dispatcher to handle both login POST and all Dashboard concurrent API calls
-        var loginHandled = false
         mockWebServer.dispatcher =
             object : Dispatcher() {
                 override fun dispatch(request: RecordedRequest): MockResponse {
@@ -157,8 +168,7 @@ class LoginActivityTest {
 
                     return when {
                         // Login POST
-                        path.contains("/api/auth/login") && request.method == "POST" -> {
-                            loginHandled = true
+                        path.contains("/api/auth/login") && request.method == "POST" ->
                             MockResponse()
                                 .setResponseCode(200)
                                 .setBody(
@@ -180,7 +190,6 @@ class LoginActivityTest {
                                     """.trimIndent(),
                                 )
                                 .addHeader("Content-Type", "application/json")
-                        }
 
                         // Store status
                         path.contains("/api/store/status") ->
@@ -233,7 +242,7 @@ class LoginActivityTest {
                                 )
                                 .addHeader("Content-Type", "application/json")
 
-                        // All other Dashboard endpoints return empty arrays or objects
+                        // All other Dashboard endpoints
                         path.contains("/api/sales") ->
                             MockResponse()
                                 .setResponseCode(200)
@@ -246,6 +255,78 @@ class LoginActivityTest {
                                 .setBody("[]")
                                 .addHeader("Content-Type", "application/json")
 
+                        // Forecast weather (Expected: WeatherDto - object)
+                        path.contains("/api/forecast/weather") ->
+                            MockResponse()
+                                .setResponseCode(200)
+                                .setBody(
+                                    """
+                                    {
+                                        "temperature": 30.5,
+                                        "condition": "Partly Cloudy",
+                                        "description": "Partly Cloudy",
+                                        "humidity": 75
+                                    }
+                                    """.trimIndent(),
+                                )
+                                .addHeader("Content-Type", "application/json")
+
+                        // Forecast holidays (Expected: List<HolidayDto> - array)
+                        path.contains("/api/forecast/holidays") ->
+                            MockResponse()
+                                .setResponseCode(200)
+                                .setBody(
+                                    """
+                                    [
+                                        {"date": "2026-02-14", "name": "Valentine's Day"},
+                                        {"date": "2026-04-18", "name": "Good Friday"}
+                                    ]
+                                    """.trimIndent(),
+                                )
+                                .addHeader("Content-Type", "application/json")
+
+                        // Forecast summary (Expected: List<ForecastSummaryDto> - array)
+                        path.contains("/api/forecast/summary") ->
+                            MockResponse()
+                                .setResponseCode(200)
+                                .setBody("[]")
+                                .addHeader("Content-Type", "application/json")
+
+                        // Forecast tomorrow (Expected: TomorrowForecastDto - object)
+                        path.contains("/api/forecast/tomorrow") ->
+                            MockResponse()
+                                .setResponseCode(200)
+                                .setBody(
+                                    """
+                                    {
+                                        "date": "2026-02-12",
+                                        "calendar": {
+                                            "date": "2026-02-12",
+                                            "isHoliday": false,
+                                            "isSchoolHoliday": false,
+                                            "isWeekend": false,
+                                            "holidayName": null,
+                                            "weather": {
+                                                "temperatureMax": 28.0,
+                                                "temperatureMin": 22.0,
+                                                "rainMm": 5.0,
+                                                "weatherCode": 800,
+                                                "weatherDescription": "Partly Cloudy"
+                                            }
+                                        },
+                                        "weather": {
+                                            "temperatureMax": 28.0,
+                                            "temperatureMin": 22.0,
+                                            "rainMm": 5.0,
+                                            "weatherCode": 800,
+                                            "weatherDescription": "Partly Cloudy"
+                                        }
+                                    }
+                                    """.trimIndent(),
+                                )
+                                .addHeader("Content-Type", "application/json")
+
+                        // Forecast (generic catch-all)
                         path.contains("/api/forecast") ->
                             MockResponse()
                                 .setResponseCode(200)
@@ -278,8 +359,7 @@ class LoginActivityTest {
         // Click Sign In
         onView(withId(R.id.btnSignIn)).perform(click())
 
-        // Wait for response and verify intent to DashboardActivity is fired
-        Thread.sleep(2000)
+        // IdlingResource waits for network call to complete, then verify navigation
         Intents.intended(hasComponent(DashboardActivity::class.java.name))
     }
 
@@ -306,10 +386,7 @@ class LoginActivityTest {
         // Click Sign In
         onView(withId(R.id.btnSignIn)).perform(click())
 
-        // Wait for response processing
-        Thread.sleep(2000)
-
-        // Button should be re-enabled after failure
+        // IdlingResource waits for network response; button should be re-enabled after failure
         onView(withId(R.id.btnSignIn)).check(matches(isEnabled()))
     }
 
@@ -329,9 +406,7 @@ class LoginActivityTest {
         onView(withId(R.id.etPassword)).perform(replaceText("Password1!"), closeSoftKeyboard())
         onView(withId(R.id.btnSignIn)).perform(click())
 
-        Thread.sleep(2000)
-
-        // Button should be re-enabled after error
+        // IdlingResource waits for network response; button should be re-enabled after error
         onView(withId(R.id.btnSignIn)).check(matches(isEnabled()))
     }
 
@@ -386,8 +461,10 @@ class LoginActivityTest {
         // Click Send Reset Link
         onView(withId(R.id.btnSendReset)).perform(click())
 
+        // Small UI-settling delay (no network call, just local Toast + form toggle)
+        Thread.sleep(300)
+
         // Should toggle back to login form
-        Thread.sleep(500)
         onView(withId(R.id.loginForm)).check(matches(isDisplayed()))
     }
 

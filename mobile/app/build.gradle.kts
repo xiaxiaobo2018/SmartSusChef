@@ -96,6 +96,7 @@ android {
             isReturnDefaultValues = true
         }
         animationsDisabled = true
+        execution = "ANDROIDX_TEST_ORCHESTRATOR"
     }
 
     lint {
@@ -126,9 +127,13 @@ dependencies {
     testImplementation(libs.robolectric)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.androidx.espresso.contrib)
+    androidTestImplementation(libs.androidx.espresso.idling.resource)
     androidTestImplementation(libs.androidx.espresso.intents)
     androidTestImplementation(libs.coroutines.test)
     androidTestImplementation(libs.mockwebserver)
+    androidTestImplementation(libs.androidx.test.runner)
+    androidTestUtil(libs.androidx.test.orchestrator)
     detektPlugins(libs.detekt.formatting)
     // Networking (For .NET Backend & Python ML)
     implementation(libs.retrofit.core)
@@ -182,6 +187,11 @@ jacoco {
 }
 
 tasks.withType<Test> {
+    testLogging {
+        showStandardStreams = true
+        events("PASSED", "SKIPPED", "FAILED")
+        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+    }
     configure<JacocoTaskExtension> {
         excludes =
             listOf(

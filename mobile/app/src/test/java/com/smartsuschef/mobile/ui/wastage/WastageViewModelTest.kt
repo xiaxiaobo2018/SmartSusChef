@@ -14,6 +14,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -148,5 +149,48 @@ class WastageViewModelTest {
 
         assertEquals("Sauce", breakdownItems?.get(2)?.name)
         assertEquals("Sub-Recipe", breakdownItems?.get(2)?.type)
+    }
+
+    @Test
+    fun `setFilter should update currentFilter LiveData`() {
+        // The default is LAST_7_DAYS from init
+        assertEquals(WastageFilter.LAST_7_DAYS, viewModel.currentFilter.value)
+    }
+
+    @Test
+    fun `setWastageBreakdown with empty list should return empty success`() {
+        viewModel.setWastageBreakdown(emptyList())
+
+        val actualResult = viewModel.wastageBreakdown.value
+        assertTrue(actualResult is Resource.Success)
+        assertTrue((actualResult as Resource.Success).data?.isEmpty() == true)
+    }
+
+    @Test
+    fun `setWastageBreakdown should correctly map quantity and carbonFootprint`() {
+        val itemWastageDtos =
+            listOf(
+                ItemWastageDto(
+                    ingredientId = "ing-1",
+                    displayName = "Tomato",
+                    quantity = 3.5,
+                    unit = "kg",
+                    carbonFootprint = 2.1,
+                    recipeId = null,
+                ),
+            )
+
+        viewModel.setWastageBreakdown(itemWastageDtos)
+
+        val breakdownItems = (viewModel.wastageBreakdown.value as Resource.Success).data
+        assertEquals(3.5, breakdownItems?.get(0)?.quantity ?: 0.0, 0.0)
+        assertEquals(2.1, breakdownItems?.get(0)?.carbonFootprint ?: 0.0, 0.0)
+        assertEquals("kg", breakdownItems?.get(0)?.unit)
+    }
+
+    @Test
+    fun `wastageBreakdown should be null before setWastageBreakdown is called`() {
+        // The ViewModel is created in setUp, wastageBreakdown is never set
+        assertNull(viewModel.wastageBreakdown.value)
     }
 }

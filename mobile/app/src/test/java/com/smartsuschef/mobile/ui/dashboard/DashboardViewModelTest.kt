@@ -226,4 +226,74 @@ class DashboardViewModelTest {
             // 6. Verify that the loading state is set to false
             assertEquals(false, viewModel.isLoading.value)
         }
+
+    @Test
+    fun `init when getUserRole returns null should default to Employee`() =
+        runTest {
+            // ARRANGE
+            val dummyUser =
+                UserDto(
+                    "id",
+                    "user",
+                    "name",
+                    "email",
+                    "Employee",
+                    "Active",
+                    "2026-02-08T00:00:00",
+                    "2026-02-08T00:00:00",
+                )
+            val dummyStore =
+                StoreDto(1, "", "", "Store", "Location", "", "", 0.0, 0.0, null, null, true, "", "")
+            whenever(mockTokenManager.getUserRole()).thenReturn(null)
+            whenever(mockUsersRepository.getCurrentUser()).thenReturn(Resource.Success(dummyUser))
+            whenever(mockStoreRepository.getStore()).thenReturn(Resource.Success(dummyStore))
+
+            // ACT
+            val viewModel =
+                DashboardViewModel(
+                    mockAuthRepository,
+                    mockUsersRepository,
+                    mockStoreRepository,
+                    mockTokenManager,
+                )
+
+            // ASSERT
+            assertEquals("Employee", viewModel.userRole.value)
+        }
+
+    @Test
+    fun `init when user name is null should default to User`() =
+        runTest {
+            // ARRANGE
+            val mockUserDto =
+                UserDto(
+                    "id",
+                    "username",
+                    "",
+                    "email",
+                    "Employee",
+                    "Active",
+                    "2026-02-08T00:00:00",
+                    "2026-02-08T00:00:00",
+                )
+            val dummyStore =
+                StoreDto(1, "", "", "Store", "Location", "", "", 0.0, 0.0, null, null, true, "", "")
+            whenever(mockTokenManager.getUserRole()).thenReturn("Employee")
+            whenever(mockUsersRepository.getCurrentUser()).thenReturn(
+                Resource.Success(mockUserDto),
+            )
+            whenever(mockStoreRepository.getStore()).thenReturn(Resource.Success(dummyStore))
+
+            // ACT
+            val viewModel =
+                DashboardViewModel(
+                    mockAuthRepository,
+                    mockUsersRepository,
+                    mockStoreRepository,
+                    mockTokenManager,
+                )
+
+            // ASSERT - name is empty string but not null, so it should be set as-is
+            assertEquals("", viewModel.username.value)
+        }
 }

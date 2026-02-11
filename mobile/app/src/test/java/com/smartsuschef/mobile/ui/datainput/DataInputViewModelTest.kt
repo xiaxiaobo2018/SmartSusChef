@@ -21,6 +21,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -562,4 +563,167 @@ class DataInputViewModelTest {
             assertEquals("Recent entries list should still contain the item", 1, recentEntries?.size)
             assertTrue("The item should still be in the list", recentEntries?.contains(entryToAttemptDelete) == true)
         }
+
+    @Test
+    fun `submitData with no item selected should return error`() =
+        runTest {
+            // ARRANGE — do not call onItemSelected, so selectedItemId/Name are null
+            viewModel.setMode(isSales = true)
+
+            // ACT
+            viewModel.submitData(quantity = 5.0)
+
+            // ASSERT
+            val status = viewModel.submitStatus.value
+            assertTrue("Submit status should be Error", status is Resource.Error)
+            assertEquals("No item selected.", (status as Resource.Error).message)
+        }
+
+    @Test
+    fun `setMode should update isSalesMode and clear selection`() {
+        // ARRANGE — select an item first
+        viewModel.onItemSelected("recipe-1", "Pizza")
+        assertEquals("recipe-1", viewModel.selectedItemId.value)
+
+        // ACT
+        viewModel.setMode(isSales = false)
+
+        // ASSERT
+        assertEquals(false, viewModel.isSalesMode.value)
+        assertNull(viewModel.selectedItemId.value)
+        assertNull(viewModel.selectedItemName.value)
+    }
+
+    @Test
+    fun `setWastageType should update wastageType and clear selection`() {
+        // ARRANGE — select an item first
+        viewModel.onItemSelected("ing-1", "Tomato")
+
+        // ACT
+        viewModel.setWastageType(WastageType.MAIN_DISH)
+
+        // ASSERT
+        assertEquals(WastageType.MAIN_DISH, viewModel.wastageType.value)
+        assertNull(viewModel.selectedItemId.value)
+        assertNull(viewModel.selectedItemName.value)
+    }
+
+    @Test
+    fun `findExistingEntry should return matching entry`() =
+        runTest {
+            // ARRANGE — submit an entry so it exists in the in-memory list
+            viewModel.setMode(isSales = true)
+            viewModel.onItemSelected("recipe-1", "Pizza")
+
+            val todayStr = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+            val mockSalesDto =
+                SalesDataDto(
+                    id = "sale-1",
+                    date = todayStr,
+                    recipeId = "recipe-1",
+                    recipeName = "Pizza",
+                    quantity = 5,
+                    createdAt = todayStr,
+                    updatedAt = todayStr,
+                )
+            whenever(mockSalesRepository.create(any())).thenReturn(Resource.Success(mockSalesDto))
+            viewModel.submitData(5.0)
+
+            // ACT
+            val found = viewModel.findExistingEntry("Pizza")
+
+            // ASSERT
+            assertEquals("sale-1", found?.id)
+            assertEquals("Pizza", found?.name)
+        }
+
+    @Test
+    fun `findExistingEntry should return null for non-existing entry`() {
+        val found = viewModel.findExistingEntry("NonExistentItem")
+        assertNull(found)
+    }
+
+    @Test
+    fun `submitData in wastage mode with MAIN_DISH type should send recipeId`() =
+        runTest {
+            // ARRANGE
+            viewModel.setMode(isSales = false)
+            viewModel.setWastageType(WastageType.MAIN_DISH)
+            viewModel.onItemSelected(itemId = "recipe-main-1", itemName = "Curry")
+
+            val todayStr = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+            val mockResponse =
+                WastageDataDto(
+                    id = "wastage-main-1",
+                    date = todayStr,
+                    ingredientId = null,
+                    recipeId = "recipe-main-1",
+                    displayName = "Curry",
+                    unit = "plates",
+                    quantity = 3.0,
+                    carbonFootprint = 2.0,
+                    createdAt = todayStr,
+                    updatedAt = todayStr,
+                )
+            val requestCaptor = argumentCaptor<CreateWastageDataRequest>()
+            whenever(mockWastageRepository.create(any())).thenReturn(Resource.Success(mockResponse))
+
+            // ACT
+            viewModel.submitData(quantity = 3.0)
+
+            // ASSERT
+            verify(mockWastageRepository).create(requestCaptor.capture())
+            assertEquals("recipe-main-1", requestCaptor.firstValue.recipeId)
+            assertNull(requestCaptor.firstValue.ingredientId)
+        }
+
+    @Test
+    fun `submitData in wastage mode with SUB_RECIPE type should send recipeId`() =
+        runTest {
+            // ARRANGE
+            viewModel.setMode(isSales = false)
+            viewModel.setWastageType(WastageType.SUB_RECIPE)
+            viewModel.onItemSelected(itemId = "sub-recipe-1", itemName = "Sauce Base")
+
+            val todayStr = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+            val mockResponse =
+                WastageDataDto(
+                    id = "wastage-sub-1",
+                    date = todayStr,
+                    ingredientId = null,
+                    recipeId = "sub-recipe-1",
+                    displayName = "Sauce Base",
+                    unit = "l",
+                    quantity = 1.5,
+                    carbonFootprint = 0.8,
+                    createdAt = todayStr,
+                    updatedAt = todayStr,
+                )
+            val requestCaptor = argumentCaptor<CreateWastageDataRequest>()
+            whenever(mockWastageRepository.create(any())).thenReturn(Resource.Success(mockResponse))
+
+            // ACT
+            viewModel.submitData(quantity = 1.5)
+
+            // ASSERT
+            verify(mockWastageRepository).create(requestCaptor.capture())
+            assertEquals("sub-recipe-1", requestCaptor.firstValue.recipeId)
+            assertNull(requestCaptor.firstValue.ingredientId)
+        }
+
+    @Test
+    fun `onItemSelected should update selectedItemId and selectedItemName`() {
+        // ACT
+        viewModel.onItemSelected("test-id", "Test Name")
+
+        // ASSERT
+        assertEquals("test-id", viewModel.selectedItemId.value)
+        assertEquals("Test Name", viewModel.selectedItemName.value)
+    }
+
+    @Test
+    fun `default state should be sales mode with INGREDIENT wastage type`() {
+        assertEquals(true, viewModel.isSalesMode.value)
+        assertEquals(WastageType.INGREDIENT, viewModel.wastageType.value)
+    }
 }

@@ -19,6 +19,7 @@ import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.any
 import org.mockito.kotlin.whenever
+import retrofit2.HttpException
 import retrofit2.Response
 import java.io.IOException
 
@@ -187,5 +188,103 @@ class WastageRepositoryTest {
             // Assert
             assertTrue(result is Resource.Error)
             assertEquals("Failed to delete wastage: $errorMessage", result.message)
+        }
+
+    // --- HttpException Tests ---
+
+    @Test
+    fun `getTrend HttpException should return error resource`() =
+        runTest(testDispatcher) {
+            val httpException =
+                HttpException(Response.error<List<WastageTrendDto>>(500, "{}".toResponseBody(null)))
+            whenever(mockWastageApiService.getTrend(any(), any()))
+                .thenAnswer { throw httpException }
+
+            val result = wastageRepository.getTrend("2023-01-01", "2023-01-07")
+
+            assertTrue(result is Resource.Error)
+            assertEquals("An unexpected error occurred: ${httpException.message()}", result.message)
+        }
+
+    @Test
+    fun `create network error should return error resource`() =
+        runTest(testDispatcher) {
+            val createRequest = CreateWastageDataRequest("2023-01-01", "ing1", null, 5.0)
+            whenever(mockWastageApiService.create(any()))
+                .thenAnswer { throw IOException("No internet") }
+
+            val result = wastageRepository.create(createRequest)
+
+            assertTrue(result is Resource.Error)
+            assertEquals("Couldn't reach the server. Check your internet connection.", result.message)
+        }
+
+    @Test
+    fun `create HttpException should return error resource`() =
+        runTest(testDispatcher) {
+            val createRequest = CreateWastageDataRequest("2023-01-01", "ing1", null, 5.0)
+            val httpException =
+                HttpException(Response.error<WastageDataDto>(500, "{}".toResponseBody(null)))
+            whenever(mockWastageApiService.create(any()))
+                .thenAnswer { throw httpException }
+
+            val result = wastageRepository.create(createRequest)
+
+            assertTrue(result is Resource.Error)
+            assertEquals("An unexpected error occurred: ${httpException.message()}", result.message)
+        }
+
+    @Test
+    fun `update API error should return error resource`() =
+        runTest(testDispatcher) {
+            val updateRequest = UpdateWastageDataRequest("2023-01-01", "ing1", null, 6.0)
+            val errorMessage = "Not Found"
+            val errorResponse =
+                Response.error<WastageDataDto>(404, errorMessage.toResponseBody(null))
+            whenever(mockWastageApiService.update(any(), any())).thenReturn(errorResponse)
+
+            val result = wastageRepository.update("wastage1", updateRequest)
+
+            assertTrue(result is Resource.Error)
+            assertEquals("Failed to update wastage: $errorMessage", result.message)
+        }
+
+    @Test
+    fun `update network error should return error resource`() =
+        runTest(testDispatcher) {
+            val updateRequest = UpdateWastageDataRequest("2023-01-01", "ing1", null, 6.0)
+            whenever(mockWastageApiService.update(any(), any()))
+                .thenAnswer { throw IOException("No internet") }
+
+            val result = wastageRepository.update("wastage1", updateRequest)
+
+            assertTrue(result is Resource.Error)
+            assertEquals("Couldn't reach the server. Check your internet connection.", result.message)
+        }
+
+    @Test
+    fun `delete network error should return error resource`() =
+        runTest(testDispatcher) {
+            whenever(mockWastageApiService.delete(any()))
+                .thenAnswer { throw IOException("No internet") }
+
+            val result = wastageRepository.delete("wastage1")
+
+            assertTrue(result is Resource.Error)
+            assertEquals("Couldn't reach the server. Check your internet connection.", result.message)
+        }
+
+    @Test
+    fun `delete HttpException should return error resource`() =
+        runTest(testDispatcher) {
+            val httpException =
+                HttpException(Response.error<Unit>(500, "{}".toResponseBody(null)))
+            whenever(mockWastageApiService.delete(any()))
+                .thenAnswer { throw httpException }
+
+            val result = wastageRepository.delete("wastage1")
+
+            assertTrue(result is Resource.Error)
+            assertEquals("An unexpected error occurred: ${httpException.message()}", result.message)
         }
 }

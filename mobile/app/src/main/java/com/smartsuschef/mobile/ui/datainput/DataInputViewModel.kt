@@ -1,5 +1,6 @@
 package com.smartsuschef.mobile.ui.datainput
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -39,6 +40,10 @@ class DataInputViewModel
         private val ingredientsRepository: IngredientsRepository,
         private val recipesRepository: RecipesRepository,
     ) : ViewModel() {
+        companion object {
+            private const val TAG = "DataInputViewModel"
+        }
+
         // Tracks whether we are in "Sales" or "Wastage" mode
         private val _isSalesMode = MutableLiveData(true)
         val isSalesMode: LiveData<Boolean> = _isSalesMode
@@ -77,7 +82,7 @@ class DataInputViewModel
         init {
             fetchIngredients()
             fetchRecipes()
-            loadRecentEntries() // Initial load
+            loadTodayEntries()
         }
 
         fun setMode(isSales: Boolean) {
@@ -198,7 +203,11 @@ class DataInputViewModel
             when (result) {
                 is Resource.Success -> {
                     val isSalesMode = _isSalesMode.value ?: true
-                    val unit = if (isSalesMode) "plates" else "units"
+                    val unit =
+                        when (val data = result.data) {
+                            is WastageDataDto -> data.unit
+                            else -> "plates"
+                        }
                     val todayStr = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
                     val currentTimeStr = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
 
@@ -278,6 +287,67 @@ class DataInputViewModel
                     }
                     is Resource.Loading -> { /* Loading */ }
                 }
+            }
+        }
+
+        private fun loadTodayEntries() {
+            viewModelScope.launch {
+                val todayStr = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+                val entries = mutableListOf<RecentEntry>()
+
+                when (val salesResult = salesRepository.getAll(todayStr, todayStr)) {
+                    is Resource.Success -> {
+                        salesResult.data?.forEach { sale ->
+                            entries.add(
+                                RecentEntry(
+                                    id = sale.id,
+                                    name = sale.recipeName,
+                                    quantity = sale.quantity.toDouble(),
+                                    unit = "plates",
+                                    date = sale.date,
+                                    time = extractTime(sale.updatedAt),
+                                    isSales = true,
+                                ),
+                            )
+                        }
+                    }
+                    else -> { /* Silently skip if fetch fails */ }
+                }
+
+                when (val wastageResult = wastageRepository.getAll(todayStr, todayStr)) {
+                    is Resource.Success -> {
+                        wastageResult.data?.forEach { wastage ->
+                            entries.add(
+                                RecentEntry(
+                                    id = wastage.id,
+                                    name = wastage.displayName,
+                                    quantity = wastage.quantity,
+                                    unit = wastage.unit,
+                                    date = wastage.date,
+                                    time = extractTime(wastage.updatedAt),
+                                    isSales = false,
+                                ),
+                            )
+                        }
+                    }
+                    else -> { /* Silently skip if fetch fails */ }
+                }
+
+                submittedEntries.clear()
+                submittedEntries.addAll(entries)
+                loadRecentEntries()
+            }
+        }
+
+        private fun extractTime(timestamp: String): String {
+            return try {
+                val apiFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+                val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+                val date = apiFormat.parse(timestamp)
+                date?.let { timeFormat.format(it) } ?: "00:00"
+            } catch (e: java.text.ParseException) {
+                Log.w(TAG, "Failed to parse timestamp: $timestamp", e)
+                "00:00"
             }
         }
 

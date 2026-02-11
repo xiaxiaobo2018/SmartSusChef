@@ -22,6 +22,7 @@ import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.whenever
+import retrofit2.HttpException
 import retrofit2.Response
 import java.io.IOException
 
@@ -269,5 +270,151 @@ class SalesRepositoryTest {
             // Assert
             assertTrue(result is Resource.Error)
             assertEquals("Failed to delete sale: $errorMessage", result.message)
+        }
+
+    // --- HttpException Tests ---
+
+    @Test
+    fun `getAll HttpException should return error resource`() =
+        runTest(testDispatcher) {
+            val httpException =
+                HttpException(Response.error<List<SalesDataDto>>(500, "{}".toResponseBody(null)))
+            whenever(mockSalesApiService.getAll(anyOrNull(), anyOrNull()))
+                .thenAnswer { throw httpException }
+
+            val result = salesRepository.getAll(null, null)
+
+            assertTrue(result is Resource.Error)
+            assertEquals("An unexpected error occurred: ${httpException.message()}", result.message)
+        }
+
+    @Test
+    fun `getTrend network error should return error resource`() =
+        runTest(testDispatcher) {
+            whenever(mockSalesApiService.getTrend(any(), any()))
+                .thenAnswer { throw IOException("No internet") }
+
+            val result = salesRepository.getTrend("2023-01-01", "2023-01-07")
+
+            assertTrue(result is Resource.Error)
+            assertEquals("Couldn't reach the server. Check your internet connection.", result.message)
+        }
+
+    @Test
+    fun `getTrend HttpException should return error resource`() =
+        runTest(testDispatcher) {
+            val httpException =
+                HttpException(Response.error<List<SalesTrendDto>>(500, "{}".toResponseBody(null)))
+            whenever(mockSalesApiService.getTrend(any(), any()))
+                .thenAnswer { throw httpException }
+
+            val result = salesRepository.getTrend("2023-01-01", "2023-01-07")
+
+            assertTrue(result is Resource.Error)
+            assertEquals("An unexpected error occurred: ${httpException.message()}", result.message)
+        }
+
+    @Test
+    fun `getIngredientUsageByDate API error should return error resource`() =
+        runTest(testDispatcher) {
+            val errorMessage = "Bad Request"
+            val errorResponse =
+                Response.error<List<IngredientUsageDto>>(400, errorMessage.toResponseBody(null))
+            whenever(mockSalesApiService.getIngredientUsageByDate(any())).thenReturn(errorResponse)
+
+            val result = salesRepository.getIngredientUsageByDate("2023-01-01")
+
+            assertTrue(result is Resource.Error)
+            assertEquals("Failed to fetch ingredient usage: $errorMessage", result.message)
+        }
+
+    @Test
+    fun `getIngredientUsageByDate network error should return error resource`() =
+        runTest(testDispatcher) {
+            whenever(mockSalesApiService.getIngredientUsageByDate(any()))
+                .thenAnswer { throw IOException("No internet") }
+
+            val result = salesRepository.getIngredientUsageByDate("2023-01-01")
+
+            assertTrue(result is Resource.Error)
+            assertEquals("Couldn't reach the server. Check your internet connection.", result.message)
+        }
+
+    @Test
+    fun `getRecipeSalesByDate API error should return error resource`() =
+        runTest(testDispatcher) {
+            val errorMessage = "Not Found"
+            val errorResponse =
+                Response.error<List<RecipeSalesDto>>(404, errorMessage.toResponseBody(null))
+            whenever(mockSalesApiService.getRecipeSalesByDate(any())).thenReturn(errorResponse)
+
+            val result = salesRepository.getRecipeSalesByDate("2023-01-01")
+
+            assertTrue(result is Resource.Error)
+            assertEquals("Failed to fetch recipe sales: $errorMessage", result.message)
+        }
+
+    @Test
+    fun `getRecipeSalesByDate network error should return error resource`() =
+        runTest(testDispatcher) {
+            whenever(mockSalesApiService.getRecipeSalesByDate(any()))
+                .thenAnswer { throw IOException("No internet") }
+
+            val result = salesRepository.getRecipeSalesByDate("2023-01-01")
+
+            assertTrue(result is Resource.Error)
+            assertEquals("Couldn't reach the server. Check your internet connection.", result.message)
+        }
+
+    @Test
+    fun `create network error should return error resource`() =
+        runTest(testDispatcher) {
+            val createRequest = CreateSalesDataRequest("2023-01-01", "recipe1", 10)
+            whenever(mockSalesApiService.create(any()))
+                .thenAnswer { throw IOException("No internet") }
+
+            val result = salesRepository.create(createRequest)
+
+            assertTrue(result is Resource.Error)
+            assertEquals("Couldn't reach the server. Check your internet connection.", result.message)
+        }
+
+    @Test
+    fun `update API error should return error resource`() =
+        runTest(testDispatcher) {
+            val updateRequest = UpdateSalesDataRequest(15)
+            val errorMessage = "Not Found"
+            val errorResponse = Response.error<SalesDataDto>(404, errorMessage.toResponseBody(null))
+            whenever(mockSalesApiService.update(any(), any())).thenReturn(errorResponse)
+
+            val result = salesRepository.update("sale1", updateRequest)
+
+            assertTrue(result is Resource.Error)
+            assertEquals("Failed to update sale: $errorMessage", result.message)
+        }
+
+    @Test
+    fun `update network error should return error resource`() =
+        runTest(testDispatcher) {
+            val updateRequest = UpdateSalesDataRequest(15)
+            whenever(mockSalesApiService.update(any(), any()))
+                .thenAnswer { throw IOException("No internet") }
+
+            val result = salesRepository.update("sale1", updateRequest)
+
+            assertTrue(result is Resource.Error)
+            assertEquals("Couldn't reach the server. Check your internet connection.", result.message)
+        }
+
+    @Test
+    fun `delete network error should return error resource`() =
+        runTest(testDispatcher) {
+            whenever(mockSalesApiService.delete(any()))
+                .thenAnswer { throw IOException("No internet") }
+
+            val result = salesRepository.delete("sale1")
+
+            assertTrue(result is Resource.Error)
+            assertEquals("Couldn't reach the server. Check your internet connection.", result.message)
         }
 }

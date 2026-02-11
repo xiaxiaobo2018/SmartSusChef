@@ -3,6 +3,7 @@ package com.smartsuschef.mobile.data.repository
 import com.smartsuschef.mobile.data.TokenManager
 import com.smartsuschef.mobile.network.api.AuthApiService
 import com.smartsuschef.mobile.network.dto.ChangePasswordRequest
+import com.smartsuschef.mobile.network.dto.ForgotPasswordRequest
 import com.smartsuschef.mobile.network.dto.LoginRequest
 import com.smartsuschef.mobile.network.dto.LoginResponse
 import com.smartsuschef.mobile.network.dto.UserDto
@@ -17,6 +18,7 @@ import kotlinx.coroutines.test.setMain
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -263,5 +265,120 @@ class AuthRepositoryTest {
             // ASSERT
             assertTrue(result is Resource.Error)
             assertEquals("Couldn't reach the server. Check your internet connection.", result.message)
+        }
+
+    @Test
+    fun `forgotPassword success should return success resource`() =
+        runTest {
+            // ARRANGE
+            val request = ForgotPasswordRequest("test@example.com")
+            whenever(mockAuthApi.forgotPassword(any())).thenReturn(Response.success(Unit))
+
+            // ACT
+            val result = repository.forgotPassword(request)
+
+            // ASSERT
+            assertTrue(result is Resource.Success)
+        }
+
+    @Test
+    fun `forgotPassword api error should return error resource with message`() =
+        runTest {
+            // ARRANGE
+            val request = ForgotPasswordRequest("test@example.com")
+            val apiErrorMessage = "Email not found"
+
+            val mockErrorResponse: Response<Unit> = mock()
+            whenever(mockErrorResponse.isSuccessful).thenReturn(false)
+            whenever(mockErrorResponse.message()).thenReturn(apiErrorMessage)
+
+            whenever(mockAuthApi.forgotPassword(any())).thenReturn(mockErrorResponse)
+
+            // ACT
+            val result = repository.forgotPassword(request)
+
+            // ASSERT
+            assertTrue(result is Resource.Error)
+            assertEquals("Failed to send password reset request: $apiErrorMessage", result.message)
+        }
+
+    @Test
+    fun `forgotPassword network exception should return network error`() =
+        runTest {
+            // ARRANGE
+            val request = ForgotPasswordRequest("test@example.com")
+            whenever(mockAuthApi.forgotPassword(any())).thenAnswer {
+                throw IOException("Network unavailable")
+            }
+
+            // ACT
+            val result = repository.forgotPassword(request)
+
+            // ASSERT
+            assertTrue(result is Resource.Error)
+            assertEquals("Couldn't reach the server. Check your internet connection.", result.message)
+        }
+
+    @Test
+    fun `forgotPassword http exception should return unexpected error`() =
+        runTest {
+            // ARRANGE
+            val request = ForgotPasswordRequest("test@example.com")
+            val errorResponse = Response.error<Unit>(404, "".toResponseBody(null))
+            whenever(mockAuthApi.forgotPassword(any())).thenAnswer {
+                throw HttpException(errorResponse)
+            }
+
+            // ACT
+            val result = repository.forgotPassword(request)
+
+            // ASSERT
+            assertTrue(result is Resource.Error)
+            assertTrue(result.message?.contains("An unexpected error occurred") == true)
+        }
+
+    @Test
+    fun `logout should clear session from TokenManager`() =
+        runTest {
+            // ACT
+            repository.logout()
+
+            // ASSERT
+            verify(mockTokenManager).clearSession()
+        }
+
+    @Test
+    fun `isUserLoggedIn when token is present should return true`() =
+        runTest {
+            // ARRANGE
+            whenever(mockTokenManager.getToken()).thenReturn("some-token")
+
+            // ACT
+            val result = repository.isUserLoggedIn()
+
+            // ASSERT
+            assertTrue(result)
+        }
+
+    @Test
+    fun `isUserLoggedIn when token is null or empty should return false`() =
+        runTest {
+            // ARRANGE
+            whenever(mockTokenManager.getToken()).thenReturn(null)
+
+            // ACT
+            val result = repository.isUserLoggedIn()
+
+            // ASSERT
+            assertFalse(result)
+
+            // ARRANGE
+            whenever(mockTokenManager.getToken()).thenReturn("")
+
+            // ACT
+            val resultEmpty = repository.isUserLoggedIn()
+
+            // ASSERT
+            assertFalse(resultEmpty)
         }
 }

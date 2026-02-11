@@ -279,6 +279,7 @@ interface ForecastApiService {
     @GET("forecast")
     suspend fun getForecast(
         @Query("days") days: Int = 7,
+        @Query("includePastDays") includePastDays: Int = 0,
     ): Response<List<ForecastDto>>
 
     /**
