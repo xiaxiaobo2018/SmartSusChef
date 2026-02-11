@@ -4,7 +4,6 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { MlModelStatusCard } from '../MlModelStatus';
 import { AppProvider } from '@/app/context/AppContext';
-import * as AppContext from '@/app/context/AppContext';
 import * as api from '@/app/services/api';
 
 // Mock AuthContext (AppProvider now depends on useAuth)

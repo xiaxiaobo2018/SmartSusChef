@@ -100,7 +100,7 @@ describe('RecipeManagement', () => {
         fireEvent.click(checkbox);
     }
 
-    function fillComponentRow(index: number, itemValue: string, quantity: string) {
+    function _fillComponentRow(index: number, itemValue: string, quantity: string) {
         const rows = screen.getAllByRole('combobox');
         const selectTrigger = rows[index];
         fireEvent.click(selectTrigger);

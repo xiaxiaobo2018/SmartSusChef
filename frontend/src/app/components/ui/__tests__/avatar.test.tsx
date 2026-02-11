@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
-import { Avatar, AvatarImage, AvatarFallback } from '../avatar';
+import { Avatar, AvatarFallback } from '../avatar';
 
 describe('Avatar', () => {
     it('should render avatar root', () => {

@@ -102,7 +102,7 @@ describe('Badge', () => {
         });
 
         it('should use Slot component when asChild is true', () => {
-            const { container } = render(
+            render(
                 <Badge asChild>
                     <a href="/test">Link Badge</a>
                 </Badge>
@@ -114,7 +114,7 @@ describe('Badge', () => {
 
     describe('Attributes', () => {
         it('should accept data attributes', () => {
-            const { container } = render(
+            render(
                 <Badge data-testid="custom-badge" data-value="123">
                     Attributed Badge
                 </Badge>

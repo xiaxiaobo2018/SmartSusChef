@@ -42,7 +42,7 @@ vi.mock('@/app/utils/unitConversion', () => ({
 }));
 
 vi.mock('@/app/utils/recipeCalculations', () => ({
-    calculateRecipeWeight: vi.fn((recipeId: string, recipeMap: Map<string, Recipe>, ingredientMap: Map<string, Ingredient>) => {
+    calculateRecipeWeight: vi.fn((recipeId: string, recipeMap: Map<string, Recipe>, _ingredientMap: Map<string, Ingredient>) => {
         const recipe = recipeMap.get(recipeId);
         if (!recipe || !recipe.ingredients) return 0;
 

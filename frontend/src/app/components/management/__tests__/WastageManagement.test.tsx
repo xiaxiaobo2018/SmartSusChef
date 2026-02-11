@@ -3,7 +3,6 @@ import { render, screen, fireEvent, within } from '@testing-library/react';
 import { WastageManagement } from '../WastageManagement';
 import * as AppContext from '@/app/context/AppContext';
 import type { AppContextType } from '@/app/types';
-import { toast } from 'sonner';
 
 vi.mock('sonner', () => ({
     toast: {

@@ -469,13 +469,16 @@ jobs:
           # ESLint
           echo "### ESLint" >> $GITHUB_STEP_SUMMARY
           if [ -f eslint-report.txt ]; then
-            LINT_ERRORS=$(grep -cE '[0-9]+ error' eslint-report.txt 2>/dev/null || echo 0)
-            LINT_WARNINGS=$(grep -cE '[0-9]+ warning' eslint-report.txt 2>/dev/null || echo 0)
-            if [ "$LINT_ERRORS" -eq 0 ] && [ "$LINT_WARNINGS" -eq 0 ]; then
+            ESLINT_SUMMARY=$(grep -oE '[0-9]+ error|[0-9]+ warning' eslint-report.txt 2>/dev/null | tail -2 | tr '\n' ', ' | sed 's/, $//')
+            if [ -z "$ESLINT_SUMMARY" ]; then
               echo ":white_check_mark: No lint issues." >> $GITHUB_STEP_SUMMARY
             else
-              SUMMARY_LINE=$(tail -1 eslint-report.txt 2>/dev/null || echo "See artifact")
-              echo "$SUMMARY_LINE" >> $GITHUB_STEP_SUMMARY
+              ERR_COUNT=$(echo "$ESLINT_SUMMARY" | grep -oE '^[0-9]+' | head -1)
+              if [ "$ERR_COUNT" = "0" ]; then
+                echo ":warning: $ESLINT_SUMMARY (see artifact for details)." >> $GITHUB_STEP_SUMMARY
+              else
+                echo ":x: $ESLINT_SUMMARY" >> $GITHUB_STEP_SUMMARY
+              fi
             fi
           else
             echo "Report not available." >> $GITHUB_STEP_SUMMARY

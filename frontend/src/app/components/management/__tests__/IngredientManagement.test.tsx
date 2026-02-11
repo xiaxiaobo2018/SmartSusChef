@@ -1015,7 +1015,7 @@ describe('IngredientManagement', () => {
                 ingredients: [...mockIngredients, unusedIngredient]
             }) as any);
 
-            const { rerender } = render(<IngredientManagement />);
+            render(<IngredientManagement />);
             clickDelete('Garlic');
             fireEvent.click(screen.getByText('Yes, Delete Ingredient'));
             await waitFor(() => expect(mockDeleteIngredient).toHaveBeenCalled());
