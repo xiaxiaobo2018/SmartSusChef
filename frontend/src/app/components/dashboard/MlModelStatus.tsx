@@ -59,7 +59,7 @@ const STATUS_CONFIG: Record<MlModelStatus, {
 };
 
 export function MlModelStatusCard() {
-    const { refreshData } = useApp();
+    const { refreshData, refreshForecast } = useApp();
     const [status, setStatus] = useState<MlStatusDto | null>(null);
     const [loading, setLoading] = useState(true);
     const [training, setTraining] = useState(false);
@@ -120,11 +120,11 @@ export function MlModelStatusCard() {
         prevStatusRef.current = curr;
 
         if (prev === 'training' && curr === 'ready') {
-            // Training just finished — refreshData triggers ML prediction via forecast endpoint
+            // Training just finished — call forecast API directly and wait for it
             (async () => {
                 try {
                     setLoading(true);
-                    await refreshData();
+                    await refreshForecast();
                     await fetchStatus();
                 } catch (err) {
                     console.error('[MlModelStatus] Auto-predict after training failed:', err);
@@ -133,7 +133,7 @@ export function MlModelStatusCard() {
                 }
             })();
         }
-    }, [status?.status, refreshData, fetchStatus]);
+    }, [status?.status, refreshForecast, fetchStatus]);
 
     const handleTrain = async () => {
         try {
@@ -154,13 +154,13 @@ export function MlModelStatusCard() {
         try {
             setLoading(true);
             setError(null);
-            // refreshData calls GET /api/forecast which triggers ML prediction
-            // and saves results to DB — no need for separate mlApi.predict call
-            await refreshData();
+            // Directly call and await the forecast API (which triggers ML prediction)
+            // instead of refreshData (which fires forecast as non-blocking Phase 2)
+            await refreshForecast();
             await fetchStatus();
         } catch (err) {
             console.error('[MlModelStatus] Failed to refresh predictions:', err);
-            setError('Failed to refresh predictions.');
+            setError('Failed to refresh predictions. The ML prediction may take a while — please try again.');
         } finally {
             setLoading(false);
         }

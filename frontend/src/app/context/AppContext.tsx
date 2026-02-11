@@ -79,6 +79,7 @@ export interface AppContextType {
   holidays: HolidayEvent[];
   weather: WeatherData | null;
   refreshData: () => Promise<void>;
+  refreshForecast: () => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | null>(null);
@@ -652,6 +653,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
     await loadAllData();
   };
 
+  /**
+   * Directly fetch forecast data from backend (awaitable).
+   * Unlike refreshData/loadAllData which fires Phase 2 as non-blocking,
+   * this function waits for the forecast API to return so callers
+   * can show a proper loading state.
+   */
+  const refreshForecast = async () => {
+    console.log('[AppContext] refreshForecast: calling forecastApi.get(7, 7)...');
+    const forecastDataResult = await forecastApi.get(7, 7);
+    const mappedForecast = forecastDataResult.map(mapForecastDto);
+    console.log('[AppContext] refreshForecast: received', mappedForecast.length, 'forecast items');
+    setForecastData(mappedForecast);
+  };
+
   const value: AppContextType = {
     user,
     loading,
@@ -688,6 +703,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     holidays,
     weather,
     refreshData,
+    refreshForecast,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
