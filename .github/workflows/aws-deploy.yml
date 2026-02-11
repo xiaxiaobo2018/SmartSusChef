@@ -116,15 +116,15 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@v4
         with:
           languages: ${{ matrix.language }}
 
       - name: Autobuild
-        uses: github/codeql-action/autobuild@v3
+        uses: github/codeql-action/autobuild@v4
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
+        uses: github/codeql-action/analyze@v4
         with:
           category: "/language:${{ matrix.language }}"
           output: codeql-results
@@ -136,6 +136,28 @@ jobs:
           name: codeql-report-${{ matrix.language }}
           path: codeql-results/*.sarif
           retention-days: 30
+
+      - name: CodeQL scan summary
+        if: always()
+        run: |
+          echo "## CodeQL Security Scan (${{ matrix.language }})" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if ls codeql-results/*.sarif 1>/dev/null 2>&1; then
+            for f in codeql-results/*.sarif; do
+              TOTAL=$(jq '[.runs[].results[]] | length' "$f" 2>/dev/null || echo 0)
+              ERRORS=$(jq '[.runs[].results[] | select(.level=="error")] | length' "$f" 2>/dev/null || echo 0)
+              WARNINGS=$(jq '[.runs[].results[] | select(.level=="warning")] | length' "$f" 2>/dev/null || echo 0)
+              NOTES=$(jq '[.runs[].results[] | select(.level=="note")] | length' "$f" 2>/dev/null || echo 0)
+              echo "| Severity | Count |" >> $GITHUB_STEP_SUMMARY
+              echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
+              echo "| :red_circle: Error | $ERRORS |" >> $GITHUB_STEP_SUMMARY
+              echo "| :orange_circle: Warning | $WARNINGS |" >> $GITHUB_STEP_SUMMARY
+              echo "| :blue_circle: Note | $NOTES |" >> $GITHUB_STEP_SUMMARY
+              echo "| **Total** | **$TOTAL** |" >> $GITHUB_STEP_SUMMARY
+            done
+          else
+            echo ":white_check_mark: No SARIF results found — analysis clean or skipped." >> $GITHUB_STEP_SUMMARY
+          fi
 
   # ==========================================
   # STAGE 1b: Snyk Dependency Scanning
@@ -164,21 +186,38 @@ jobs:
         if: needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.infra == 'true'
         run: dotnet restore backend/SmartSusChef.sln
 
-      - name: Snyk .NET scan
+      - name: Snyk .NET scan (Api)
         if: needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.infra == 'true'
         uses: snyk/actions/dotnet@master
         continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          args: --file=backend/SmartSusChef.sln --sarif-file-output=snyk-backend.sarif --severity-threshold=high
+          args: --file=backend/SmartSusChef.Api/SmartSusChef.Api.csproj --sarif-file-output=snyk-backend-api.sarif --severity-threshold=high
 
-      - name: Upload Snyk Backend SARIF
-        if: always() && (needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.infra == 'true')
-        uses: github/codeql-action/upload-sarif@v3
+      - name: Snyk .NET scan (Tests)
+        if: needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.infra == 'true'
+        uses: snyk/actions/dotnet@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          sarif_file: snyk-backend.sarif
-          category: snyk-backend
+          args: --file=backend/SmartSusChef.Api.Tests/SmartSusChef.Api.Tests.csproj --sarif-file-output=snyk-backend-tests.sarif --severity-threshold=high
+
+      - name: Upload Snyk Backend Api SARIF
+        if: always() && (needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.infra == 'true')
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: snyk-backend-api.sarif
+          category: snyk-backend-api
+        continue-on-error: true
+
+      - name: Upload Snyk Backend Tests SARIF
+        if: always() && (needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.infra == 'true')
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: snyk-backend-tests.sarif
+          category: snyk-backend-tests
         continue-on-error: true
 
       # --- Frontend (npm) ---
@@ -206,7 +245,7 @@ jobs:
 
       - name: Upload Snyk Frontend SARIF
         if: always() && (needs.detect-changes.outputs.frontend == 'true' || needs.detect-changes.outputs.infra == 'true')
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: snyk-frontend.sarif
           category: snyk-frontend
@@ -237,7 +276,7 @@ jobs:
 
       - name: Upload Snyk ML SARIF
         if: always() && (needs.detect-changes.outputs.ml == 'true' || needs.detect-changes.outputs.infra == 'true')
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: snyk-ml.sarif
           category: snyk-ml
@@ -259,7 +298,8 @@ jobs:
           echo "## Snyk Dependency Scan" >> $GITHUB_STEP_SUMMARY
           echo "| Component | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
-          [ -f snyk-backend.sarif ]  && echo "| Backend (.NET) | :white_check_mark: Scanned |" >> $GITHUB_STEP_SUMMARY  || echo "| Backend (.NET) | :yellow_circle: Skipped |" >> $GITHUB_STEP_SUMMARY
+          [ -f snyk-backend-api.sarif ] && echo "| Backend Api (.NET) | :white_check_mark: Scanned |" >> $GITHUB_STEP_SUMMARY || echo "| Backend Api (.NET) | :yellow_circle: Skipped |" >> $GITHUB_STEP_SUMMARY
+          [ -f snyk-backend-tests.sarif ] && echo "| Backend Tests (.NET) | :white_check_mark: Scanned |" >> $GITHUB_STEP_SUMMARY || echo "| Backend Tests (.NET) | :yellow_circle: Skipped |" >> $GITHUB_STEP_SUMMARY
           [ -f snyk-frontend.sarif ] && echo "| Frontend (npm) | :white_check_mark: Scanned |" >> $GITHUB_STEP_SUMMARY  || echo "| Frontend (npm) | :yellow_circle: Skipped |" >> $GITHUB_STEP_SUMMARY
           [ -f snyk-ml.sarif ]       && echo "| ML (pip) | :white_check_mark: Scanned |" >> $GITHUB_STEP_SUMMARY       || echo "| ML (pip) | :yellow_circle: Skipped |" >> $GITHUB_STEP_SUMMARY
 
@@ -298,6 +338,38 @@ jobs:
           name: backend-test-results
           path: ./TestResults/
           retention-days: 30
+
+      - name: Backend test summary
+        if: always()
+        run: |
+          echo "## Backend Unit Tests (.NET)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          TRX_FILE=$(find ./TestResults -name '*.trx' -type f 2>/dev/null | head -1)
+          if [ -n "$TRX_FILE" ]; then
+            TOTAL=$(grep -oP 'total="\K[0-9]+' "$TRX_FILE" | head -1 || echo 0)
+            PASSED=$(grep -oP 'passed="\K[0-9]+' "$TRX_FILE" | head -1 || echo 0)
+            FAILED=$(grep -oP 'failed="\K[0-9]+' "$TRX_FILE" | head -1 || echo 0)
+            echo "| Metric | Count |" >> $GITHUB_STEP_SUMMARY
+            echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+            echo "| :white_check_mark: Passed | $PASSED |" >> $GITHUB_STEP_SUMMARY
+            echo "| :x: Failed | $FAILED |" >> $GITHUB_STEP_SUMMARY
+            echo "| **Total** | **$TOTAL** |" >> $GITHUB_STEP_SUMMARY
+          else
+            # Fallback: parse dotnet test output from coverage XMLs
+            COVERAGE_FILE=$(find ./TestResults -name 'coverage.cobertura.xml' -type f 2>/dev/null | head -1)
+            if [ -n "$COVERAGE_FILE" ]; then
+              LINE_RATE=$(grep -oP 'line-rate="\K[0-9.]+' "$COVERAGE_FILE" | head -1 || echo "N/A")
+              BRANCH_RATE=$(grep -oP 'branch-rate="\K[0-9.]+' "$COVERAGE_FILE" | head -1 || echo "N/A")
+              LINE_PCT=$(echo "$LINE_RATE * 100" | bc 2>/dev/null || echo "N/A")
+              BRANCH_PCT=$(echo "$BRANCH_RATE * 100" | bc 2>/dev/null || echo "N/A")
+              echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+              echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+              echo "| Line Coverage | ${LINE_PCT}% |" >> $GITHUB_STEP_SUMMARY
+              echo "| Branch Coverage | ${BRANCH_PCT}% |" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "Tests executed (see artifact for details)." >> $GITHUB_STEP_SUMMARY
+            fi
+          fi
 
   # ==========================================
   # STAGE 2: Frontend Build & Test
@@ -361,6 +433,68 @@ jobs:
             frontend/test-report.txt
             frontend/coverage/
           retention-days: 30
+
+      - name: Frontend test summary
+        if: always()
+        working-directory: ./frontend
+        run: |
+          echo "## Frontend Build & Test" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          # npm audit summary
+          echo "### npm Audit" >> $GITHUB_STEP_SUMMARY
+          if [ -f npm-audit-report.txt ]; then
+            VULNS=$(grep -c 'Severity:' npm-audit-report.txt 2>/dev/null || echo 0)
+            if [ "$VULNS" -eq 0 ]; then
+              echo ":white_check_mark: No vulnerabilities found." >> $GITHUB_STEP_SUMMARY
+            else
+              echo ":warning: $VULNS vulnerabilities found (see artifact for details)." >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "Report not available." >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          # TypeScript check
+          echo "### TypeScript Type Check" >> $GITHUB_STEP_SUMMARY
+          if [ -f typescript-report.txt ]; then
+            TS_ERRORS=$(grep -c 'error TS' typescript-report.txt 2>/dev/null || echo 0)
+            if [ "$TS_ERRORS" -eq 0 ]; then
+              echo ":white_check_mark: No type errors." >> $GITHUB_STEP_SUMMARY
+            else
+              echo ":x: $TS_ERRORS type error(s) found." >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "Report not available." >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          # ESLint
+          echo "### ESLint" >> $GITHUB_STEP_SUMMARY
+          if [ -f eslint-report.txt ]; then
+            LINT_ERRORS=$(grep -cE '[0-9]+ error' eslint-report.txt 2>/dev/null || echo 0)
+            LINT_WARNINGS=$(grep -cE '[0-9]+ warning' eslint-report.txt 2>/dev/null || echo 0)
+            if [ "$LINT_ERRORS" -eq 0 ] && [ "$LINT_WARNINGS" -eq 0 ]; then
+              echo ":white_check_mark: No lint issues." >> $GITHUB_STEP_SUMMARY
+            else
+              SUMMARY_LINE=$(tail -1 eslint-report.txt 2>/dev/null || echo "See artifact")
+              echo "$SUMMARY_LINE" >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "Report not available." >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          # Vitest results
+          echo "### Unit Tests (Vitest)" >> $GITHUB_STEP_SUMMARY
+          if [ -f test-report.txt ]; then
+            PASS_LINE=$(grep -E 'Tests\s+[0-9]' test-report.txt | tail -1 || echo "")
+            if [ -n "$PASS_LINE" ]; then
+              echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+              echo "$PASS_LINE" >> $GITHUB_STEP_SUMMARY
+              echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "See artifact for details." >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "Report not available." >> $GITHUB_STEP_SUMMARY
+          fi
 
   # ==========================================
   # STAGE 2: ML Service Build & Test
@@ -507,6 +641,82 @@ jobs:
           if-no-files-found: warn
           retention-days: 30
 
+      - name: ML test summary
+        if: always()
+        working-directory: ./ML
+        run: |
+          echo "## ML Service Build & Test" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          # Pytest results
+          echo "### Pytest" >> $GITHUB_STEP_SUMMARY
+          if [ -f pytest-report.xml ]; then
+            TESTS=$(grep -oP 'tests="\K[0-9]+' pytest-report.xml | head -1 || echo 0)
+            FAILURES=$(grep -oP 'failures="\K[0-9]+' pytest-report.xml | head -1 || echo 0)
+            ERRORS=$(grep -oP 'errors="\K[0-9]+' pytest-report.xml | head -1 || echo 0)
+            SKIPPED=$(grep -oP 'skipped="\K[0-9]+' pytest-report.xml | head -1 || echo 0)
+            PASSED=$((TESTS - FAILURES - ERRORS - SKIPPED))
+            echo "| Metric | Count |" >> $GITHUB_STEP_SUMMARY
+            echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+            echo "| :white_check_mark: Passed | $PASSED |" >> $GITHUB_STEP_SUMMARY
+            echo "| :x: Failed | $FAILURES |" >> $GITHUB_STEP_SUMMARY
+            echo "| :warning: Errors | $ERRORS |" >> $GITHUB_STEP_SUMMARY
+            echo "| :fast_forward: Skipped | $SKIPPED |" >> $GITHUB_STEP_SUMMARY
+            echo "| **Total** | **$TESTS** |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No pytest report found." >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          # Coverage
+          echo "### Coverage" >> $GITHUB_STEP_SUMMARY
+          if [ -f coverage.xml ]; then
+            LINE_RATE=$(grep -oP 'line-rate="\K[0-9.]+' coverage.xml | head -1 || echo "0")
+            LINE_PCT=$(echo "$LINE_RATE * 100" | bc 2>/dev/null || echo "N/A")
+            echo "Line Coverage: **${LINE_PCT}%**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No coverage report found." >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          # Ruff
+          echo "### Ruff Lint" >> $GITHUB_STEP_SUMMARY
+          if [ -f ruff-report.json ]; then
+            ISSUES=$(jq 'length' ruff-report.json 2>/dev/null || echo 0)
+            if [ "$ISSUES" -eq 0 ]; then
+              echo ":white_check_mark: No lint issues." >> $GITHUB_STEP_SUMMARY
+            else
+              echo ":warning: $ISSUES issue(s) found." >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "Report not available." >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          # Mypy
+          echo "### Mypy Type Check" >> $GITHUB_STEP_SUMMARY
+          if [ -f mypy-report.txt ]; then
+            MYPY_ERRORS=$(grep -c 'error:' mypy-report.txt 2>/dev/null || echo 0)
+            if [ "$MYPY_ERRORS" -eq 0 ]; then
+              echo ":white_check_mark: No type errors." >> $GITHUB_STEP_SUMMARY
+            else
+              echo ":warning: $MYPY_ERRORS type error(s) found." >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "Report not available." >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          # Bandit
+          echo "### Bandit Security Scan" >> $GITHUB_STEP_SUMMARY
+          if [ -f bandit-report.json ]; then
+            HIGH=$(jq '[.results[] | select(.issue_severity=="HIGH")] | length' bandit-report.json 2>/dev/null || echo 0)
+            MEDIUM=$(jq '[.results[] | select(.issue_severity=="MEDIUM")] | length' bandit-report.json 2>/dev/null || echo 0)
+            LOW=$(jq '[.results[] | select(.issue_severity=="LOW")] | length' bandit-report.json 2>/dev/null || echo 0)
+            echo "| Severity | Count |" >> $GITHUB_STEP_SUMMARY
+            echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
+            echo "| :red_circle: High | $HIGH |" >> $GITHUB_STEP_SUMMARY
+            echo "| :orange_circle: Medium | $MEDIUM |" >> $GITHUB_STEP_SUMMARY
+            echo "| :yellow_circle: Low | $LOW |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "Report not available." >> $GITHUB_STEP_SUMMARY
+          fi
+
   # ==========================================
   # STAGE 3: Build & Push Docker Images to ECR
   # ==========================================
@@ -634,21 +844,21 @@ jobs:
           retention-days: 30
 
       - name: Upload Trivy Backend SARIF to GitHub Security
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         if: always() && (needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.infra == 'true')
         with:
           sarif_file: 'trivy-backend-image.sarif'
           category: 'trivy-image-backend'
 
       - name: Upload Trivy Frontend SARIF to GitHub Security
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         if: always() && (needs.detect-changes.outputs.frontend == 'true' || needs.detect-changes.outputs.infra == 'true')
         with:
           sarif_file: 'trivy-frontend-image.sarif'
           category: 'trivy-image-frontend'
 
       - name: Upload Trivy ML SARIF to GitHub Security
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         if: always() && (needs.detect-changes.outputs.ml == 'true' || needs.detect-changes.outputs.infra == 'true')
         with:
           sarif_file: 'trivy-ml-image.sarif'
@@ -664,7 +874,7 @@ jobs:
           severity: 'CRITICAL,HIGH'
 
       - name: Upload Trivy filesystem SARIF to GitHub Security
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         if: always()
         with:
           sarif_file: 'trivy-fs-results.sarif'
@@ -677,6 +887,29 @@ jobs:
           name: trivy-filesystem-report
           path: trivy-fs-results.sarif
           retention-days: 30
+
+      - name: Trivy scan summary
+        if: always()
+        run: |
+          echo "## Trivy Container & Filesystem Scan" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          parse_sarif() {
+            local label=$1 file=$2
+            if [ -f "$file" ]; then
+              CRITICAL=$(jq '[.runs[].results[] | select(.level=="error")] | length' "$file" 2>/dev/null || echo 0)
+              HIGH=$(jq '[.runs[].results[] | select(.level=="warning")] | length' "$file" 2>/dev/null || echo 0)
+              TOTAL=$(jq '[.runs[].results[]] | length' "$file" 2>/dev/null || echo 0)
+              echo "| $label | $CRITICAL | $HIGH | $TOTAL |" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "| $label | — | — | skipped |" >> $GITHUB_STEP_SUMMARY
+            fi
+          }
+          echo "| Target | Critical | High | Total |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|----------|------|-------|" >> $GITHUB_STEP_SUMMARY
+          parse_sarif "Backend Image" "trivy-backend-image.sarif"
+          parse_sarif "Frontend Image" "trivy-frontend-image.sarif"
+          parse_sarif "ML Image" "trivy-ml-image.sarif"
+          parse_sarif "Filesystem" "trivy-fs-results.sarif"
 
   # ==========================================
   # STAGE 4: Deploy to UAT Environment
@@ -911,6 +1144,27 @@ jobs:
           path: frontend/playwright-report/
           retention-days: 30
 
+      - name: Playwright test summary
+        if: always()
+        run: |
+          echo "## E2E Tests (Playwright)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          JUNIT_FILE=$(find frontend -name 'results.xml' -o -name 'junit-report.xml' 2>/dev/null | head -1)
+          if [ -n "$JUNIT_FILE" ]; then
+            TESTS=$(grep -oP 'tests="\K[0-9]+' "$JUNIT_FILE" | head -1 || echo 0)
+            FAILURES=$(grep -oP 'failures="\K[0-9]+' "$JUNIT_FILE" | head -1 || echo 0)
+            PASSED=$((TESTS - FAILURES))
+            echo "| Metric | Count |" >> $GITHUB_STEP_SUMMARY
+            echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+            echo "| :white_check_mark: Passed | $PASSED |" >> $GITHUB_STEP_SUMMARY
+            echo "| :x: Failed | $FAILURES |" >> $GITHUB_STEP_SUMMARY
+            echo "| **Total** | **$TESTS** |" >> $GITHUB_STEP_SUMMARY
+          elif [ -d frontend/playwright-report ]; then
+            echo ":white_check_mark: Playwright report generated (see artifact for details)." >> $GITHUB_STEP_SUMMARY
+          else
+            echo ":warning: No Playwright results found." >> $GITHUB_STEP_SUMMARY
+          fi
+
   # ==========================================
   # STAGE 4c: Performance Tests with JMeter
   # ==========================================
@@ -956,9 +1210,12 @@ jobs:
         continue-on-error: true
 
       - name: Check Apdex score
+        if: always()
         run: |
+          echo "## Performance Tests (JMeter)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
           python3 << 'EOF'
-          import csv
+          import csv, os
           
           threshold_ms = 500
           satisfied = tolerating = frustrated = 0
@@ -993,23 +1250,27 @@ jobs:
                   apdex = (satisfied + tolerating/2) / total
                   error_rate = (error_count / total_requests * 100) if total_requests > 0 else 0
                   
-                  print(f"=== JMeter Performance Summary ===")
-                  print(f"Total Requests: {total_requests}")
-                  print(f"Successful: {success_count}, Failed: {error_count}")
-                  print(f"Error Rate: {error_rate:.1f}%")
-                  print(f"")
-                  print(f"Apdex Score: {apdex:.3f} (threshold: {threshold_ms}ms)")
-                  print(f"  Satisfied (<={threshold_ms}ms): {satisfied}")
-                  print(f"  Tolerating (<={4*threshold_ms}ms): {tolerating}")
-                  print(f"  Frustrated (>{4*threshold_ms}ms): {frustrated}")
+                  summary = os.environ.get('GITHUB_STEP_SUMMARY', '/dev/null')
+                  with open(summary, 'a') as s:
+                      s.write("| Metric | Value |\n")
+                      s.write("|--------|-------|\n")
+                      s.write(f"| Total Requests | {total_requests} |\n")
+                      s.write(f"| :white_check_mark: Successful | {success_count} |\n")
+                      s.write(f"| :x: Failed | {error_count} |\n")
+                      s.write(f"| Error Rate | {error_rate:.1f}% |\n")
+                      s.write(f"| **Apdex Score** | **{apdex:.3f}** (threshold: {threshold_ms}ms) |\n")
+                      s.write(f"| Satisfied (<={threshold_ms}ms) | {satisfied} |\n")
+                      s.write(f"| Tolerating (<={4*threshold_ms}ms) | {tolerating} |\n")
+                      s.write(f"| Frustrated (>{4*threshold_ms}ms) | {frustrated} |\n")
+                      s.write("\n")
+                      if apdex < 0.85:
+                          s.write(f":warning: Apdex score {apdex:.3f} below threshold (0.85)\n")
+                      else:
+                          s.write(f":white_check_mark: Apdex score {apdex:.3f} meets threshold (0.85)\n")
+                      if error_rate > 50:
+                          s.write(f":warning: High error rate {error_rate:.1f}%\n")
                   
-                  if apdex < 0.85:
-                      print(f"\nWARNING: Apdex score {apdex:.3f} below threshold (0.85)")
-                  else:
-                      print(f"\nOK: Apdex score {apdex:.3f} meets threshold (0.85)")
-                  
-                  if error_rate > 50:
-                      print(f"WARNING: High error rate {error_rate:.1f}%")
+                  print(f"Apdex Score: {apdex:.3f}, Total: {total_requests}, Errors: {error_count}")
               else:
                   print("No valid results found in results.jtl")
           except FileNotFoundError:
