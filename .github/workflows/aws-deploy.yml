@@ -207,34 +207,19 @@ jobs:
         if: needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.infra == 'true'
         run: npm install -g snyk
 
-      - name: Snyk .NET scan (Api)
+      - name: Snyk .NET scan
         if: needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.infra == 'true'
         continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        run: snyk test --file=backend/SmartSusChef.Api/SmartSusChef.Api.csproj --sarif-file-output=snyk-backend-api.sarif --severity-threshold=high
+        run: snyk test --file=backend/SmartSusChef.sln --sarif-file-output=snyk-backend.sarif --severity-threshold=high
 
-      - name: Snyk .NET scan (Tests)
-        if: needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.infra == 'true'
-        continue-on-error: true
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        run: snyk test --file=backend/SmartSusChef.Api.Tests/SmartSusChef.Api.Tests.csproj --sarif-file-output=snyk-backend-tests.sarif --severity-threshold=high
-
-      - name: Upload Snyk Backend Api SARIF
+      - name: Upload Snyk Backend SARIF
         if: always() && (needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.infra == 'true')
         uses: github/codeql-action/upload-sarif@v4
         with:
-          sarif_file: snyk-backend-api.sarif
-          category: snyk-backend-api
-        continue-on-error: true
-
-      - name: Upload Snyk Backend Tests SARIF
-        if: always() && (needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.infra == 'true')
-        uses: github/codeql-action/upload-sarif@v4
-        with:
-          sarif_file: snyk-backend-tests.sarif
-          category: snyk-backend-tests
+          sarif_file: snyk-backend.sarif
+          category: snyk-backend
         continue-on-error: true
 
       # --- Frontend (npm) ---
