@@ -1052,7 +1052,8 @@ jobs:
           fi
 
           if [ -n "$SERVICES" ]; then
-            echo "Waiting for all services to stabilize in parallel..."
+            echo "Waiting for all services to stabilize in parallel (up to 15 min)..."
+            export AWS_MAX_ATTEMPTS=30
             declare -A PID_SVC_MAP
             for svc in $SERVICES; do
               echo "  Waiting: $svc"
@@ -1579,7 +1580,8 @@ jobs:
           fi
 
           if [ -n "$SERVICES" ]; then
-            echo "Waiting for all services to stabilize in parallel..."
+            echo "Waiting for all services to stabilize in parallel (up to 15 min)..."
+            export AWS_MAX_ATTEMPTS=30
             declare -A PID_SVC_MAP
             for svc in $SERVICES; do
               echo "  Waiting: $svc"
