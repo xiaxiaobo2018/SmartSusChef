@@ -223,8 +223,8 @@ export function StoreSettings({ onBack }: StoreSettingsProps) {
       });
       toast.success('Store settings updated successfully');
       setStoreErrors({});
-    } catch (_error) {
-      toast.error('Failed to update store settings');
+    } catch {
+      // fetchWithAuth already shows specific error toast
     } finally {
       setIsSaving(false);
     }
@@ -232,10 +232,21 @@ export function StoreSettings({ onBack }: StoreSettingsProps) {
 
   const handleUserSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!userForm.name || !userForm.username) {
+    const trimmedName = userForm.name.trim();
+    const trimmedUsername = userForm.username.trim();
+    const trimmedEmail = userForm.email.trim();
+
+    if (!trimmedName || !trimmedUsername) {
       toast.error('Please fill in all required fields');
       return;
     }
+
+    if (trimmedEmail && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(trimmedEmail)) {
+      toast.error('Please enter a valid email address');
+      return;
+    }
+
+    const submittedForm = { ...userForm, name: trimmedName, username: trimmedUsername, email: trimmedEmail };
 
     try {
       if (editingUser) {
@@ -244,7 +255,7 @@ export function StoreSettings({ onBack }: StoreSettingsProps) {
           toast.error(`Password requirement not met: ${unmet?.label}`);
           return;
         }
-        await updateUser(editingUser.id, userForm.password ? userForm : { ...userForm, password: undefined });
+        await updateUser(editingUser.id, userForm.password ? submittedForm : { ...submittedForm, password: undefined });
         toast.success('User updated successfully');
       } else {
         if (!userForm.password) {
@@ -256,14 +267,14 @@ export function StoreSettings({ onBack }: StoreSettingsProps) {
           toast.error(`Password requirement not met: ${unmet?.label}`);
           return;
         }
-        await addUser(userForm);
+        await addUser(submittedForm);
         toast.success('New user added successfully');
       }
 
       setIsUserDialogOpen(false);
       setEditingUser(null);
-    } catch (_error) {
-      toast.error('Failed to save user');
+    } catch {
+      // fetchWithAuth already shows specific error toast
     }
   };
 
@@ -281,8 +292,8 @@ export function StoreSettings({ onBack }: StoreSettingsProps) {
       try {
         await deleteUser(id);
         toast.success("User deleted successfully");
-      } catch (_error) {
-        toast.error("Failed to delete user");
+      } catch {
+        // fetchWithAuth already shows specific error toast
       }
     }
   };
@@ -305,21 +316,35 @@ export function StoreSettings({ onBack }: StoreSettingsProps) {
       await changePassword(passwordForm.currentPassword, passwordForm.newPassword);
       toast.success('Password updated successfully');
       setPasswordForm({ currentPassword: '', newPassword: '' });
-    } catch (_error) {
-      toast.error('Failed to update password');
+    } catch {
+      // fetchWithAuth already shows specific error toast (e.g., "Current password is incorrect")
     }
   };
 
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
+
   const handleSaveProfile = async () => {
-    if (!profileForm.name || !profileForm.email) {
+    const trimmedName = profileForm.name.trim();
+    const trimmedEmail = profileForm.email.trim();
+
+    if (!trimmedName || !trimmedEmail) {
       toast.error('Please fill in name and email');
       return;
     }
+
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(trimmedEmail)) {
+      toast.error('Please enter a valid email address');
+      return;
+    }
+
+    setIsSavingProfile(true);
     try {
-      await updateProfile({ name: profileForm.name, email: profileForm.email });
+      await updateProfile({ name: trimmedName, email: trimmedEmail });
       toast.success('Profile updated successfully');
-    } catch (_error) {
-      toast.error('Failed to update profile');
+    } catch {
+      // fetchWithAuth already shows specific error toast
+    } finally {
+      setIsSavingProfile(false);
     }
   };
 
@@ -686,9 +711,10 @@ export function StoreSettings({ onBack }: StoreSettingsProps) {
                 <Button
                   variant="outline"
                   onClick={handleSaveProfile}
+                  disabled={isSavingProfile}
                   className="w-full border-[#4F6F52] text-[#4F6F52] hover:bg-[#4F6F52]/5 rounded-[32px] h-11"
                 >
-                  Save Profile Info
+                  {isSavingProfile ? 'Saving...' : 'Save Profile Info'}
                 </Button>
               </CardContent>
             </Card>
