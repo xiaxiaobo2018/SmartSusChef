@@ -83,6 +83,8 @@ jobs:
     name: "Performance Tests (JMeter)"
     runs-on: ubuntu-latest
     if: ${{ inputs.run_jmeter }}
+    environment:
+      name: uat
 
     steps:
       - name: Checkout code
