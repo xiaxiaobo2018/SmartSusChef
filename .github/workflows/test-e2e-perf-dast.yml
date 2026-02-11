@@ -124,10 +124,10 @@ jobs:
           echo "Attempting login at $TARGET_URL/api/Auth/login ..."
           HTTP_CODE=$(curl -s -o /tmp/login_resp.json -w "%{http_code}" -X POST "$TARGET_URL/api/Auth/login" \
             -H "Content-Type: application/json" \
-            -d "{\"username\":\"${{ secrets.ZAP_DAST_USERNAME }}\",\"password\":\"${{ secrets.ZAP_DAST_PASSWORD }}\"}" 2>&1) || true
+            -d "{\"username\":\"${{ secrets.ZAP_DAST_USERNAME }}\",\"password\":\"${{ secrets.ZAP_DAST_PASSWORD }}\"}" 2>/dev/null) || true
           echo "Login HTTP status: $HTTP_CODE"
 
-          TOKEN=$(jq -r '.token // empty' /tmp/login_resp.json 2>/dev/null)
+          TOKEN=$(jq -r '.token // empty' /tmp/login_resp.json 2>/dev/null || echo "")
 
           if [ -z "$TOKEN" ]; then
             echo "::warning::Login failed (HTTP $HTTP_CODE) — skipping test data cleanup"
