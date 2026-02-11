@@ -19,6 +19,13 @@ on:
         description: 'Target ALB URL (without trailing slash)'
         type: string
         default: 'http://smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com'
+      db_environment:
+        description: 'Database environment for JMeter tests'
+        type: choice
+        options:
+          - production
+          - uat
+        default: 'uat'
 
 env:
   NODE_VERSION: '20.x'
@@ -104,7 +111,7 @@ jobs:
         env:
           TARGET_URL: ${{ inputs.target_url }}
           TARGET_PORT: 5001 # Assuming 5001 is the default port for backend in CI
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }} # Ensure this secret is set in GitHub
+          DB_PASSWORD: ${{ secrets[format('DB_PASSWORD_{0}', inputs.db_environment)] }} # Dynamically select secret
         run: |
           chmod +x ./run-jmeter-test.sh
           ./run-jmeter-test.sh
