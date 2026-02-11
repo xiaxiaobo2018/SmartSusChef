@@ -36,7 +36,9 @@ COPY app/ ./app/
 COPY core/ ./core/
 COPY training_logic_v2.py .
 COPY Final_model_v2.py .
-COPY models/ ./models/
+# models/ may not exist yet (generated dynamically at runtime); create empty dir as fallback
+RUN mkdir -p ./models
+COPY model[s]/ ./models/
 
 # Non-root user
 RUN addgroup --system app && adduser --system --ingroup app app
