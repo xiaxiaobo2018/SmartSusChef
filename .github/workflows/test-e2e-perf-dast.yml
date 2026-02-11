@@ -121,16 +121,20 @@ jobs:
           TARGET_URL="${{ inputs.target_url }}"
 
           # Login to get JWT token (Manager role required for delete)
-          RESPONSE=$(curl -sf -X POST "$TARGET_URL/api/Auth/login" \
+          echo "Attempting login at $TARGET_URL/api/Auth/login ..."
+          HTTP_CODE=$(curl -s -o /tmp/login_resp.json -w "%{http_code}" -X POST "$TARGET_URL/api/Auth/login" \
             -H "Content-Type: application/json" \
-            -d '{"username":"${{ secrets.ZAP_DAST_USERNAME }}","password":"${{ secrets.ZAP_DAST_PASSWORD }}"}' 2>&1) || true
-          TOKEN=$(echo "$RESPONSE" | jq -r '.token // empty')
+            -d "{\"username\":\"${{ secrets.ZAP_DAST_USERNAME }}\",\"password\":\"${{ secrets.ZAP_DAST_PASSWORD }}\"}" 2>&1) || true
+          echo "Login HTTP status: $HTTP_CODE"
+
+          TOKEN=$(jq -r '.token // empty' /tmp/login_resp.json 2>/dev/null)
 
           if [ -z "$TOKEN" ]; then
-            echo "::warning::Login failed — skipping test data cleanup"
+            echo "::warning::Login failed (HTTP $HTTP_CODE) — skipping test data cleanup"
+            cat /tmp/login_resp.json 2>/dev/null || true
             exit 0
           fi
-          echo "✅ Login successful"
+          echo "✅ Login successful (token length: ${#TOKEN})"
           AUTH="Authorization: Bearer $TOKEN"
 
           # 1) Delete wastage data linked to test ingredients
@@ -187,7 +191,7 @@ jobs:
             -t testing/performance/jmx/Main_Scenario.jmx \
             -l "$RESULTS_FILE" \
             -e -o "$REPORT_DIR" \
-            -Jtarget_url=${{ inputs.target_url }} \
+            -Jtarget_host=${{ steps.parse-url.outputs.host }} \
             -Jtarget_port=${{ steps.parse-url.outputs.port }} \
             -f
         continue-on-error: true

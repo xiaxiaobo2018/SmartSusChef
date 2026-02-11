@@ -23,8 +23,8 @@
       </ThreadGroup>
       <hashTree>
         <ConfigTestElement guiclass="HttpDefaultsGui" testclass="ConfigTestElement" testname="HTTP Request Defaults" enabled="true">
-          <stringProp name="HTTPSampler.domain">${__P(target_url, localhost)}</stringProp>
-          <stringProp name="HTTPSampler.port">5001</stringProp>
+          <stringProp name="HTTPSampler.domain">${__P(target_host, localhost)}</stringProp>
+          <stringProp name="HTTPSampler.port">${__P(target_port, 5001)}</stringProp>
           <stringProp name="HTTPSampler.protocol">http</stringProp>
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
             <collectionProp name="Arguments.arguments"/>
