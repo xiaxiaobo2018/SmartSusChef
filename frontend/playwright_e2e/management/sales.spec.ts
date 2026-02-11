@@ -36,6 +36,8 @@ test('add new sales record', async ({ page }) => {
 
 test('edit sales record', async ({ page }) => {
     await goToSalesManagement(page);
+    // Wait for table data to load before clicking Edit
+    await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 15000 });
     // Click edit button on first available record
     await page.getByRole('button', { name: 'Edit' }).first().click();
     await expect(page.getByRole('dialog')).toBeVisible();

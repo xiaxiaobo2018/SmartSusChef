@@ -1,5 +1,59 @@
 
 # SmartSusChef
+### _Smarter Prep, Less Waste_
+
+**SmartSusChef** is a predictive analytics application designed for F&B operators who prepare food or dishes in advance—such as economical rice stalls, buffets, and canteen operators. These businesses often struggle with unpredictable daily demand, leading to over‑preparation and unnecessary food waste.
+
+SmartSusChef helps operators answer the key question:
+
+### **“How much should I prep for tomorrow?”**
+
+---
+
+### What SmartSusChef Does
+
+- 📊 **Demand Forecasting**  
+  Uses time‑series machine learning models enhanced with weather and calendar signals to predict next‑day demand.
+
+- 🔁 **Flexible Data Input**  
+  Accepts sales and leftover data through manual entry or CSV import.
+
+- 🌤️ **Weather‑ & Event‑Aware Insights**  
+  Incorporates external factors like weather and school holidays that affect demand.
+
+- 🧾 **Recipe & Ingredient Management**  
+  Helps contextualize prep recommendations by linking them to actual recipes and ingredients.
+
+- 📱 **Mobile App for Employees**  
+  Simple interface to input sales/wastage data and view short‑term insights (last 7 days).
+
+- 🖥️ **Web Dashboard for Managers**  
+  View trends up to 30 days, manage data, edit entries, export reports, and monitor waste patterns.
+
+- ♻️ **Waste Tracking & Reduction**  
+  Tracks surplus and leftover patterns to support more sustainable operations.
+
+-----
+
+### Who We Designed This For
+
+SmartSusChef is built specifically for F&B operators who:
+- Prepare ingredients or dishes in advance  
+- Receive pre‑prepared food from central kitchens  
+- Need simple, affordable forecasting tools  
+- Want to reduce food waste without relying on complex POS systems
+
+-----
+
+### Why It Matters
+
+Food waste is a major sustainability issue. SmartSusChef empowers operators to:
+- Prep more accurately  
+- Reduce avoidable wastage  
+- Improve profitability  
+- Contribute to Singapore’s Zero Waste goals
+
+-----
 
 ## Quick Start
 
