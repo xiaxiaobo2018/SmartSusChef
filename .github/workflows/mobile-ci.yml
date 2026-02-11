@@ -385,25 +385,45 @@ jobs:
         if: always()
         run: |
           echo "## MobSF Security Scan Results" >> $GITHUB_STEP_SUMMARY
-          python3 -c "
-          import json
-          with open('mobsf-report.json') as f:
-              r = json.load(f)
-          score = r.get('security_score', r.get('average_cvss', 'N/A'))
-          print(f'| Metric | Value |')
-          print(f'|--------|-------|')
-          print(f'| Security Score | {score} |')
-          print(f'| App Name | {r.get(\"app_name\", \"N/A\")} |')
-          print(f'| Package | {r.get(\"package_name\", \"N/A\")} |')
-          print(f'| Target SDK | {r.get(\"target_sdk\", \"N/A\")} |')
-          print(f'| Min SDK | {r.get(\"min_sdk\", \"N/A\")} |')
-          high = len([i for i in r.get('manifest_analysis', []) if i.get('severity','') == 'high'])
-          warn = len([i for i in r.get('manifest_analysis', []) if i.get('severity','') == 'warning'])
-          info = len([i for i in r.get('manifest_analysis', []) if i.get('severity','') == 'info'])
-          print(f'| Manifest Issues (High) | {high} |')
-          print(f'| Manifest Issues (Warning) | {warn} |')
-          print(f'| Manifest Issues (Info) | {info} |')
-          " >> $GITHUB_STEP_SUMMARY
+          python3 << 'PYEOF' >> $GITHUB_STEP_SUMMARY
+          import json, sys
+          try:
+              with open('mobsf-report.json') as f:
+                  r = json.load(f)
+              score = r.get('security_score', r.get('average_cvss', 'N/A'))
+              print('| Metric | Value |')
+              print('|--------|-------|')
+              print(f'| Security Score | {score} |')
+              print(f'| App Name | {r.get("app_name", "N/A")} |')
+              print(f'| Package | {r.get("package_name", "N/A")} |')
+              print(f'| Target SDK | {r.get("target_sdk", "N/A")} |')
+              print(f'| Min SDK | {r.get("min_sdk", "N/A")} |')
+              # code_analysis severity counts
+              code = r.get('code_analysis', {})
+              if isinstance(code, dict):
+                  findings = code.values() if not isinstance(list(code.values() or [None])[0] if code else None, list) else [i for v in code.values() for i in (v if isinstance(v, list) else [v])]
+                  high = sum(1 for v in code.values() if isinstance(v, dict) and v.get('severity','').lower() == 'high')
+                  warn = sum(1 for v in code.values() if isinstance(v, dict) and v.get('severity','').lower() in ('warning','medium'))
+                  info = sum(1 for v in code.values() if isinstance(v, dict) and v.get('severity','').lower() in ('info','low'))
+              else:
+                  high = warn = info = 0
+              # manifest_analysis - may be list or string
+              ma = r.get('manifest_analysis', [])
+              if isinstance(ma, list):
+                  m_high = sum(1 for i in ma if isinstance(i, dict) and i.get('severity','').lower() == 'high')
+                  m_warn = sum(1 for i in ma if isinstance(i, dict) and i.get('severity','').lower() in ('warning','medium'))
+                  m_info = sum(1 for i in ma if isinstance(i, dict) and i.get('severity','').lower() in ('info','low'))
+              else:
+                  m_high = m_warn = m_info = 0
+              print(f'| Code Issues (High) | {high} |')
+              print(f'| Code Issues (Warning) | {warn} |')
+              print(f'| Code Issues (Info) | {info} |')
+              print(f'| Manifest Issues (High) | {m_high} |')
+              print(f'| Manifest Issues (Warning) | {m_warn} |')
+              print(f'| Manifest Issues (Info) | {m_info} |')
+          except Exception as e:
+              print(f'| Error | {e} |')
+          PYEOF
         continue-on-error: true
 
       - name: Upload MobSF reports
@@ -592,25 +612,44 @@ jobs:
         if: always()
         run: |
           echo "## MobSF Production Security Scan Results" >> $GITHUB_STEP_SUMMARY
-          python3 -c "
-          import json
-          with open('mobsf-report.json') as f:
-              r = json.load(f)
-          score = r.get('security_score', r.get('average_cvss', 'N/A'))
-          print(f'| Metric | Value |')
-          print(f'|--------|-------|')
-          print(f'| Security Score | {score} |')
-          print(f'| App Name | {r.get(\"app_name\", \"N/A\")} |')
-          print(f'| Package | {r.get(\"package_name\", \"N/A\")} |')
-          print(f'| Target SDK | {r.get(\"target_sdk\", \"N/A\")} |')
-          print(f'| Min SDK | {r.get(\"min_sdk\", \"N/A\")} |')
-          high = len([i for i in r.get('manifest_analysis', []) if i.get('severity','') == 'high'])
-          warn = len([i for i in r.get('manifest_analysis', []) if i.get('severity','') == 'warning'])
-          info = len([i for i in r.get('manifest_analysis', []) if i.get('severity','') == 'info'])
-          print(f'| Manifest Issues (High) | {high} |')
-          print(f'| Manifest Issues (Warning) | {warn} |')
-          print(f'| Manifest Issues (Info) | {info} |')
-          " >> $GITHUB_STEP_SUMMARY
+          python3 << 'PYEOF' >> $GITHUB_STEP_SUMMARY
+          import json, sys
+          try:
+              with open('mobsf-report.json') as f:
+                  r = json.load(f)
+              score = r.get('security_score', r.get('average_cvss', 'N/A'))
+              print('| Metric | Value |')
+              print('|--------|-------|')
+              print(f'| Security Score | {score} |')
+              print(f'| App Name | {r.get("app_name", "N/A")} |')
+              print(f'| Package | {r.get("package_name", "N/A")} |')
+              print(f'| Target SDK | {r.get("target_sdk", "N/A")} |')
+              print(f'| Min SDK | {r.get("min_sdk", "N/A")} |')
+              # code_analysis severity counts
+              code = r.get('code_analysis', {})
+              if isinstance(code, dict):
+                  high = sum(1 for v in code.values() if isinstance(v, dict) and v.get('severity','').lower() == 'high')
+                  warn = sum(1 for v in code.values() if isinstance(v, dict) and v.get('severity','').lower() in ('warning','medium'))
+                  info = sum(1 for v in code.values() if isinstance(v, dict) and v.get('severity','').lower() in ('info','low'))
+              else:
+                  high = warn = info = 0
+              # manifest_analysis - may be list or string
+              ma = r.get('manifest_analysis', [])
+              if isinstance(ma, list):
+                  m_high = sum(1 for i in ma if isinstance(i, dict) and i.get('severity','').lower() == 'high')
+                  m_warn = sum(1 for i in ma if isinstance(i, dict) and i.get('severity','').lower() in ('warning','medium'))
+                  m_info = sum(1 for i in ma if isinstance(i, dict) and i.get('severity','').lower() in ('info','low'))
+              else:
+                  m_high = m_warn = m_info = 0
+              print(f'| Code Issues (High) | {high} |')
+              print(f'| Code Issues (Warning) | {warn} |')
+              print(f'| Code Issues (Info) | {info} |')
+              print(f'| Manifest Issues (High) | {m_high} |')
+              print(f'| Manifest Issues (Warning) | {m_warn} |')
+              print(f'| Manifest Issues (Info) | {m_info} |')
+          except Exception as e:
+              print(f'| Error | {e} |')
+          PYEOF
         continue-on-error: true
 
       - name: Upload MobSF reports
