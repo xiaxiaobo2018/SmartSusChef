@@ -66,6 +66,72 @@ jobs:
           retention-days: 30
 
   # ==========================================
+  # STAGE 1b: Snyk Dependency Scan (Mobile)
+  # ==========================================
+  snyk-scan:
+    name: Snyk Dependency Scan
+    runs-on: ubuntu-latest
+    continue-on-error: true
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+        working-directory: ./mobile
+
+      - name: Build for dependency resolution
+        run: ./gradlew dependencies --no-daemon
+        working-directory: ./mobile
+        continue-on-error: true
+
+      - name: Run Snyk scan
+        uses: snyk/actions/gradle@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --file=mobile/build.gradle.kts --severity-threshold=high --sub-project=app --sarif-file-output=snyk-mobile.sarif
+
+      - name: Upload Snyk SARIF to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: snyk-mobile.sarif
+          category: snyk-mobile
+        continue-on-error: true
+
+      - name: Snyk scan summary
+        if: always()
+        run: |
+          echo "## Snyk Mobile Dependency Scan" >> $GITHUB_STEP_SUMMARY
+          if [ -f snyk-mobile.sarif ]; then
+            RESULTS=$(python3 -c "import json; d=json.load(open('snyk-mobile.sarif')); runs=d.get('runs',[]); total=sum(len(r.get('results',[])) for r in runs); print(total)" 2>/dev/null || echo 'N/A')
+            echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+            echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+            echo "| Vulnerabilities Found | $RESULTS |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No SARIF report generated" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Upload Snyk report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: snyk-mobile-report
+          path: snyk-mobile.sarif
+          if-no-files-found: warn
+          retention-days: 30
+
+  # ==========================================
   # STAGE 2: Unit Tests
   # ==========================================
   unit-test:
@@ -106,6 +172,67 @@ jobs:
           retention-days: 30
 
   # ==========================================
+  # STAGE 2b: Espresso UI Tests (Instrumented)
+  # ==========================================
+  espresso-ui-tests:
+    name: Espresso UI Tests
+    runs-on: ubuntu-latest
+    needs: [unit-test]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+        working-directory: ./mobile
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: AVD cache
+        uses: actions/cache@v4
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-api-31-${{ runner.os }}
+
+      - name: Run Espresso tests on emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 31
+          arch: x86_64
+          target: google_apis
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          disable-animations: true
+          script: |
+            cd mobile
+            ./gradlew connectedUatDebugAndroidTest --stacktrace
+        continue-on-error: true
+
+      - name: Upload Espresso test report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: espresso-test-report
+          path: mobile/app/build/reports/androidTests/
+          if-no-files-found: warn
+          retention-days: 30
+
+  # ==========================================
   # STAGE 3: Build APK (Conditional)
   # ==========================================
   build-debug-apk:
@@ -138,6 +265,124 @@ jobs:
         with:
           name: debug-apk-${{ github.run_number }}-${{ github.event.pull_request.number || github.ref_name }}
           path: mobile/app/build/outputs/apk/uat/debug/*.apk
+          retention-days: 30
+
+  # ==========================================
+  # STAGE 3b: MobSF Security Scan (Debug APK)
+  # ==========================================
+  mobsf-scan-debug:
+    name: MobSF Security Scan (Debug)
+    runs-on: ubuntu-latest
+    needs: [build-debug-apk]
+    if: github.ref != 'refs/heads/mobile-release'
+    timeout-minutes: 30
+
+    services:
+      mobsf:
+        image: opensecurity/mobile-security-framework-mobsf:latest
+        ports:
+          - 8000:8000
+        env:
+          MOBSF_API_KEY: ${{ secrets.MOBSF_API_KEY || '7e3ad7070ad234f5fb1b73f498b7c3e4db78dad46327e0a0dee53f2b9484e995' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download Debug APK
+        uses: actions/download-artifact@v4
+        with:
+          name: debug-apk-${{ github.run_number }}-${{ github.event.pull_request.number || github.ref_name }}
+          path: ./apk
+
+      - name: Wait for MobSF to start
+        run: |
+          echo "Waiting for MobSF to be ready..."
+          for i in $(seq 1 60); do
+            if curl -s http://localhost:8000/api/v1/scans -H "Authorization:${{ secrets.MOBSF_API_KEY || '7e3ad7070ad234f5fb1b73f498b7c3e4db78dad46327e0a0dee53f2b9484e995' }}" > /dev/null 2>&1; then
+              echo "MobSF is ready!"
+              break
+            fi
+            echo "Attempt $i/60 - waiting..."
+            sleep 5
+          done
+
+      - name: Find APK file
+        id: find-apk
+        run: |
+          APK_PATH=$(find ./apk -name "*.apk" -type f | head -1)
+          echo "apk_path=$APK_PATH" >> $GITHUB_OUTPUT
+          echo "Found APK: $APK_PATH"
+
+      - name: Upload APK to MobSF
+        id: upload
+        run: |
+          MOBSF_API_KEY="${{ secrets.MOBSF_API_KEY || '7e3ad7070ad234f5fb1b73f498b7c3e4db78dad46327e0a0dee53f2b9484e995' }}"
+          RESPONSE=$(curl -s -F "file=@${{ steps.find-apk.outputs.apk_path }}" \
+            http://localhost:8000/api/v1/upload \
+            -H "Authorization:${MOBSF_API_KEY}")
+          echo "Upload response: $RESPONSE"
+          HASH=$(echo "$RESPONSE" | python3 -c "import sys,json; print(json.load(sys.stdin)['hash'])")
+          echo "hash=$HASH" >> $GITHUB_OUTPUT
+
+      - name: Run MobSF scan
+        run: |
+          MOBSF_API_KEY="${{ secrets.MOBSF_API_KEY || '7e3ad7070ad234f5fb1b73f498b7c3e4db78dad46327e0a0dee53f2b9484e995' }}"
+          curl -s -X POST http://localhost:8000/api/v1/scan \
+            -H "Authorization:${MOBSF_API_KEY}" \
+            -d "hash=${{ steps.upload.outputs.hash }}"
+
+      - name: Download MobSF JSON report
+        run: |
+          MOBSF_API_KEY="${{ secrets.MOBSF_API_KEY || '7e3ad7070ad234f5fb1b73f498b7c3e4db78dad46327e0a0dee53f2b9484e995' }}"
+          curl -s -X POST http://localhost:8000/api/v1/report_json \
+            -H "Authorization:${MOBSF_API_KEY}" \
+            -d "hash=${{ steps.upload.outputs.hash }}" \
+            -o mobsf-report.json
+
+      - name: Download MobSF PDF report
+        run: |
+          MOBSF_API_KEY="${{ secrets.MOBSF_API_KEY || '7e3ad7070ad234f5fb1b73f498b7c3e4db78dad46327e0a0dee53f2b9484e995' }}"
+          curl -s -X POST http://localhost:8000/api/v1/download_pdf \
+            -H "Authorization:${MOBSF_API_KEY}" \
+            -d "hash=${{ steps.upload.outputs.hash }}" \
+            -o mobsf-report.pdf
+        continue-on-error: true
+
+      - name: Parse MobSF results summary
+        if: always()
+        run: |
+          echo "## MobSF Security Scan Results" >> $GITHUB_STEP_SUMMARY
+          python3 -c "
+          import json
+          with open('mobsf-report.json') as f:
+              r = json.load(f)
+          score = r.get('security_score', r.get('average_cvss', 'N/A'))
+          print(f'| Metric | Value |')
+          print(f'|--------|-------|')
+          print(f'| Security Score | {score} |')
+          print(f'| App Name | {r.get(\"app_name\", \"N/A\")} |')
+          print(f'| Package | {r.get(\"package_name\", \"N/A\")} |')
+          print(f'| Target SDK | {r.get(\"target_sdk\", \"N/A\")} |')
+          print(f'| Min SDK | {r.get(\"min_sdk\", \"N/A\")} |')
+          high = len([i for i in r.get('manifest_analysis', []) if i.get('severity','') == 'high'])
+          warn = len([i for i in r.get('manifest_analysis', []) if i.get('severity','') == 'warning'])
+          info = len([i for i in r.get('manifest_analysis', []) if i.get('severity','') == 'info'])
+          print(f'| Manifest Issues (High) | {high} |')
+          print(f'| Manifest Issues (Warning) | {warn} |')
+          print(f'| Manifest Issues (Info) | {info} |')
+          " >> $GITHUB_STEP_SUMMARY
+        continue-on-error: true
+
+      - name: Upload MobSF reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mobsf-debug-report
+          path: |
+            mobsf-report.json
+            mobsf-report.pdf
+          if-no-files-found: warn
           retention-days: 30
 
   # ==========================================
@@ -223,3 +468,121 @@ jobs:
           draft: false
           prerelease: false
         continue-on-error: true
+
+  # ==========================================
+  # STAGE 4b: MobSF Security Scan (Production APK)
+  # ==========================================
+  mobsf-scan-production:
+    name: MobSF Security Scan (Production)
+    runs-on: ubuntu-latest
+    needs: [build-production-apk]
+    if: github.ref == 'refs/heads/mobile-release'
+    timeout-minutes: 30
+
+    services:
+      mobsf:
+        image: opensecurity/mobile-security-framework-mobsf:latest
+        ports:
+          - 8000:8000
+        env:
+          MOBSF_API_KEY: ${{ secrets.MOBSF_API_KEY || '7e3ad7070ad234f5fb1b73f498b7c3e4db78dad46327e0a0dee53f2b9484e995' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download Production APK
+        uses: actions/download-artifact@v4
+        with:
+          name: production-apk
+          path: ./apk
+
+      - name: Wait for MobSF to start
+        run: |
+          echo "Waiting for MobSF to be ready..."
+          for i in $(seq 1 60); do
+            if curl -s http://localhost:8000/api/v1/scans -H "Authorization:${{ secrets.MOBSF_API_KEY || '7e3ad7070ad234f5fb1b73f498b7c3e4db78dad46327e0a0dee53f2b9484e995' }}" > /dev/null 2>&1; then
+              echo "MobSF is ready!"
+              break
+            fi
+            echo "Attempt $i/60 - waiting..."
+            sleep 5
+          done
+
+      - name: Find APK file
+        id: find-apk
+        run: |
+          APK_PATH=$(find ./apk -name "*.apk" -type f | head -1)
+          echo "apk_path=$APK_PATH" >> $GITHUB_OUTPUT
+          echo "Found APK: $APK_PATH"
+
+      - name: Upload APK to MobSF
+        id: upload
+        run: |
+          MOBSF_API_KEY="${{ secrets.MOBSF_API_KEY || '7e3ad7070ad234f5fb1b73f498b7c3e4db78dad46327e0a0dee53f2b9484e995' }}"
+          RESPONSE=$(curl -s -F "file=@${{ steps.find-apk.outputs.apk_path }}" \
+            http://localhost:8000/api/v1/upload \
+            -H "Authorization:${MOBSF_API_KEY}")
+          echo "Upload response: $RESPONSE"
+          HASH=$(echo "$RESPONSE" | python3 -c "import sys,json; print(json.load(sys.stdin)['hash'])")
+          echo "hash=$HASH" >> $GITHUB_OUTPUT
+
+      - name: Run MobSF scan
+        run: |
+          MOBSF_API_KEY="${{ secrets.MOBSF_API_KEY || '7e3ad7070ad234f5fb1b73f498b7c3e4db78dad46327e0a0dee53f2b9484e995' }}"
+          curl -s -X POST http://localhost:8000/api/v1/scan \
+            -H "Authorization:${MOBSF_API_KEY}" \
+            -d "hash=${{ steps.upload.outputs.hash }}"
+
+      - name: Download MobSF JSON report
+        run: |
+          MOBSF_API_KEY="${{ secrets.MOBSF_API_KEY || '7e3ad7070ad234f5fb1b73f498b7c3e4db78dad46327e0a0dee53f2b9484e995' }}"
+          curl -s -X POST http://localhost:8000/api/v1/report_json \
+            -H "Authorization:${MOBSF_API_KEY}" \
+            -d "hash=${{ steps.upload.outputs.hash }}" \
+            -o mobsf-report.json
+
+      - name: Download MobSF PDF report
+        run: |
+          MOBSF_API_KEY="${{ secrets.MOBSF_API_KEY || '7e3ad7070ad234f5fb1b73f498b7c3e4db78dad46327e0a0dee53f2b9484e995' }}"
+          curl -s -X POST http://localhost:8000/api/v1/download_pdf \
+            -H "Authorization:${MOBSF_API_KEY}" \
+            -d "hash=${{ steps.upload.outputs.hash }}" \
+            -o mobsf-report.pdf
+        continue-on-error: true
+
+      - name: Parse MobSF results summary
+        if: always()
+        run: |
+          echo "## MobSF Production Security Scan Results" >> $GITHUB_STEP_SUMMARY
+          python3 -c "
+          import json
+          with open('mobsf-report.json') as f:
+              r = json.load(f)
+          score = r.get('security_score', r.get('average_cvss', 'N/A'))
+          print(f'| Metric | Value |')
+          print(f'|--------|-------|')
+          print(f'| Security Score | {score} |')
+          print(f'| App Name | {r.get(\"app_name\", \"N/A\")} |')
+          print(f'| Package | {r.get(\"package_name\", \"N/A\")} |')
+          print(f'| Target SDK | {r.get(\"target_sdk\", \"N/A\")} |')
+          print(f'| Min SDK | {r.get(\"min_sdk\", \"N/A\")} |')
+          high = len([i for i in r.get('manifest_analysis', []) if i.get('severity','') == 'high'])
+          warn = len([i for i in r.get('manifest_analysis', []) if i.get('severity','') == 'warning'])
+          info = len([i for i in r.get('manifest_analysis', []) if i.get('severity','') == 'info'])
+          print(f'| Manifest Issues (High) | {high} |')
+          print(f'| Manifest Issues (Warning) | {warn} |')
+          print(f'| Manifest Issues (Info) | {info} |')
+          " >> $GITHUB_STEP_SUMMARY
+        continue-on-error: true
+
+      - name: Upload MobSF reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mobsf-production-report
+          path: |
+            mobsf-report.json
+            mobsf-report.pdf
+          if-no-files-found: warn
+          retention-days: 90

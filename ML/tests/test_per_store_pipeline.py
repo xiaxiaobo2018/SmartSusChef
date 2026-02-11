@@ -14,7 +14,6 @@ import os
 import sys
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -261,9 +260,7 @@ class TestStoreManagerTraining:
         from app.store_manager import StoreModelManager
 
         mgr = StoreModelManager(base_model_dir=str(tmp_path))
-        df = pd.DataFrame(
-            {"date": pd.to_datetime(["2024-01-01"]), "dish": ["A"], "sales": [1.0]}
-        )
+        df = pd.DataFrame({"date": pd.to_datetime(["2024-01-01"]), "dish": ["A"], "sales": [1.0]})
         monkeypatch.setattr(mgr, "fetch_store_sales", lambda sid: (df, 5))
         result = mgr.train_store_models(1)
         assert result["status"] == "insufficient_data"
@@ -338,8 +335,9 @@ class TestStoreTrainEndpoint:
         main_mod.get_model_manager.cache_clear()
 
     def _make_client(self, monkeypatch, manager):
-        import app.main as main_mod
         from fastapi.testclient import TestClient
+
+        import app.main as main_mod
 
         main_mod.get_model_store.cache_clear()
         main_mod.get_model_manager.cache_clear()
@@ -430,8 +428,9 @@ class TestPredictionErrors:
         main_mod.get_model_manager.cache_clear()
 
     def _make_client(self, monkeypatch, manager):
-        import app.main as main_mod
         from fastapi.testclient import TestClient
+
+        import app.main as main_mod
 
         main_mod.get_model_store.cache_clear()
         main_mod.get_model_manager.cache_clear()
