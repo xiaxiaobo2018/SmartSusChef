@@ -283,11 +283,17 @@ class StoreModelManager:
                                 e,
                                 rows,
                                 unique_days,
-                                min_date.strftime("%Y-%m-%d") if hasattr(min_date, "strftime") else str(min_date),
-                                max_date.strftime("%Y-%m-%d") if hasattr(max_date, "strftime") else str(max_date),
+                                min_date.strftime("%Y-%m-%d")
+                                if hasattr(min_date, "strftime")
+                                else str(min_date),
+                                max_date.strftime("%Y-%m-%d")
+                                if hasattr(max_date, "strftime")
+                                else str(max_date),
                             )
                         else:
-                            logger.warning("Store %d, dish '%s' failed: %s (no data)", store_id, dish, e)
+                            logger.warning(
+                                "Store %d, dish '%s' failed: %s (no data)", store_id, dish, e
+                            )
                     except Exception:
                         logger.warning("Store %d, dish '%s' failed: %s", store_id, dish, e)
                     failed_dishes[dish] = str(e)
