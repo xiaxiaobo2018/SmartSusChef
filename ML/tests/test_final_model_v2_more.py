@@ -73,7 +73,9 @@ def test_get_prediction_hybrid_path(monkeypatch):
             }
         ),
     )
-    monkeypatch.setattr(fm, "_load_hybrid_models", lambda store_id, dish, model, config: (object(), object()))
+    monkeypatch.setattr(
+        fm, "_load_hybrid_models", lambda store_id, dish, model, config: (object(), object())
+    )
     monkeypatch.setattr(
         fm,
         "_predict_hybrid_multiday",

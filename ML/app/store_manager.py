@@ -260,9 +260,7 @@ class StoreModelManager:
                     "current_dish": dish,
                 }
                 try:
-                    result = process_dish(
-                        dish, dish_frames[dish], cc, config, store_id=store_id
-                    )
+                    result = process_dish(dish, dish_frames[dish], cc, config, store_id=store_id)
                     champion_map[dish] = {
                         "model": result["champion"],
                         "mae": result.get("champion_mae", 0.0),
@@ -277,14 +275,20 @@ class StoreModelManager:
                 except Exception as e:
                     logger.error(
                         "Store %d, dish '%s': unexpected training error: %s",
-                        store_id, dish, e, exc_info=True,
+                        store_id,
+                        dish,
+                        e,
+                        exc_info=True,
                     )
                     failed_dishes[dish] = str(e)
                     failed += 1
 
                 logger.info(
                     "Store %d training progress: %d/%d (failed: %d)",
-                    store_id, trained + failed, total, failed,
+                    store_id,
+                    trained + failed,
+                    total,
+                    failed,
                 )
 
             # Save registry to store-specific directory

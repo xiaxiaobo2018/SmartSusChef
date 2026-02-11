@@ -1,6 +1,5 @@
 import functools
 import os
-import threading
 from typing import Any
 
 from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException
@@ -328,9 +327,7 @@ def store_predict(
             )
             all_predictions[dish] = result
         except FileNotFoundError as e:
-            logger.warning(
-                "Store %d, dish '%s': model files missing: %s", store_id, dish, e
-            )
+            logger.warning("Store %d, dish '%s': model files missing: %s", store_id, dish, e)
             all_predictions[dish] = {
                 "error": f"Model files missing for '{dish}'. The model may not have been "
                 "trained successfully due to insufficient data for this dish.",
@@ -338,7 +335,10 @@ def store_predict(
         except Exception as e:
             logger.error(
                 "Store %d, prediction failed for dish '%s': %s",
-                store_id, dish, e, exc_info=True,
+                store_id,
+                dish,
+                e,
+                exc_info=True,
             )
             all_predictions[dish] = {"error": str(e)}
 
