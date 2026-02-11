@@ -186,3 +186,8 @@ tools/
 
 # Do not ignore the Android debug source set
 !mobile/app/src/debug/
+
+# Python-related ignores
+.venv/
+__pycache__/
+
