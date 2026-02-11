@@ -16,6 +16,7 @@ param(
 $ErrorActionPreference = "Stop"
 $Root = $PSScriptRoot
 $BackendPort = 5001
+$MlPort = 8000
 
 # Default: start frontend unless explicitly disabled
 if (-not $env:START_FRONTEND) {
@@ -73,6 +74,17 @@ else {
     Write-Host "[WARN] Could not detect Wi-Fi IP (physical devices may not connect)" -ForegroundColor Yellow
 }
 
+Write-Host ""
+Write-Host "Mobile API base URLs:" -ForegroundColor Cyan
+Write-Host "  Emulator       -> http://10.0.2.2:${BackendPort}/api/" -ForegroundColor White
+if ($WifiIP) {
+    Write-Host "  Physical phone -> http://${WifiIP}:${BackendPort}/api/" -ForegroundColor White
+}
+else {
+    Write-Host "  Physical phone -> (Wi-Fi IP not detected)" -ForegroundColor Yellow
+}
+Write-Host ""
+
 # -- Tool checks ------------------------------------------------------------
 $missing = @()
 if (-not (Get-Command python -ErrorAction SilentlyContinue)) { $missing += "Python" }
@@ -87,7 +99,40 @@ Write-Host "[OK] Python / .NET / Node.js installed" -ForegroundColor Green
 
 # -- DB connection string ---------------------------------------------------
 $connStr = "Server=$DbServer;Port=$DbPort;Database=$DbName;User Id=$DbUser;Password=$DbPassword;SslMode=None;AllowPublicKeyRetrieval=true;ConnectionTimeout=30"
+$sqlAlchemyUrl = "mysql+pymysql://${DbUser}:${DbPassword}@${DbServer}:${DbPort}/${DbName}?charset=utf8mb4"
 Write-Host "[OK] DB: $DbServer`:$DbPort/$DbName (user: $DbUser)" -ForegroundColor Green
+$env:DATABASE_URL = $sqlAlchemyUrl
+Write-Host ""
+
+# -- Kill existing processes on ML_PORT -------------------------------------
+Write-Host "[INFO] Checking for processes on port ${MlPort}..." -ForegroundColor Cyan
+$mlProcesses = Get-NetTCPConnection -LocalPort $MlPort -ErrorAction SilentlyContinue
+if ($mlProcesses) {
+    $mlProcesses | ForEach-Object {
+        $procId = $_.OwningProcess
+        Write-Host "[INFO] Killing process $procId on port $MlPort" -ForegroundColor Yellow
+        Stop-Process -Id $procId -Force -ErrorAction SilentlyContinue
+    }
+    Start-Sleep -Seconds 1
+}
+else {
+    Write-Host "[INFO] No process found on port $MlPort" -ForegroundColor Gray
+}
+
+# -- Kill existing processes on BACKEND_PORT --------------------------------
+Write-Host "[INFO] Checking for processes on port ${BackendPort}..." -ForegroundColor Cyan
+$backendProcesses = Get-NetTCPConnection -LocalPort $BackendPort -ErrorAction SilentlyContinue
+if ($backendProcesses) {
+    $backendProcesses | ForEach-Object {
+        $procId = $_.OwningProcess
+        Write-Host "[INFO] Killing process $procId on port $BackendPort" -ForegroundColor Yellow
+        Stop-Process -Id $procId -Force -ErrorAction SilentlyContinue
+    }
+    Start-Sleep -Seconds 1
+}
+else {
+    Write-Host "[INFO] No process found on port $BackendPort" -ForegroundColor Gray
+}
 Write-Host ""
 
 # -- Android local.properties ----------------------------------------------
@@ -113,12 +158,12 @@ else {
 }
 
 # -- Start ML ---------------------------------------------------------------
-Write-Host "[1/3] Starting ML Service (8000)..." -ForegroundColor Cyan
+Write-Host "[1/3] Starting ML Service (port $MlPort)..." -ForegroundColor Cyan
 Start-Process powershell -ArgumentList "-NoExit", "-Command", @"
-    `$Host.UI.RawUI.WindowTitle = 'SmartSusChef - ML (8000)'
+    `$Host.UI.RawUI.WindowTitle = 'SmartSusChef - ML ($MlPort)'
     Set-Location '$Root\ML'
-    python -m pip install -q -r requirements.txt
-    python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    python -m pip install -q -r requirements-prod.txt
+    python -m uvicorn app.main:app --host 0.0.0.0 --port $MlPort --reload --log-level warning
 "@
 
 Start-Sleep 3
@@ -153,15 +198,23 @@ else {
 # -- Summary ---------------------------------------------------------------
 Write-Host ""
 Write-Host "==========================================" -ForegroundColor Green
-Write-Host "  Mobile Dev Environment Ready" -ForegroundColor Green
+Write-Host "  All Services Started (Mobile Mode)" -ForegroundColor Green
 Write-Host "==========================================" -ForegroundColor Green
 Write-Host ""
-Write-Host "  Backend (local)  -> http://localhost:$BackendPort" -ForegroundColor White
-Write-Host "  Swagger          -> http://localhost:$BackendPort/swagger" -ForegroundColor White
-Write-Host "  ML API           -> http://localhost:8000" -ForegroundColor White
+Write-Host "  Frontend (Web)     -> http://localhost:5173" -ForegroundColor White
+Write-Host "  Backend (Local)    -> http://localhost:$BackendPort" -ForegroundColor White
+Write-Host "  Swagger            -> http://localhost:$BackendPort/swagger" -ForegroundColor White
+Write-Host "  ML API             -> http://localhost:$MlPort" -ForegroundColor White
 Write-Host ""
-Write-Host "  Android Emulator -> http://10.0.2.2:$BackendPort/api/" -ForegroundColor Cyan
-
+Write-Host "  Mobile access:" -ForegroundColor Cyan
+Write-Host "    Android Emulator -> http://10.0.2.2:$BackendPort/api/" -ForegroundColor Cyan
+if ($WifiIP) {
+    Write-Host "    Physical Device  -> http://$WifiIP`:$BackendPort/api/" -ForegroundColor Cyan
+}
+else {
+    Write-Host "    Physical Device  -> (Wi-Fi IP not detected)" -ForegroundColor Yellow
+}
 Write-Host ""
 Write-Host "  Stop services: close each PowerShell window" -ForegroundColor Gray
+Write-Host "  Press Ctrl+C to stop all services" -ForegroundColor Gray
 Write-Host "==========================================" -ForegroundColor Green
