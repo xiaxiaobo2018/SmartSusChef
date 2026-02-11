@@ -25,8 +25,8 @@
               <elementProp name="" elementType="HTTPArgument">
                 <boolProp name="HTTPArgument.always_encode">false</boolProp>
                 <stringProp name="Argument.value">{&#xd;
-    &quot;name&quot;: &quot;Updated Test Ingredient ${ingredientNum}&quot;,&#xd;
-    &quot;unit&quot;: &quot;kg&quot;,&#xd;
+    &quot;name&quot;: &quot;Updated Ingredient ${__threadNum}_${__time(,)}_${ingredientNum}&quot;,&#xd;
+    &quot;unit&quot;: &quot;g&quot;,&#xd;
     &quot;carbonFootprint&quot;: 0.6&#xd;
 }</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
