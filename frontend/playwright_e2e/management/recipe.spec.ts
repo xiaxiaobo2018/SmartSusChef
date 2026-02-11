@@ -1,6 +1,6 @@
 ﻿import { test, expect, Page } from '@playwright/test';
 
-const API_BASE = (process.env.BASE_URL || 'http://localhost:5000') + '/api';
+const API_BASE = (process.env.BASE_URL || 'http://localhost:5001') + '/api';
 const TEST_USER = { username: 'Simon', password: 'Leinuozhen2003.' };
 
 // Helper: get auth token

@@ -86,15 +86,16 @@ Start-Process powershell -ArgumentList "-NoExit", "-Command", @"
 Start-Sleep -Seconds 3
 
 # Start Backend API in a separate PowerShell window
-# - .NET API running on port 5000
+# - .NET API running on port 5001
 # - Uses database connection string from ConnectionStrings__DefaultConnection env var
 # - Requirements: .NET 6 or 8 SDK
-Write-Host "[2/3] Starting Backend (port 5000)..." -ForegroundColor Cyan
+Write-Host "[2/3] Starting Backend (port 5001)..." -ForegroundColor Cyan
 Start-Process powershell -ArgumentList "-NoExit", "-Command", @"
-    `$Host.UI.RawUI.WindowTitle = 'SmartSusChef - Backend (5000)'
+    `$Host.UI.RawUI.WindowTitle = 'SmartSusChef - Backend (5001)'
     Set-Location '$Root\backend\SmartSusChef.Api'
     `$env:ASPNETCORE_ENVIRONMENT = 'Development'
     `$env:ConnectionStrings__DefaultConnection = '$connStr'
+    `$env:ASPNETCORE_URLS = 'http://localhost:5001'
     Write-Host 'Backend starting (Development)...' -ForegroundColor Green
     dotnet run
 "@
@@ -123,8 +124,8 @@ Write-Host "  All 3 service windows launched" -ForegroundColor Green
 Write-Host "==========================================" -ForegroundColor Green
 Write-Host ""
 Write-Host "  Frontend   ->  http://localhost:5173" -ForegroundColor White
-Write-Host "  Backend    ->  http://localhost:5000" -ForegroundColor White
-Write-Host "  Swagger    ->  http://localhost:5000/swagger" -ForegroundColor White
+Write-Host "  Backend    ->  http://localhost:5001" -ForegroundColor White
+Write-Host "  Swagger    ->  http://localhost:5001/swagger" -ForegroundColor White
 Write-Host "  ML API     ->  http://localhost:8000" -ForegroundColor White
 Write-Host "  ML Docs    ->  http://localhost:8000/docs" -ForegroundColor White
 Write-Host ""
