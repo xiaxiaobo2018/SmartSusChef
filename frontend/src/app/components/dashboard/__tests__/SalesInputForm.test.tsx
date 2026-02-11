@@ -374,7 +374,7 @@ describe('SalesInputForm', () => {
     describe('Form Submission Success', () => {
         it('should call addSalesData with correct parameters', async () => {
             const { toast } = await import('sonner');
-            const mockCreate = vi.mocked(api.salesApi.create).mockResolvedValue({
+            vi.mocked(api.salesApi.create).mockResolvedValue({
                 id: 'new-sale-1',
                 date: new Date().toISOString().split('T')[0],
                 recipeId: 'recipe-1',
@@ -404,7 +404,7 @@ describe('SalesInputForm', () => {
         });
 
         it('should show success message after adding sales data', async () => {
-            const { toast } = await import('sonner');
+            await import('sonner');
             vi.mocked(api.salesApi.create).mockResolvedValue({
                 id: 'new-sale-1',
                 date: new Date().toISOString().split('T')[0],
@@ -423,7 +423,7 @@ describe('SalesInputForm', () => {
         });
 
         it('should handle API error gracefully when adding sales data', async () => {
-            const { toast } = await import('sonner');
+            await import('sonner');
             vi.mocked(api.salesApi.create).mockRejectedValue(new Error('API Error'));
 
             renderWithProviders();
@@ -447,8 +447,8 @@ describe('SalesInputForm', () => {
 
     describe('Update Sales Data', () => {
         it('should call updateSalesData when editing', async () => {
-            const { toast } = await import('sonner');
-            const mockUpdate = vi.mocked(api.salesApi.update).mockResolvedValue({
+            await import('sonner');
+            vi.mocked(api.salesApi.update).mockResolvedValue({
                 id: 'sale-1',
                 date: new Date().toISOString().split('T')[0],
                 recipeId: 'recipe-1',
@@ -466,7 +466,7 @@ describe('SalesInputForm', () => {
         });
 
         it('should show success message after updating sales data', async () => {
-            const { toast } = await import('sonner');
+            await import('sonner');
             vi.mocked(api.salesApi.update).mockResolvedValue({
                 id: 'sale-1',
                 date: new Date().toISOString().split('T')[0],
@@ -485,7 +485,7 @@ describe('SalesInputForm', () => {
         });
 
         it('should handle API error when updating sales data', async () => {
-            const { toast } = await import('sonner');
+            await import('sonner');
             vi.mocked(api.salesApi.update).mockRejectedValue(new Error('API Error'));
 
             renderWithProviders();
@@ -498,8 +498,8 @@ describe('SalesInputForm', () => {
 
     describe('Delete Sales Data', () => {
         it('should call deleteSalesData when confirming delete', async () => {
-            const { toast } = await import('sonner');
-            const mockDelete = vi.mocked(api.salesApi.delete).mockResolvedValue({});
+            await import('sonner');
+            vi.mocked(api.salesApi.delete).mockResolvedValue({});
 
             renderWithProviders();
 
@@ -509,7 +509,7 @@ describe('SalesInputForm', () => {
         });
 
         it('should show success message after deleting', async () => {
-            const { toast } = await import('sonner');
+            await import('sonner');
             vi.mocked(api.salesApi.delete).mockResolvedValue({});
 
             renderWithProviders();
@@ -520,7 +520,7 @@ describe('SalesInputForm', () => {
         });
 
         it('should handle API error when deleting sales data', async () => {
-            const { toast } = await import('sonner');
+            await import('sonner');
             vi.mocked(api.salesApi.delete).mockRejectedValue(new Error('API Error'));
 
             renderWithProviders();

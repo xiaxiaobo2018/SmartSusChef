@@ -35,7 +35,15 @@ echo ""
 
 # -- Check prerequisites ---------------------------------------------------
 MISSING=""
-command -v python3 >/dev/null 2>&1 || MISSING="$MISSING Python3"
+PYTHON_BIN=""
+if command -v python3.11 >/dev/null 2>&1; then
+    PYTHON_BIN="python3.11"
+elif command -v python3 >/dev/null 2>&1; then
+    PYTHON_BIN="python3"
+else
+    MISSING="$MISSING Python3(>=3.10)"
+fi
+
 command -v dotnet  >/dev/null 2>&1 || MISSING="$MISSING .NET-SDK"
 command -v node    >/dev/null 2>&1 || MISSING="$MISSING Node.js"
 
@@ -43,6 +51,15 @@ if [ -n "$MISSING" ]; then
     echo "[ERROR] Missing:$MISSING"
     exit 1
 fi
+if [ -n "$PYTHON_BIN" ]; then
+    PY_VERSION="$($PYTHON_BIN -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')"
+    if [ "$PY_VERSION" = "3.9" ] || [ "$PY_VERSION" = "3.8" ] || [ "$PY_VERSION" = "3.7" ]; then
+        echo "[ERROR] Python $PY_VERSION detected. ML service requires Python >= 3.10."
+        echo "        Install python@3.11 and re-run. Example: brew install python@3.11"
+        exit 1
+    fi
+fi
+
 echo "[OK] Python / .NET / Node.js installed"
 
 # -- Build connection string ------------------------------------------------
@@ -67,8 +84,8 @@ trap cleanup EXIT INT TERM
 echo "[1/3] Starting ML Service (port 8000)..."
 (
     cd "$ROOT/ML"
-    python3 -m pip install -q -r requirements-prod.txt
-    python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    "$PYTHON_BIN" -m pip install -q -r requirements-prod.txt
+    "$PYTHON_BIN" -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ) &
 ML_PID=$!
 sleep 3

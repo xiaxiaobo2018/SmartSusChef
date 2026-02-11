@@ -91,7 +91,7 @@ describe('WeatherWidget', () => {
 
     describe('Weather Data Display', () => {
         it('should display temperature correctly', () => {
-            const { rerender } = render(
+            render(
                 <AppProvider>
                     <WeatherWidget />
                 </AppProvider>

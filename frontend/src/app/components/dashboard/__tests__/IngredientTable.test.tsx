@@ -358,7 +358,7 @@ describe('IngredientTable', () => {
         });
 
         it('should use converted values from convertUnit', () => {
-            (UnitConversion.convertUnit as any).mockImplementation((quantity: number, unit: string) => ({
+            (UnitConversion.convertUnit as any).mockImplementation((quantity: number, _unit: string) => ({
                 quantity: quantity * 1000, // Simulate kg to g conversion
                 unit: 'g',
                 displayText: `${(quantity * 1000).toFixed(2)} g`,

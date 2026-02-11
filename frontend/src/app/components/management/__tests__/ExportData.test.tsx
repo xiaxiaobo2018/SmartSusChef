@@ -623,7 +623,7 @@ describe('ExportData', () => {
             const mockContext = createMockContext();
             vi.spyOn(AppContext, 'useApp').mockReturnValue(mockContext as AppContextType);
 
-            const { container } = render(<ExportData />);
+            render(<ExportData />);
 
             const exportButtons = screen.getAllByText('Export as CSV');
             exportButtons.forEach(button => {

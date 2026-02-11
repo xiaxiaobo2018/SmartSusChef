@@ -241,7 +241,7 @@ describe('SalesManagement', () => {
 
         it('should disable Edit buttons for old records (non-manager)', () => {
             render(<SalesManagement />);
-            const cells = screen.getAllByText('Chicken Rice').filter(el => el.tagName === 'TD');
+            screen.getAllByText('Chicken Rice').filter(el => el.tagName === 'TD');
             // Find the row with the old date (thirtyDaysAgo or eightDaysAgo)
             const allRows = screen.getAllByRole('row');
             const oldDataRow = allRows.find(row => {
