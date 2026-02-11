@@ -31,7 +31,7 @@ on:
         type: boolean
 
 permissions:
-  contents: read
+  contents: write
   security-events: write
   actions: read
 
@@ -249,6 +249,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -265,8 +268,26 @@ jobs:
           pip install -r requirements-dev.txt
         working-directory: ./ML
 
-      - name: Ruff lint
-        run: ruff check . --output-format=json --output-file=ruff-report.json && ruff format . --check --diff
+      - name: Ruff auto-fix
+        run: |
+          ruff check . --fix
+          ruff format .
+        working-directory: ./ML
+
+      - name: Commit Ruff fixes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A ML/
+          if git diff --cached --quiet; then
+            echo "No Ruff fixes needed"
+          else
+            git commit -m "style(ml): auto-fix ruff lint and format [skip ci]"
+            git push
+          fi
+
+      - name: Ruff lint report
+        run: ruff check . --output-format=json --output-file=ruff-report.json || true
         working-directory: ./ML
 
       - name: Mypy type check
