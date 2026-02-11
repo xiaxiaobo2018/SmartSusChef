@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { DistributionPieChart } from '../DistributionPieChart';
 import * as AppContext from '@/app/context/AppContext';
+import type { AppContextType } from '@/app/context/AppContext';
 
 // Mock recharts components
 vi.mock('recharts', () => ({
@@ -64,10 +65,9 @@ describe('DistributionPieChart', () => {
             addWastageData: vi.fn(),
             updateWastageData: vi.fn(),
             deleteWastageData: vi.fn(),
-            refreshForecast: vi.fn(),
-            isLoading: false,
-            error: null,
-        });
+            refreshData: vi.fn(),
+            loading: false,
+        } as unknown as AppContextType);
     });
 
     describe('Rendering', () => {
@@ -113,10 +113,9 @@ describe('DistributionPieChart', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<DistributionPieChart date="2026-02-09" />);
 
@@ -148,10 +147,9 @@ describe('DistributionPieChart', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<DistributionPieChart date="2026-02-09" />);
 
@@ -210,10 +208,9 @@ describe('DistributionPieChart', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<DistributionPieChart date="2026-02-09" />);
 
@@ -285,10 +282,9 @@ describe('DistributionPieChart', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<DistributionPieChart date="2026-02-09" />);
 
@@ -333,10 +329,9 @@ describe('DistributionPieChart', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<DistributionPieChart date="2026-02-09" />);
 
@@ -383,10 +378,9 @@ describe('DistributionPieChart', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<DistributionPieChart date="2026-02-09" />);
 
@@ -435,10 +429,9 @@ describe('DistributionPieChart', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<DistributionPieChart date="2026-02-09" />);
 
@@ -485,10 +478,9 @@ describe('DistributionPieChart', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<DistributionPieChart date="2026-02-09" />);
 
@@ -550,10 +542,9 @@ describe('DistributionPieChart', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<DistributionPieChart date="2026-02-09" />);
 
@@ -606,10 +597,9 @@ describe('DistributionPieChart', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<DistributionPieChart date="2026-02-09" />);
 
@@ -637,10 +627,9 @@ describe('DistributionPieChart', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<DistributionPieChart date="2026-02-09" />);
 
@@ -671,10 +660,9 @@ describe('DistributionPieChart', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<DistributionPieChart date="2026-02-09" />);
 
@@ -705,10 +693,9 @@ describe('DistributionPieChart', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<DistributionPieChart date="2026-02-09" />);
 

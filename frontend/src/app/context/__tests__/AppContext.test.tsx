@@ -248,10 +248,17 @@ describe('AppContext', () => {
             const setupMock = vi.mocked(api.storeApi.setup).mockResolvedValue({
                 id: 1,
                 companyName: 'Test Company',
+                uen: '123456789A',
                 storeName: 'Test Store',
+                outletLocation: 'Downtown',
+                contactNumber: '+6512345678',
+                openingDate: '2024-01-01',
                 latitude: 1.3521,
                 longitude: 103.8198,
                 countryCode: 'SG',
+                isActive: true,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
             });
 
             const result = await renderAppHook();
@@ -272,10 +279,17 @@ describe('AppContext', () => {
             const updateMock = vi.mocked(api.storeApi.update).mockResolvedValue({
                 id: 1,
                 companyName: 'Test Company',
+                uen: '123456789A',
                 storeName: 'Updated Store',
+                outletLocation: 'Downtown',
+                contactNumber: '+6512345678',
+                openingDate: '2024-01-01',
                 latitude: 1.3521,
                 longitude: 103.8198,
                 countryCode: 'SG',
+                isActive: true,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
             });
 
             const result = await renderAppHook();
@@ -406,15 +420,15 @@ describe('AppContext', () => {
 
             // Mock initial data with recipe, sales, and wastage
             vi.mocked(api.recipesApi.getAll).mockResolvedValue([
-                { id: 'recipe-1', name: 'Test Recipe', isSellable: true, isSubRecipe: false, ingredients: [], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
+                { id: 'recipe-1', name: 'Test Recipe', isSellable: true, isSubRecipe: false, ingredients: [] }
             ]);
             vi.mocked(api.salesApi.getAll).mockResolvedValue([
                 { id: 'sales-1', date: '2024-01-01', recipeId: 'recipe-1', recipeName: 'Test Recipe', quantity: 10 },
                 { id: 'sales-2', date: '2024-01-02', recipeId: 'recipe-2', recipeName: 'Other Recipe', quantity: 5 }
             ]);
             vi.mocked(api.wastageApi.getAll).mockResolvedValue([
-                { id: 'waste-1', date: '2024-01-01', recipeId: 'recipe-1', quantity: 2, ingredientId: null, ingredientName: null, recipeName: 'Test Recipe', unit: 'portions' },
-                { id: 'waste-2', date: '2024-01-02', recipeId: 'recipe-2', quantity: 1, ingredientId: null, ingredientName: null, recipeName: 'Other Recipe', unit: 'portions' }
+                { id: 'waste-1', date: '2024-01-01', recipeId: 'recipe-1', quantity: 2, ingredientId: undefined, displayName: 'Test Recipe', unit: 'portions', carbonFootprint: 0, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
+                { id: 'waste-2', date: '2024-01-02', recipeId: 'recipe-2', quantity: 1, ingredientId: undefined, displayName: 'Other Recipe', unit: 'portions', carbonFootprint: 0, createdAt: '2024-01-02', updatedAt: '2024-01-02' }
             ]);
 
             const result = await renderAppHook();

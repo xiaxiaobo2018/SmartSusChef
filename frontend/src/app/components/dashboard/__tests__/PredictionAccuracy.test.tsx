@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { PredictionAccuracy } from '../PredictionAccuracy';
 import * as AppContext from '@/app/context/AppContext';
+import type { AppContextType } from '@/app/context/AppContext';
 
 // Mock recharts components
 vi.mock('recharts', () => ({
@@ -113,10 +114,9 @@ describe('PredictionAccuracy', () => {
             addWastageData: vi.fn(),
             updateWastageData: vi.fn(),
             deleteWastageData: vi.fn(),
-            refreshForecast: vi.fn(),
-            isLoading: false,
-            error: null,
-        });
+            refreshData: vi.fn(),
+            loading: false,
+        } as unknown as AppContextType);
     });
 
     describe('Rendering', () => {
@@ -139,7 +139,7 @@ describe('PredictionAccuracy', () => {
 
             // Total actual: 10+8+12+6+15+9+11+13+10 = 94
             // Total predicted: 9+7+11+5+14+10+12+13+10 = 91
-            // Accuracy: (1 - |94-91|/91) * 100 = (1 - 3/91) * 100 ≈ 96.7%
+            // Accuracy: (1 - |94-91|/91) * 100 = (1 - 3/91) * 100 �?96.7%
             const accuracyText = screen.getByText(/96\.7%/);
             expect(accuracyText).toBeInTheDocument();
         });
@@ -174,10 +174,9 @@ describe('PredictionAccuracy', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<PredictionAccuracy />);
 
@@ -205,10 +204,9 @@ describe('PredictionAccuracy', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<PredictionAccuracy />);
 
@@ -235,10 +233,9 @@ describe('PredictionAccuracy', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<PredictionAccuracy />);
 
@@ -264,10 +261,9 @@ describe('PredictionAccuracy', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<PredictionAccuracy />);
 
@@ -348,10 +344,9 @@ describe('PredictionAccuracy', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<PredictionAccuracy />);
 
@@ -453,10 +448,9 @@ describe('PredictionAccuracy', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<PredictionAccuracy />);
 
@@ -505,10 +499,9 @@ describe('PredictionAccuracy', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<PredictionAccuracy />);
 
@@ -573,10 +566,9 @@ describe('PredictionAccuracy', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<PredictionAccuracy />);
 
@@ -611,10 +603,9 @@ describe('PredictionAccuracy', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<PredictionAccuracy />);
 
@@ -647,10 +638,9 @@ describe('PredictionAccuracy', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<PredictionAccuracy />);
 
@@ -687,10 +677,9 @@ describe('PredictionAccuracy', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<PredictionAccuracy />);
 
@@ -721,10 +710,9 @@ describe('PredictionAccuracy', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<PredictionAccuracy />);
 
@@ -756,10 +744,9 @@ describe('PredictionAccuracy', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<PredictionAccuracy />);
 
@@ -790,10 +777,9 @@ describe('PredictionAccuracy', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<PredictionAccuracy />);
 
@@ -833,10 +819,9 @@ describe('PredictionAccuracy', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<PredictionAccuracy />);
 
@@ -889,10 +874,9 @@ describe('PredictionAccuracy', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<PredictionAccuracy />);
 
@@ -931,10 +915,9 @@ describe('PredictionAccuracy', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             const { container } = render(<PredictionAccuracy />);
 
@@ -989,10 +972,9 @@ describe('PredictionAccuracy', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             rerender(<PredictionAccuracy />);
 

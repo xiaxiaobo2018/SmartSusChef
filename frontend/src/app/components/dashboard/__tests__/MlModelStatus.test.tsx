@@ -95,10 +95,14 @@ describe('MlModelStatusCard', () => {
     describe('Status States', () => {
         it('should display unavailable status', async () => {
             vi.mocked(api.mlApi.getStatus).mockResolvedValue({
+                storeId: 1,
+                hasModels: false,
+                isTraining: false,
+                dishes: null,
+                daysAvailable: null,
                 status: 'unavailable',
                 message: 'ML service is not available',
-                dataStats: null,
-                lastTrained: null,
+                trainingProgress: null,
             });
 
             renderWithProviders();
@@ -110,15 +114,14 @@ describe('MlModelStatusCard', () => {
 
         it('should display ready status', async () => {
             vi.mocked(api.mlApi.getStatus).mockResolvedValue({
+                storeId: 1,
+                hasModels: true,
+                isTraining: false,
+                dishes: ['Chicken Rice', 'Nasi Lemak'],
+                daysAvailable: 40,
                 status: 'ready',
                 message: 'Models are ready for prediction',
-                dataStats: {
-                    totalSalesRecords: 100,
-                    totalWastageRecords: 50,
-                    dateRangeStart: '2026-01-01',
-                    dateRangeEnd: '2026-02-09',
-                },
-                lastTrained: '2026-02-09T10:00:00Z',
+                trainingProgress: null,
             });
 
             renderWithProviders();
@@ -130,15 +133,14 @@ describe('MlModelStatusCard', () => {
 
         it('should display insufficient data status', async () => {
             vi.mocked(api.mlApi.getStatus).mockResolvedValue({
+                storeId: 1,
+                hasModels: false,
+                isTraining: false,
+                dishes: null,
+                daysAvailable: 2,
                 status: 'insufficient_data',
                 message: 'Not enough data for training',
-                dataStats: {
-                    totalSalesRecords: 5,
-                    totalWastageRecords: 2,
-                    dateRangeStart: '2026-02-08',
-                    dateRangeEnd: '2026-02-09',
-                },
-                lastTrained: null,
+                trainingProgress: null,
             });
 
             renderWithProviders();

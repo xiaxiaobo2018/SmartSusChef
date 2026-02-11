@@ -43,7 +43,7 @@ import {
 import { useAuth } from './AuthContext';
 
 // --- Types for Context ---
-interface AppContextType {
+export interface AppContextType {
   user: User | null;
   loading: boolean;
   dataLoading: boolean;

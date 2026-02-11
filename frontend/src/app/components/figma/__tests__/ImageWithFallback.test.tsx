@@ -171,7 +171,6 @@ describe('ImageWithFallback', () => {
     // ==================== Edge Cases ====================
     describe('Edge Cases', () => {
         it('should handle missing src attribute', () => {
-            // @ts-expect-error Testing edge case without src
             render(<ImageWithFallback alt="Test" />);
 
             const img = screen.getByAltText('Test');

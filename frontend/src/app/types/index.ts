@@ -1,4 +1,6 @@
 // Core types for SmartSus Chef system
+export type { AppContextType } from '@/app/context/AppContext';
+
 export interface User {
   id: string;
   username: string;

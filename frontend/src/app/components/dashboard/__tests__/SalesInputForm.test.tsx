@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { SalesInputForm } from '../SalesInputForm';
@@ -498,8 +498,7 @@ describe('SalesInputForm', () => {
 
     describe('Delete Sales Data', () => {
         it('should call deleteSalesData when confirming delete', async () => {
-            await import('sonner');
-            vi.mocked(api.salesApi.delete).mockResolvedValue({});
+            vi.mocked(api.salesApi.delete).mockResolvedValue(undefined);
 
             renderWithProviders();
 
@@ -509,8 +508,7 @@ describe('SalesInputForm', () => {
         });
 
         it('should show success message after deleting', async () => {
-            await import('sonner');
-            vi.mocked(api.salesApi.delete).mockResolvedValue({});
+            vi.mocked(api.salesApi.delete).mockResolvedValue(undefined);
 
             renderWithProviders();
 

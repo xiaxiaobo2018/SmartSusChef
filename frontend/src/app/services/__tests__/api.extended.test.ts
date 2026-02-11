@@ -18,7 +18,7 @@ describe('api service extended', () => {
 
     beforeEach(() => {
         mockFetch = vi.fn();
-        global.fetch = mockFetch;
+        global.fetch = mockFetch as typeof fetch;
         setAuthToken('test-token');
         mockFetch.mockClear();
     });
@@ -111,7 +111,7 @@ describe('api service extended', () => {
         describe('update', () => {
             it('should update an ingredient', async () => {
                 const ingredientId = '1';
-                const updates = { name: 'Cherry Tomato', carbonFootprint: 0.6 };
+                const updates = { name: 'Cherry Tomato', unit: 'kg', carbonFootprint: 0.6 };
                 const updatedIngredient = { id: ingredientId, ...updates, unit: 'kg' };
 
                 mockFetch.mockResolvedValueOnce({
@@ -287,7 +287,7 @@ describe('api service extended', () => {
         describe('update', () => {
             it('should update a recipe', async () => {
                 const recipeId = '1';
-                const updates = { name: 'Garden Salad', isSellable: false };
+                const updates = { name: 'Garden Salad', isSellable: false, isSubRecipe: false, ingredients: [] };
                 const updatedRecipe = { id: recipeId, ...updates, isSubRecipe: false, ingredients: [] };
 
                 mockFetch.mockResolvedValueOnce({
@@ -528,7 +528,7 @@ describe('api service extended', () => {
         describe('update', () => {
             it('should update wastage data', async () => {
                 const wastageId = '1';
-                const updates = { quantity: 3 };
+                const updates = { date: '2024-01-01', quantity: 3 };
                 const updatedWastage = {
                     id: wastageId,
                     date: '2024-01-01',

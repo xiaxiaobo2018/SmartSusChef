@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import { IngredientManagement } from '../IngredientManagement';
 import * as AppContext from '@/app/context/AppContext';
+import type { AppContextType } from '@/app/context/AppContext';
 import { toast } from 'sonner';
 
 // ========== Module mocks ==========
@@ -780,7 +781,7 @@ describe('IngredientManagement', () => {
             render(<IngredientManagement />);
             clickDelete('Pepper');
             // Use queryAllByText since multiple parent elements match
-            const elements = screen.queryAllByText((content, element) => {
+            const elements = screen.queryAllByText((_content, element) => {
                 const text = element?.textContent || '';
                 return text.includes('2') && text.includes('Wastage Data record');
             });
@@ -799,7 +800,7 @@ describe('IngredientManagement', () => {
             });
             render(<IngredientManagement />);
             clickDelete('Pepper');
-            const elements = screen.queryAllByText((content, element) => {
+            const elements = screen.queryAllByText((_content, element) => {
                 return element?.textContent?.includes('permanently delete') &&
                     element?.textContent?.includes('all 2 related wastage record') || false;
             });
@@ -904,7 +905,7 @@ describe('IngredientManagement', () => {
             render(<IngredientManagement />);
             clickDelete('Chicken');
             // Use getAllByText and find the specific <p> element
-            const elements = screen.queryAllByText((content, element) => {
+            const elements = screen.queryAllByText((_content, element) => {
                 return element?.tagName === 'P' &&
                     element?.textContent?.includes('This ingredient') &&
                     element?.textContent?.includes('Chicken') &&
@@ -993,7 +994,7 @@ describe('IngredientManagement', () => {
             expect(screen.getByText('0 ingredients in the system')).toBeInTheDocument();
         });
 
-        it('should handle add ï¿½?edit ï¿½?delete workflow', async () => {
+        it('should handle add ï¿?edit ï¿?delete workflow', async () => {
             useCtx();
             render(<IngredientManagement />);
 

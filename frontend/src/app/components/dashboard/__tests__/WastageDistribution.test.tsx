@@ -49,7 +49,7 @@ vi.mock('@/app/utils/recipeCalculations', () => ({
 
         let totalCarbon = 0;
         recipe.ingredients.forEach(ing => {
-            const ingredient = ingredientMap.get(ing.ingredientId);
+            const ingredient = ing.ingredientId ? ingredientMap.get(ing.ingredientId) : undefined;
             if (ingredient) {
                 // Recipe quantities are always in grams or ml
                 // Convert to kg/L for carbon calculation

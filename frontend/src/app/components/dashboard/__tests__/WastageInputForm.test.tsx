@@ -1,7 +1,6 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 import { WastageInputForm } from '../WastageInputForm';
 import { AppProvider } from '@/app/context/AppContext';
 import * as AppContext from '@/app/context/AppContext';
@@ -293,8 +292,12 @@ describe('WastageInputForm', () => {
                     id: 'waste-1',
                     date: todayStr,
                     ingredientId: 'ing-1',
+                    displayName: 'Chicken',
+                    unit: 'kg',
                     quantity: 2.5,
+                    carbonFootprint: 3.2,
                     createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
                 },
             ]);
         });
@@ -323,8 +326,12 @@ describe('WastageInputForm', () => {
                     id: 'waste-1',
                     date: todayStr,
                     ingredientId: 'ing-1',
+                    displayName: 'Chicken',
+                    unit: 'kg',
                     quantity: 2.5,
+                    carbonFootprint: 3.2,
                     createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
                 },
             ]);
         });

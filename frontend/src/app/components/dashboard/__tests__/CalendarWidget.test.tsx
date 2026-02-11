@@ -1,6 +1,5 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import React from 'react';
 import { CalendarWidget } from '../CalendarWidget';
 import { AppProvider } from '@/app/context/AppContext';
 import * as AppContext from '@/app/context/AppContext';
@@ -92,13 +91,11 @@ describe('CalendarWidget', () => {
             vi.mocked(api.forecastApi.getHolidays).mockResolvedValue([
                 {
                     date: tomorrow.toISOString().split('T')[0],
-                    name: 'New Year Day',
-                    isWeekend: false
+                    name: 'New Year Day'
                 },
                 {
                     date: nextWeek.toISOString().split('T')[0],
-                    name: 'Spring Festival',
-                    isWeekend: false
+                    name: 'Spring Festival'
                 }
             ]);
 
@@ -113,13 +110,11 @@ describe('CalendarWidget', () => {
             vi.mocked(api.forecastApi.getHolidays).mockResolvedValue([
                 {
                     date: addDays(new Date(), 1).toISOString().split('T')[0],
-                    name: 'Tomorrow Holiday',
-                    isWeekend: false
+                    name: 'Tomorrow Holiday'
                 },
                 {
                     date: addDays(new Date(), 100).toISOString().split('T')[0],
-                    name: 'Far Future Holiday',
-                    isWeekend: false
+                    name: 'Far Future Holiday'
                 }
             ]);
 
@@ -132,8 +127,7 @@ describe('CalendarWidget', () => {
         it('should limit to showing 3 holidays', () => {
             const holidays = Array.from({ length: 5 }, (_, i) => ({
                 date: addDays(new Date(), i + 1).toISOString().split('T')[0],
-                name: `Holiday ${i + 1}`,
-                isWeekend: false
+                name: `Holiday ${i + 1}`
             }));
 
             vi.mocked(api.forecastApi.getHolidays).mockResolvedValue(holidays);

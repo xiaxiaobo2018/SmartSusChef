@@ -1,8 +1,8 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { RecipeManagement } from '../RecipeManagement';
 import * as AppContext from '@/app/context/AppContext';
+import type { AppContextType } from '@/app/context/AppContext';
 import { Recipe, Ingredient, SalesData, WastageData } from '@/app/types';
 import { toast } from 'sonner';
 
@@ -17,9 +17,9 @@ vi.mock('sonner', () => ({
 describe('RecipeManagement', () => {
     // Mock data
     const mockIngredients: Ingredient[] = [
-        { id: 'ing1', name: 'Chicken', unit: 'g', carbonFootprint: 6.9, storeId: 's1', globalIngredientId: 1 },
-        { id: 'ing2', name: 'Rice', unit: 'g', carbonFootprint: 2.7, storeId: 's1', globalIngredientId: 2 },
-        { id: 'ing3', name: 'Soy Sauce', unit: 'ml', carbonFootprint: 1.5, storeId: 's1', globalIngredientId: 3 },
+        { id: 'ing1', name: 'Chicken', unit: 'g', carbonFootprint: 6.9 },
+        { id: 'ing2', name: 'Rice', unit: 'g', carbonFootprint: 2.7 },
+        { id: 'ing3', name: 'Soy Sauce', unit: 'ml', carbonFootprint: 1.5 },
     ];
 
     const mockRecipes: Recipe[] = [
@@ -27,7 +27,6 @@ describe('RecipeManagement', () => {
             id: 'r1',
             name: 'Chicken Rice',
             isSubRecipe: false,
-            storeId: 's1',
             ingredients: [
                 { ingredientId: 'ing1', quantity: 200 },
                 { ingredientId: 'ing2', quantity: 150 },
@@ -38,7 +37,6 @@ describe('RecipeManagement', () => {
             id: 'r2',
             name: 'Fried Rice',
             isSubRecipe: false,
-            storeId: 's1',
             ingredients: [
                 { ingredientId: 'ing2', quantity: 200 },
             ],
@@ -47,7 +45,6 @@ describe('RecipeManagement', () => {
             id: 'r3',
             name: 'Special Sauce',
             isSubRecipe: true,
-            storeId: 's1',
             ingredients: [
                 { ingredientId: 'ing3', quantity: 30 },
             ],
@@ -55,12 +52,12 @@ describe('RecipeManagement', () => {
     ];
 
     const mockSalesData: SalesData[] = [
-        { id: 's1', recipeId: 'r2', quantity: 5, date: '2024-01-01', storeId: 's1' },
-        { id: 's2', recipeId: 'r2', quantity: 3, date: '2024-01-02', storeId: 's1' },
+        { id: 's1', recipeId: 'r2', quantity: 5, date: '2024-01-01' },
+        { id: 's2', recipeId: 'r2', quantity: 3, date: '2024-01-02' },
     ];
 
     const mockWastageData: WastageData[] = [
-        { id: 'w1', recipeId: 'r2', ingredientId: 'ing2', quantity: 10, date: '2024-01-01', reason: 'expired', storeId: 's1' },
+        { id: 'w1', recipeId: 'r2', ingredientId: 'ing2', quantity: 10, date: '2024-01-01' },
     ];
 
     const mockAddRecipe = vi.fn().mockResolvedValue(undefined);
@@ -75,7 +72,7 @@ describe('RecipeManagement', () => {
         addRecipe: mockAddRecipe,
         updateRecipe: mockUpdateRecipe,
         deleteRecipe: mockDeleteRecipe,
-        storeSettings: { id: 's1', name: 'Test Store', address: '', phone: '', email: '' },
+        storeSettings: { storeId: 's1', companyName: 'Test Company', uen: '123456789A', storeName: 'Test Store', address: '123 Test Street', contactNumber: '+6512345678' },
         ...overrides,
     });
 
@@ -692,7 +689,6 @@ describe('RecipeManagement', () => {
                     id: 'r4',
                     name: 'Standalone Recipe',
                     isSubRecipe: false,
-                    storeId: 's1',
                     ingredients: [{ ingredientId: 'ing1', quantity: 100 }],
                 },
             ];
@@ -711,7 +707,6 @@ describe('RecipeManagement', () => {
                     id: 'r4',
                     name: 'Standalone Recipe',
                     isSubRecipe: false,
-                    storeId: 's1',
                     ingredients: [{ ingredientId: 'ing1', quantity: 100 }],
                 },
             ];
@@ -731,7 +726,6 @@ describe('RecipeManagement', () => {
                     id: 'r4',
                     name: 'Standalone Recipe',
                     isSubRecipe: false,
-                    storeId: 's1',
                     ingredients: [{ ingredientId: 'ing1', quantity: 100 }],
                 },
             ];
@@ -750,7 +744,6 @@ describe('RecipeManagement', () => {
                     id: 'r4',
                     name: 'Standalone Recipe',
                     isSubRecipe: false,
-                    storeId: 's1',
                     ingredients: [{ ingredientId: 'ing1', quantity: 100 }],
                 },
             ];
@@ -769,7 +762,6 @@ describe('RecipeManagement', () => {
                     id: 'r4',
                     name: 'Standalone Recipe',
                     isSubRecipe: false,
-                    storeId: 's1',
                     ingredients: [{ ingredientId: 'ing1', quantity: 100 }],
                 },
             ];
@@ -793,7 +785,6 @@ describe('RecipeManagement', () => {
                     id: 'r4',
                     name: 'Standalone Recipe',
                     isSubRecipe: false,
-                    storeId: 's1',
                     ingredients: [{ ingredientId: 'ing1', quantity: 100 }],
                 },
             ];
@@ -817,7 +808,6 @@ describe('RecipeManagement', () => {
                     id: 'r4',
                     name: 'Standalone Recipe',
                     isSubRecipe: false,
-                    storeId: 's1',
                     ingredients: [{ ingredientId: 'ing1', quantity: 100 }],
                 },
             ];
@@ -841,7 +831,6 @@ describe('RecipeManagement', () => {
                     id: 'r4',
                     name: 'Standalone Recipe',
                     isSubRecipe: false,
-                    storeId: 's1',
                     ingredients: [{ ingredientId: 'ing1', quantity: 100 }],
                 },
             ];
@@ -867,7 +856,6 @@ describe('RecipeManagement', () => {
                     id: 'r4',
                     name: 'Standalone Recipe',
                     isSubRecipe: false,
-                    storeId: 's1',
                     ingredients: [{ ingredientId: 'ing1', quantity: 100 }],
                 },
             ];
@@ -895,7 +883,7 @@ describe('RecipeManagement', () => {
         it('should display sales data count', () => {
             render(<RecipeManagement />);
             clickDelete('Fried Rice');
-            const salesCountElements = screen.queryAllByText((content, element) => {
+            const salesCountElements = screen.queryAllByText((_content, element) => {
                 return element?.textContent?.includes('2') && element?.textContent?.includes('Sales Data record') || false;
             });
             expect(salesCountElements.length).toBeGreaterThan(0);
@@ -904,7 +892,7 @@ describe('RecipeManagement', () => {
         it('should display wastage data count', () => {
             render(<RecipeManagement />);
             clickDelete('Fried Rice');
-            const wastageCountElements = screen.queryAllByText((content, element) => {
+            const wastageCountElements = screen.queryAllByText((_content, element) => {
                 return element?.textContent?.includes('1') && element?.textContent?.includes('Wastage Data record') || false;
             });
             expect(wastageCountElements.length).toBeGreaterThan(0);
@@ -913,7 +901,7 @@ describe('RecipeManagement', () => {
         it('should show total count in warning message', () => {
             render(<RecipeManagement />);
             clickDelete('Fried Rice');
-            const warningElements = screen.queryAllByText((content, element) => {
+            const warningElements = screen.queryAllByText((_content, element) => {
                 return element?.textContent?.includes('3') && element?.textContent?.includes('related data records') || false;
             });
             expect(warningElements.length).toBeGreaterThan(0);
@@ -973,7 +961,7 @@ describe('RecipeManagement', () => {
         it('should show sub-recipe name in message', () => {
             render(<RecipeManagement />);
             clickDelete('Special Sauce');
-            const messageElements = screen.queryAllByText((content, element) => {
+            const messageElements = screen.queryAllByText((_content, element) => {
                 return element?.textContent?.includes('Special Sauce') && element?.textContent?.includes('currently used') || false;
             });
             expect(messageElements.length).toBeGreaterThan(0);
@@ -982,7 +970,7 @@ describe('RecipeManagement', () => {
         it('should show note about removing from recipes first', () => {
             render(<RecipeManagement />);
             clickDelete('Special Sauce');
-            const noteElements = screen.queryAllByText((content, element) => {
+            const noteElements = screen.queryAllByText((_content, element) => {
                 return element?.textContent?.includes('You need to remove this sub-recipe') || false;
             });
             expect(noteElements.length).toBeGreaterThan(0);
@@ -991,7 +979,7 @@ describe('RecipeManagement', () => {
         it('should show singular text for single recipe', () => {
             render(<RecipeManagement />);
             clickDelete('Special Sauce');
-            const singularElements = screen.queryAllByText((content, element) => {
+            const singularElements = screen.queryAllByText((_content, element) => {
                 return element?.textContent?.includes('main dish:') && !element?.textContent?.includes('dishes') || false;
             });
             expect(singularElements.length).toBeGreaterThan(0);
@@ -1005,7 +993,6 @@ describe('RecipeManagement', () => {
                     id: 'r4',
                     name: 'Another Dish',
                     isSubRecipe: false,
-                    storeId: 's1',
                     ingredients: [{ childRecipeId: 'r3', quantity: 30 }],
                 },
             ];
@@ -1014,7 +1001,7 @@ describe('RecipeManagement', () => {
             );
             render(<RecipeManagement />);
             clickDelete('Special Sauce');
-            const pluralElements = screen.queryAllByText((content, element) => {
+            const pluralElements = screen.queryAllByText((_content, element) => {
                 return element?.textContent?.includes('main dishes:') || false;
             });
             expect(pluralElements.length).toBeGreaterThan(0);
@@ -1096,7 +1083,6 @@ describe('RecipeManagement', () => {
                     id: 'r4',
                     name: 'Standalone Recipe',
                     isSubRecipe: false,
-                    storeId: 's1',
                     ingredients: [{ ingredientId: 'ing1', quantity: 100 }],
                 },
             ];
@@ -1140,7 +1126,6 @@ describe('RecipeManagement', () => {
                     id: 'r4',
                     name: 'Standalone Recipe',
                     isSubRecipe: false,
-                    storeId: 's1',
                     ingredients: [{ ingredientId: 'ing1', quantity: 100 }],
                 },
             ];

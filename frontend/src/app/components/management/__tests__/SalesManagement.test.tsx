@@ -1,9 +1,9 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { SalesManagement } from '../SalesManagement';
 import * as AppContext from '@/app/context/AppContext';
-import { AppContextType, SalesData, Recipe, User } from '@/app/types';
+import type { AppContextType } from '@/app/context/AppContext';
+import { SalesData, Recipe, User } from '@/app/types';
 import { toast } from 'sonner';
 import { format, subDays } from 'date-fns';
 
@@ -35,7 +35,6 @@ describe('SalesManagement', () => {
             name: 'Chicken Rice',
             isSubRecipe: false,
             isSellable: true,
-            storeId: 's1',
             ingredients: [{ ingredientId: 'i1', quantity: 100 }],
         },
         {
@@ -43,7 +42,6 @@ describe('SalesManagement', () => {
             name: 'Beef Noodles',
             isSubRecipe: false,
             isSellable: true,
-            storeId: 's1',
             ingredients: [{ ingredientId: 'i2', quantity: 200 }],
         },
         {
@@ -51,7 +49,6 @@ describe('SalesManagement', () => {
             name: 'Special Sauce',
             isSubRecipe: true,
             isSellable: false,
-            storeId: 's1',
             ingredients: [{ ingredientId: 'i3', quantity: 50 }],
         },
         {
@@ -59,7 +56,6 @@ describe('SalesManagement', () => {
             name: 'Fried Rice',
             isSubRecipe: false,
             isSellable: true,
-            storeId: 's1',
             ingredients: [{ ingredientId: 'i4', quantity: 150 }],
         },
     ];
@@ -70,7 +66,6 @@ describe('SalesManagement', () => {
             recipeId: 'r1',
             quantity: 10,
             date: todayStr,
-            storeId: 's1',
             modifiedAt: new Date().toISOString(),
         },
         {
@@ -78,7 +73,6 @@ describe('SalesManagement', () => {
             recipeId: 'r2',
             quantity: 15,
             date: yesterdayStr,
-            storeId: 's1',
             modifiedAt: new Date().toISOString(),
         },
         {
@@ -86,38 +80,35 @@ describe('SalesManagement', () => {
             recipeId: 'r1',
             quantity: 8,
             date: sixDaysAgoStr,
-            storeId: 's1',
         },
         {
             id: 's4',
             recipeId: 'r2',
             quantity: 20,
             date: eightDaysAgoStr,
-            storeId: 's1',
         },
         {
             id: 's5',
             recipeId: 'r1',
             quantity: 5,
             date: thirtyDaysAgoStr,
-            storeId: 's1',
         },
     ];
 
     const mockUser: User = {
         id: 'u1',
         username: 'testuser',
+        name: 'Test User',
         email: 'test@example.com',
-        role: 'staff',
-        storeId: 's1',
+        role: 'employee',
     };
 
     const mockManagerUser: User = {
         id: 'u2',
         username: 'manager',
+        name: 'Manager User',
         email: 'manager@example.com',
         role: 'manager',
-        storeId: 's1',
     };
 
     const mockUpdateSalesData = vi.fn().mockResolvedValue(undefined);

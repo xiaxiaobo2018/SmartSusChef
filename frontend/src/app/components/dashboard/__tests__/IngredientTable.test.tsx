@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { IngredientTable } from '../IngredientTable';
 import * as AppContext from '@/app/context/AppContext';
+import type { AppContextType } from '@/app/context/AppContext';
 import * as UnitConversion from '@/app/utils/unitConversion';
 
 // Mock the convertUnit utility
@@ -89,10 +90,9 @@ describe('IngredientTable', () => {
             addWastageData: vi.fn(),
             updateWastageData: vi.fn(),
             deleteWastageData: vi.fn(),
-            refreshForecast: vi.fn(),
-            isLoading: false,
-            error: null,
-        });
+            refreshData: vi.fn(),
+            loading: false,
+        } as unknown as AppContextType);
     });
 
     describe('Rendering', () => {
@@ -139,10 +139,9 @@ describe('IngredientTable', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<IngredientTable date="2026-02-09" />);
 
@@ -174,10 +173,9 @@ describe('IngredientTable', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             const { container } = render(<IngredientTable date="2026-02-09" />);
 
@@ -277,10 +275,9 @@ describe('IngredientTable', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<IngredientTable date="2026-02-09" />);
 
@@ -392,10 +389,9 @@ describe('IngredientTable', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<IngredientTable date="2026-02-09" />);
 
@@ -421,10 +417,9 @@ describe('IngredientTable', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<IngredientTable date="2026-02-09" />);
 
@@ -454,10 +449,9 @@ describe('IngredientTable', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<IngredientTable date="2026-02-09" />);
 
@@ -499,10 +493,9 @@ describe('IngredientTable', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<IngredientTable date="2026-02-09" />);
 
@@ -545,10 +538,9 @@ describe('IngredientTable', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<IngredientTable date="2026-02-09" />);
 
@@ -591,10 +583,9 @@ describe('IngredientTable', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<IngredientTable date="2026-02-09" />);
 
@@ -645,10 +636,9 @@ describe('IngredientTable', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<IngredientTable date="2026-02-09" />);
 
@@ -693,10 +683,9 @@ describe('IngredientTable', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<IngredientTable date="2026-02-09" />);
 
@@ -749,10 +738,9 @@ describe('IngredientTable', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<IngredientTable date="2026-02-09" />);
 

@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen, waitFor, act } from '@testing-library/react';
-import React from 'react';
 import { useIsMobile } from '../use-mobile';
 
 function TestComponent() {

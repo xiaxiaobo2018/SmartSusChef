@@ -79,7 +79,7 @@ describe('PredictionSummary', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        vi.mocked(api.forecastApi.getAll).mockResolvedValue([]);
+        vi.mocked(api.forecastApi.get).mockResolvedValue([]);
     });
 
     describe('Rendering', () => {
@@ -100,7 +100,7 @@ describe('PredictionSummary', () => {
 
     describe('Empty State', () => {
         it('should show empty state when no forecast data', () => {
-            vi.mocked(api.forecastApi.getAll).mockResolvedValue([]);
+            vi.mocked(api.forecastApi.get).mockResolvedValue([]);
 
             renderWithProviders();
 
@@ -113,13 +113,12 @@ describe('PredictionSummary', () => {
         it('should display forecast chart with data', () => {
             const tomorrow = addDays(new Date(), 1);
 
-            vi.mocked(api.forecastApi.getAll).mockResolvedValue([
+            vi.mocked(api.forecastApi.get).mockResolvedValue([
                 {
-                    id: 'forecast-1',
                     date: format(tomorrow, 'yyyy-MM-dd'),
                     recipeId: 'recipe-1',
                     recipeName: 'Chicken Rice',
-                    quantity: 50,
+                    quantity: 50, ingredients: []
                 },
             ]);
 
@@ -134,20 +133,18 @@ describe('PredictionSummary', () => {
             const tomorrow = addDays(today, 1);
             const nextDay = addDays(today, 2);
 
-            vi.mocked(api.forecastApi.getAll).mockResolvedValue([
+            vi.mocked(api.forecastApi.get).mockResolvedValue([
                 {
-                    id: 'forecast-1',
                     date: format(tomorrow, 'yyyy-MM-dd'),
                     recipeId: 'recipe-1',
                     recipeName: 'Chicken Rice',
-                    quantity: 50,
+                    quantity: 50, ingredients: []
                 },
                 {
-                    id: 'forecast-2',
                     date: format(nextDay, 'yyyy-MM-dd'),
                     recipeId: 'recipe-1',
                     recipeName: 'Chicken Rice',
-                    quantity: 60,
+                    quantity: 60, ingredients: []
                 },
             ]);
 
@@ -160,20 +157,18 @@ describe('PredictionSummary', () => {
         it('should filter out sub-recipes from forecast', () => {
             const tomorrow = addDays(new Date(), 1);
 
-            vi.mocked(api.forecastApi.getAll).mockResolvedValue([
+            vi.mocked(api.forecastApi.get).mockResolvedValue([
                 {
-                    id: 'forecast-1',
                     date: format(tomorrow, 'yyyy-MM-dd'),
                     recipeId: 'recipe-1',
                     recipeName: 'Chicken Rice',
-                    quantity: 50,
+                    quantity: 50, ingredients: []
                 },
                 {
-                    id: 'forecast-2',
                     date: format(tomorrow, 'yyyy-MM-dd'),
                     recipeId: 'sub-recipe-1', // This should be filtered out
                     recipeName: 'Sauce',
-                    quantity: 10,
+                    quantity: 10, ingredients: []
                 },
             ]);
 

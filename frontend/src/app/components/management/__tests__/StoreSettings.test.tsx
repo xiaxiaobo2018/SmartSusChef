@@ -1,7 +1,6 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { StoreSettings } from '../StoreSettings';
 import * as AppContext from '@/app/context/AppContext';
 import { User, StoreSettings as StoreSettingsType } from '@/app/types';
@@ -27,7 +26,6 @@ describe('StoreSettings', () => {
         email: 'manager@example.com',
         name: 'Test Manager',
         role: 'manager',
-        storeId: 's1',
         status: 'Active',
     };
 
@@ -37,7 +35,6 @@ describe('StoreSettings', () => {
         email: 'employee@example.com',
         name: 'Test Employee',
         role: 'employee',
-        storeId: 's1',
         status: 'Active',
     };
 
@@ -63,7 +60,6 @@ describe('StoreSettings', () => {
             email: 'staff@example.com',
             name: 'Test Staff',
             role: 'employee',
-            storeId: 's1',
             status: 'Inactive',
         },
     ];
@@ -110,7 +106,7 @@ describe('StoreSettings', () => {
         // Wait for specific tab content to appear
         if (tabName.includes('Team')) {
             await waitFor(() => {
-                expect(screen.getByText((content, element) =>
+                expect(screen.getByText((_content, element) =>
                     element?.textContent === 'Team Access Control'
                 )).toBeInTheDocument();
             });
@@ -453,7 +449,7 @@ describe('StoreSettings', () => {
         });
 
         it('should display Team Access Control title', () => {
-            expect(screen.getByText((content, element) => {
+            expect(screen.getByText((_content, element) => {
                 return element?.textContent === 'Team Access Control';
             })).toBeInTheDocument();
         });
@@ -1184,7 +1180,7 @@ describe('StoreSettings', () => {
             render(<StoreSettings />);
 
             await clickTab('Team Access');
-            expect(screen.getByText((content, element) => {
+            expect(screen.getByText((_content, element) => {
                 return element?.textContent === 'Team Access Control';
             })).toBeInTheDocument();
 
@@ -1192,7 +1188,7 @@ describe('StoreSettings', () => {
             expect(screen.getByText('Password Management')).toBeInTheDocument();
 
             await clickTab('Store Profile');
-            expect(screen.getByText((content, element) => {
+            expect(screen.getByText((_content, element) => {
                 return element?.textContent === 'Store Profile Management';
             })).toBeInTheDocument();
         });

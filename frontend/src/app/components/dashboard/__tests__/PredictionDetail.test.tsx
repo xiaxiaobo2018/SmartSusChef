@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { PredictionDetail } from '../PredictionDetail';
 import * as AppContext from '@/app/context/AppContext';
+import type { AppContextType } from '@/app/context/AppContext';
 import * as UnitConversion from '@/app/utils/unitConversion';
 import { format, addDays } from 'date-fns';
 
@@ -137,10 +138,9 @@ describe('PredictionDetail', () => {
             addWastageData: vi.fn(),
             updateWastageData: vi.fn(),
             deleteWastageData: vi.fn(),
-            refreshForecast: vi.fn(),
-            isLoading: false,
-            error: null,
-        });
+            refreshData: vi.fn(),
+            loading: false,
+        } as unknown as AppContextType);
     });
 
     describe('Rendering', () => {
@@ -204,10 +204,9 @@ describe('PredictionDetail', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<PredictionDetail />);
 
@@ -233,10 +232,9 @@ describe('PredictionDetail', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<PredictionDetail />);
 
@@ -262,10 +260,9 @@ describe('PredictionDetail', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<PredictionDetail />);
 
@@ -322,10 +319,9 @@ describe('PredictionDetail', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<PredictionDetail />);
 
@@ -374,10 +370,9 @@ describe('PredictionDetail', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<PredictionDetail />);
 
@@ -411,10 +406,9 @@ describe('PredictionDetail', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<PredictionDetail />);
 
@@ -455,10 +449,9 @@ describe('PredictionDetail', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<PredictionDetail />);
 
@@ -523,10 +516,9 @@ describe('PredictionDetail', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<PredictionDetail />);
 
@@ -599,10 +591,9 @@ describe('PredictionDetail', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<PredictionDetail />);
 
@@ -640,10 +631,9 @@ describe('PredictionDetail', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<PredictionDetail />);
 
@@ -674,10 +664,9 @@ describe('PredictionDetail', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<PredictionDetail />);
 
@@ -713,10 +702,9 @@ describe('PredictionDetail', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<PredictionDetail />);
 
@@ -759,10 +747,9 @@ describe('PredictionDetail', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<PredictionDetail />);
 
@@ -805,10 +792,9 @@ describe('PredictionDetail', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<PredictionDetail />);
 
@@ -860,10 +846,9 @@ describe('PredictionDetail', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<PredictionDetail />);
 
@@ -894,10 +879,9 @@ describe('PredictionDetail', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<PredictionDetail />);
 
@@ -929,10 +913,9 @@ describe('PredictionDetail', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<PredictionDetail />);
 
@@ -968,10 +951,9 @@ describe('PredictionDetail', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<PredictionDetail />);
 
@@ -1004,10 +986,9 @@ describe('PredictionDetail', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<PredictionDetail />);
 
@@ -1045,10 +1026,9 @@ describe('PredictionDetail', () => {
                 addWastageData: vi.fn(),
                 updateWastageData: vi.fn(),
                 deleteWastageData: vi.fn(),
-                refreshForecast: vi.fn(),
-                isLoading: false,
-                error: null,
-            });
+                refreshData: vi.fn(),
+                loading: false,
+            } as unknown as AppContextType);
 
             render(<PredictionDetail />);
 
