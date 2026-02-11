@@ -517,7 +517,7 @@ describe('StoreSettings', () => {
 
         it('should display all form fields', () => {
             expect(screen.getByLabelText(/Username/i)).toBeInTheDocument();
-            expect(screen.getByLabelText(/Password/i)).toBeInTheDocument();
+            expect(screen.getByPlaceholderText(/Set a temporary password/i)).toBeInTheDocument();
             expect(screen.getByLabelText(/Full Name/i)).toBeInTheDocument();
             expect(screen.getByLabelText(/Email Address/i)).toBeInTheDocument();
         });
@@ -561,7 +561,7 @@ describe('StoreSettings', () => {
             fireEvent.change(screen.getByLabelText(/Username/i), { target: { value: 'newuser' } });
             fireEvent.change(screen.getByLabelText(/Full Name/i), { target: { value: 'New User' } });
             fireEvent.change(screen.getByLabelText(/Email Address/i), { target: { value: 'new@example.com' } });
-            fireEvent.change(screen.getByLabelText(/Password/i), { target: { value: 'weak' } });
+            fireEvent.change(screen.getByPlaceholderText(/Set a temporary password/i), { target: { value: 'weak' } });
 
             const createButton = screen.getByText('Create Account');
             fireEvent.click(createButton);
@@ -572,7 +572,7 @@ describe('StoreSettings', () => {
         });
 
         it('should display password requirements when typing password', () => {
-            const passwordInput = screen.getByLabelText(/Password/i);
+            const passwordInput = screen.getByPlaceholderText(/Set a temporary password/i);
             fireEvent.change(passwordInput, { target: { value: 'Test' } });
 
             expect(screen.getByText(/Between 12 and 36 characters/i)).toBeInTheDocument();
@@ -586,7 +586,7 @@ describe('StoreSettings', () => {
             fireEvent.change(screen.getByLabelText(/Username/i), { target: { value: 'newuser' } });
             fireEvent.change(screen.getByLabelText(/Full Name/i), { target: { value: 'New User' } });
             fireEvent.change(screen.getByLabelText(/Email Address/i), { target: { value: 'new@example.com' } });
-            fireEvent.change(screen.getByLabelText(/Password/i), { target: { value: 'ValidPassword123!' } });
+            fireEvent.change(screen.getByPlaceholderText(/Set a temporary password/i), { target: { value: 'ValidPassword123!' } });
 
             const createButton = screen.getByText('Create Account');
             fireEvent.click(createButton);
@@ -607,7 +607,7 @@ describe('StoreSettings', () => {
             fireEvent.change(screen.getByLabelText(/Username/i), { target: { value: 'newuser' } });
             fireEvent.change(screen.getByLabelText(/Full Name/i), { target: { value: 'New User' } });
             fireEvent.change(screen.getByLabelText(/Email Address/i), { target: { value: 'new@example.com' } });
-            fireEvent.change(screen.getByLabelText(/Password/i), { target: { value: 'ValidPassword123!' } });
+            fireEvent.change(screen.getByPlaceholderText(/Set a temporary password/i), { target: { value: 'ValidPassword123!' } });
 
             const createButton = screen.getByText('Create Account');
             fireEvent.click(createButton);
@@ -621,7 +621,7 @@ describe('StoreSettings', () => {
             fireEvent.change(screen.getByLabelText(/Username/i), { target: { value: 'newuser' } });
             fireEvent.change(screen.getByLabelText(/Full Name/i), { target: { value: 'New User' } });
             fireEvent.change(screen.getByLabelText(/Email Address/i), { target: { value: 'new@example.com' } });
-            fireEvent.change(screen.getByLabelText(/Password/i), { target: { value: 'ValidPassword123!' } });
+            fireEvent.change(screen.getByPlaceholderText(/Set a temporary password/i), { target: { value: 'ValidPassword123!' } });
 
             const createButton = screen.getByText('Create Account');
             fireEvent.click(createButton);
@@ -637,13 +637,13 @@ describe('StoreSettings', () => {
             fireEvent.change(screen.getByLabelText(/Username/i), { target: { value: 'newuser' } });
             fireEvent.change(screen.getByLabelText(/Full Name/i), { target: { value: 'New User' } });
             fireEvent.change(screen.getByLabelText(/Email Address/i), { target: { value: 'new@example.com' } });
-            fireEvent.change(screen.getByLabelText(/Password/i), { target: { value: 'ValidPassword123!' } });
+            fireEvent.change(screen.getByPlaceholderText(/Set a temporary password/i), { target: { value: 'ValidPassword123!' } });
 
             const createButton = screen.getByText('Create Account');
             fireEvent.click(createButton);
 
             await waitFor(() => {
-                expect(toast.error).toHaveBeenCalledWith('Failed to save user');
+                expect(toast.error).toHaveBeenCalledWith('Failed to add user');
             });
         });
 
@@ -731,7 +731,7 @@ describe('StoreSettings', () => {
         it('should validate password when provided in edit mode', async () => {
             await clickEditUser('Test Employee');
 
-            fireEvent.change(screen.getByLabelText(/Password/i), { target: { value: 'weak' } });
+            fireEvent.change(screen.getByPlaceholderText(/Leave blank to keep current password/i), { target: { value: 'weak' } });
 
             const dialog = screen.getByRole('dialog');
             const saveButton = within(dialog).getByRole('button', { name: /save changes/i });
@@ -745,7 +745,7 @@ describe('StoreSettings', () => {
         it('should update user with new password if valid', async () => {
             await clickEditUser('Test Employee');
 
-            fireEvent.change(screen.getByLabelText(/Password/i), { target: { value: 'NewPassword123!' } });
+            fireEvent.change(screen.getByPlaceholderText(/Leave blank to keep current password/i), { target: { value: 'NewPassword123!' } });
 
             const dialog = screen.getByRole('dialog');
             const saveButton = within(dialog).getByRole('button', { name: /save changes/i });
@@ -785,7 +785,7 @@ describe('StoreSettings', () => {
         it('should show password requirements when password is entered', async () => {
             await clickEditUser('Test Employee');
 
-            fireEvent.change(screen.getByLabelText(/Password/i), { target: { value: 'Test123' } });
+            fireEvent.change(screen.getByPlaceholderText(/Leave blank to keep current password/i), { target: { value: 'Test123' } });
 
             expect(screen.getByText(/Between 12 and 36 characters/i)).toBeInTheDocument();
         });

@@ -57,12 +57,15 @@ function getPasswordRequirements(password: string) {
     { label: 'At least one uppercase letter (A-Z)', met: /[A-Z]/.test(password) },
     { label: 'At least one lowercase letter (a-z)', met: /[a-z]/.test(password) },
     { label: 'At least one number (0-9)', met: /\d/.test(password) },
-    { label: `At least one special character (${SPECIAL_CHARS})`, met: /[@$!%*?&#^()\-_=+[\]{}|;:',.<>/~`]/.test(password) },
+    { label: `At least one special character (${SPECIAL_CHARS})`, met: /[@$!%*?&#^()\-_=+\[\]{}|;:',.<>/~`]/.test(password) },
   ];
 }
 
 function isPasswordValid(password: string): boolean {
-  return getPasswordRequirements(password).every(r => r.met);
+  // Must match backend regex exactly:
+  // ^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#\^()\-_=+\[\]{}|;:',.<>\/~`]).{12,36}$
+  const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#^()\-_=+\[\]{}|;:',.<>/~`]).{12,36}$/;
+  return regex.test(password);
 }
 
 interface StoreSettingsProps {
@@ -223,8 +226,13 @@ export function StoreSettings({ onBack }: StoreSettingsProps) {
       });
       toast.success('Store settings updated successfully');
       setStoreErrors({});
-    } catch {
-      // fetchWithAuth already shows specific error toast
+    } catch (err: any) {
+      console.error('Store settings update error:', err);
+      // fetchWithAuth already shows toast for API errors
+      // Only show fallback for unexpected errors
+      if (!err?.message || err?.message === 'API Error' || err?.message === 'Network error') {
+        toast.error('Failed to update store settings');
+      }
     } finally {
       setIsSaving(false);
     }
@@ -273,8 +281,13 @@ export function StoreSettings({ onBack }: StoreSettingsProps) {
 
       setIsUserDialogOpen(false);
       setEditingUser(null);
-    } catch {
-      // fetchWithAuth already shows specific error toast
+    } catch (err: any) {
+      console.error('User save error:', err);
+      // fetchWithAuth already shows toast for API errors
+      // Only show fallback for unexpected errors
+      if (!err?.message || err?.message === 'API Error' || err?.message === 'Network error') {
+        toast.error(editingUser ? 'Failed to update user' : 'Failed to add user');
+      }
     }
   };
 
@@ -292,8 +305,13 @@ export function StoreSettings({ onBack }: StoreSettingsProps) {
       try {
         await deleteUser(id);
         toast.success("User deleted successfully");
-      } catch {
-        // fetchWithAuth already shows specific error toast
+      } catch (err: any) {
+        console.error('User delete error:', err);
+        // fetchWithAuth already shows toast for API errors
+        // Only show fallback for unexpected errors
+        if (!err?.message || err?.message === 'API Error' || err?.message === 'Network error') {
+          toast.error('Failed to delete user');
+        }
       }
     }
   };
@@ -316,8 +334,13 @@ export function StoreSettings({ onBack }: StoreSettingsProps) {
       await changePassword(passwordForm.currentPassword, passwordForm.newPassword);
       toast.success('Password updated successfully');
       setPasswordForm({ currentPassword: '', newPassword: '' });
-    } catch {
-      // fetchWithAuth already shows specific error toast (e.g., "Current password is incorrect")
+    } catch (err: any) {
+      console.error('Password change error:', err);
+      // fetchWithAuth already shows toast for API errors
+      // Only show fallback for unexpected errors
+      if (!err?.message || err?.message === 'API Error' || err?.message === 'Network error') {
+        toast.error('Failed to update password');
+      }
     }
   };
 
@@ -341,8 +364,13 @@ export function StoreSettings({ onBack }: StoreSettingsProps) {
     try {
       await updateProfile({ name: trimmedName, email: trimmedEmail });
       toast.success('Profile updated successfully');
-    } catch {
-      // fetchWithAuth already shows specific error toast
+    } catch (err: any) {
+      console.error('Profile update error:', err);
+      // fetchWithAuth already shows toast for API errors
+      // Only show fallback for unexpected errors
+      if (!err?.message || err?.message === 'API Error' || err?.message === 'Network error') {
+        toast.error('Failed to update profile');
+      }
     } finally {
       setIsSavingProfile(false);
     }

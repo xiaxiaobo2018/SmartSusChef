@@ -100,20 +100,6 @@ describe('RecipeManagement', () => {
         fireEvent.click(checkbox);
     }
 
-    function _fillComponentRow(index: number, itemValue: string, quantity: string) {
-        const rows = screen.getAllByRole('combobox');
-        const selectTrigger = rows[index];
-        fireEvent.click(selectTrigger);
-
-        // Wait for dropdown to open and select item
-        const option = screen.getByRole('option', { name: new RegExp(itemValue, 'i') });
-        fireEvent.click(option);
-
-        // Fill quantity
-        const quantityInputs = screen.getAllByPlaceholderText('0.00');
-        fireEvent.change(quantityInputs[index], { target: { value: quantity } });
-    }
-
     function clickAddComponent() {
         const addComponentButton = screen.getByText(/Add Component/i);
         fireEvent.click(addComponentButton);

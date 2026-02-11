@@ -46,7 +46,7 @@ describe('LoginPage', () => {
     expect(screen.getByText('SmartSus Chef')).toBeInTheDocument();
     expect(screen.getByText('Demand Forecasting & Food Prep Recommendation')).toBeInTheDocument();
     expect(screen.getByLabelText(/username/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/enter your password/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /sign in/i })).toBeInTheDocument();
   });
 
@@ -61,7 +61,7 @@ describe('LoginPage', () => {
     renderPage();
 
     fireEvent.change(screen.getByLabelText(/username/i), { target: { value: 'testuser' } });
-    fireEvent.change(screen.getByLabelText(/password/i), { target: { value: 'password123' } });
+    fireEvent.change(screen.getByPlaceholderText(/enter your password/i), { target: { value: 'password123' } });
     fireEvent.click(screen.getByRole('button', { name: /sign in/i }));
 
     await waitFor(() => {
@@ -75,7 +75,7 @@ describe('LoginPage', () => {
     renderPage();
 
     fireEvent.change(screen.getByLabelText(/username/i), { target: { value: 'bad' } });
-    fireEvent.change(screen.getByLabelText(/password/i), { target: { value: 'bad' } });
+    fireEvent.change(screen.getByPlaceholderText(/enter your password/i), { target: { value: 'bad' } });
     fireEvent.click(screen.getByRole('button', { name: /sign in/i }));
 
     expect(await screen.findByText(/invalid credentials/i)).toBeInTheDocument();
@@ -86,7 +86,7 @@ describe('LoginPage', () => {
     renderPage();
 
     fireEvent.change(screen.getByLabelText(/username/i), { target: { value: 'user' } });
-    fireEvent.change(screen.getByLabelText(/password/i), { target: { value: 'pass' } });
+    fireEvent.change(screen.getByPlaceholderText(/enter your password/i), { target: { value: 'pass' } });
     fireEvent.click(screen.getByRole('button', { name: /sign in/i }));
 
     expect(await screen.findByText(/failed to connect to the server/i)).toBeInTheDocument();
@@ -103,7 +103,7 @@ describe('LoginPage', () => {
     const button = screen.getByRole('button', { name: /sign in/i });
 
     fireEvent.change(screen.getByLabelText(/username/i), { target: { value: 'test' } });
-    fireEvent.change(screen.getByLabelText(/password/i), { target: { value: 'test' } });
+    fireEvent.change(screen.getByPlaceholderText(/enter your password/i), { target: { value: 'test' } });
     fireEvent.click(button);
 
     expect(button).toBeDisabled();

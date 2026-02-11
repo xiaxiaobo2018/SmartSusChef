@@ -40,8 +40,8 @@ describe('RegisterPage', () => {
     expect(screen.getByLabelText(/full name/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/username/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/^password$/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/confirm password/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/create a password.*12-36 characters/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/confirm your password/i)).toBeInTheDocument();
   });
 
   it('validates username length', async () => {
@@ -49,8 +49,8 @@ describe('RegisterPage', () => {
     fireEvent.change(screen.getByLabelText(/full name/i), { target: { value: 'Test User' } });
     fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'test@example.com' } });
     fireEvent.change(screen.getByLabelText(/username/i), { target: { value: 'ab' } });
-    fireEvent.change(screen.getByLabelText(/^password$/i), { target: { value: 'Password123!' } });
-    fireEvent.change(screen.getByLabelText(/confirm password/i), { target: { value: 'Password123!' } });
+    fireEvent.change(screen.getByPlaceholderText(/create a password.*12-36 characters/i), { target: { value: 'Password123!' } });
+    fireEvent.change(screen.getByPlaceholderText(/confirm your password/i), { target: { value: 'Password123!' } });
     fireEvent.click(screen.getByRole('button', { name: /create account/i }));
 
     expect(await screen.findByText(/username must be at least 3 characters/i)).toBeInTheDocument();
@@ -62,8 +62,8 @@ describe('RegisterPage', () => {
     fireEvent.change(screen.getByLabelText(/full name/i), { target: { value: 'Test User' } });
     fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'test@example.com' } });
     fireEvent.change(screen.getByLabelText(/username/i), { target: { value: 'testuser' } });
-    fireEvent.change(screen.getByLabelText(/^password$/i), { target: { value: 'Password123!' } });
-    fireEvent.change(screen.getByLabelText(/confirm password/i), { target: { value: 'Password123' } });
+    fireEvent.change(screen.getByPlaceholderText(/create a password.*12-36 characters/i), { target: { value: 'Password123!' } });
+    fireEvent.change(screen.getByPlaceholderText(/confirm your password/i), { target: { value: 'Password123' } });
     fireEvent.click(screen.getByRole('button', { name: /create account/i }));
 
     expect(await screen.findByText(/passwords do not match/i)).toBeInTheDocument();
@@ -77,7 +77,7 @@ describe('RegisterPage', () => {
     fireEvent.change(screen.getByLabelText(/full name/i), { target: { value: 'Test User' } });
     fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'invalid-email' } });
     fireEvent.change(screen.getByLabelText(/username/i), { target: { value: 'testuser' } });
-    fireEvent.change(screen.getByLabelText(/^password$/i), { target: { value: 'Password123!' } });
+    fireEvent.change(screen.getByPlaceholderText(/create a password.*12-36 characters/i), { target: { value: 'Password123!' } });
     fireEvent.change(screen.getByLabelText(/confirm password/i), { target: { value: 'Password123!' } });
     fireEvent.click(screen.getByRole('button', { name: /create account/i }));
 
@@ -91,8 +91,8 @@ describe('RegisterPage', () => {
     fireEvent.change(screen.getByLabelText(/full name/i), { target: { value: 'Test User' } });
     fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'test@example.com' } });
     fireEvent.change(screen.getByLabelText(/username/i), { target: { value: 'testuser' } });
-    fireEvent.change(screen.getByLabelText(/^password$/i), { target: { value: 'Password123!' } });
-    fireEvent.change(screen.getByLabelText(/confirm password/i), { target: { value: 'Password123!' } });
+    fireEvent.change(screen.getByPlaceholderText(/create a password.*12-36 characters/i), { target: { value: 'Password123!' } });
+    fireEvent.change(screen.getByPlaceholderText(/confirm your password/i), { target: { value: 'Password123!' } });
     fireEvent.click(screen.getByRole('button', { name: /create account/i }));
 
     await waitFor(() => {
@@ -107,8 +107,8 @@ describe('RegisterPage', () => {
     fireEvent.change(screen.getByLabelText(/full name/i), { target: { value: 'Test User' } });
     fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'test@example.com' } });
     fireEvent.change(screen.getByLabelText(/username/i), { target: { value: 'testuser' } });
-    fireEvent.change(screen.getByLabelText(/^password$/i), { target: { value: 'Password123!' } });
-    fireEvent.change(screen.getByLabelText(/confirm password/i), { target: { value: 'Password123!' } });
+    fireEvent.change(screen.getByPlaceholderText(/create a password.*12-36 characters/i), { target: { value: 'Password123!' } });
+    fireEvent.change(screen.getByPlaceholderText(/confirm your password/i), { target: { value: 'Password123!' } });
     fireEvent.click(screen.getByRole('button', { name: /create account/i }));
 
     expect(await screen.findByText(/username exists/i)).toBeInTheDocument();
