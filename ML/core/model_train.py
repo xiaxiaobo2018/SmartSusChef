@@ -3,7 +3,7 @@
 import os
 from dataclasses import dataclass, field
 from types import ModuleType
-from typing import Any, Optional
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -15,7 +15,7 @@ from app.utils.secure_io import secure_dump, secure_load
 logger = setup_logger(__name__)
 
 # Import tree frameworks (optional dependencies)
-lgb: Optional[ModuleType] = None
+lgb: ModuleType | None = None
 try:
     import lightgbm as _lgb
 
@@ -23,7 +23,7 @@ try:
 except ImportError:
     pass
 
-CatBoostRegressor: Optional[type[Any]] = None
+CatBoostRegressor: type[Any] | None = None
 try:
     from catboost import CatBoostRegressor as _CatBoostRegressor
 
@@ -31,7 +31,7 @@ try:
 except ImportError:
     pass
 
-XGBRegressor: Optional[type[Any]] = None
+XGBRegressor: type[Any] | None = None
 try:
     from xgboost import XGBRegressor as _XGBRegressor
 
@@ -39,7 +39,7 @@ try:
 except ImportError:
     pass
 
-Prophet: Optional[type[Any]] = None
+Prophet: type[Any] | None = None
 try:
     from prophet import Prophet as _Prophet
 
@@ -92,7 +92,7 @@ def _detect_gpu() -> dict[str, bool]:
     return gpu
 
 
-_GPU_AVAILABLE: Optional[dict[str, bool]] = None
+_GPU_AVAILABLE: dict[str, bool] | None = None
 
 
 def get_gpu_flags() -> dict[str, bool]:
@@ -236,7 +236,7 @@ def _prophet_predict(model: Any, df: pd.DataFrame) -> np.ndarray:
 # Model Persistence
 # ---------------------------------------------------------------------------
 def _save_hybrid_models(
-    store_id: Optional[int],
+    store_id: int | None,
     dish: str,
     prophet_model: Any,
     tree_model: Any,
@@ -265,7 +265,7 @@ def _save_hybrid_models(
 
 
 def _load_hybrid_models(
-    store_id: Optional[int],
+    store_id: int | None,
     dish: str,
     champion: str,
     config: PipelineConfig,
@@ -298,7 +298,7 @@ def process_dish(
     shared_df: pd.DataFrame,
     country_code: str,
     config: PipelineConfig,
-    store_id: Optional[int] = None,
+    store_id: int | None = None,
 ) -> dict[str, Any]:
     """
     Process a single dish using Prophet + Tree Residual Stacking.
