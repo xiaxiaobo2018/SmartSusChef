@@ -204,7 +204,6 @@ jobs:
         run: dotnet restore backend/SmartSusChef.sln
 
       - name: Install Snyk CLI
-        if: needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.infra == 'true'
         run: npm install -g snyk
 
       - name: Snyk .NET scan
@@ -238,12 +237,10 @@ jobs:
 
       - name: Snyk npm scan
         if: needs.detect-changes.outputs.frontend == 'true' || needs.detect-changes.outputs.infra == 'true'
-        uses: snyk/actions/node@master
         continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          args: --file=frontend/package.json --sarif-file-output=snyk-frontend.sarif --severity-threshold=high
+        run: snyk test --file=frontend/package.json --sarif-file-output=snyk-frontend.sarif --severity-threshold=high
 
       - name: Upload Snyk Frontend SARIF
         if: always() && (needs.detect-changes.outputs.frontend == 'true' || needs.detect-changes.outputs.infra == 'true')
@@ -269,12 +266,10 @@ jobs:
 
       - name: Snyk Python scan
         if: needs.detect-changes.outputs.ml == 'true' || needs.detect-changes.outputs.infra == 'true'
-        uses: snyk/actions/python-3.10@master
         continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          args: --file=ML/requirements-prod.txt --sarif-file-output=snyk-ml.sarif --severity-threshold=high --package-manager=pip
+        run: snyk test --file=ML/requirements-prod.txt --sarif-file-output=snyk-ml.sarif --severity-threshold=high --package-manager=pip
 
       - name: Upload Snyk ML SARIF
         if: always() && (needs.detect-changes.outputs.ml == 'true' || needs.detect-changes.outputs.infra == 'true')
@@ -300,8 +295,7 @@ jobs:
           echo "## Snyk Dependency Scan" >> $GITHUB_STEP_SUMMARY
           echo "| Component | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
-          [ -f snyk-backend-api.sarif ] && echo "| Backend Api (.NET) | :white_check_mark: Scanned |" >> $GITHUB_STEP_SUMMARY || echo "| Backend Api (.NET) | :yellow_circle: Skipped |" >> $GITHUB_STEP_SUMMARY
-          [ -f snyk-backend-tests.sarif ] && echo "| Backend Tests (.NET) | :white_check_mark: Scanned |" >> $GITHUB_STEP_SUMMARY || echo "| Backend Tests (.NET) | :yellow_circle: Skipped |" >> $GITHUB_STEP_SUMMARY
+          [ -f snyk-backend.sarif ] && echo "| Backend (.NET) | :white_check_mark: Scanned |" >> $GITHUB_STEP_SUMMARY || echo "| Backend (.NET) | :yellow_circle: Skipped |" >> $GITHUB_STEP_SUMMARY
           [ -f snyk-frontend.sarif ] && echo "| Frontend (npm) | :white_check_mark: Scanned |" >> $GITHUB_STEP_SUMMARY  || echo "| Frontend (npm) | :yellow_circle: Skipped |" >> $GITHUB_STEP_SUMMARY
           [ -f snyk-ml.sarif ]       && echo "| ML (pip) | :white_check_mark: Scanned |" >> $GITHUB_STEP_SUMMARY       || echo "| ML (pip) | :yellow_circle: Skipped |" >> $GITHUB_STEP_SUMMARY
 
