@@ -66,6 +66,7 @@ Write-Host "[OK] Python / .NET / Node.js installed" -ForegroundColor Green
 # Parameters: SslMode=None (no SSL for dev), AllowPublicKeyRetrieval=true (MySQL 8.0+)
 $connStr = "Server=$DbServer;Port=$DbPort;Database=$DbName;User Id=$DbUser;Password=$DbPassword;SslMode=None;AllowPublicKeyRetrieval=true;ConnectionTimeout=30"
 Write-Host "[OK] DB: $DbServer`:$DbPort/$DbName (user: $DbUser)" -ForegroundColor Green
+Write-Host "[OK] ML DATABASE_URL: mysql+pymysql://${DbUser}:****@${DbServer}:${DbPort}/${DbName}" -ForegroundColor Green
 Write-Host ""
 
 # Start ML Service in a separate PowerShell window
@@ -73,9 +74,12 @@ Write-Host ""
 # - --reload flag enables auto-restart on code changes
 # - Requirements: Python 3.8+
 Write-Host "[1/3] Starting ML Service (port 8000)..." -ForegroundColor Cyan
+# Build DATABASE_URL for ML service (PyMySQL format)
+$mlDbUrl = "mysql+pymysql://${DbUser}:${DbPassword}@${DbServer}:${DbPort}/${DbName}"
 Start-Process powershell -ArgumentList "-NoExit", "-Command", @"
     `$Host.UI.RawUI.WindowTitle = 'SmartSusChef - ML (8000)'
     Set-Location '$Root\ML'
+    `$env:DATABASE_URL = '$mlDbUrl'
     Write-Host 'Installing Python dependencies...' -ForegroundColor Yellow
     python -m pip install -q -r requirements-prod.txt
     Write-Host 'ML service starting...' -ForegroundColor Green
