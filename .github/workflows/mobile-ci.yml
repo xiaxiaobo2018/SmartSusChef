@@ -562,7 +562,7 @@ jobs:
       - name: Get version
         id: version
         run: |
-          VERSION=$(grep "versionName" mobile/app/build.gradle.kts | awk '{print $3}' | tr -d '"' || echo "1.0.0")
+          VERSION=$(grep -m1 'versionName ' mobile/app/build.gradle.kts | awk '{print $3}' | tr -d '"' || echo "1.0.0")
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Release
