@@ -360,6 +360,7 @@ class DataInputViewModelTest {
             assertEquals(updatedQuantity.toDouble(), recentEntries.first().quantity, 0.0)
         }
 
+    @Suppress("LongMethod")
     @Test
     fun `submitData in wastage mode with existing entry should call wastageRepository update and return success`() =
         runTest {

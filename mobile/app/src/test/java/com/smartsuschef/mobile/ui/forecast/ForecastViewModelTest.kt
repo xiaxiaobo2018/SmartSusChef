@@ -56,6 +56,7 @@ class ForecastViewModelTest {
         Dispatchers.resetMain()
     }
 
+    @Suppress("LongMethod")
     @Test
     fun `init when repository call succeeds should process and update all LiveData`() =
         runTest {
