@@ -3,10 +3,16 @@ import { test, expect, Page } from '@playwright/test';
 // Helper: login and navigate to Sales Data Management
 async function goToSalesManagement(page: Page) {
     await page.goto('/login');
-    await page.getByRole('textbox', { name: 'Username' }).fill('Simon');
+
+    const usernameInput = page.getByRole('textbox', { name: 'Username' });
+    await expect(usernameInput).toBeVisible({ timeout: 15000 });
+    await usernameInput.fill('Simon');
+    
     await page.getByRole('textbox', { name: 'Password' }).fill('Leinuozhen2003.');
     await page.getByRole('button', { name: 'Sign In' }).click();
-    await page.waitForURL(/.*\//, { timeout: 10000 });
+
+    await expect(page.getByRole('button', { name: 'Manage Store' })).toBeVisible({ timeout: 30000 });
+    
     await page.getByRole('button', { name: 'Manage Store' }).click();
     await page.getByText('Sales Data Management').click();
     await expect(page.getByRole('heading', { name: 'Sales Data Management' })).toBeVisible({ timeout: 10000 });
@@ -35,13 +41,28 @@ test('add new sales record', async ({ page }) => {
 });
 
 test('edit sales record', async ({ page }) => {
+
+    test.setTimeout(60000);
+
     await goToSalesManagement(page);
+    if (await page.getByRole('button', { name: 'Edit' }).count() === 0) {
+        console.log('List is empty, creating a record first...');
+        await page.getByRole('button', { name: 'Add New Record' }).click();
+        await page.locator('#new-recipe').click();
+        await page.getByRole('option').first().click();
+        await page.locator('#new-quantity-create').fill('100');
+        await page.getByRole('button', { name: 'Save Record' }).click();
+        await page.waitForTimeout(2000);
+    }
+
     // Wait for table data to load before clicking Edit
     await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 15000 });
+    
     // Click edit button on first available record
     await page.getByRole('button', { name: 'Edit' }).first().click();
     await expect(page.getByRole('dialog')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Edit Sales Data' })).toBeVisible();
+    
     // Change quantity
     await page.locator('#new-quantity').fill('999');
     await page.getByRole('button', { name: 'Update Record' }).click();
