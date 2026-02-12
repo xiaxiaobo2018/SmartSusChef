@@ -18,7 +18,9 @@ import com.smartsuschef.mobile.util.showToast
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class DataInputFragment : Fragment(R.layout.fragment_data_input), RecentEntryActions {
+class DataInputFragment :
+    Fragment(R.layout.fragment_data_input),
+    RecentEntryActions {
     private var _binding: FragmentDataInputBinding? = null
     private val binding get() = _binding!!
     private val viewModel: DataInputViewModel by viewModels()
@@ -68,21 +70,33 @@ class DataInputFragment : Fragment(R.layout.fragment_data_input), RecentEntryAct
                     val (selectedId, selectedItemName) =
                         when {
                             isSalesMode -> {
-                                val item = viewModel.mainRecipes.value?.data?.find { it.name == selectedName }
+                                val item =
+                                    viewModel.mainRecipes.value
+                                        ?.data
+                                        ?.find { it.name == selectedName }
                                 Pair(item?.id, item?.name)
                             }
                             else ->
                                 when (wastageType) {
                                     WastageType.MAIN_DISH -> {
-                                        val item = viewModel.mainRecipes.value?.data?.find { it.name == selectedName }
+                                        val item =
+                                            viewModel.mainRecipes.value
+                                                ?.data
+                                                ?.find { it.name == selectedName }
                                         Pair(item?.id, item?.name)
                                     }
                                     WastageType.SUB_RECIPE -> {
-                                        val item = viewModel.subRecipes.value?.data?.find { it.name == selectedName }
+                                        val item =
+                                            viewModel.subRecipes.value
+                                                ?.data
+                                                ?.find { it.name == selectedName }
                                         Pair(item?.id, item?.name)
                                     }
                                     WastageType.INGREDIENT -> {
-                                        val item = viewModel.ingredients.value?.data?.find { it.name == selectedName }
+                                        val item =
+                                            viewModel.ingredients.value
+                                                ?.data
+                                                ?.find { it.name == selectedName }
                                         Pair(item?.id, item?.name)
                                     }
                                     else -> Pair(null, null)
@@ -199,7 +213,10 @@ class DataInputFragment : Fragment(R.layout.fragment_data_input), RecentEntryAct
 
     private fun setupSaveButtonClickListener() {
         binding.btnSaveData.setOnClickListener {
-            val qty = binding.etQuantity.text.toString().toDoubleOrNull()
+            val qty =
+                binding.etQuantity.text
+                    .toString()
+                    .toDoubleOrNull()
 
             if (qty == null || qty <= 0) {
                 requireContext().showToast("Please enter a valid quantity")
@@ -236,17 +253,16 @@ class DataInputFragment : Fragment(R.layout.fragment_data_input), RecentEntryAct
         val message =
             "You have already entered data for " +
                 "${existingEntry.name}. Do you want to overwrite the existing quantity?"
-        AlertDialog.Builder(requireContext())
+        AlertDialog
+            .Builder(requireContext())
             .setTitle("Entry Already Exists")
             .setMessage(message)
             .setPositiveButton("Overwrite Entry") { dialog, _ ->
                 viewModel.submitData(quantity, existingEntry.id)
                 dialog.dismiss()
-            }
-            .setNegativeButton("Cancel") { dialog, _ ->
+            }.setNegativeButton("Cancel") { dialog, _ ->
                 dialog.dismiss()
-            }
-            .show()
+            }.show()
     }
 
     private fun resetForm() {
@@ -277,17 +293,16 @@ class DataInputFragment : Fragment(R.layout.fragment_data_input), RecentEntryAct
     }
 
     override fun onDeleteClick(entry: RecentEntry) {
-        AlertDialog.Builder(requireContext())
+        AlertDialog
+            .Builder(requireContext())
             .setTitle("Delete Entry")
             .setMessage("Are you sure you want to delete the entry for ${entry.name}? This action cannot be undone.")
             .setPositiveButton("Delete") { dialog, _ ->
                 viewModel.deleteEntry(entry)
                 dialog.dismiss()
-            }
-            .setNegativeButton("Cancel") { dialog, _ ->
+            }.setNegativeButton("Cancel") { dialog, _ ->
                 dialog.dismiss()
-            }
-            .show()
+            }.show()
     }
 
     private fun <T> handleResource(

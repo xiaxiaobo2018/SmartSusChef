@@ -32,8 +32,8 @@ class AuthRepository
          * Executes login and saves the token if successful.
          * Maps to .NET AuthController.Login
          */
-        suspend fun login(request: LoginRequest): Resource<LoginResponse> {
-            return withContext(Dispatchers.IO) {
+        suspend fun login(request: LoginRequest): Resource<LoginResponse> =
+            withContext(Dispatchers.IO) {
                 try {
                     val response = authApi.login(request)
                     if (response.isSuccessful && response.body() != null) {
@@ -52,13 +52,12 @@ class AuthRepository
                     Resource.Error(e.localizedMessage ?: "An unexpected error occurred")
                 }
             }
-        }
 
         /**
          * Sends a password reset request.
          */
-        suspend fun forgotPassword(request: ForgotPasswordRequest): Resource<Unit> {
-            return withContext(Dispatchers.IO) {
+        suspend fun forgotPassword(request: ForgotPasswordRequest): Resource<Unit> =
+            withContext(Dispatchers.IO) {
                 try {
                     val response = authApi.forgotPassword(request)
                     if (response.isSuccessful) {
@@ -78,7 +77,6 @@ class AuthRepository
                     Resource.Error("An unexpected error occurred: ${e.message}")
                 }
             }
-        }
 
         /**
          * Change user password
@@ -139,7 +137,5 @@ class AuthRepository
         /**
          * Checks if a user is currently authenticated.
          */
-        fun isUserLoggedIn(): Boolean {
-            return !tokenManager.getToken().isNullOrEmpty()
-        }
+        fun isUserLoggedIn(): Boolean = !tokenManager.getToken().isNullOrEmpty()
     }

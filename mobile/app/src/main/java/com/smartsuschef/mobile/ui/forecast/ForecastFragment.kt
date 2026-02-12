@@ -154,16 +154,15 @@ class ForecastFragment : Fragment(R.layout.fragment_forecast) {
         return Triple(barEntries, lineEntries, labels)
     }
 
-    private fun createBarDataSet(barEntries: List<BarEntry>): BarDataSet {
-        return BarDataSet(barEntries, "Predicted Sales").apply {
+    private fun createBarDataSet(barEntries: List<BarEntry>): BarDataSet =
+        BarDataSet(barEntries, "Predicted Sales").apply {
             color = ContextCompat.getColor(requireContext(), R.color.forecast_gold)
             setDrawValues(false)
         }
-    }
 
     @Suppress("MagicNumber")
-    private fun createLineDataSet(lineEntries: List<Entry>): LineDataSet {
-        return LineDataSet(lineEntries, "Trend").apply {
+    private fun createLineDataSet(lineEntries: List<Entry>): LineDataSet =
+        LineDataSet(lineEntries, "Trend").apply {
             color = ContextCompat.getColor(requireContext(), R.color.forecast_trend)
             lineWidth = 2.5f
             circleRadius = 4f
@@ -172,7 +171,6 @@ class ForecastFragment : Fragment(R.layout.fragment_forecast) {
             setDrawValues(false)
             setDrawCircleHole(false)
         }
-    }
 
     @Suppress("MagicNumber")
     private fun styleSummaryChart(
@@ -263,9 +261,13 @@ class ForecastFragment : Fragment(R.layout.fragment_forecast) {
         val entries =
             forecastData.mapIndexed { index, daily ->
                 val values =
-                    allDishNames.map { dishName ->
-                        daily.dishes.find { it.name == dishName }?.predictedSales?.toFloat() ?: 0f
-                    }.toFloatArray()
+                    allDishNames
+                        .map { dishName ->
+                            daily.dishes
+                                .find { it.name == dishName }
+                                ?.predictedSales
+                                ?.toFloat() ?: 0f
+                        }.toFloatArray()
                 labels.add(formatDate(daily.date))
                 BarEntry(index.toFloat(), values)
             }
@@ -276,14 +278,13 @@ class ForecastFragment : Fragment(R.layout.fragment_forecast) {
     private fun createStackedBarDataSet(
         entries: List<BarEntry>,
         dishNames: Array<String>,
-    ): BarDataSet {
-        return BarDataSet(entries, "").apply {
+    ): BarDataSet =
+        BarDataSet(entries, "").apply {
             colors = getChartColors()
             stackLabels = dishNames
             setDrawValues(false)
             highLightAlpha = 0
         }
-    }
 
     private fun getChartColors(): List<Int> {
         val colorIds =
@@ -497,8 +498,8 @@ class ForecastFragment : Fragment(R.layout.fragment_forecast) {
         }
     }
 
-    private fun formatDate(dateStr: String): String {
-        return try {
+    private fun formatDate(dateStr: String): String =
+        try {
             val parser = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
             val formatter = SimpleDateFormat("d MMM", Locale.getDefault())
             parser.parse(dateStr)?.let { formatter.format(it) } ?: dateStr
@@ -506,7 +507,6 @@ class ForecastFragment : Fragment(R.layout.fragment_forecast) {
             Log.e(TAG, "Error formatting date: $dateStr", e)
             dateStr
         }
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()

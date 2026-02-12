@@ -168,9 +168,7 @@ class SettingsViewModel
         }
 
         // Validate password in real-time (for UI feedback)
-        fun validatePasswordFormat(password: String): String? {
-            return PasswordValidator.getErrorMessage(password)
-        }
+        fun validatePasswordFormat(password: String): String? = PasswordValidator.getErrorMessage(password)
 
         // Clear result messages after they've been shown
 
@@ -183,7 +181,5 @@ class SettingsViewModel
         }
 
         // Email validation helper
-        private fun isValidEmail(email: String): Boolean {
-            return emailValidator.isValid(email)
-        }
+        private fun isValidEmail(email: String): Boolean = emailValidator.isValid(email)
     }

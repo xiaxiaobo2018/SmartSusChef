@@ -63,7 +63,10 @@ class SettingsActivity : AppCompatActivity() {
         // Real-time validation for confirm password (check if matches)
         binding.tilConfirmPassword.editText?.addTextChangedListener { text ->
             val confirmPassword = text?.toString() ?: ""
-            val newPassword = binding.tilNewPassword.editText?.text?.toString() ?: ""
+            val newPassword =
+                binding.tilNewPassword.editText
+                    ?.text
+                    ?.toString() ?: ""
 
             // Don't show errors for empty field
             if (confirmPassword.isEmpty()) {
@@ -157,13 +160,12 @@ class SettingsActivity : AppCompatActivity() {
         binding.tilConfirmPassword.isErrorEnabled = false
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean =
+        when (item.itemId) {
             android.R.id.home -> {
                 finish()
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
-    }
 }

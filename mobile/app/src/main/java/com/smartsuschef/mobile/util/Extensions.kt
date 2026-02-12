@@ -53,9 +53,7 @@ fun TextInputLayout.clearError() {
 }
 
 // Gets the text from the TextInputLayout's EditText
-fun TextInputLayout.getText(): String {
-    return editText?.text?.toString() ?: ""
-}
+fun TextInputLayout.getText(): String = editText?.text?.toString() ?: ""
 
 // Adds a text change listener that validates on each change
 // Returns the TextWatcher so it can be removed if needed

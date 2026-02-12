@@ -29,32 +29,28 @@ object TestNetworkModule {
 
     @Provides
     @Singleton
-    fun provideGson(): Gson {
-        return GsonBuilder()
+    fun provideGson(): Gson =
+        GsonBuilder()
             .setLenient()
             .create()
-    }
 
     @Provides
     @Singleton
     fun provideTokenManager(
         @ApplicationContext context: Context,
-    ): TokenManager {
-        return TokenManager(context)
-    }
+    ): TokenManager = TokenManager(context)
 
     @Provides
     @Singleton
-    fun provideLoggingInterceptor(): HttpLoggingInterceptor {
-        return HttpLoggingInterceptor().apply {
+    fun provideLoggingInterceptor(): HttpLoggingInterceptor =
+        HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
-    }
 
     @Provides
     @Singleton
-    fun provideAuthInterceptor(tokenManager: TokenManager): Interceptor {
-        return Interceptor { chain ->
+    fun provideAuthInterceptor(tokenManager: TokenManager): Interceptor =
+        Interceptor { chain ->
             val originalRequest = chain.request()
             val token = tokenManager.getToken()
             val requestBuilder = originalRequest.newBuilder()
@@ -64,15 +60,15 @@ object TestNetworkModule {
             val request = requestBuilder.build()
             chain.proceed(request)
         }
-    }
 
     @Provides
     @Singleton
     fun provideOkHttpClient(
         loggingInterceptor: HttpLoggingInterceptor,
         authInterceptor: Interceptor,
-    ): OkHttpClient {
-        return OkHttpClient.Builder()
+    ): OkHttpClient =
+        OkHttpClient
+            .Builder()
             .addInterceptor(authInterceptor)
             .addInterceptor(ApdexInterceptor())
             .addInterceptor(loggingInterceptor)
@@ -80,18 +76,17 @@ object TestNetworkModule {
             .readTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
             .writeTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
             .build()
-    }
 
     @Provides
     @Singleton
     fun provideRetrofit(
         okHttpClient: OkHttpClient,
         gson: Gson,
-    ): Retrofit {
-        return Retrofit.Builder()
+    ): Retrofit =
+        Retrofit
+            .Builder()
             .baseUrl(mockWebServerUrl)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
-    }
 }

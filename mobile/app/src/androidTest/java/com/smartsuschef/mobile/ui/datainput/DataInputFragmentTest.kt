@@ -101,11 +101,14 @@ class DataInputFragmentTest {
     fun dataInput_showsToggleGroup() {
         launchDataInputTab()
 
-        Espresso.onView(ViewMatchers.withId(R.id.toggleGroup))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.toggleGroup))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        Espresso.onView(ViewMatchers.withId(R.id.btnSalesTab))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.btnSalesTab))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        Espresso.onView(ViewMatchers.withId(R.id.btnWastageTab))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.btnWastageTab))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
     }
 
@@ -113,13 +116,17 @@ class DataInputFragmentTest {
     fun dataInput_showsFormFields() {
         launchDataInputTab()
 
-        Espresso.onView(ViewMatchers.withId(R.id.tvStep1Label))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.tvStep1Label))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        Espresso.onView(ViewMatchers.withId(R.id.itemSpinner))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.itemSpinner))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        Espresso.onView(ViewMatchers.withId(R.id.etQuantity))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etQuantity))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        Espresso.onView(ViewMatchers.withId(R.id.btnSaveData))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.btnSaveData))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
     }
 
@@ -127,7 +134,8 @@ class DataInputFragmentTest {
     fun dataInput_showsRecentEntriesSection() {
         launchDataInputTab()
 
-        Espresso.onView(ViewMatchers.withId(R.id.rvRecentEntries))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.rvRecentEntries))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
     }
 
@@ -136,7 +144,8 @@ class DataInputFragmentTest {
         launchDataInputTab()
 
         // In sales mode, the step label should say "Select Dish"
-        Espresso.onView(ViewMatchers.withId(R.id.tvStep1Label))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.tvStep1Label))
             .check(ViewAssertions.matches(ViewMatchers.withText("Step 1: Select Dish")))
     }
 
@@ -152,11 +161,13 @@ class DataInputFragmentTest {
         Espresso.onView(ViewMatchers.withId(R.id.btnWastageTab)).perform(ViewActions.click())
 
         // Label should change
-        Espresso.onView(ViewMatchers.withId(R.id.tvStep1Label))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.tvStep1Label))
             .check(ViewAssertions.matches(ViewMatchers.withText("Step 1: Select Item Type")))
 
         // Wastage type toggle group should now be visible
-        Espresso.onView(ViewMatchers.withId(R.id.wastageTypeToggleGroup))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.wastageTypeToggleGroup))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
     }
 
@@ -170,9 +181,11 @@ class DataInputFragmentTest {
         // Go back to Sales
         Espresso.onView(ViewMatchers.withId(R.id.btnSalesTab)).perform(ViewActions.click())
 
-        Espresso.onView(ViewMatchers.withId(R.id.tvStep1Label))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.tvStep1Label))
             .check(ViewAssertions.matches(ViewMatchers.withText("Step 1: Select Dish")))
-        Espresso.onView(ViewMatchers.withId(R.id.wastageTypeToggleGroup))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.wastageTypeToggleGroup))
             .check(ViewAssertions.matches(Matchers.not(ViewMatchers.isDisplayed())))
     }
 
@@ -182,11 +195,14 @@ class DataInputFragmentTest {
 
         Espresso.onView(ViewMatchers.withId(R.id.btnWastageTab)).perform(ViewActions.click())
 
-        Espresso.onView(ViewMatchers.withId(R.id.btnMainDishType))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.btnMainDishType))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        Espresso.onView(ViewMatchers.withId(R.id.btnSubRecipeType))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.btnSubRecipeType))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        Espresso.onView(ViewMatchers.withId(R.id.btnIngredientType))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.btnIngredientType))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
     }
 
@@ -202,7 +218,8 @@ class DataInputFragmentTest {
         Espresso.onView(ViewMatchers.withId(R.id.btnMainDishType)).perform(ViewActions.click())
 
         // Spinner should now be populated with main dishes
-        Espresso.onView(ViewMatchers.withId(R.id.itemSpinner))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.itemSpinner))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
     }
 
@@ -213,7 +230,8 @@ class DataInputFragmentTest {
         Espresso.onView(ViewMatchers.withId(R.id.btnWastageTab)).perform(ViewActions.click())
         Espresso.onView(ViewMatchers.withId(R.id.btnSubRecipeType)).perform(ViewActions.click())
 
-        Espresso.onView(ViewMatchers.withId(R.id.itemSpinner))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.itemSpinner))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
     }
 
@@ -224,7 +242,8 @@ class DataInputFragmentTest {
         Espresso.onView(ViewMatchers.withId(R.id.btnWastageTab)).perform(ViewActions.click())
         Espresso.onView(ViewMatchers.withId(R.id.btnIngredientType)).perform(ViewActions.click())
 
-        Espresso.onView(ViewMatchers.withId(R.id.itemSpinner))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.itemSpinner))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
     }
 
@@ -241,12 +260,13 @@ class DataInputFragmentTest {
 
         // Open spinner and verify main dish items
         Espresso.onView(ViewMatchers.withId(R.id.itemSpinner)).perform(ViewActions.click())
-        Espresso.onData(
-            Matchers.allOf(
-                Matchers.instanceOf(String::class.java),
-                Matchers.`is`("Chicken Rice"),
-            ),
-        ).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+        Espresso
+            .onData(
+                Matchers.allOf(
+                    Matchers.instanceOf(String::class.java),
+                    Matchers.`is`("Chicken Rice"),
+                ),
+            ).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
     }
 
     @Test
@@ -258,12 +278,13 @@ class DataInputFragmentTest {
 
         // Open spinner and verify sub recipe items
         Espresso.onView(ViewMatchers.withId(R.id.itemSpinner)).perform(ViewActions.click())
-        Espresso.onData(
-            Matchers.allOf(
-                Matchers.instanceOf(String::class.java),
-                Matchers.`is`("Sambal Sauce"),
-            ),
-        ).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+        Espresso
+            .onData(
+                Matchers.allOf(
+                    Matchers.instanceOf(String::class.java),
+                    Matchers.`is`("Sambal Sauce"),
+                ),
+            ).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
     }
 
     @Test
@@ -275,12 +296,13 @@ class DataInputFragmentTest {
 
         // Open spinner and verify ingredient items
         Espresso.onView(ViewMatchers.withId(R.id.itemSpinner)).perform(ViewActions.click())
-        Espresso.onData(
-            Matchers.allOf(
-                Matchers.instanceOf(String::class.java),
-                Matchers.`is`("Rice"),
-            ),
-        ).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+        Espresso
+            .onData(
+                Matchers.allOf(
+                    Matchers.instanceOf(String::class.java),
+                    Matchers.`is`("Rice"),
+                ),
+            ).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
     }
 
     // ============================================================
@@ -295,15 +317,17 @@ class DataInputFragmentTest {
         Espresso.onView(ViewMatchers.withId(R.id.itemSpinner)).perform(ViewActions.click())
 
         // Select "Chicken Rice" from the spinner dropdown
-        Espresso.onData(
-            Matchers.allOf(
-                Matchers.instanceOf(String::class.java),
-                Matchers.`is`("Chicken Rice"),
-            ),
-        ).perform(ViewActions.click())
+        Espresso
+            .onData(
+                Matchers.allOf(
+                    Matchers.instanceOf(String::class.java),
+                    Matchers.`is`("Chicken Rice"),
+                ),
+            ).perform(ViewActions.click())
 
         // Spinner should now show "Chicken Rice"
-        Espresso.onView(ViewMatchers.withId(R.id.itemSpinner))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.itemSpinner))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
     }
 
@@ -315,9 +339,11 @@ class DataInputFragmentTest {
     fun dataInput_enterQuantity() {
         launchDataInputTab()
 
-        Espresso.onView(ViewMatchers.withId(R.id.etQuantity))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etQuantity))
             .perform(ViewActions.replaceText("25.5"), ViewActions.closeSoftKeyboard())
-        Espresso.onView(ViewMatchers.withId(R.id.etQuantity))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etQuantity))
             .check(ViewAssertions.matches(ViewMatchers.withText("25.5")))
     }
 
@@ -325,7 +351,8 @@ class DataInputFragmentTest {
     fun dataInput_saveButtonShowsCorrectDefaultText() {
         launchDataInputTab()
 
-        Espresso.onView(ViewMatchers.withId(R.id.btnSaveData))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.btnSaveData))
             .check(ViewAssertions.matches(ViewMatchers.withText("Save Entry")))
     }
 
@@ -339,18 +366,20 @@ class DataInputFragmentTest {
 
         // Select an item first
         Espresso.onView(ViewMatchers.withId(R.id.itemSpinner)).perform(ViewActions.click())
-        Espresso.onData(
-            Matchers.allOf(
-                Matchers.instanceOf(String::class.java),
-                Matchers.`is`("Chicken Rice"),
-            ),
-        ).perform(ViewActions.click())
+        Espresso
+            .onData(
+                Matchers.allOf(
+                    Matchers.instanceOf(String::class.java),
+                    Matchers.`is`("Chicken Rice"),
+                ),
+            ).perform(ViewActions.click())
 
         // Don't enter quantity, just click save
         Espresso.onView(ViewMatchers.withId(R.id.btnSaveData)).perform(ViewActions.click())
 
         // Form should still be showing (validation prevents submission)
-        Espresso.onView(ViewMatchers.withId(R.id.btnSaveData))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.btnSaveData))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
     }
 
@@ -360,20 +389,23 @@ class DataInputFragmentTest {
 
         // Select an item
         Espresso.onView(ViewMatchers.withId(R.id.itemSpinner)).perform(ViewActions.click())
-        Espresso.onData(
-            Matchers.allOf(
-                Matchers.instanceOf(String::class.java),
-                Matchers.`is`("Chicken Rice"),
-            ),
-        ).perform(ViewActions.click())
+        Espresso
+            .onData(
+                Matchers.allOf(
+                    Matchers.instanceOf(String::class.java),
+                    Matchers.`is`("Chicken Rice"),
+                ),
+            ).perform(ViewActions.click())
 
         // Enter zero
-        Espresso.onView(ViewMatchers.withId(R.id.etQuantity))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etQuantity))
             .perform(ViewActions.replaceText("0"), ViewActions.closeSoftKeyboard())
         Espresso.onView(ViewMatchers.withId(R.id.btnSaveData)).perform(ViewActions.click())
 
         // Form should still be showing (validation prevents submission)
-        Espresso.onView(ViewMatchers.withId(R.id.btnSaveData))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.btnSaveData))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
     }
 
@@ -383,20 +415,23 @@ class DataInputFragmentTest {
 
         // Select an item
         Espresso.onView(ViewMatchers.withId(R.id.itemSpinner)).perform(ViewActions.click())
-        Espresso.onData(
-            Matchers.allOf(
-                Matchers.instanceOf(String::class.java),
-                Matchers.`is`("Chicken Rice"),
-            ),
-        ).perform(ViewActions.click())
+        Espresso
+            .onData(
+                Matchers.allOf(
+                    Matchers.instanceOf(String::class.java),
+                    Matchers.`is`("Chicken Rice"),
+                ),
+            ).perform(ViewActions.click())
 
         // Enter negative quantity
-        Espresso.onView(ViewMatchers.withId(R.id.etQuantity))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etQuantity))
             .perform(ViewActions.replaceText("-5"), ViewActions.closeSoftKeyboard())
         Espresso.onView(ViewMatchers.withId(R.id.btnSaveData)).perform(ViewActions.click())
 
         // Form should still be showing (validation prevents submission)
-        Espresso.onView(ViewMatchers.withId(R.id.btnSaveData))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.btnSaveData))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
     }
 
@@ -406,20 +441,23 @@ class DataInputFragmentTest {
 
         // Select an item
         Espresso.onView(ViewMatchers.withId(R.id.itemSpinner)).perform(ViewActions.click())
-        Espresso.onData(
-            Matchers.allOf(
-                Matchers.instanceOf(String::class.java),
-                Matchers.`is`("Chicken Rice"),
-            ),
-        ).perform(ViewActions.click())
+        Espresso
+            .onData(
+                Matchers.allOf(
+                    Matchers.instanceOf(String::class.java),
+                    Matchers.`is`("Chicken Rice"),
+                ),
+            ).perform(ViewActions.click())
 
         // Leave quantity empty, click save
-        Espresso.onView(ViewMatchers.withId(R.id.etQuantity))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etQuantity))
             .perform(ViewActions.replaceText(""), ViewActions.closeSoftKeyboard())
         Espresso.onView(ViewMatchers.withId(R.id.btnSaveData)).perform(ViewActions.click())
 
         // Form should still be showing (validation prevents submission)
-        Espresso.onView(ViewMatchers.withId(R.id.btnSaveData))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.btnSaveData))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
     }
 
@@ -428,12 +466,14 @@ class DataInputFragmentTest {
         launchDataInputTab()
 
         // Enter a valid quantity but don't select an item (spinner at default "Select..." prompt)
-        Espresso.onView(ViewMatchers.withId(R.id.etQuantity))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etQuantity))
             .perform(ViewActions.replaceText("50"), ViewActions.closeSoftKeyboard())
         Espresso.onView(ViewMatchers.withId(R.id.btnSaveData)).perform(ViewActions.click())
 
         // Form should still be showing (validation prevents submission)
-        Espresso.onView(ViewMatchers.withId(R.id.btnSaveData))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.btnSaveData))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
     }
 
@@ -447,25 +487,29 @@ class DataInputFragmentTest {
 
         // Select an item
         Espresso.onView(ViewMatchers.withId(R.id.itemSpinner)).perform(ViewActions.click())
-        Espresso.onData(
-            Matchers.allOf(
-                Matchers.instanceOf(String::class.java),
-                Matchers.`is`("Chicken Rice"),
-            ),
-        ).perform(ViewActions.click())
+        Espresso
+            .onData(
+                Matchers.allOf(
+                    Matchers.instanceOf(String::class.java),
+                    Matchers.`is`("Chicken Rice"),
+                ),
+            ).perform(ViewActions.click())
 
         // Enter valid quantity
-        Espresso.onView(ViewMatchers.withId(R.id.etQuantity))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etQuantity))
             .perform(ViewActions.replaceText("50"), ViewActions.closeSoftKeyboard())
 
         // Click save
         Espresso.onView(ViewMatchers.withId(R.id.btnSaveData)).perform(ViewActions.click())
 
         // IdlingResource waits for network call; after successful save, quantity field should be cleared
-        Espresso.onView(ViewMatchers.withId(R.id.etQuantity))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etQuantity))
             .check(ViewAssertions.matches(ViewMatchers.withText("")))
         // Button text should reset to "Save"
-        Espresso.onView(ViewMatchers.withId(R.id.btnSaveData))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.btnSaveData))
             .check(ViewAssertions.matches(ViewMatchers.withText("Save")))
     }
 
@@ -475,22 +519,25 @@ class DataInputFragmentTest {
 
         // Select Chicken Rice
         Espresso.onView(ViewMatchers.withId(R.id.itemSpinner)).perform(ViewActions.click())
-        Espresso.onData(
-            Matchers.allOf(
-                Matchers.instanceOf(String::class.java),
-                Matchers.`is`("Chicken Rice"),
-            ),
-        ).perform(ViewActions.click())
+        Espresso
+            .onData(
+                Matchers.allOf(
+                    Matchers.instanceOf(String::class.java),
+                    Matchers.`is`("Chicken Rice"),
+                ),
+            ).perform(ViewActions.click())
 
         // Enter quantity
-        Espresso.onView(ViewMatchers.withId(R.id.etQuantity))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etQuantity))
             .perform(ViewActions.replaceText("50"), ViewActions.closeSoftKeyboard())
 
         // Click save
         Espresso.onView(ViewMatchers.withId(R.id.btnSaveData)).perform(ViewActions.click())
 
         // Wait for form reset to confirm save completed
-        Espresso.onView(ViewMatchers.withId(R.id.etQuantity))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etQuantity))
             .check(ViewAssertions.matches(ViewMatchers.withText("")))
 
         // Verify the POST request was sent correctly
@@ -510,22 +557,25 @@ class DataInputFragmentTest {
 
         // Select Rice
         Espresso.onView(ViewMatchers.withId(R.id.itemSpinner)).perform(ViewActions.click())
-        Espresso.onData(
-            Matchers.allOf(
-                Matchers.instanceOf(String::class.java),
-                Matchers.`is`("Rice"),
-            ),
-        ).perform(ViewActions.click())
+        Espresso
+            .onData(
+                Matchers.allOf(
+                    Matchers.instanceOf(String::class.java),
+                    Matchers.`is`("Rice"),
+                ),
+            ).perform(ViewActions.click())
 
         // Enter quantity
-        Espresso.onView(ViewMatchers.withId(R.id.etQuantity))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etQuantity))
             .perform(ViewActions.replaceText("5"), ViewActions.closeSoftKeyboard())
 
         // Click save
         Espresso.onView(ViewMatchers.withId(R.id.btnSaveData)).perform(ViewActions.click())
 
         // Wait for form reset
-        Espresso.onView(ViewMatchers.withId(R.id.etQuantity))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etQuantity))
             .check(ViewAssertions.matches(ViewMatchers.withText("")))
 
         // Verify the POST request was sent to wastage
@@ -545,22 +595,25 @@ class DataInputFragmentTest {
 
         // Select Chicken Rice
         Espresso.onView(ViewMatchers.withId(R.id.itemSpinner)).perform(ViewActions.click())
-        Espresso.onData(
-            Matchers.allOf(
-                Matchers.instanceOf(String::class.java),
-                Matchers.`is`("Chicken Rice"),
-            ),
-        ).perform(ViewActions.click())
+        Espresso
+            .onData(
+                Matchers.allOf(
+                    Matchers.instanceOf(String::class.java),
+                    Matchers.`is`("Chicken Rice"),
+                ),
+            ).perform(ViewActions.click())
 
         // Enter quantity
-        Espresso.onView(ViewMatchers.withId(R.id.etQuantity))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etQuantity))
             .perform(ViewActions.replaceText("10"), ViewActions.closeSoftKeyboard())
 
         // Click save
         Espresso.onView(ViewMatchers.withId(R.id.btnSaveData)).perform(ViewActions.click())
 
         // Wait for form reset
-        Espresso.onView(ViewMatchers.withId(R.id.etQuantity))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etQuantity))
             .check(ViewAssertions.matches(ViewMatchers.withText("")))
 
         // Verify the POST request
@@ -579,22 +632,25 @@ class DataInputFragmentTest {
 
         // Select an item
         Espresso.onView(ViewMatchers.withId(R.id.itemSpinner)).perform(ViewActions.click())
-        Espresso.onData(
-            Matchers.allOf(
-                Matchers.instanceOf(String::class.java),
-                Matchers.`is`("Chicken Rice"),
-            ),
-        ).perform(ViewActions.click())
+        Espresso
+            .onData(
+                Matchers.allOf(
+                    Matchers.instanceOf(String::class.java),
+                    Matchers.`is`("Chicken Rice"),
+                ),
+            ).perform(ViewActions.click())
 
         // Enter valid quantity
-        Espresso.onView(ViewMatchers.withId(R.id.etQuantity))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etQuantity))
             .perform(ViewActions.replaceText("50"), ViewActions.closeSoftKeyboard())
 
         // Click save
         Espresso.onView(ViewMatchers.withId(R.id.btnSaveData)).perform(ViewActions.click())
 
         // Form should still be showing after error
-        Espresso.onView(ViewMatchers.withId(R.id.btnSaveData))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.btnSaveData))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
     }
 
@@ -605,22 +661,25 @@ class DataInputFragmentTest {
 
         // Select an item
         Espresso.onView(ViewMatchers.withId(R.id.itemSpinner)).perform(ViewActions.click())
-        Espresso.onData(
-            Matchers.allOf(
-                Matchers.instanceOf(String::class.java),
-                Matchers.`is`("Chicken Rice"),
-            ),
-        ).perform(ViewActions.click())
+        Espresso
+            .onData(
+                Matchers.allOf(
+                    Matchers.instanceOf(String::class.java),
+                    Matchers.`is`("Chicken Rice"),
+                ),
+            ).perform(ViewActions.click())
 
         // Enter valid quantity
-        Espresso.onView(ViewMatchers.withId(R.id.etQuantity))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etQuantity))
             .perform(ViewActions.replaceText("50"), ViewActions.closeSoftKeyboard())
 
         // Click save
         Espresso.onView(ViewMatchers.withId(R.id.btnSaveData)).perform(ViewActions.click())
 
         // Quantity field should retain its value on error
-        Espresso.onView(ViewMatchers.withId(R.id.etQuantity))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etQuantity))
             .check(ViewAssertions.matches(ViewMatchers.withText("50")))
     }
 
@@ -635,18 +694,21 @@ class DataInputFragmentTest {
 
         // Select an item and save
         Espresso.onView(ViewMatchers.withId(R.id.itemSpinner)).perform(ViewActions.click())
-        Espresso.onData(
-            Matchers.allOf(
-                Matchers.instanceOf(String::class.java),
-                Matchers.`is`("Chicken Rice"),
-            ),
-        ).perform(ViewActions.click())
-        Espresso.onView(ViewMatchers.withId(R.id.etQuantity))
+        Espresso
+            .onData(
+                Matchers.allOf(
+                    Matchers.instanceOf(String::class.java),
+                    Matchers.`is`("Chicken Rice"),
+                ),
+            ).perform(ViewActions.click())
+        Espresso
+            .onView(ViewMatchers.withId(R.id.etQuantity))
             .perform(ViewActions.replaceText("50"), ViewActions.closeSoftKeyboard())
         Espresso.onView(ViewMatchers.withId(R.id.btnSaveData)).perform(ViewActions.click())
 
         // Verify RecyclerView is displayed after save
-        Espresso.onView(ViewMatchers.withId(R.id.rvRecentEntries))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.rvRecentEntries))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
     }
 
@@ -712,8 +774,7 @@ class DataInputFragmentTest {
                                     "updatedAt": "2026-01-01T00:00:00Z"
                                 }
                                 """.trimIndent(),
-                            )
-                            .addHeader("Content-Type", "application/json")
+                            ).addHeader("Content-Type", "application/json")
 
                     // Auth
                     path.contains("/api/auth/me") ->
@@ -732,8 +793,7 @@ class DataInputFragmentTest {
                                     "updatedAt": "2026-01-01T00:00:00Z"
                                 }
                                 """.trimIndent(),
-                            )
-                            .addHeader("Content-Type", "application/json")
+                            ).addHeader("Content-Type", "application/json")
 
                     // Recipes (main dishes + sub recipes)
                     path.contains("/api/recipes") ->
@@ -747,8 +807,7 @@ class DataInputFragmentTest {
                                     {"id": "r3", "name": "Sambal Sauce", "isSellable": false, "isSubRecipe": true, "ingredients": [], "createdAt": "2026-01-01T00:00:00Z", "updatedAt": "2026-01-01T00:00:00Z"}
                                 ]
                                 """.trimIndent(),
-                            )
-                            .addHeader("Content-Type", "application/json")
+                            ).addHeader("Content-Type", "application/json")
 
                     // Ingredients
                     path.contains("/api/ingredients") ->
@@ -762,8 +821,7 @@ class DataInputFragmentTest {
                                     {"id": "i3", "name": "Coconut Milk", "unit": "litre", "carbonFootprint": 2.5, "createdAt": "2026-01-01T00:00:00Z", "updatedAt": "2026-01-01T00:00:00Z"}
                                 ]
                                 """.trimIndent(),
-                            )
-                            .addHeader("Content-Type", "application/json")
+                            ).addHeader("Content-Type", "application/json")
 
                     // POST sales data (create)
                     path.contains("/api/sales") && request.method == "POST" -> {
@@ -788,8 +846,7 @@ class DataInputFragmentTest {
                                         "updatedAt": "2026-02-11T10:00:00Z"
                                     }
                                     """.trimIndent(),
-                                )
-                                .addHeader("Content-Type", "application/json")
+                                ).addHeader("Content-Type", "application/json")
                         }
                     }
 
@@ -812,8 +869,7 @@ class DataInputFragmentTest {
                                         }
                                     ]
                                     """.trimIndent(),
-                                )
-                                .addHeader("Content-Type", "application/json")
+                                ).addHeader("Content-Type", "application/json")
                         } else {
                             MockResponse()
                                 .setResponseCode(200)
@@ -846,8 +902,7 @@ class DataInputFragmentTest {
                                         "updatedAt": "2026-02-11T10:00:00Z"
                                     }
                                     """.trimIndent(),
-                                )
-                                .addHeader("Content-Type", "application/json")
+                                ).addHeader("Content-Type", "application/json")
                         }
                     }
 
@@ -878,8 +933,7 @@ class DataInputFragmentTest {
                                     "humidity": 75
                                 }
                                 """.trimIndent(),
-                            )
-                            .addHeader("Content-Type", "application/json")
+                            ).addHeader("Content-Type", "application/json")
 
                     // Forecast holidays (Expected: List<HolidayDto> - array)
                     path.contains("/api/forecast/holidays") ->
@@ -892,8 +946,7 @@ class DataInputFragmentTest {
                                     {"date": "2026-04-18", "name": "Good Friday"}
                                 ]
                                 """.trimIndent(),
-                            )
-                            .addHeader("Content-Type", "application/json")
+                            ).addHeader("Content-Type", "application/json")
 
                     // Forecast summary (Expected: List<ForecastSummaryDto> - array)
                     path.contains("/api/forecast/summary") ->
@@ -933,8 +986,7 @@ class DataInputFragmentTest {
                                     }
                                 }
                                 """.trimIndent(),
-                            )
-                            .addHeader("Content-Type", "application/json")
+                            ).addHeader("Content-Type", "application/json")
 
                     // Forecast (generic catch-all)
                     path.contains("/api/forecast") ->

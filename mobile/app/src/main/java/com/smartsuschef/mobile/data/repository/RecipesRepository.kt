@@ -20,8 +20,8 @@ class RecipesRepository
             private const val TAG = "RecipesRepository"
         }
 
-        suspend fun getAll(): Resource<List<RecipeDto>> {
-            return withContext(Dispatchers.IO) {
+        suspend fun getAll(): Resource<List<RecipeDto>> =
+            withContext(Dispatchers.IO) {
                 try {
                     val response = recipeApiService.getAll()
                     if (response.isSuccessful) {
@@ -41,10 +41,9 @@ class RecipesRepository
                     Resource.Error("An unexpected error occurred: ${e.message}")
                 }
             }
-        }
 
-        suspend fun create(request: CreateRecipeRequest): Resource<RecipeDto> {
-            return withContext(Dispatchers.IO) {
+        suspend fun create(request: CreateRecipeRequest): Resource<RecipeDto> =
+            withContext(Dispatchers.IO) {
                 try {
                     val response = recipeApiService.create(request)
                     if (response.isSuccessful) {
@@ -64,5 +63,4 @@ class RecipesRepository
                     Resource.Error("An unexpected error occurred: ${e.message}")
                 }
             }
-        }
     }

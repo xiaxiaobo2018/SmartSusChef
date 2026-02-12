@@ -29,11 +29,10 @@ object CoreNetworkModule {
      */
     @Provides
     @Singleton
-    fun provideGson(): Gson {
-        return GsonBuilder()
+    fun provideGson(): Gson =
+        GsonBuilder()
             .setLenient()
             .create()
-    }
 
     /**
      * Provides TokenManager. TokenManager now internally handles EncryptedSharedPreferences.
@@ -43,9 +42,7 @@ object CoreNetworkModule {
     @Singleton
     fun provideTokenManager(
         @ApplicationContext context: Context,
-    ): TokenManager {
-        return TokenManager(context)
-    }
+    ): TokenManager = TokenManager(context)
 
     /**
      * Provides HTTP Logging Interceptor for debugging API calls
@@ -53,8 +50,8 @@ object CoreNetworkModule {
      */
     @Provides
     @Singleton
-    fun provideLoggingInterceptor(): HttpLoggingInterceptor {
-        return HttpLoggingInterceptor().apply {
+    fun provideLoggingInterceptor(): HttpLoggingInterceptor =
+        HttpLoggingInterceptor().apply {
             level =
                 if (BuildConfig.DEBUG) {
                     HttpLoggingInterceptor.Level.BODY
@@ -62,7 +59,6 @@ object CoreNetworkModule {
                     HttpLoggingInterceptor.Level.NONE
                 }
         }
-    }
 
     /**
      * Provides Auth Interceptor to add JWT token to all requests
@@ -70,8 +66,8 @@ object CoreNetworkModule {
      */
     @Provides
     @Singleton
-    fun provideAuthInterceptor(tokenManager: TokenManager): Interceptor {
-        return Interceptor { chain ->
+    fun provideAuthInterceptor(tokenManager: TokenManager): Interceptor =
+        Interceptor { chain ->
             val originalRequest = chain.request()
 
             // Get token from TokenManager.
@@ -87,7 +83,6 @@ object CoreNetworkModule {
             val request = requestBuilder.build()
             chain.proceed(request)
         }
-    }
 
     /**
      * Provides OkHttpClient with interceptors and timeout configs
@@ -97,8 +92,9 @@ object CoreNetworkModule {
     fun provideOkHttpClient(
         loggingInterceptor: HttpLoggingInterceptor,
         authInterceptor: Interceptor,
-    ): OkHttpClient {
-        return OkHttpClient.Builder()
+    ): OkHttpClient =
+        OkHttpClient
+            .Builder()
             .addInterceptor(authInterceptor) // Add auth token to requests
             .addInterceptor(ApdexInterceptor()) // Log Apdex performance metrics
             .addInterceptor(loggingInterceptor) // Log requests/responses
@@ -106,7 +102,6 @@ object CoreNetworkModule {
             .readTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS) // Read timeout
             .writeTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS) // Write timeout
             .build()
-    }
 
     /**
      * Provides Retrofit instance.
@@ -117,11 +112,11 @@ object CoreNetworkModule {
     fun provideRetrofit(
         okHttpClient: OkHttpClient,
         gson: Gson,
-    ): Retrofit {
-        return Retrofit.Builder()
+    ): Retrofit =
+        Retrofit
+            .Builder()
             .baseUrl(BuildConfig.BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
-    }
 }

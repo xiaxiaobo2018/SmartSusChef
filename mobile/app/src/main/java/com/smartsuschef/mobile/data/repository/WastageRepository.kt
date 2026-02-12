@@ -25,8 +25,8 @@ class WastageRepository
         suspend fun getAll(
             startDate: String?,
             endDate: String?,
-        ): Resource<List<WastageDataDto>> {
-            return withContext(Dispatchers.IO) {
+        ): Resource<List<WastageDataDto>> =
+            withContext(Dispatchers.IO) {
                 try {
                     val response = wastageApiService.getAll(startDate, endDate)
                     if (response.isSuccessful) {
@@ -46,13 +46,12 @@ class WastageRepository
                     Resource.Error("An unexpected error occurred: ${e.message}")
                 }
             }
-        }
 
         suspend fun getTrend(
             startDate: String,
             endDate: String,
-        ): Resource<List<WastageTrendDto>> {
-            return withContext(Dispatchers.IO) {
+        ): Resource<List<WastageTrendDto>> =
+            withContext(Dispatchers.IO) {
                 try {
                     val response = wastageApiService.getTrend(startDate, endDate)
                     if (response.isSuccessful) {
@@ -72,10 +71,9 @@ class WastageRepository
                     Resource.Error("An unexpected error occurred: ${e.message}")
                 }
             }
-        }
 
-        suspend fun create(request: CreateWastageDataRequest): Resource<WastageDataDto> {
-            return withContext(Dispatchers.IO) {
+        suspend fun create(request: CreateWastageDataRequest): Resource<WastageDataDto> =
+            withContext(Dispatchers.IO) {
                 try {
                     val response = wastageApiService.create(request)
                     if (response.isSuccessful) {
@@ -95,13 +93,12 @@ class WastageRepository
                     Resource.Error("An unexpected error occurred: ${e.message}")
                 }
             }
-        }
 
         suspend fun update(
             id: String,
             request: UpdateWastageDataRequest,
-        ): Resource<WastageDataDto> {
-            return withContext(Dispatchers.IO) {
+        ): Resource<WastageDataDto> =
+            withContext(Dispatchers.IO) {
                 try {
                     val response = wastageApiService.update(id, request)
                     if (response.isSuccessful) {
@@ -121,10 +118,9 @@ class WastageRepository
                     Resource.Error("An unexpected error occurred: ${e.message}")
                 }
             }
-        }
 
-        suspend fun delete(id: String): Resource<Unit> {
-            return withContext(Dispatchers.IO) {
+        suspend fun delete(id: String): Resource<Unit> =
+            withContext(Dispatchers.IO) {
                 try {
                     val response = wastageApiService.delete(id)
                     if (response.isSuccessful) {
@@ -144,5 +140,4 @@ class WastageRepository
                     Resource.Error("An unexpected error occurred: ${e.message}")
                 }
             }
-        }
     }

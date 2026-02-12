@@ -51,7 +51,8 @@ class WastageDetailFragment : Fragment(R.layout.fragment_wastage_detail) {
     @Suppress("MagicNumber")
     private fun setupPieChart(data: List<WastageBreakdownItem>) {
         val breakdown =
-            data.groupBy { it.type }
+            data
+                .groupBy { it.type }
                 .mapValues { entry -> entry.value.sumOf { it.carbonFootprint } }
 
         val entries =

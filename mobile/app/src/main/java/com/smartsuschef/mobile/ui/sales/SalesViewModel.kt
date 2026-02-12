@@ -157,8 +157,18 @@ class SalesViewModel
     }
 
 // Data models matching UI needs
-data class SalesTrendItem(val date: String, val sales: Int)
+data class SalesTrendItem(
+    val date: String,
+    val sales: Int,
+)
 
-data class IngredientRequirement(val name: String, val quantity: Double, val unit: String)
+data class IngredientRequirement(
+    val name: String,
+    val quantity: Double,
+    val unit: String,
+)
 
-data class RecipeSalesItem(val name: String, val quantity: Int)
+data class RecipeSalesItem(
+    val name: String,
+    val quantity: Int,
+)

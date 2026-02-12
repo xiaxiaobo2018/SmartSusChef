@@ -197,8 +197,7 @@ class SalesOverviewFragmentTest {
                                     "updatedAt": "2026-01-01T00:00:00Z"
                                 }
                                 """.trimIndent(),
-                            )
-                            .addHeader("Content-Type", "application/json")
+                            ).addHeader("Content-Type", "application/json")
 
                     path.contains("/api/auth/me") ->
                         MockResponse()
@@ -216,12 +215,12 @@ class SalesOverviewFragmentTest {
                                     "updatedAt": "2026-01-01T00:00:00Z"
                                 }
                                 """.trimIndent(),
-                            )
-                            .addHeader("Content-Type", "application/json")
+                            ).addHeader("Content-Type", "application/json")
 
                     path.contains("/api/sales/trend") ->
                         if (salesTrendError) {
-                            MockResponse().setResponseCode(500)
+                            MockResponse()
+                                .setResponseCode(500)
                                 .setBody("""{"message": "Internal Server Error"}""")
                                 .addHeader("Content-Type", "application/json")
                         } else {
@@ -235,13 +234,13 @@ class SalesOverviewFragmentTest {
                                         {"date": "2026-02-08", "totalQuantity": 130, "recipeBreakdown": []}
                                     ]
                                     """.trimIndent(),
-                                )
-                                .addHeader("Content-Type", "application/json")
+                                ).addHeader("Content-Type", "application/json")
                         }
 
                     path.contains("/api/forecast/weather") ->
                         if (weatherError) {
-                            MockResponse().setResponseCode(500)
+                            MockResponse()
+                                .setResponseCode(500)
                                 .setBody("""{"message": "Internal Server Error"}""")
                                 .addHeader("Content-Type", "application/json")
                         } else {
@@ -256,13 +255,13 @@ class SalesOverviewFragmentTest {
                                         "humidity": 75
                                     }
                                     """.trimIndent(),
-                                )
-                                .addHeader("Content-Type", "application/json")
+                                ).addHeader("Content-Type", "application/json")
                         }
 
                     path.contains("/api/forecast/holidays") ->
                         if (holidaysError) {
-                            MockResponse().setResponseCode(500)
+                            MockResponse()
+                                .setResponseCode(500)
                                 .setBody("""{"message": "Internal Server Error"}""")
                                 .addHeader("Content-Type", "application/json")
                         } else {
@@ -275,8 +274,7 @@ class SalesOverviewFragmentTest {
                                         {"date": "2026-04-18", "name": "Good Friday"}
                                     ]
                                     """.trimIndent(),
-                                )
-                                .addHeader("Content-Type", "application/json")
+                                ).addHeader("Content-Type", "application/json")
                         }
 
                     path.contains("/api/forecast") ->
@@ -286,7 +284,8 @@ class SalesOverviewFragmentTest {
                             .addHeader("Content-Type", "application/json")
 
                     else ->
-                        MockResponse().setResponseCode(200)
+                        MockResponse()
+                            .setResponseCode(200)
                             .setBody("[]")
                             .addHeader("Content-Type", "application/json")
                 }

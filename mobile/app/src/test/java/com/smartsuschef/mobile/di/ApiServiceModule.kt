@@ -32,43 +32,29 @@ import javax.inject.Singleton
 object ApiServiceModule {
     @Provides
     @Singleton
-    fun provideAuthApiService(): AuthApiService {
-        return MockAuthApiService()
-    }
+    fun provideAuthApiService(): AuthApiService = MockAuthApiService()
 
     @Provides
     @Singleton
-    fun provideSalesApiService(): SalesApiService {
-        return MockSalesApiService()
-    }
+    fun provideSalesApiService(): SalesApiService = MockSalesApiService()
 
     @Provides
     @Singleton
-    fun provideWastageApiService(): WastageApiService {
-        return MockWastageApiService()
-    }
+    fun provideWastageApiService(): WastageApiService = MockWastageApiService()
 
     @Provides
     @Singleton
-    fun provideForecastApiService(): ForecastApiService {
-        return MockForecastApiService()
-    }
+    fun provideForecastApiService(): ForecastApiService = MockForecastApiService()
 
     @Provides
     @Singleton
-    fun provideRecipeApiService(): RecipeApiService {
-        return MockRecipeApiService()
-    }
+    fun provideRecipeApiService(): RecipeApiService = MockRecipeApiService()
 
     @Provides
     @Singleton
-    fun provideIngredientApiService(): IngredientApiService {
-        return MockIngredientApiService()
-    }
+    fun provideIngredientApiService(): IngredientApiService = MockIngredientApiService()
 
     @Provides
     @Singleton
-    fun provideStoreApiService(): StoreApiService {
-        return MockStoreApiService()
-    }
+    fun provideStoreApiService(): StoreApiService = MockStoreApiService()
 }

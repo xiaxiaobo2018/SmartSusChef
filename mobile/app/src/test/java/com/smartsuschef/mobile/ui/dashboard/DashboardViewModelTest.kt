@@ -82,8 +82,20 @@ class DashboardViewModelTest {
                 )
             val mockStoreDto =
                 StoreDto(
-                    1, "company", "uen", mockStoreName, mockOutletLocation,
-                    "123", "date", 0.0, 0.0, "SG", "address", true, "date", "date",
+                    1,
+                    "company",
+                    "uen",
+                    mockStoreName,
+                    mockOutletLocation,
+                    "123",
+                    "date",
+                    0.0,
+                    0.0,
+                    "SG",
+                    "address",
+                    true,
+                    "date",
+                    "date",
                 )
 
             // 2. Program the mocks to return the successful data

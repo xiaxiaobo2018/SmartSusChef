@@ -312,7 +312,13 @@ class DataInputViewModelTest {
 
             // Ensure the entry is in the list
             assertEquals(1, viewModel.recentEntries.value?.size)
-            assertEquals(initialQuantity.toDouble(), viewModel.recentEntries.value!!.first().quantity, 0.0)
+            assertEquals(
+                initialQuantity.toDouble(),
+                viewModel.recentEntries.value!!
+                    .first()
+                    .quantity,
+                0.0,
+            )
 
             // 2. Prepare the mock response for the update operation
             val mockSalesDtoForUpdate =
@@ -389,7 +395,13 @@ class DataInputViewModelTest {
 
             // Ensure the entry is in the list
             assertEquals(1, viewModel.recentEntries.value?.size)
-            assertEquals(initialQuantity, viewModel.recentEntries.value!!.first().quantity, 0.0)
+            assertEquals(
+                initialQuantity,
+                viewModel.recentEntries.value!!
+                    .first()
+                    .quantity,
+                0.0,
+            )
 
             // 2. Prepare the mock response for the update operation
             val mockWastageDtoForUpdate =

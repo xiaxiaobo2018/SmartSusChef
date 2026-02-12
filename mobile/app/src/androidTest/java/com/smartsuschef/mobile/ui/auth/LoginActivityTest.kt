@@ -191,8 +191,7 @@ class LoginActivityTest {
                                         "storeSetupRequired": false
                                     }
                                     """.trimIndent(),
-                                )
-                                .addHeader("Content-Type", "application/json")
+                                ).addHeader("Content-Type", "application/json")
 
                         // Store status
                         path.contains("/api/store/status") ->
@@ -222,8 +221,7 @@ class LoginActivityTest {
                                         "updatedAt": "2026-01-01T00:00:00Z"
                                     }
                                     """.trimIndent(),
-                                )
-                                .addHeader("Content-Type", "application/json")
+                                ).addHeader("Content-Type", "application/json")
 
                         // Current user
                         path.contains("/api/auth/me") ->
@@ -242,8 +240,7 @@ class LoginActivityTest {
                                         "updatedAt": "2026-01-01T00:00:00Z"
                                     }
                                     """.trimIndent(),
-                                )
-                                .addHeader("Content-Type", "application/json")
+                                ).addHeader("Content-Type", "application/json")
 
                         // All other Dashboard endpoints
                         path.contains("/api/sales") ->
@@ -271,8 +268,7 @@ class LoginActivityTest {
                                         "humidity": 75
                                     }
                                     """.trimIndent(),
-                                )
-                                .addHeader("Content-Type", "application/json")
+                                ).addHeader("Content-Type", "application/json")
 
                         // Forecast holidays (Expected: List<HolidayDto> - array)
                         path.contains("/api/forecast/holidays") ->
@@ -285,8 +281,7 @@ class LoginActivityTest {
                                         {"date": "2026-04-18", "name": "Good Friday"}
                                     ]
                                     """.trimIndent(),
-                                )
-                                .addHeader("Content-Type", "application/json")
+                                ).addHeader("Content-Type", "application/json")
 
                         // Forecast summary (Expected: List<ForecastSummaryDto> - array)
                         path.contains("/api/forecast/summary") ->
@@ -326,8 +321,7 @@ class LoginActivityTest {
                                         }
                                     }
                                     """.trimIndent(),
-                                )
-                                .addHeader("Content-Type", "application/json")
+                                ).addHeader("Content-Type", "application/json")
 
                         // Forecast (generic catch-all)
                         path.contains("/api/forecast") ->
