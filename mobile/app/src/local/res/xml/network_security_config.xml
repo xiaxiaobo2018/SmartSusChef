@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Local flavor network security config: allows cleartext traffic
+    for Android Emulator (10.0.2.2) and localhost development.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <!-- Android Emulator loopback -->
+        <domain includeSubdomains="false">10.0.2.2</domain>
+        <!-- Physical device local network (override via local.properties if needed) -->
+        <domain includeSubdomains="false">localhost</domain>
+    </domain-config>
+</network-security-config>

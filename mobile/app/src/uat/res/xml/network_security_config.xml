@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    UAT flavor network security config: allows cleartext traffic
+    to the UAT ALB endpoint only (ALB does not terminate TLS).
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <!-- UAT ALB (HTTP only) -->
+        <domain includeSubdomains="true">smartsuschef-uat-alb-374711244.ap-southeast-1.elb.amazonaws.com</domain>
+    </domain-config>
+</network-security-config>
