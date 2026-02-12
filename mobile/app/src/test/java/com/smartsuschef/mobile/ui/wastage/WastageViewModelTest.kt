@@ -193,4 +193,15 @@ class WastageViewModelTest {
         // The ViewModel is created in setUp, wastageBreakdown is never set
         assertNull(viewModel.wastageBreakdown.value)
     }
+
+    @Test
+    fun `setFilter with TODAY should update currentFilter to TODAY`() =
+        runTest {
+            whenever(wastageRepository.getTrend(any(), any()))
+                .thenReturn(Resource.Success(emptyList()))
+
+            viewModel.setFilter(WastageFilter.TODAY)
+
+            assertEquals(WastageFilter.TODAY, viewModel.currentFilter.value)
+        }
 }

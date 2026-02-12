@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SettingsViewModel.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">com.smartsuschef.mobile.ui.settings</a> &gt; <span class="el_source">SettingsViewModel.kt</span></div><h1>SettingsViewModel.kt</h1><pre class="source lang-java linenums">package com.smartsuschef.mobile.ui.settings
+
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.smartsuschef.mobile.data.repository.AuthRepository
+import com.smartsuschef.mobile.data.repository.UsersRepository
+import com.smartsuschef.mobile.network.dto.ChangePasswordRequest
+import com.smartsuschef.mobile.network.dto.UpdateProfileRequest
+import com.smartsuschef.mobile.network.dto.UserDto
+import com.smartsuschef.mobile.util.EmailValidator
+import com.smartsuschef.mobile.util.PasswordValidator
+import com.smartsuschef.mobile.util.Resource
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+@HiltViewModel
+class SettingsViewModel
+<span class="fc" id="L21">    @Inject</span>
+    constructor(
+<span class="fc" id="L23">        private val authRepository: AuthRepository,</span>
+<span class="fc" id="L24">        private val usersRepository: UsersRepository,</span>
+<span class="fc" id="L25">        private val emailValidator: EmailValidator,</span>
+<span class="fc" id="L26">    ) : ViewModel() {</span>
+        // Current user data
+<span class="fc" id="L28">        private val _currentUser = MutableLiveData&lt;UserDto?&gt;()</span>
+<span class="fc" id="L29">        val currentUser: LiveData&lt;UserDto?&gt; = _currentUser</span>
+
+        // Loading states
+<span class="fc" id="L32">        private val _isLoadingProfile = MutableLiveData(false)</span>
+<span class="fc" id="L33">        val isLoadingProfile: LiveData&lt;Boolean&gt; = _isLoadingProfile</span>
+
+<span class="fc" id="L35">        private val _isLoadingPassword = MutableLiveData(false)</span>
+<span class="fc" id="L36">        val isLoadingPassword: LiveData&lt;Boolean&gt; = _isLoadingPassword</span>
+
+        // Result messages
+<span class="fc" id="L39">        private val _profileUpdateResult = MutableLiveData&lt;String?&gt;()</span>
+<span class="fc" id="L40">        val profileUpdateResult: LiveData&lt;String?&gt; = _profileUpdateResult</span>
+
+<span class="fc" id="L42">        private val _passwordUpdateResult = MutableLiveData&lt;String?&gt;()</span>
+<span class="fc" id="L43">        val passwordUpdateResult: LiveData&lt;String?&gt; = _passwordUpdateResult</span>
+
+<span class="fc" id="L45">        init {</span>
+<span class="fc" id="L46">            loadCurrentUser()</span>
+<span class="fc" id="L47">        }</span>
+
+        /**
+         * Load current user information
+         */
+        private fun loadCurrentUser() {
+<span class="fc" id="L53">            viewModelScope.launch {</span>
+<span class="fc" id="L54">                _isLoadingProfile.value = true</span>
+<span class="fc" id="L55">                when (val result = usersRepository.getCurrentUser()) {</span>
+<span class="fc bfc" id="L56" title="All 2 branches covered.">                    is Resource.Success -&gt; {</span>
+<span class="fc" id="L57">                        _currentUser.value = result.data</span>
+<span class="fc" id="L58">                        _isLoadingProfile.value = false</span>
+                    }
+<span class="pc bpc" id="L60" title="1 of 2 branches missed.">                    is Resource.Error -&gt; {</span>
+<span class="fc" id="L61">                        _profileUpdateResult.value = &quot;Failed to load user info: ${result.message}&quot;</span>
+<span class="fc" id="L62">                        _isLoadingProfile.value = false</span>
+                    }
+<span class="nc" id="L64">                    is Resource.Loading -&gt; {</span>
+<span class="nc" id="L65">                        _isLoadingProfile.value = true</span>
+                    }
+                }
+<span class="fc" id="L68">            }</span>
+<span class="fc" id="L69">        }</span>
+
+        /**
+         * Update user profile (name and email)
+         */
+        fun updateProfile(
+            name: String,
+            email: String,
+        ) {
+            // Validation
+<span class="fc bfc" id="L79" title="All 2 branches covered.">            if (name.isBlank()) {</span>
+<span class="fc" id="L80">                _profileUpdateResult.value = &quot;Name cannot be empty&quot;</span>
+<span class="fc" id="L81">                return</span>
+            }
+<span class="fc bfc" id="L83" title="All 2 branches covered.">            if (email.isBlank()) {</span>
+<span class="fc" id="L84">                _profileUpdateResult.value = &quot;Email cannot be empty&quot;</span>
+<span class="fc" id="L85">                return</span>
+            }
+<span class="fc bfc" id="L87" title="All 2 branches covered.">            if (!isValidEmail(email)) {</span>
+<span class="fc" id="L88">                _profileUpdateResult.value = &quot;Please enter a valid email address&quot;</span>
+<span class="fc" id="L89">                return</span>
+            }
+
+<span class="fc" id="L92">            viewModelScope.launch {</span>
+<span class="fc" id="L93">                _isLoadingProfile.value = true</span>
+<span class="fc" id="L94">                val request = UpdateProfileRequest(name = name.trim(), email = email.trim())</span>
+
+<span class="fc" id="L96">                when (val result = usersRepository.updateUser(request)) {</span>
+<span class="fc bfc" id="L97" title="All 2 branches covered.">                    is Resource.Success -&gt; {</span>
+<span class="fc" id="L98">                        _currentUser.value = result.data</span>
+<span class="fc" id="L99">                        _profileUpdateResult.value = &quot;Profile updated successfully&quot;</span>
+<span class="fc" id="L100">                        _isLoadingProfile.value = false</span>
+                    }
+<span class="pc bpc" id="L102" title="1 of 2 branches missed.">                    is Resource.Error -&gt; {</span>
+<span class="fc" id="L103">                        _profileUpdateResult.value = &quot;Failed to update profile: ${result.message}&quot;</span>
+<span class="fc" id="L104">                        _isLoadingProfile.value = false</span>
+                    }
+<span class="nc" id="L106">                    is Resource.Loading -&gt; {</span>
+<span class="nc" id="L107">                        _isLoadingProfile.value = true</span>
+                    }
+                }
+<span class="fc" id="L110">            }</span>
+<span class="fc" id="L111">        }</span>
+
+        // Change password with comprehensive validation
+        @Suppress(&quot;ReturnCount&quot;)
+        fun changePassword(
+            currentPassword: String,
+            newPassword: String,
+            confirmPassword: String,
+        ) {
+<span class="fc bfc" id="L120" title="All 2 branches covered.">            if (currentPassword.isBlank()) {</span>
+<span class="fc" id="L121">                _passwordUpdateResult.value = &quot;Current password is required&quot;</span>
+<span class="fc" id="L122">                return</span>
+            }
+
+<span class="fc bfc" id="L125" title="All 2 branches covered.">            if (newPassword.isBlank()) {</span>
+<span class="fc" id="L126">                _passwordUpdateResult.value = &quot;New password is required&quot;</span>
+<span class="fc" id="L127">                return</span>
+            }
+
+<span class="fc bfc" id="L130" title="All 2 branches covered.">            if (newPassword != confirmPassword) {</span>
+<span class="fc" id="L131">                _passwordUpdateResult.value = &quot;Passwords do not match&quot;</span>
+<span class="fc" id="L132">                return</span>
+            }
+
+<span class="fc bfc" id="L135" title="All 2 branches covered.">            if (currentPassword == newPassword) {</span>
+<span class="fc" id="L136">                _passwordUpdateResult.value = &quot;New password must be different from current password&quot;</span>
+<span class="fc" id="L137">                return</span>
+            }
+
+<span class="fc" id="L140">            val validationResult = PasswordValidator.validate(newPassword)</span>
+<span class="fc bfc" id="L141" title="All 2 branches covered.">            if (!validationResult.isValid) {</span>
+<span class="fc" id="L142">                _passwordUpdateResult.value = validationResult.errorMessage</span>
+<span class="fc" id="L143">                return</span>
+            }
+
+<span class="fc" id="L146">            _isLoadingPassword.value = true</span>
+<span class="fc" id="L147">            viewModelScope.launch {</span>
+<span class="fc" id="L148">                val request =</span>
+<span class="fc" id="L149">                    ChangePasswordRequest(</span>
+<span class="fc" id="L150">                        currentPassword = currentPassword,</span>
+<span class="fc" id="L151">                        newPassword = newPassword,</span>
+                    )
+
+<span class="fc" id="L154">                when (val result = authRepository.changePassword(request)) {</span>
+<span class="fc bfc" id="L155" title="All 2 branches covered.">                    is Resource.Success -&gt; {</span>
+<span class="fc" id="L156">                        _passwordUpdateResult.value = &quot;Password changed successfully&quot;</span>
+<span class="fc" id="L157">                        _isLoadingPassword.value = false</span>
+                    }
+<span class="pc bpc" id="L159" title="1 of 2 branches missed.">                    is Resource.Error -&gt; {</span>
+<span class="fc" id="L160">                        _passwordUpdateResult.value = &quot;Failed to change password: ${result.message}&quot;</span>
+<span class="fc" id="L161">                        _isLoadingPassword.value = false</span>
+                    }
+<span class="nc" id="L163">                    is Resource.Loading -&gt; {</span>
+<span class="nc" id="L164">                        _isLoadingPassword.value = true</span>
+                    }
+                }
+<span class="fc" id="L167">            }</span>
+<span class="fc" id="L168">        }</span>
+
+        // Validate password in real-time (for UI feedback)
+        fun validatePasswordFormat(password: String): String? {
+<span class="nc" id="L172">            return PasswordValidator.getErrorMessage(password)</span>
+        }
+
+        // Clear result messages after they've been shown
+
+        fun clearProfileResult() {
+<span class="fc" id="L178">            _profileUpdateResult.value = null</span>
+<span class="fc" id="L179">        }</span>
+
+        fun clearPasswordResult() {
+<span class="fc" id="L182">            _passwordUpdateResult.value = null</span>
+<span class="fc" id="L183">        }</span>
+
+        // Email validation helper
+        private fun isValidEmail(email: String): Boolean {
+<span class="fc" id="L187">            return emailValidator.isValid(email)</span>
+        }
+    }
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

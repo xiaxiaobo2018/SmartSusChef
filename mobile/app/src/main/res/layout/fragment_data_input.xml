@@ -127,7 +127,8 @@
                 android:background="@drawable/bg_input_field"
                 android:hint="0.00"
                 android:inputType="numberDecimal"
-                android:paddingHorizontal="12dp" />
+                android:paddingHorizontal="12dp"
+                android:importantForAutofill="no" />
 
             <Button
                 android:id="@+id/btnSaveData"

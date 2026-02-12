@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DateUtils.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">com.smartsuschef.mobile.util</a> &gt; <span class="el_source">DateUtils.kt</span></div><h1>DateUtils.kt</h1><pre class="source lang-java linenums">package com.smartsuschef.mobile.util
+
+import android.util.Log
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
+
+object DateUtils {
+    private const val TAG = &quot;DateUtils&quot;
+
+    // Get today's date in API format (yyyy-MM-dd)
+    fun getTodayFormatted(): String {
+<span class="fc" id="L14">        val formatter = SimpleDateFormat(Constants.DATE_FORMAT_API, Locale.getDefault())</span>
+<span class="fc" id="L15">        return formatter.format(Date())</span>
+    }
+
+    // Get date N days ago in API format
+    fun getDaysAgoFormatted(daysAgo: Int): String {
+<span class="fc" id="L20">        val calendar = Calendar.getInstance()</span>
+<span class="fc" id="L21">        calendar.add(Calendar.DAY_OF_YEAR, -daysAgo)</span>
+<span class="fc" id="L22">        val formatter = SimpleDateFormat(Constants.DATE_FORMAT_API, Locale.getDefault())</span>
+<span class="fc" id="L23">        return formatter.format(calendar.time)</span>
+    }
+
+    // Get date N days from now in API format
+    fun getDaysFromNowFormatted(daysFromNow: Int): String {
+<span class="fc" id="L28">        val calendar = Calendar.getInstance()</span>
+<span class="fc" id="L29">        calendar.add(Calendar.DAY_OF_YEAR, daysFromNow)</span>
+<span class="fc" id="L30">        val formatter = SimpleDateFormat(Constants.DATE_FORMAT_API, Locale.getDefault())</span>
+<span class="fc" id="L31">        return formatter.format(calendar.time)</span>
+    }
+
+    // Convert API date string (yyyy-MM-dd) to display format (dd MMM yyyy)
+    fun formatDateForDisplay(apiDateString: String): String {
+<span class="fc" id="L36">        return try {</span>
+<span class="fc" id="L37">            val apiFormatter = SimpleDateFormat(Constants.DATE_FORMAT_API, Locale.getDefault())</span>
+<span class="fc" id="L38">            val displayFormatter = SimpleDateFormat(Constants.DATE_FORMAT_DISPLAY, Locale.getDefault())</span>
+<span class="fc" id="L39">            val date = apiFormatter.parse(apiDateString)</span>
+<span class="fc" id="L40">            displayFormatter.format(date!!)</span>
+<span class="fc" id="L41">        } catch (e: Exception) {</span>
+<span class="fc" id="L42">            Log.e(TAG, &quot;Error formatting date: $apiDateString&quot;, e)</span>
+<span class="fc" id="L43">            apiDateString // Return as-is if parsing fails</span>
+        }
+    }
+
+    // Convert Date to API format string (yyyy-MM-dd)
+    fun formatDateForApi(date: Date): String {
+<span class="fc" id="L49">        val formatter = SimpleDateFormat(Constants.DATE_FORMAT_API, Locale.getDefault())</span>
+<span class="fc" id="L50">        return formatter.format(date)</span>
+    }
+
+    // Get start date based on user role - Employee (last 7 days), Manager (last 30 days)
+    fun getStartDateByRole(isEmployee: Boolean): String {
+<span class="fc bfc" id="L55" title="All 2 branches covered.">        val daysAgo = if (isEmployee) Constants.EMPLOYEE_DATA_DAYS else Constants.MANAGER_DATA_DAYS</span>
+<span class="fc" id="L56">        return getDaysAgoFormatted(daysAgo)</span>
+    }
+
+    // Check if date string is today
+    fun isToday(apiDateString: String): Boolean {
+<span class="fc" id="L61">        return apiDateString == getTodayFormatted()</span>
+    }
+
+    // Get current timestamp in API format
+    fun getCurrentTimestamp(): String {
+<span class="fc" id="L66">        val formatter = SimpleDateFormat(Constants.DATETIME_FORMAT_API, Locale.getDefault())</span>
+<span class="fc" id="L67">        return formatter.format(Date())</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

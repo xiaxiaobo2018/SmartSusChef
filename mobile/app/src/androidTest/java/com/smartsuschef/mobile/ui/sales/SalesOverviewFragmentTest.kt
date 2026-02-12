@@ -12,6 +12,7 @@ import com.smartsuschef.mobile.R
 import com.smartsuschef.mobile.data.TokenManager
 import com.smartsuschef.mobile.di.TestNetworkModule
 import com.smartsuschef.mobile.ui.dashboard.DashboardActivity
+import com.smartsuschef.mobile.util.AnimationDisableRule
 import com.smartsuschef.mobile.util.OkHttp3IdlingResource
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -33,6 +34,9 @@ import javax.inject.Inject
 class SalesOverviewFragmentTest {
     @get:Rule(order = 0)
     val hiltRule = HiltAndroidRule(this)
+
+    @get:Rule(order = 1)
+    val animationDisableRule = AnimationDisableRule()
 
     @Inject
     lateinit var tokenManager: TokenManager

@@ -3,9 +3,11 @@ package com.smartsuschef.mobile.ui.sales
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.smartsuschef.mobile.data.repository.ForecastRepository
 import com.smartsuschef.mobile.data.repository.SalesRepository
+import com.smartsuschef.mobile.network.dto.HolidayDto
 import com.smartsuschef.mobile.network.dto.IngredientUsageDto
 import com.smartsuschef.mobile.network.dto.RecipeSalesDto
 import com.smartsuschef.mobile.network.dto.SalesTrendDto
+import com.smartsuschef.mobile.network.dto.WeatherDto
 import com.smartsuschef.mobile.util.Resource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -239,5 +241,65 @@ class SalesViewModelTest {
             val actualResult = viewModel.recipeSales.value
             assertTrue(actualResult is Resource.Success)
             assertTrue((actualResult as Resource.Success).data?.isEmpty() == true)
+        }
+
+    @Test
+    fun `fetchWeather success should populate weather with data`() =
+        runTest {
+            val weatherDto = WeatherDto(28.5, "Sunny", 65, "Clear sky")
+            whenever(forecastRepository.getWeather()).thenReturn(Resource.Success(weatherDto))
+
+            val vm = SalesViewModel(salesRepository, forecastRepository)
+
+            val result = vm.weather.value
+            assertTrue(result is Resource.Success)
+            assertEquals("Sunny", (result as Resource.Success).data?.condition)
+            assertEquals(28.5, result.data?.temperature ?: 0.0, 0.0)
+            assertEquals(65, result.data?.humidity)
+        }
+
+    @Test
+    fun `fetchWeather error should populate weather with error message`() =
+        runTest {
+            whenever(forecastRepository.getWeather())
+                .thenReturn(Resource.Error("Weather unavailable"))
+
+            val vm = SalesViewModel(salesRepository, forecastRepository)
+
+            val result = vm.weather.value
+            assertTrue(result is Resource.Error)
+            assertEquals("Weather unavailable", (result as Resource.Error).message)
+        }
+
+    @Test
+    fun `fetchHolidays success should populate holidays with data`() =
+        runTest {
+            val holidays =
+                listOf(
+                    HolidayDto("2026-02-14", "Valentine's Day"),
+                    HolidayDto("2026-12-25", "Christmas Day"),
+                )
+            whenever(forecastRepository.getHolidays(any())).thenReturn(Resource.Success(holidays))
+
+            val vm = SalesViewModel(salesRepository, forecastRepository)
+
+            val result = vm.holidays.value
+            assertTrue(result is Resource.Success)
+            assertEquals(2, (result as Resource.Success).data?.size)
+            assertEquals("Valentine's Day", result.data?.get(0)?.name)
+            assertEquals("Christmas Day", result.data?.get(1)?.name)
+        }
+
+    @Test
+    fun `fetchHolidays error should populate holidays with error message`() =
+        runTest {
+            whenever(forecastRepository.getHolidays(any()))
+                .thenReturn(Resource.Error("Holidays unavailable"))
+
+            val vm = SalesViewModel(salesRepository, forecastRepository)
+
+            val result = vm.holidays.value
+            assertTrue(result is Resource.Error)
+            assertEquals("Holidays unavailable", (result as Resource.Error).message)
         }
 }

@@ -40,6 +40,9 @@ class ForecastRepository
                 } catch (e: IOException) {
                     Log.e(TAG, "Network error in getForecast: ${e.message}", e)
                     Resource.Error("Couldn't reach the server. Check your internet connection.")
+                } catch (e: Exception) {
+                    Log.e(TAG, "Unexpected error in getForecast: ${e.message}", e)
+                    Resource.Error("An unexpected error occurred: ${e.message}")
                 }
             }
         }
@@ -60,6 +63,9 @@ class ForecastRepository
                 } catch (e: IOException) {
                     Log.e(TAG, "Network error in getWeather: ${e.message}", e)
                     Resource.Error("Couldn't reach the server. Check your internet connection.")
+                } catch (e: Exception) {
+                    Log.e(TAG, "Unexpected error in getWeather: ${e.message}", e)
+                    Resource.Error("An unexpected error occurred: ${e.message}")
                 }
             }
         }
@@ -80,6 +86,9 @@ class ForecastRepository
                 } catch (e: IOException) {
                     Log.e(TAG, "Network error in getHolidays: ${e.message}", e)
                     Resource.Error("Couldn't reach the server. Check your internet connection.")
+                } catch (e: Exception) {
+                    Log.e(TAG, "Unexpected error in getHolidays: ${e.message}", e)
+                    Resource.Error("An unexpected error occurred: ${e.message}")
                 }
             }
         }

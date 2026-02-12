@@ -178,7 +178,7 @@ class AuthRepositoryTest {
         }
 
     @Test
-    fun `changePassword api error with 401 code should return specific error`() =
+    fun `changePassword_onApiError401_shouldLogoutAndReturnSessionExpiredError`() =
         runTest {
             // ARRANGE
             val request = ChangePasswordRequest("currentPass", "newPass")
@@ -190,7 +190,8 @@ class AuthRepositoryTest {
 
             // ASSERT
             assertTrue(result is Resource.Error)
-            assertEquals("Current password is incorrect", result.message)
+            assertEquals("Session expired. Please log in again.", result.message)
+            verify(mockTokenManager).clearSession()
         }
 
     @Test

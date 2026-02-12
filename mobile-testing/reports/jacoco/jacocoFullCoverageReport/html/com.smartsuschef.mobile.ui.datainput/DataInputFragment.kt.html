@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DataInputFragment.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">com.smartsuschef.mobile.ui.datainput</a> &gt; <span class="el_source">DataInputFragment.kt</span></div><h1>DataInputFragment.kt</h1><pre class="source lang-java linenums">package com.smartsuschef.mobile.ui.datainput
+
+import android.os.Bundle
+import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import androidx.appcompat.app.AlertDialog
+import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.smartsuschef.mobile.R
+import com.smartsuschef.mobile.databinding.FragmentDataInputBinding
+import com.smartsuschef.mobile.network.dto.IngredientDto
+import com.smartsuschef.mobile.network.dto.RecipeDto
+import com.smartsuschef.mobile.util.Resource
+import com.smartsuschef.mobile.util.showToast
+import dagger.hilt.android.AndroidEntryPoint
+
+<span class="fc" id="L20">@AndroidEntryPoint</span>
+<span class="fc" id="L21">class DataInputFragment : Fragment(R.layout.fragment_data_input), RecentEntryActions {</span>
+    private var _binding: FragmentDataInputBinding? = null
+<span class="fc" id="L23">    private val binding get() = _binding!!</span>
+<span class="fc" id="L24">    private val viewModel: DataInputViewModel by viewModels()</span>
+    private lateinit var recentEntriesAdapter: RecentEntriesAdapter
+
+    private lateinit var ingredientsAdapter: ArrayAdapter&lt;String&gt;
+    private lateinit var mainRecipesAdapter: ArrayAdapter&lt;String&gt;
+    private lateinit var subRecipesAdapter: ArrayAdapter&lt;String&gt;
+
+    private var currentEditedEntry: RecentEntry? = null
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
+<span class="fc" id="L37">        super.onViewCreated(view, savedInstanceState)</span>
+<span class="fc" id="L38">        _binding = FragmentDataInputBinding.bind(view)</span>
+
+<span class="fc" id="L40">        setupSpinners()</span>
+<span class="fc" id="L41">        setupTabs()</span>
+<span class="fc" id="L42">        setupRecyclerView()</span>
+<span class="fc" id="L43">        observeViewModel()</span>
+<span class="fc" id="L44">    }</span>
+
+    private fun setupSpinners() {
+<span class="fc" id="L47">        val spinnerLayout = android.R.layout.simple_spinner_dropdown_item</span>
+<span class="fc" id="L48">        ingredientsAdapter = ArrayAdapter(requireContext(), spinnerLayout, mutableListOf())</span>
+<span class="fc" id="L49">        mainRecipesAdapter = ArrayAdapter(requireContext(), spinnerLayout, mutableListOf())</span>
+<span class="fc" id="L50">        subRecipesAdapter = ArrayAdapter(requireContext(), spinnerLayout, mutableListOf())</span>
+
+<span class="fc" id="L52">        binding.itemSpinner.onItemSelectedListener =</span>
+<span class="fc" id="L53">            object : AdapterView.OnItemSelectedListener {</span>
+                override fun onItemSelected(
+                    parent: AdapterView&lt;*&gt;?,
+                    view: View?,
+                    position: Int,
+                    id: Long,
+                ) {
+<span class="fc bfc" id="L60" title="All 2 branches covered.">                    if (position == 0) { // Hint position</span>
+<span class="fc" id="L61">                        viewModel.onItemSelected(&quot;&quot;, &quot;&quot;)</span>
+<span class="fc" id="L62">                        return</span>
+                    }
+<span class="pc bpc" id="L64" title="1 of 2 branches missed.">                    val selectedName = parent?.getItemAtPosition(position).toString()</span>
+<span class="pc bpc" id="L65" title="1 of 2 branches missed.">                    val isSalesMode = viewModel.isSalesMode.value ?: true</span>
+<span class="fc" id="L66">                    val wastageType = viewModel.wastageType.value</span>
+
+<span class="fc" id="L68">                    val (selectedId, selectedItemName) =</span>
+<span class="fc" id="L69">                        when {</span>
+<span class="fc bfc" id="L70" title="All 2 branches covered.">                            isSalesMode -&gt; {</span>
+<span class="pc bpc" id="L71" title="4 of 8 branches missed.">                                val item = viewModel.mainRecipes.value?.data?.find { it.name == selectedName }</span>
+<span class="pc bpc" id="L72" title="2 of 4 branches missed.">                                Pair(item?.id, item?.name)</span>
+                            }
+                            else -&gt;
+<span class="pc bpc" id="L75" title="3 of 6 branches missed.">                                when (wastageType) {</span>
+                                    WastageType.MAIN_DISH -&gt; {
+<span class="pc bpc" id="L77" title="4 of 8 branches missed.">                                        val item = viewModel.mainRecipes.value?.data?.find { it.name == selectedName }</span>
+<span class="pc bpc" id="L78" title="2 of 4 branches missed.">                                        Pair(item?.id, item?.name)</span>
+                                    }
+                                    WastageType.SUB_RECIPE -&gt; {
+<span class="nc bnc" id="L81" title="All 8 branches missed.">                                        val item = viewModel.subRecipes.value?.data?.find { it.name == selectedName }</span>
+<span class="nc bnc" id="L82" title="All 4 branches missed.">                                        Pair(item?.id, item?.name)</span>
+                                    }
+                                    WastageType.INGREDIENT -&gt; {
+<span class="pc bpc" id="L85" title="4 of 8 branches missed.">                                        val item = viewModel.ingredients.value?.data?.find { it.name == selectedName }</span>
+<span class="pc bpc" id="L86" title="2 of 4 branches missed.">                                        Pair(item?.id, item?.name)</span>
+                                    }
+<span class="nc" id="L88">                                    else -&gt; Pair(null, null)</span>
+                                }
+                        }
+
+<span class="pc bpc" id="L92" title="2 of 4 branches missed.">                    if (selectedId != null &amp;&amp; selectedItemName != null) {</span>
+<span class="fc" id="L93">                        viewModel.onItemSelected(selectedId, selectedItemName)</span>
+                    }
+<span class="fc" id="L95">                }</span>
+
+                override fun onNothingSelected(parent: AdapterView&lt;*&gt;?) {
+<span class="nc" id="L98">                    viewModel.onItemSelected(&quot;&quot;, &quot;&quot;)</span>
+<span class="nc" id="L99">                }</span>
+            }
+<span class="fc" id="L101">    }</span>
+
+    private fun setupTabs() {
+<span class="fc" id="L104">        binding.toggleGroup.addOnButtonCheckedListener { _, checkedId, isChecked -&gt;</span>
+<span class="fc bfc" id="L105" title="All 2 branches covered.">            if (isChecked) {</span>
+<span class="fc bfc" id="L106" title="All 2 branches covered.">                val isSales = checkedId == R.id.btnSalesTab</span>
+<span class="fc" id="L107">                viewModel.setMode(isSales)</span>
+<span class="fc" id="L108">                resetForm()</span>
+            }
+<span class="fc" id="L110">        }</span>
+
+<span class="fc" id="L112">        binding.wastageTypeToggleGroup.addOnButtonCheckedListener { group, checkedId, isChecked -&gt;</span>
+<span class="fc bfc" id="L113" title="All 2 branches covered.">            if (isChecked) {</span>
+<span class="fc" id="L114">                val type =</span>
+<span class="fc" id="L115">                    when (checkedId) {</span>
+<span class="fc bfc" id="L116" title="All 2 branches covered.">                        R.id.btnMainDishType -&gt; WastageType.MAIN_DISH</span>
+<span class="pc bpc" id="L117" title="1 of 2 branches missed.">                        R.id.btnSubRecipeType -&gt; WastageType.SUB_RECIPE</span>
+<span class="nc" id="L118">                        else -&gt; WastageType.INGREDIENT</span>
+                    }
+<span class="fc" id="L120">                viewModel.setWastageType(type)</span>
+<span class="fc" id="L121">                resetForm()</span>
+            }
+<span class="fc" id="L123">        }</span>
+<span class="fc" id="L124">    }</span>
+
+    private fun updateSpinnerAdapter(
+        isSales: Boolean,
+        wastageType: WastageType?,
+    ) {
+<span class="fc" id="L130">        binding.itemSpinner.adapter =</span>
+<span class="fc bfc" id="L131" title="All 2 branches covered.">            if (isSales) {</span>
+<span class="pc bpc" id="L132" title="1 of 2 branches missed.">                mainRecipesAdapter</span>
+            } else {
+<span class="pc bpc" id="L134" title="2 of 6 branches missed.">                when (wastageType) {</span>
+<span class="pc bpc" id="L135" title="1 of 2 branches missed.">                    WastageType.MAIN_DISH -&gt; mainRecipesAdapter</span>
+<span class="pc bpc" id="L136" title="1 of 2 branches missed.">                    WastageType.SUB_RECIPE -&gt; subRecipesAdapter</span>
+<span class="pc bpc" id="L137" title="1 of 2 branches missed.">                    WastageType.INGREDIENT -&gt; ingredientsAdapter</span>
+<span class="pc" id="L138">                    else -&gt; null</span>
+                }
+            }
+<span class="fc" id="L141">        binding.itemSpinner.setSelection(0)</span>
+<span class="fc" id="L142">    }</span>
+
+    private fun setupRecyclerView() {
+<span class="fc" id="L145">        recentEntriesAdapter = RecentEntriesAdapter(this) // Pass this as listener</span>
+<span class="fc" id="L146">        binding.rvRecentEntries.apply {</span>
+<span class="pc bpc" id="L147" title="1 of 2 branches missed.">            adapter = recentEntriesAdapter</span>
+<span class="fc" id="L148">            layoutManager = LinearLayoutManager(requireContext())</span>
+<span class="fc" id="L149">        }</span>
+<span class="fc" id="L150">    }</span>
+
+    private fun observeViewModel() {
+<span class="fc" id="L153">        observeSpinnerData()</span>
+<span class="fc" id="L154">        observeUiState()</span>
+<span class="fc" id="L155">        observeActionsAndResults()</span>
+<span class="fc" id="L156">        setupSaveButtonClickListener()</span>
+<span class="fc" id="L157">    }</span>
+
+    private fun observeSpinnerData() {
+<span class="fc" id="L160">        viewModel.ingredients.observe(viewLifecycleOwner) { resource -&gt;</span>
+<span class="pc bpc" id="L161" title="1 of 2 branches missed.">            handleResource(resource, ingredientsAdapter, &quot;Select Ingredient...&quot;)</span>
+<span class="fc" id="L162">        }</span>
+<span class="fc" id="L163">        viewModel.mainRecipes.observe(viewLifecycleOwner) { resource -&gt;</span>
+<span class="pc bpc" id="L164" title="1 of 2 branches missed.">            handleResource(resource, mainRecipesAdapter, &quot;Select Main Dish...&quot;)</span>
+<span class="fc" id="L165">        }</span>
+<span class="fc" id="L166">        viewModel.subRecipes.observe(viewLifecycleOwner) { resource -&gt;</span>
+<span class="pc bpc" id="L167" title="1 of 2 branches missed.">            handleResource(resource, subRecipesAdapter, &quot;Select Sub-Recipe...&quot;)</span>
+<span class="fc" id="L168">        }</span>
+<span class="fc" id="L169">    }</span>
+
+    private fun observeUiState() {
+<span class="fc" id="L172">        viewModel.isSalesMode.observe(viewLifecycleOwner) { isSales -&gt;</span>
+<span class="fc bfc" id="L173" title="All 2 branches covered.">            binding.wastageTypeToggleGroup.isVisible = !isSales</span>
+<span class="fc bfc" id="L174" title="All 2 branches covered.">            binding.tvStep1Label.text = if (isSales) &quot;Step 1: Select Dish&quot; else &quot;Step 1: Select Item Type&quot;</span>
+<span class="fc" id="L175">            updateSpinnerAdapter(isSales, viewModel.wastageType.value)</span>
+<span class="fc" id="L176">        }</span>
+<span class="fc" id="L177">        viewModel.wastageType.observe(viewLifecycleOwner) { wastageType -&gt;</span>
+<span class="fc bfc" id="L178" title="All 2 branches covered.">            if (viewModel.isSalesMode.value == false) {</span>
+<span class="fc" id="L179">                updateSpinnerAdapter(false, wastageType)</span>
+            }
+<span class="fc" id="L181">        }</span>
+<span class="fc" id="L182">    }</span>
+
+    private fun observeActionsAndResults() {
+<span class="fc" id="L185">        viewModel.recentEntries.observe(viewLifecycleOwner) { entries -&gt;</span>
+<span class="pc bpc" id="L186" title="1 of 2 branches missed.">            recentEntriesAdapter.submitList(entries)</span>
+<span class="fc" id="L187">        }</span>
+<span class="fc" id="L188">        viewModel.submitStatus.observe(viewLifecycleOwner) { resource -&gt;</span>
+<span class="pc" id="L189">            when (resource) {</span>
+<span class="fc bfc" id="L190" title="All 2 branches covered.">                is Resource.Success -&gt; {</span>
+<span class="pc bpc" id="L191" title="1 of 2 branches missed.">                    requireContext().showToast(resource.message ?: &quot;Entry saved successfully!&quot;)</span>
+<span class="fc" id="L192">                    resetForm()</span>
+                }
+<span class="fc bfc" id="L194" title="All 2 branches covered.">                is Resource.Error -&gt; requireContext().showToast(&quot;Error saving entry: ${resource.message}&quot;)</span>
+<span class="pc bpc" id="L195" title="1 of 2 branches missed.">                is Resource.Loading -&gt; { /* Optionally show a loading dialog/spinner */ }</span>
+            }
+<span class="fc" id="L197">        }</span>
+<span class="fc" id="L198">    }</span>
+
+    private fun setupSaveButtonClickListener() {
+<span class="fc" id="L201">        binding.btnSaveData.setOnClickListener {</span>
+<span class="fc" id="L202">            val qty = binding.etQuantity.text.toString().toDoubleOrNull()</span>
+
+<span class="fc bfc" id="L204" title="All 4 branches covered.">            if (qty == null || qty &lt;= 0) {</span>
+<span class="fc" id="L205">                requireContext().showToast(&quot;Please enter a valid quantity&quot;)</span>
+<span class="fc" id="L206">                return@setOnClickListener</span>
+            }
+<span class="fc" id="L208">            val selectedItemId = viewModel.selectedItemId.value</span>
+<span class="fc" id="L209">            val selectedItemName = viewModel.selectedItemName.value</span>
+
+<span class="pc bpc" id="L211" title="4 of 12 branches missed.">            if (selectedItemId.isNullOrEmpty() || selectedItemName.isNullOrEmpty()) {</span>
+<span class="fc" id="L212">                requireContext().showToast(&quot;Please select an item first.&quot;)</span>
+<span class="fc" id="L213">                return@setOnClickListener</span>
+            }
+
+            // If we are currently editing an entry, just submit the update
+<span class="pc bpc" id="L217" title="1 of 2 branches missed.">            if (currentEditedEntry != null) {</span>
+<span class="nc" id="L218">                viewModel.submitData(qty, currentEditedEntry!!.id)</span>
+<span class="nc" id="L219">                return@setOnClickListener</span>
+            }
+
+            // Check for existing entry if not in edit mode
+<span class="fc" id="L223">            val existingEntry = viewModel.findExistingEntry(selectedItemName)</span>
+<span class="pc bpc" id="L224" title="1 of 2 branches missed.">            if (existingEntry != null) {</span>
+<span class="nc" id="L225">                showOverwriteDialog(qty, existingEntry)</span>
+            } else {
+<span class="fc" id="L227">                viewModel.submitData(qty)</span>
+            }
+<span class="fc" id="L229">        }</span>
+<span class="fc" id="L230">    }</span>
+
+    private fun showOverwriteDialog(
+        quantity: Double,
+        existingEntry: RecentEntry,
+    ) {
+<span class="nc" id="L236">        val message =</span>
+            &quot;You have already entered data for &quot; +
+<span class="nc" id="L238">                &quot;${existingEntry.name}. Do you want to overwrite the existing quantity?&quot;</span>
+<span class="nc" id="L239">        AlertDialog.Builder(requireContext())</span>
+<span class="nc" id="L240">            .setTitle(&quot;Entry Already Exists&quot;)</span>
+<span class="nc" id="L241">            .setMessage(message)</span>
+<span class="nc" id="L242">            .setPositiveButton(&quot;Overwrite Entry&quot;) { dialog, _ -&gt;</span>
+<span class="nc" id="L243">                viewModel.submitData(quantity, existingEntry.id)</span>
+<span class="nc" id="L244">                dialog.dismiss()</span>
+<span class="nc" id="L245">            }</span>
+<span class="nc" id="L246">            .setNegativeButton(&quot;Cancel&quot;) { dialog, _ -&gt;</span>
+<span class="nc" id="L247">                dialog.dismiss()</span>
+<span class="nc" id="L248">            }</span>
+<span class="nc" id="L249">            .show()</span>
+<span class="nc" id="L250">    }</span>
+
+    private fun resetForm() {
+<span class="fc" id="L253">        binding.etQuantity.text.clear()</span>
+<span class="fc" id="L254">        binding.itemSpinner.setSelection(0)</span>
+<span class="fc" id="L255">        binding.itemSpinner.isEnabled = true // Enable spinner</span>
+<span class="fc" id="L256">        binding.btnSaveData.text = &quot;Save&quot; // Reset button text</span>
+<span class="fc" id="L257">        currentEditedEntry = null // Clear edited entry</span>
+<span class="fc" id="L258">    }</span>
+
+    override fun onEditClick(entry: RecentEntry) {
+<span class="nc" id="L261">        currentEditedEntry = entry</span>
+        // Populate form fields
+<span class="nc" id="L263">        binding.etQuantity.setText(entry.quantity.toString())</span>
+
+        // Set spinner selection
+<span class="nc" id="L266">        @Suppress(&quot;UNCHECKED_CAST&quot;)</span>
+<span class="nc bnc" id="L267" title="All 2 branches missed.">        val adapter = binding.itemSpinner.adapter as? ArrayAdapter&lt;String&gt;</span>
+<span class="nc bnc" id="L268" title="All 2 branches missed.">        if (adapter != null) {</span>
+<span class="nc" id="L269">            val position = adapter.getPosition(entry.name)</span>
+<span class="nc bnc" id="L270" title="All 2 branches missed.">            if (position != -1) {</span>
+<span class="nc" id="L271">                binding.itemSpinner.setSelection(position)</span>
+            }
+        }
+<span class="nc" id="L274">        binding.itemSpinner.isEnabled = false // Lock item selection</span>
+
+<span class="nc" id="L276">        binding.btnSaveData.text = &quot;Update&quot; // Change button text</span>
+<span class="nc" id="L277">    }</span>
+
+    override fun onDeleteClick(entry: RecentEntry) {
+<span class="nc" id="L280">        AlertDialog.Builder(requireContext())</span>
+<span class="nc" id="L281">            .setTitle(&quot;Delete Entry&quot;)</span>
+<span class="nc" id="L282">            .setMessage(&quot;Are you sure you want to delete the entry for ${entry.name}? This action cannot be undone.&quot;)</span>
+<span class="nc" id="L283">            .setPositiveButton(&quot;Delete&quot;) { dialog, _ -&gt;</span>
+<span class="nc" id="L284">                viewModel.deleteEntry(entry)</span>
+<span class="nc" id="L285">                dialog.dismiss()</span>
+<span class="nc" id="L286">            }</span>
+<span class="nc" id="L287">            .setNegativeButton(&quot;Cancel&quot;) { dialog, _ -&gt;</span>
+<span class="nc" id="L288">                dialog.dismiss()</span>
+<span class="nc" id="L289">            }</span>
+<span class="nc" id="L290">            .show()</span>
+<span class="nc" id="L291">    }</span>
+
+    private fun &lt;T&gt; handleResource(
+        resource: Resource&lt;List&lt;T&gt;&gt;,
+        adapter: ArrayAdapter&lt;String&gt;,
+        hint: String,
+    ) {
+<span class="pc" id="L298">        when (resource) {</span>
+<span class="fc bfc" id="L299" title="All 2 branches covered.">            is Resource.Success -&gt; {</span>
+<span class="fc" id="L300">                adapter.clear()</span>
+<span class="fc" id="L301">                adapter.add(hint)</span>
+<span class="fc" id="L302">                adapter.addAll(</span>
+<span class="pc bpc" id="L303" title="1 of 2 branches missed.">                    resource.data?.mapNotNull { item -&gt;</span>
+<span class="fc" id="L304">                        when (item) {</span>
+<span class="fc bfc" id="L305" title="All 2 branches covered.">                            is RecipeDto -&gt; item.name</span>
+<span class="pc bpc" id="L306" title="1 of 2 branches missed.">                            is IngredientDto -&gt; item.name</span>
+<span class="nc" id="L307">                            else -&gt; null</span>
+<span class="fc" id="L308">                        }</span>
+<span class="nc" id="L309">                    } ?: emptyList(),</span>
+                )
+<span class="fc" id="L311">                adapter.notifyDataSetChanged()</span>
+            }
+<span class="pc bpc" id="L313" title="1 of 2 branches missed.">            is Resource.Error -&gt; requireContext().showToast(&quot;Error loading data: ${resource.message}&quot;)</span>
+<span class="pc bpc" id="L314" title="1 of 2 branches missed.">            is Resource.Loading -&gt; { /* Optionally show a loading indicator */ }</span>
+        }
+<span class="fc" id="L316">    }</span>
+
+    override fun onDestroyView() {
+<span class="fc" id="L319">        super.onDestroyView()</span>
+<span class="fc" id="L320">        _binding = null</span>
+<span class="fc" id="L321">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

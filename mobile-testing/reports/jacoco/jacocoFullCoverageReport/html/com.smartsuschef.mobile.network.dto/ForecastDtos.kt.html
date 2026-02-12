@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ForecastDtos.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">com.smartsuschef.mobile.network.dto</a> &gt; <span class="el_source">ForecastDtos.kt</span></div><h1>ForecastDtos.kt</h1><pre class="source lang-java linenums">package com.smartsuschef.mobile.network.dto
+
+import com.google.gson.annotations.SerializedName
+
+/**
+ * Forecast DTO
+ * Maps to: ForecastDto(string Date, string RecipeId, string RecipeName, int Quantity, List&lt;ForecastIngredientDto&gt; Ingredients)
+ */
+<span class="fc" id="L9">data class ForecastDto(</span>
+<span class="fc" id="L10">    @SerializedName(&quot;date&quot;)</span>
+    val date: String,
+<span class="fc" id="L12">    @SerializedName(&quot;recipeId&quot;)</span>
+    val recipeId: String,
+<span class="fc" id="L14">    @SerializedName(&quot;recipeName&quot;)</span>
+    val recipeName: String,
+<span class="fc" id="L16">    @SerializedName(&quot;quantity&quot;)</span>
+    val quantity: Int,
+<span class="fc" id="L18">    @SerializedName(&quot;confidence&quot;)</span>
+    val confidence: String,
+<span class="fc" id="L20">    @SerializedName(&quot;ingredients&quot;)</span>
+    val ingredients: List&lt;ForecastIngredientDto&gt;,
+)
+
+/**
+ * Forecast Ingredient DTO
+ * Maps to: ForecastIngredientDto
+ */
+<span class="fc" id="L28">data class ForecastIngredientDto(</span>
+<span class="fc" id="L29">    @SerializedName(&quot;ingredientId&quot;)</span>
+    val ingredientId: String,
+<span class="fc" id="L31">    @SerializedName(&quot;ingredientName&quot;)</span>
+    val ingredientName: String,
+<span class="fc" id="L33">    @SerializedName(&quot;unit&quot;)</span>
+    val unit: String,
+<span class="fc" id="L35">    @SerializedName(&quot;quantity&quot;)</span>
+    val quantity: Double,
+)
+
+/**
+ * Forecast Summary DTO
+ * Maps to: ForecastSummaryDto(string Date, int TotalQuantity, decimal ChangePercentage)
+ */
+<span class="nc" id="L43">data class ForecastSummaryDto(</span>
+<span class="pc" id="L44">    @SerializedName(&quot;date&quot;)</span>
+    val date: String,
+<span class="pc" id="L46">    @SerializedName(&quot;totalQuantity&quot;)</span>
+    val totalQuantity: Int,
+<span class="pc" id="L48">    @SerializedName(&quot;changePercentage&quot;)</span>
+    val changePercentage: Double,
+)
+
+/**
+ * Weather DTO
+ * Maps to: WeatherDto
+ */
+<span class="fc" id="L56">data class WeatherDto(</span>
+<span class="fc" id="L57">    @SerializedName(&quot;temperature&quot;)</span>
+    val temperature: Double,
+<span class="fc" id="L59">    @SerializedName(&quot;condition&quot;)</span>
+    val condition: String,
+<span class="fc" id="L61">    @SerializedName(&quot;humidity&quot;)</span>
+    val humidity: Int,
+<span class="fc" id="L63">    @SerializedName(&quot;description&quot;)</span>
+    val description: String,
+)
+
+/**
+ * Holiday DTO
+ * Maps to: HolidayDto
+ */
+<span class="fc" id="L71">data class HolidayDto(</span>
+<span class="fc" id="L72">    @SerializedName(&quot;date&quot;)</span>
+    val date: String,
+<span class="fc" id="L74">    @SerializedName(&quot;name&quot;)</span>
+    val name: String,
+)
+
+/**
+ * Weather Forecast DTO
+ * Maps to: WeatherForecastDto
+ */
+<span class="nc" id="L82">data class WeatherForecastDto(</span>
+<span class="pc" id="L83">    @SerializedName(&quot;date&quot;)</span>
+    val date: String,
+<span class="pc" id="L85">    @SerializedName(&quot;temperatureMax&quot;)</span>
+<span class="nc" id="L86">    val temperatureMax: Double? = null,</span>
+<span class="pc" id="L87">    @SerializedName(&quot;temperatureMin&quot;)</span>
+<span class="nc" id="L88">    val temperatureMin: Double? = null,</span>
+<span class="pc" id="L89">    @SerializedName(&quot;rainMm&quot;)</span>
+    val rainMm: Double,
+<span class="pc" id="L91">    @SerializedName(&quot;weatherCode&quot;)</span>
+    val weatherCode: Int,
+<span class="pc" id="L93">    @SerializedName(&quot;weatherDescription&quot;)</span>
+    val weatherDescription: String,
+<span class="nc" id="L95">)</span>
+
+/**
+ * Calendar Day DTO
+ * Maps to: CalendarDayDto - includes weather and holiday status
+ */
+<span class="nc" id="L101">data class CalendarDayDto(</span>
+<span class="pc" id="L102">    @SerializedName(&quot;date&quot;)</span>
+    val date: String,
+<span class="pc" id="L104">    @SerializedName(&quot;isHoliday&quot;)</span>
+    val isHoliday: Boolean,
+<span class="pc" id="L106">    @SerializedName(&quot;holidayName&quot;)</span>
+<span class="nc" id="L107">    val holidayName: String? = null,</span>
+<span class="pc" id="L108">    @SerializedName(&quot;isSchoolHoliday&quot;)</span>
+    val isSchoolHoliday: Boolean,
+<span class="pc" id="L110">    @SerializedName(&quot;isWeekend&quot;)</span>
+    val isWeekend: Boolean,
+<span class="pc" id="L112">    @SerializedName(&quot;weather&quot;)</span>
+<span class="nc" id="L113">    val weather: WeatherForecastDto? = null,</span>
+<span class="nc" id="L114">)</span>
+
+/**
+ * Tomorrow Forecast DTO
+ * Maps to: TomorrowForecastDto - combined forecast and calendar response
+ */
+<span class="nc" id="L120">data class TomorrowForecastDto(</span>
+<span class="pc" id="L121">    @SerializedName(&quot;date&quot;)</span>
+    val date: String,
+<span class="pc" id="L123">    @SerializedName(&quot;calendar&quot;)</span>
+    val calendar: CalendarDayDto,
+<span class="pc" id="L125">    @SerializedName(&quot;weather&quot;)</span>
+<span class="nc" id="L126">    val weather: WeatherForecastDto? = null,</span>
+<span class="nc" id="L127">)</span>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

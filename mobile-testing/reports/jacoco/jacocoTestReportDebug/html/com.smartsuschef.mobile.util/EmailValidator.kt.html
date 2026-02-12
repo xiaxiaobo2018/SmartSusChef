@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EmailValidator.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">com.smartsuschef.mobile.util</a> &gt; <span class="el_source">EmailValidator.kt</span></div><h1>EmailValidator.kt</h1><pre class="source lang-java linenums">package com.smartsuschef.mobile.util
+
+import javax.inject.Inject
+
+/**
+ * Email Validator
+ *
+ * Validates email addresses using RFC 5322 compliant regex pattern.
+ * This was done using pure Kotlin implementation to avoid Android framework dependencies.
+ * Enables unit tested without Robolectric, which caused issues.
+ */
+class EmailValidator
+<span class="fc" id="L13">    @Inject</span>
+    constructor() {
+        companion object {
+<span class="fc" id="L16">            private val EMAIL_REGEX = &quot;^[a-zA-Z0-9]+([._%+-][a-zA-Z0-9]+)*@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$&quot;.toRegex()</span>
+        }
+
+        /**
+         * Validates if the given email string matches valid email format
+         *
+         * @param email The email string to validate
+         * @return true if valid email format, false otherwise
+         */
+        fun isValid(email: String): Boolean {
+<span class="fc" id="L26">            return email.matches(EMAIL_REGEX)</span>
+        }
+    }
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>StoreDto.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">com.smartsuschef.mobile.network.dto</a> &gt; <span class="el_source">StoreDto.kt</span></div><h1>StoreDto.kt</h1><pre class="source lang-java linenums">package com.smartsuschef.mobile.network.dto
+
+import com.google.gson.annotations.SerializedName
+
+/**
+ * Store DTO
+ * Maps to: StoreDto in StoreDtos.cs
+ * Used to display store info in app (e.g., &quot;Aunty May's Cafe | Orchard Central&quot;)
+ */
+<span class="pc" id="L10">data class StoreDto(</span>
+<span class="pc" id="L11">    @SerializedName(&quot;id&quot;)</span>
+    val id: Int,
+<span class="pc" id="L13">    @SerializedName(&quot;companyName&quot;)</span>
+    val companyName: String,
+    // Unique Entity Number (Singapore)
+<span class="pc" id="L16">    @SerializedName(&quot;uen&quot;)</span>
+    val uen: String,
+<span class="fc" id="L18">    @SerializedName(&quot;storeName&quot;)</span>
+    val storeName: String,
+<span class="fc" id="L20">    @SerializedName(&quot;outletLocation&quot;)</span>
+    val outletLocation: String,
+<span class="pc" id="L22">    @SerializedName(&quot;contactNumber&quot;)</span>
+    val contactNumber: String,
+<span class="pc" id="L24">    @SerializedName(&quot;openingDate&quot;)</span>
+    val openingDate: String,
+<span class="pc" id="L26">    @SerializedName(&quot;latitude&quot;)</span>
+    val latitude: Double,
+<span class="pc" id="L28">    @SerializedName(&quot;longitude&quot;)</span>
+    val longitude: Double,
+<span class="pc" id="L30">    @SerializedName(&quot;countryCode&quot;)</span>
+<span class="nc" id="L31">    val countryCode: String? = null,</span>
+<span class="pc" id="L32">    @SerializedName(&quot;address&quot;)</span>
+<span class="nc" id="L33">    val address: String? = null,</span>
+<span class="pc" id="L34">    @SerializedName(&quot;isActive&quot;)</span>
+    val isActive: Boolean,
+<span class="pc" id="L36">    @SerializedName(&quot;createdAt&quot;)</span>
+    val createdAt: String,
+<span class="pc" id="L38">    @SerializedName(&quot;updatedAt&quot;)</span>
+    val updatedAt: String,
+<span class="nc" id="L40">)</span>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

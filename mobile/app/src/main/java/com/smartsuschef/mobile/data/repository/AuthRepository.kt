@@ -73,6 +73,9 @@ class AuthRepository
                 } catch (e: IOException) {
                     Log.e(TAG, "Network error in forgotPassword: ${e.message}", e)
                     Resource.Error("Couldn't reach the server. Check your internet connection.")
+                } catch (e: Exception) {
+                    Log.e(TAG, "Unexpected error in forgotPassword: ${e.message}", e)
+                    Resource.Error("An unexpected error occurred: ${e.message}")
                 }
             }
         }
@@ -89,7 +92,14 @@ class AuthRepository
                     if (response.isSuccessful) {
                         Resource.Success(Unit)
                     } else {
-                        // Parse error message from response
+                        // Handle session expiry by logging out
+                        if (response.code() == HTTP_UNAUTHORIZED) {
+                            logout()
+                            Log.e(TAG, "Session expired, user logged out.", null)
+                            return@withContext Resource.Error("Session expired. Please log in again.")
+                        }
+
+                        // Parse other error messages from response
                         val errorBody = response.errorBody()?.string()
                         val errorMessage =
                             when {
@@ -97,8 +107,6 @@ class AuthRepository
                                     "Current password is incorrect"
                                 errorBody?.contains("invalid", ignoreCase = true) == true ->
                                     "Invalid password format"
-                                response.code() == HTTP_UNAUTHORIZED ->
-                                    "Current password is incorrect"
                                 response.code() == HTTP_BAD_REQUEST ->
                                     "Password does not meet requirements"
                                 else ->
@@ -113,6 +121,9 @@ class AuthRepository
                 } catch (e: IOException) {
                     Log.e(TAG, "Network error in changePassword: ${e.message}", e)
                     Resource.Error("Couldn't reach the server. Check your internet connection.")
+                } catch (e: Exception) {
+                    Log.e(TAG, "Unexpected error in changePassword: ${e.message}", e)
+                    Resource.Error("An unexpected error occurred: ${e.message}")
                 }
             }
         }

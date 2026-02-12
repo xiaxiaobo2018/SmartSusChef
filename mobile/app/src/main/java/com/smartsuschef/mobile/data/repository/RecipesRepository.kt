@@ -36,6 +36,9 @@ class RecipesRepository
                 } catch (e: IOException) {
                     Log.e(TAG, "Network error in repository: ${e.message}", e)
                     Resource.Error("Couldn't reach the server. Check your internet connection.")
+                } catch (e: Exception) {
+                    Log.e(TAG, "Unexpected error in repository: ${e.message}", e)
+                    Resource.Error("An unexpected error occurred: ${e.message}")
                 }
             }
         }
@@ -56,6 +59,9 @@ class RecipesRepository
                 } catch (e: IOException) {
                     Log.e(TAG, "Network error in repository: ${e.message}", e)
                     Resource.Error("Couldn't reach the server. Check your internet connection.")
+                } catch (e: Exception) {
+                    Log.e(TAG, "Unexpected error in repository: ${e.message}", e)
+                    Resource.Error("An unexpected error occurred: ${e.message}")
                 }
             }
         }

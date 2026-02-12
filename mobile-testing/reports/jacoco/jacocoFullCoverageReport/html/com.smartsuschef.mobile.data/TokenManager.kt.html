@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TokenManager.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">com.smartsuschef.mobile.data</a> &gt; <span class="el_source">TokenManager.kt</span></div><h1>TokenManager.kt</h1><pre class="source lang-java linenums">package com.smartsuschef.mobile.data
+
+import android.content.Context
+import android.content.SharedPreferences
+import android.security.keystore.KeyGenParameterSpec
+import android.security.keystore.KeyProperties
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
+import com.smartsuschef.mobile.util.Constants
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
+
+// ...
+<span class="fc" id="L17">class TokenManager(private val context: Context) {</span>
+    companion object {
+        private const val KEY_SIZE = 256
+    }
+
+<span class="fc" id="L22">    private val masterKey: MasterKey by lazy {</span>
+<span class="fc" id="L23">        val keyGenParameterSpec =</span>
+<span class="fc" id="L24">            KeyGenParameterSpec.Builder(</span>
+<span class="fc" id="L25">                MasterKey.DEFAULT_MASTER_KEY_ALIAS,</span>
+<span class="fc" id="L26">                KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT,</span>
+            )
+<span class="fc" id="L28">                .setBlockModes(KeyProperties.BLOCK_MODE_GCM)</span>
+<span class="fc" id="L29">                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)</span>
+<span class="fc" id="L30">                .setKeySize(KEY_SIZE)</span>
+<span class="fc" id="L31">                .build()</span>
+<span class="fc" id="L32">        MasterKey.Builder(context)</span>
+<span class="fc" id="L33">            .setKeyGenParameterSpec(keyGenParameterSpec)</span>
+<span class="fc" id="L34">            .build()</span>
+    }
+<span class="fc" id="L36">    private val sharedPreferences: SharedPreferences by lazy {</span>
+<span class="fc" id="L37">        EncryptedSharedPreferences.create(</span>
+<span class="fc" id="L38">            context,</span>
+<span class="fc" id="L39">            Constants.SHARED_PREFS_FILE_NAME,</span>
+<span class="fc" id="L40">            masterKey,</span>
+<span class="fc" id="L41">            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,</span>
+<span class="fc" id="L42">            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,</span>
+<span class="fc" id="L43">        )</span>
+    }
+
+<span class="fc" id="L46">    private val _authTokenFlow = MutableStateFlow&lt;String?&gt;(null)</span>
+<span class="pc" id="L47">    val authTokenFlow: Flow&lt;String?&gt; = _authTokenFlow.asStateFlow()</span>
+
+<span class="fc" id="L49">    init {</span>
+        // Load initial token on startup
+<span class="fc" id="L51">        _authTokenFlow.value = sharedPreferences.getString(Constants.KEY_AUTH_TOKEN, null)</span>
+<span class="fc" id="L52">    }</span>
+
+    /**
+     * Saves the JWT token to EncryptedSharedPreferences
+     */
+    fun saveToken(token: String) {
+<span class="fc" id="L58">        sharedPreferences.edit().putString(Constants.KEY_AUTH_TOKEN, token).apply()</span>
+<span class="fc" id="L59">        _authTokenFlow.value = token</span>
+<span class="fc" id="L60">    }</span>
+
+    /**
+     * Retrieves the JWT token as a Flow (Reactive)
+     This is now based on MutableStateFlow for reactivity. The initial value is loaded in init block.
+     Subsequent changes via saveToken will update this flow.
+     The original getTokenFlow() functionality from DataStore (which watched for external changes)
+     is now handled by directly updating _authTokenFlow.value when saveToken is called internally.
+     For external preference changes (e.g., another app changing prefs directly), a more complex
+     SharedPreferences.OnSharedPreferenceChangeListener would be needed, but usually not for EncryptedSharedPreferences.
+     */
+    fun getTokenFlow(): Flow&lt;String?&gt; {
+<span class="fc" id="L72">        return authTokenFlow</span>
+    }
+
+    /**
+     * Synchronous token retrieval for the Hilt AuthInterceptor
+     * Note: This still uses runBlocking to adapt the Flow to a synchronous call as required by the Interceptor.
+     */
+    fun getToken(): String? =
+<span class="fc" id="L80">        runBlocking {</span>
+<span class="fc" id="L81">            _authTokenFlow.first()</span>
+<span class="fc" id="L82">        }</span>
+
+    /**
+     * Saves the user role (Manager vs Employee) to EncryptedSharedPreferences
+     */
+    fun saveUserRole(role: String) {
+<span class="fc" id="L88">        sharedPreferences.edit().putString(Constants.KEY_USER_ROLE, role).apply()</span>
+<span class="fc" id="L89">    }</span>
+
+    /**
+     * Retrieves the user role synchronously
+     */
+    fun getUserRole(): String? {
+<span class="fc" id="L95">        return sharedPreferences.getString(Constants.KEY_USER_ROLE, null)</span>
+    }
+
+    /**
+     * Clears all session data (Logout)
+     */
+    fun clearSession() {
+<span class="fc" id="L102">        sharedPreferences.edit()</span>
+<span class="fc" id="L103">            .remove(Constants.KEY_AUTH_TOKEN)</span>
+<span class="fc" id="L104">            .remove(Constants.KEY_USER_ROLE)</span>
+<span class="fc" id="L105">            .apply()</span>
+<span class="fc" id="L106">        _authTokenFlow.value = null</span>
+<span class="fc" id="L107">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

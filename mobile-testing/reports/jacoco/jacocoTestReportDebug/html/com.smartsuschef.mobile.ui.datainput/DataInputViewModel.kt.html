@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DataInputViewModel.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">com.smartsuschef.mobile.ui.datainput</a> &gt; <span class="el_source">DataInputViewModel.kt</span></div><h1>DataInputViewModel.kt</h1><pre class="source lang-java linenums">package com.smartsuschef.mobile.ui.datainput
+
+import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.smartsuschef.mobile.data.repository.IngredientsRepository
+import com.smartsuschef.mobile.data.repository.RecipesRepository
+import com.smartsuschef.mobile.data.repository.SalesRepository
+import com.smartsuschef.mobile.data.repository.WastageRepository
+import com.smartsuschef.mobile.network.dto.CreateSalesDataRequest
+import com.smartsuschef.mobile.network.dto.CreateWastageDataRequest
+import com.smartsuschef.mobile.network.dto.IngredientDto
+import com.smartsuschef.mobile.network.dto.RecipeDto
+import com.smartsuschef.mobile.network.dto.SalesDataDto
+import com.smartsuschef.mobile.network.dto.UpdateSalesDataRequest
+import com.smartsuschef.mobile.network.dto.UpdateWastageDataRequest
+import com.smartsuschef.mobile.network.dto.WastageDataDto
+import com.smartsuschef.mobile.util.Resource
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import javax.inject.Inject
+
+enum class WastageType {
+<span class="fc" id="L29">    MAIN_DISH,</span>
+<span class="fc" id="L30">    SUB_RECIPE,</span>
+<span class="fc" id="L31">    INGREDIENT,</span>
+<span class="nc" id="L32">}</span>
+
+@HiltViewModel
+class DataInputViewModel
+<span class="fc" id="L36">    @Inject</span>
+    constructor(
+<span class="fc" id="L38">        private val salesRepository: SalesRepository,</span>
+<span class="fc" id="L39">        private val wastageRepository: WastageRepository,</span>
+<span class="fc" id="L40">        private val ingredientsRepository: IngredientsRepository,</span>
+<span class="fc" id="L41">        private val recipesRepository: RecipesRepository,</span>
+<span class="fc" id="L42">    ) : ViewModel() {</span>
+        companion object {
+            private const val TAG = &quot;DataInputViewModel&quot;
+        }
+
+        // Tracks whether we are in &quot;Sales&quot; or &quot;Wastage&quot; mode
+<span class="fc" id="L48">        private val _isSalesMode = MutableLiveData(true)</span>
+<span class="fc" id="L49">        val isSalesMode: LiveData&lt;Boolean&gt; = _isSalesMode</span>
+
+        // Tracks the selected wastage type
+<span class="fc" id="L52">        private val _wastageType = MutableLiveData(WastageType.INGREDIENT)</span>
+<span class="fc" id="L53">        val wastageType: LiveData&lt;WastageType&gt; = _wastageType</span>
+
+        // Data for dropdowns
+<span class="fc" id="L56">        private val _ingredients = MutableLiveData&lt;Resource&lt;List&lt;IngredientDto&gt;&gt;&gt;()</span>
+<span class="pc" id="L57">        val ingredients: LiveData&lt;Resource&lt;List&lt;IngredientDto&gt;&gt;&gt; = _ingredients</span>
+
+<span class="fc" id="L59">        private val _mainRecipes = MutableLiveData&lt;Resource&lt;List&lt;RecipeDto&gt;&gt;&gt;()</span>
+<span class="fc" id="L60">        val mainRecipes: LiveData&lt;Resource&lt;List&lt;RecipeDto&gt;&gt;&gt; = _mainRecipes</span>
+
+<span class="fc" id="L62">        private val _subRecipes = MutableLiveData&lt;Resource&lt;List&lt;RecipeDto&gt;&gt;&gt;()</span>
+<span class="fc" id="L63">        val subRecipes: LiveData&lt;Resource&lt;List&lt;RecipeDto&gt;&gt;&gt; = _subRecipes</span>
+
+        // Currently selected item in the spinner
+<span class="fc" id="L66">        private val _selectedItemId = MutableLiveData&lt;String?&gt;()</span>
+<span class="fc" id="L67">        val selectedItemId: LiveData&lt;String?&gt; = _selectedItemId</span>
+
+<span class="fc" id="L69">        private val _selectedItemName = MutableLiveData&lt;String?&gt;()</span>
+<span class="fc" id="L70">        val selectedItemName: LiveData&lt;String?&gt; = _selectedItemName</span>
+
+        // Recent entries to display in the list below the form
+<span class="fc" id="L73">        private val _recentEntries = MutableLiveData&lt;List&lt;RecentEntry&gt;&gt;()</span>
+<span class="fc" id="L74">        val recentEntries: LiveData&lt;List&lt;RecentEntry&gt;&gt; = _recentEntries</span>
+
+<span class="fc" id="L76">        private val _submitStatus = MutableLiveData&lt;Resource&lt;Unit&gt;&gt;()</span>
+<span class="fc" id="L77">        val submitStatus: LiveData&lt;Resource&lt;Unit&gt;&gt; = _submitStatus</span>
+
+        // In-memory list to hold entries for the session
+<span class="fc" id="L80">        private val submittedEntries = mutableListOf&lt;RecentEntry&gt;()</span>
+
+<span class="fc" id="L82">        init {</span>
+<span class="fc" id="L83">            fetchIngredients()</span>
+<span class="fc" id="L84">            fetchRecipes()</span>
+<span class="fc" id="L85">            loadTodayEntries()</span>
+<span class="fc" id="L86">        }</span>
+
+        fun setMode(isSales: Boolean) {
+<span class="fc" id="L89">            _isSalesMode.value = isSales</span>
+<span class="fc" id="L90">            _selectedItemId.value = null // Clear selection when mode changes</span>
+<span class="fc" id="L91">            _selectedItemName.value = null</span>
+            // In a real app, you might want to clear or separate the list based on mode
+<span class="fc" id="L93">            loadRecentEntries() // Refresh list based on mode</span>
+<span class="fc" id="L94">        }</span>
+
+        fun setWastageType(type: WastageType) {
+<span class="fc" id="L97">            _wastageType.value = type</span>
+<span class="fc" id="L98">            _selectedItemId.value = null // Clear selection when type changes</span>
+<span class="fc" id="L99">            _selectedItemName.value = null</span>
+<span class="fc" id="L100">        }</span>
+
+        fun onItemSelected(
+            itemId: String,
+            itemName: String,
+        ) {
+<span class="fc" id="L106">            _selectedItemId.value = itemId</span>
+<span class="fc" id="L107">            _selectedItemName.value = itemName</span>
+<span class="fc" id="L108">        }</span>
+
+        fun findExistingEntry(itemName: String): RecentEntry? {
+<span class="pc bpc" id="L111" title="1 of 2 branches missed.">            val currentMode = _isSalesMode.value ?: true</span>
+<span class="pc bpc" id="L112" title="3 of 8 branches missed.">            return submittedEntries.find { it.name == itemName &amp;&amp; it.isSales == currentMode }</span>
+        }
+
+<span class="fc" id="L115">        fun submitData(</span>
+            quantity: Double,
+<span class="fc" id="L117">            existingEntryId: String? = null,</span>
+        ) {
+<span class="fc" id="L119">            viewModelScope.launch {</span>
+<span class="fc" id="L120">                _submitStatus.value = Resource.Loading()</span>
+<span class="fc" id="L121">                val id = _selectedItemId.value</span>
+<span class="fc" id="L122">                val name = _selectedItemName.value</span>
+
+<span class="pc bpc" id="L124" title="1 of 4 branches missed.">                if (id == null || name == null) {</span>
+<span class="fc" id="L125">                    _submitStatus.value = Resource.Error(&quot;No item selected.&quot;)</span>
+<span class="fc" id="L126">                    return@launch</span>
+                }
+
+<span class="fc" id="L129">                val result =</span>
+<span class="fc bfc" id="L130" title="All 2 branches covered.">                    if (_isSalesMode.value == true) {</span>
+<span class="fc" id="L131">                        submitSalesData(id, quantity.toInt(), existingEntryId)</span>
+                    } else {
+<span class="fc" id="L133">                        submitWastageData(id, quantity, existingEntryId)</span>
+                    }
+
+<span class="fc" id="L136">                handleSubmissionResult(result, name, quantity, existingEntryId)</span>
+<span class="fc" id="L137">            }</span>
+<span class="fc" id="L138">        }</span>
+
+        private suspend fun submitSalesData(
+            recipeId: String,
+            quantity: Int,
+            existingEntryId: String?,
+        ): Resource&lt;out Any&gt; {
+<span class="fc" id="L145">            val todayStr = SimpleDateFormat(&quot;yyyy-MM-dd&quot;, Locale.getDefault()).format(Date())</span>
+<span class="fc bfc" id="L146" title="All 2 branches covered.">            return if (existingEntryId != null) {</span>
+<span class="pc bpc" id="L147" title="1 of 2 branches missed.">                salesRepository.update(existingEntryId, UpdateSalesDataRequest(quantity = quantity))</span>
+            } else {
+<span class="pc bpc" id="L149" title="1 of 2 branches missed.">                salesRepository.create(</span>
+<span class="fc" id="L150">                    CreateSalesDataRequest(</span>
+<span class="fc" id="L151">                        date = todayStr,</span>
+<span class="fc" id="L152">                        recipeId = recipeId,</span>
+<span class="fc" id="L153">                        quantity = quantity,</span>
+                    ),
+                )
+            }
+        }
+
+        private suspend fun submitWastageData(
+            itemId: String,
+            quantity: Double,
+            existingEntryId: String?,
+        ): Resource&lt;out Any&gt; {
+<span class="fc" id="L164">            val todayStr = SimpleDateFormat(&quot;yyyy-MM-dd&quot;, Locale.getDefault()).format(Date())</span>
+<span class="fc bfc" id="L165" title="All 2 branches covered.">            return if (existingEntryId != null) {</span>
+<span class="fc bfc" id="L166" title="All 2 branches covered.">                val isIngredient = _wastageType.value == WastageType.INGREDIENT</span>
+<span class="fc" id="L167">                wastageRepository.update(</span>
+<span class="fc" id="L168">                    existingEntryId,</span>
+<span class="fc" id="L169">                    UpdateWastageDataRequest(</span>
+<span class="fc" id="L170">                        date = todayStr,</span>
+<span class="fc bfc" id="L171" title="All 2 branches covered.">                        ingredientId = if (isIngredient) itemId else null,</span>
+<span class="fc bfc" id="L172" title="All 2 branches covered.">                        recipeId = if (!isIngredient) itemId else null,</span>
+<span class="fc" id="L173">                        quantity = quantity,</span>
+                    ),
+                )
+            } else {
+<span class="fc" id="L177">                val wastageRequest =</span>
+<span class="pc bpc" id="L178" title="2 of 5 branches missed.">                    when (_wastageType.value) {</span>
+                        WastageType.MAIN_DISH, WastageType.SUB_RECIPE -&gt;
+<span class="fc" id="L180">                            CreateWastageDataRequest(</span>
+<span class="fc" id="L181">                                date = todayStr,</span>
+<span class="fc" id="L182">                                recipeId = itemId,</span>
+<span class="fc" id="L183">                                quantity = quantity,</span>
+                            )
+                        WastageType.INGREDIENT -&gt;
+<span class="fc" id="L186">                            CreateWastageDataRequest(</span>
+<span class="fc" id="L187">                                date = todayStr,</span>
+<span class="fc" id="L188">                                ingredientId = itemId,</span>
+<span class="fc" id="L189">                                quantity = quantity,</span>
+                            )
+<span class="nc" id="L191">                        else -&gt; null</span>
+                    }
+<span class="pc bpc" id="L193" title="2 of 4 branches missed.">                wastageRequest?.let { wastageRepository.create(it) } ?: Resource.Error(&quot;Invalid wastage type.&quot;)</span>
+            }
+        }
+
+        private fun handleSubmissionResult(
+            result: Resource&lt;out Any&gt;,
+            name: String,
+            quantity: Double,
+            existingEntryId: String?,
+        ) {
+<span class="pc" id="L203">            when (result) {</span>
+<span class="fc bfc" id="L204" title="All 2 branches covered.">                is Resource.Success -&gt; {</span>
+<span class="pc bpc" id="L205" title="1 of 2 branches missed.">                    val isSalesMode = _isSalesMode.value ?: true</span>
+<span class="fc" id="L206">                    val unit =</span>
+<span class="fc" id="L207">                        when (val data = result.data) {</span>
+<span class="fc bfc" id="L208" title="All 2 branches covered.">                            is WastageDataDto -&gt; data.unit</span>
+<span class="fc" id="L209">                            else -&gt; &quot;plates&quot;</span>
+                        }
+<span class="fc" id="L211">                    val todayStr = SimpleDateFormat(&quot;yyyy-MM-dd&quot;, Locale.getDefault()).format(Date())</span>
+<span class="fc" id="L212">                    val currentTimeStr = SimpleDateFormat(&quot;HH:mm&quot;, Locale.getDefault()).format(Date())</span>
+
+<span class="fc" id="L214">                    val newEntryId =</span>
+<span class="pc bpc" id="L215" title="1 of 2 branches missed.">                        when (val data = result.data) {</span>
+<span class="fc bfc" id="L216" title="All 2 branches covered.">                            is SalesDataDto -&gt; data.id</span>
+<span class="pc bpc" id="L217" title="1 of 2 branches missed.">                            is WastageDataDto -&gt; data.id</span>
+<span class="nc" id="L218">                            else -&gt; existingEntryId</span>
+<span class="nc" id="L219">                        } ?: return // Should not be null on success</span>
+
+<span class="fc" id="L221">                    val newEntry = RecentEntry(newEntryId, name, quantity, unit, todayStr, currentTimeStr, isSalesMode)</span>
+
+<span class="fc" id="L223">                    val existingIndex = submittedEntries.indexOfFirst { it.id == newEntry.id }</span>
+<span class="fc bfc" id="L224" title="All 2 branches covered.">                    if (existingIndex != -1) {</span>
+<span class="fc" id="L225">                        submittedEntries[existingIndex] = newEntry</span>
+                    } else {
+<span class="fc" id="L227">                        submittedEntries.add(0, newEntry)</span>
+                    }
+
+<span class="fc" id="L230">                    _submitStatus.value = Resource.Success(Unit, &quot;Entry saved successfully!&quot;)</span>
+<span class="fc" id="L231">                    loadRecentEntries()</span>
+                }
+<span class="pc bpc" id="L233" title="1 of 2 branches missed.">                is Resource.Error -&gt; {</span>
+<span class="pc bpc" id="L234" title="1 of 2 branches missed.">                    _submitStatus.value = Resource.Error(result.message ?: &quot;Unknown error occurred.&quot;)</span>
+                }
+<span class="nc bnc" id="L236" title="All 2 branches missed.">                is Resource.Loading -&gt; { /* No-op */ }</span>
+            }
+<span class="fc" id="L238">        }</span>
+
+        fun deleteEntry(entry: RecentEntry) {
+<span class="fc" id="L241">            viewModelScope.launch {</span>
+<span class="fc" id="L242">                _submitStatus.value = Resource.Loading&lt;Unit&gt;()</span>
+<span class="fc" id="L243">                val result =</span>
+<span class="fc bfc" id="L244" title="All 2 branches covered.">                    if (entry.isSales) {</span>
+<span class="fc" id="L245">                        salesRepository.delete(entry.id)</span>
+                    } else {
+<span class="fc" id="L247">                        wastageRepository.delete(entry.id)</span>
+                    }
+
+<span class="pc" id="L250">                when (result) {</span>
+<span class="fc bfc" id="L251" title="All 2 branches covered.">                    is Resource.Success -&gt; {</span>
+<span class="fc" id="L252">                        submittedEntries.remove(entry)</span>
+<span class="fc" id="L253">                        _submitStatus.value = Resource.Success&lt;Unit&gt;(Unit, &quot;Entry deleted successfully!&quot;)</span>
+<span class="fc" id="L254">                        loadRecentEntries()</span>
+                    }
+<span class="pc bpc" id="L256" title="1 of 2 branches missed.">                    is Resource.Error -&gt; {</span>
+<span class="pc bpc" id="L257" title="1 of 2 branches missed.">                        _submitStatus.value = Resource.Error&lt;Unit&gt;(result.message ?: &quot;Failed to delete entry.&quot;)</span>
+                    }
+<span class="nc bnc" id="L259" title="All 2 branches missed.">                    is Resource.Loading -&gt; { /* Do nothing */ }</span>
+                }
+<span class="fc" id="L261">            }</span>
+<span class="fc" id="L262">        }</span>
+
+        // Existing functions...
+
+        private fun fetchIngredients() {
+<span class="fc" id="L267">            viewModelScope.launch {</span>
+<span class="fc" id="L268">                _ingredients.value = Resource.Loading&lt;List&lt;IngredientDto&gt;&gt;()</span>
+<span class="fc" id="L269">                _ingredients.value = ingredientsRepository.getAll()</span>
+<span class="fc" id="L270">            }</span>
+<span class="fc" id="L271">        }</span>
+
+        private fun fetchRecipes() {
+<span class="fc" id="L274">            viewModelScope.launch {</span>
+<span class="fc" id="L275">                _mainRecipes.value = Resource.Loading&lt;List&lt;RecipeDto&gt;&gt;()</span>
+<span class="fc" id="L276">                _subRecipes.value = Resource.Loading&lt;List&lt;RecipeDto&gt;&gt;()</span>
+<span class="pc" id="L277">                when (val result = recipesRepository.getAll()) {</span>
+<span class="fc bfc" id="L278" title="All 2 branches covered.">                    is Resource.Success -&gt; {</span>
+<span class="pc bpc" id="L279" title="1 of 2 branches missed.">                        val allRecipes = result.data ?: emptyList()</span>
+<span class="fc bfc" id="L280" title="All 2 branches covered.">                        _mainRecipes.value = Resource.Success(allRecipes.filter { !it.isSubRecipe })</span>
+<span class="fc" id="L281">                        _subRecipes.value = Resource.Success(allRecipes.filter { it.isSubRecipe })</span>
+                    }
+<span class="pc bpc" id="L283" title="1 of 2 branches missed.">                    is Resource.Error -&gt; {</span>
+<span class="pc bpc" id="L284" title="1 of 2 branches missed.">                        val error = Resource.Error&lt;List&lt;RecipeDto&gt;&gt;(result.message ?: &quot;Failed to load recipes&quot;)</span>
+<span class="fc" id="L285">                        _mainRecipes.value = error</span>
+<span class="fc" id="L286">                        _subRecipes.value = error</span>
+                    }
+<span class="nc bnc" id="L288" title="All 2 branches missed.">                    is Resource.Loading -&gt; { /* Loading */ }</span>
+                }
+<span class="fc" id="L290">            }</span>
+<span class="fc" id="L291">        }</span>
+
+        private fun loadTodayEntries() {
+<span class="fc" id="L294">            viewModelScope.launch {</span>
+<span class="fc" id="L295">                val todayStr = SimpleDateFormat(&quot;yyyy-MM-dd&quot;, Locale.getDefault()).format(Date())</span>
+<span class="fc" id="L296">                val entries = mutableListOf&lt;RecentEntry&gt;()</span>
+
+<span class="fc" id="L298">                when (val salesResult = salesRepository.getAll(todayStr, todayStr)) {</span>
+<span class="fc bfc" id="L299" title="All 2 branches covered.">                    is Resource.Success -&gt; {</span>
+<span class="pc bpc" id="L300" title="1 of 2 branches missed.">                        salesResult.data?.forEach { sale -&gt;</span>
+<span class="fc" id="L301">                            entries.add(</span>
+<span class="fc" id="L302">                                RecentEntry(</span>
+<span class="fc" id="L303">                                    id = sale.id,</span>
+<span class="fc" id="L304">                                    name = sale.recipeName,</span>
+<span class="fc" id="L305">                                    quantity = sale.quantity.toDouble(),</span>
+<span class="fc" id="L306">                                    unit = &quot;plates&quot;,</span>
+<span class="fc" id="L307">                                    date = sale.date,</span>
+<span class="fc" id="L308">                                    time = extractTime(sale.updatedAt),</span>
+<span class="fc" id="L309">                                    isSales = true,</span>
+                                ),
+                            )
+<span class="fc" id="L312">                        }</span>
+                    }
+                    else -&gt; { /* Silently skip if fetch fails */ }
+                }
+
+<span class="fc" id="L317">                when (val wastageResult = wastageRepository.getAll(todayStr, todayStr)) {</span>
+<span class="fc bfc" id="L318" title="All 2 branches covered.">                    is Resource.Success -&gt; {</span>
+<span class="pc bpc" id="L319" title="1 of 2 branches missed.">                        wastageResult.data?.forEach { wastage -&gt;</span>
+<span class="fc" id="L320">                            entries.add(</span>
+<span class="fc" id="L321">                                RecentEntry(</span>
+<span class="fc" id="L322">                                    id = wastage.id,</span>
+<span class="fc" id="L323">                                    name = wastage.displayName,</span>
+<span class="fc" id="L324">                                    quantity = wastage.quantity,</span>
+<span class="fc" id="L325">                                    unit = wastage.unit,</span>
+<span class="fc" id="L326">                                    date = wastage.date,</span>
+<span class="fc" id="L327">                                    time = extractTime(wastage.updatedAt),</span>
+<span class="fc" id="L328">                                    isSales = false,</span>
+                                ),
+                            )
+<span class="fc" id="L331">                        }</span>
+                    }
+                    else -&gt; { /* Silently skip if fetch fails */ }
+                }
+
+<span class="fc" id="L336">                submittedEntries.clear()</span>
+<span class="fc" id="L337">                submittedEntries.addAll(entries)</span>
+<span class="fc" id="L338">                loadRecentEntries()</span>
+<span class="fc" id="L339">            }</span>
+<span class="fc" id="L340">        }</span>
+
+        private fun extractTime(timestamp: String): String {
+<span class="fc" id="L343">            return try {</span>
+<span class="fc" id="L344">                val apiFormat = SimpleDateFormat(&quot;yyyy-MM-dd'T'HH:mm:ss&quot;, Locale.getDefault())</span>
+<span class="fc" id="L345">                val timeFormat = SimpleDateFormat(&quot;HH:mm&quot;, Locale.getDefault())</span>
+<span class="fc" id="L346">                val date = apiFormat.parse(timestamp)</span>
+<span class="pc bpc" id="L347" title="2 of 4 branches missed.">                date?.let { timeFormat.format(it) } ?: &quot;00:00&quot;</span>
+<span class="fc" id="L348">            } catch (e: java.text.ParseException) {</span>
+<span class="fc" id="L349">                Log.w(TAG, &quot;Failed to parse timestamp: $timestamp&quot;, e)</span>
+<span class="fc" id="L350">                &quot;00:00&quot;</span>
+            }
+        }
+
+        private fun loadRecentEntries() {
+<span class="pc bpc" id="L355" title="1 of 2 branches missed.">            val currentMode = _isSalesMode.value ?: true</span>
+<span class="fc bfc" id="L356" title="All 2 branches covered.">            _recentEntries.value = submittedEntries.filter { it.isSales == currentMode }.toList()</span>
+<span class="fc" id="L357">        }</span>
+    }
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -1,5 +1,6 @@
 package com.smartsuschef.mobile.ui.datainput
 
+import android.util.Log
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.smartsuschef.mobile.data.repository.IngredientsRepository
 import com.smartsuschef.mobile.data.repository.RecipesRepository
@@ -7,6 +8,7 @@ import com.smartsuschef.mobile.data.repository.SalesRepository
 import com.smartsuschef.mobile.data.repository.WastageRepository
 import com.smartsuschef.mobile.network.dto.CreateSalesDataRequest
 import com.smartsuschef.mobile.network.dto.CreateWastageDataRequest
+import com.smartsuschef.mobile.network.dto.RecipeDto
 import com.smartsuschef.mobile.network.dto.SalesDataDto
 import com.smartsuschef.mobile.network.dto.UpdateSalesDataRequest
 import com.smartsuschef.mobile.network.dto.UpdateWastageDataRequest
@@ -28,6 +30,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
+import org.mockito.MockedStatic
+import org.mockito.Mockito
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
@@ -41,6 +45,7 @@ import java.util.Locale
 /**
  * Unit tests for the DataInputViewModel.
  */
+@Suppress("LargeClass")
 @ExperimentalCoroutinesApi
 @RunWith(MockitoJUnitRunner::class)
 class DataInputViewModelTest {
@@ -726,4 +731,230 @@ class DataInputViewModelTest {
         assertEquals(true, viewModel.isSalesMode.value)
         assertEquals(WastageType.INGREDIENT, viewModel.wastageType.value)
     }
+
+    @Test
+    fun `fetchRecipes error should propagate error to both recipe lists`() =
+        runTest {
+            whenever(mockRecipesRepository.getAll())
+                .thenReturn(Resource.Error("Failed to load recipes"))
+
+            val vm =
+                DataInputViewModel(
+                    mockSalesRepository,
+                    mockWastageRepository,
+                    mockIngredientsRepository,
+                    mockRecipesRepository,
+                )
+
+            val mainResult = vm.mainRecipes.value
+            assertTrue("mainRecipes should be Error", mainResult is Resource.Error)
+            assertEquals("Failed to load recipes", (mainResult as Resource.Error).message)
+
+            val subResult = vm.subRecipes.value
+            assertTrue("subRecipes should be Error", subResult is Resource.Error)
+            assertEquals("Failed to load recipes", (subResult as Resource.Error).message)
+        }
+
+    @Test
+    fun `fetchRecipes success should split into main and sub recipes`() =
+        runTest {
+            val recipes =
+                listOf(
+                    RecipeDto("r1", "Pizza", true, false, emptyList(), "2026-01-01", "2026-01-01"),
+                    RecipeDto("r2", "Sauce", false, true, emptyList(), "2026-01-01", "2026-01-01"),
+                    RecipeDto("r3", "Burger", true, false, emptyList(), "2026-01-01", "2026-01-01"),
+                )
+            whenever(mockRecipesRepository.getAll()).thenReturn(Resource.Success(recipes))
+
+            val vm =
+                DataInputViewModel(
+                    mockSalesRepository,
+                    mockWastageRepository,
+                    mockIngredientsRepository,
+                    mockRecipesRepository,
+                )
+
+            val mainResult = vm.mainRecipes.value
+            assertTrue(mainResult is Resource.Success)
+            assertEquals(2, (mainResult as Resource.Success).data?.size)
+
+            val subResult = vm.subRecipes.value
+            assertTrue(subResult is Resource.Success)
+            assertEquals(1, (subResult as Resource.Success).data?.size)
+            assertEquals("Sauce", (subResult as Resource.Success).data?.first()?.name)
+        }
+
+    @Test
+    fun `loadTodayEntries should populate recentEntries with sales data`() =
+        runTest {
+            val todayStr = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+            val salesData =
+                listOf(
+                    SalesDataDto(
+                        id = "sale-1",
+                        date = todayStr,
+                        recipeId = "rec-1",
+                        recipeName = "Pizza",
+                        quantity = 5,
+                        createdAt = todayStr,
+                        updatedAt = "${todayStr}T14:30:00",
+                    ),
+                )
+
+            whenever(mockSalesRepository.getAll(todayStr, todayStr))
+                .thenReturn(Resource.Success(salesData))
+            whenever(mockWastageRepository.getAll(todayStr, todayStr))
+                .thenReturn(Resource.Success(emptyList()))
+
+            val vm =
+                DataInputViewModel(
+                    mockSalesRepository,
+                    mockWastageRepository,
+                    mockIngredientsRepository,
+                    mockRecipesRepository,
+                )
+
+            val entries = vm.recentEntries.value
+            assertEquals(1, entries?.size)
+            assertEquals("Pizza", entries?.first()?.name)
+            assertEquals("14:30", entries?.first()?.time)
+            assertEquals(true, entries?.first()?.isSales)
+        }
+
+    @Suppress("LongMethod")
+    @Test
+    fun `loadTodayEntries should handle invalid timestamps gracefully`() =
+        runTest {
+            val logMock: MockedStatic<Log> = Mockito.mockStatic(Log::class.java)
+            try {
+                val todayStr = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+                val salesData =
+                    listOf(
+                        SalesDataDto(
+                            id = "sale-1",
+                            date = todayStr,
+                            recipeId = "rec-1",
+                            recipeName = "Pizza",
+                            quantity = 5,
+                            createdAt = todayStr,
+                            updatedAt = "invalid-timestamp",
+                        ),
+                    )
+
+                whenever(mockSalesRepository.getAll(todayStr, todayStr))
+                    .thenReturn(Resource.Success(salesData))
+                whenever(mockWastageRepository.getAll(todayStr, todayStr))
+                    .thenReturn(Resource.Success(emptyList()))
+
+                val vm =
+                    DataInputViewModel(
+                        mockSalesRepository,
+                        mockWastageRepository,
+                        mockIngredientsRepository,
+                        mockRecipesRepository,
+                    )
+
+                val entries = vm.recentEntries.value
+                assertEquals(1, entries?.size)
+                assertEquals("00:00", entries?.first()?.time)
+            } finally {
+                logMock.close()
+            }
+        }
+
+    @Test
+    fun `loadTodayEntries with sales error should still load wastage entries`() =
+        runTest {
+            val todayStr = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+            val wastageData =
+                listOf(
+                    WastageDataDto(
+                        id = "wastage-1",
+                        date = todayStr,
+                        ingredientId = "ing-1",
+                        recipeId = null,
+                        displayName = "Tomato",
+                        unit = "kg",
+                        quantity = 0.5,
+                        carbonFootprint = 1.0,
+                        createdAt = todayStr,
+                        updatedAt = "${todayStr}T15:00:00",
+                    ),
+                )
+
+            whenever(mockSalesRepository.getAll(todayStr, todayStr))
+                .thenReturn(Resource.Error("Sales fetch failed"))
+            whenever(mockWastageRepository.getAll(todayStr, todayStr))
+                .thenReturn(Resource.Success(wastageData))
+
+            val vm =
+                DataInputViewModel(
+                    mockSalesRepository,
+                    mockWastageRepository,
+                    mockIngredientsRepository,
+                    mockRecipesRepository,
+                )
+
+            // Switch to wastage mode to see wastage entries
+            vm.setMode(false)
+
+            val entries = vm.recentEntries.value
+            assertEquals(1, entries?.size)
+            assertEquals("Tomato", entries?.first()?.name)
+            assertEquals(false, entries?.first()?.isSales)
+        }
+
+    @Suppress("LongMethod")
+    @Test
+    fun `submitData wastage update with MAIN_DISH should set recipeId not ingredientId`() =
+        runTest {
+            val existingEntryId = "wastage-update-recipe-1"
+            val todayStr = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+
+            val mockInitialDto =
+                WastageDataDto(
+                    id = existingEntryId,
+                    date = todayStr,
+                    ingredientId = null,
+                    recipeId = "recipe-main-1",
+                    displayName = "Curry",
+                    unit = "plates",
+                    quantity = 2.0,
+                    carbonFootprint = 1.5,
+                    createdAt = todayStr,
+                    updatedAt = todayStr,
+                )
+            whenever(mockWastageRepository.create(any())).thenReturn(Resource.Success(mockInitialDto))
+
+            viewModel.setMode(false)
+            viewModel.setWastageType(WastageType.MAIN_DISH)
+            viewModel.onItemSelected("recipe-main-1", "Curry")
+            viewModel.submitData(2.0)
+
+            assertEquals(1, viewModel.recentEntries.value?.size)
+
+            val mockUpdateDto =
+                WastageDataDto(
+                    id = existingEntryId,
+                    date = todayStr,
+                    ingredientId = null,
+                    recipeId = "recipe-main-1",
+                    displayName = "Curry",
+                    unit = "plates",
+                    quantity = 5.0,
+                    carbonFootprint = 3.0,
+                    createdAt = todayStr,
+                    updatedAt = todayStr,
+                )
+            whenever(mockWastageRepository.update(eq(existingEntryId), any()))
+                .thenReturn(Resource.Success(mockUpdateDto))
+
+            val updateCaptor = argumentCaptor<UpdateWastageDataRequest>()
+
+            viewModel.submitData(5.0, existingEntryId)
+
+            verify(mockWastageRepository).update(eq(existingEntryId), updateCaptor.capture())
+            assertNull(updateCaptor.firstValue.ingredientId)
+            assertEquals("recipe-main-1", updateCaptor.firstValue.recipeId)
+        }
 }

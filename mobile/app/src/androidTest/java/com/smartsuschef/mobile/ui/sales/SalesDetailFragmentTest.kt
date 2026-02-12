@@ -14,6 +14,7 @@ import com.smartsuschef.mobile.R
 import com.smartsuschef.mobile.data.TokenManager
 import com.smartsuschef.mobile.di.TestNetworkModule
 import com.smartsuschef.mobile.ui.dashboard.DashboardActivity
+import com.smartsuschef.mobile.util.AnimationDisableRule
 import com.smartsuschef.mobile.util.CustomMatchers.hasItemCount
 import com.smartsuschef.mobile.util.OkHttp3IdlingResource
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -36,6 +37,9 @@ import javax.inject.Inject
 class SalesDetailFragmentTest {
     @get:Rule(order = 0)
     val hiltRule = HiltAndroidRule(this)
+
+    @get:Rule(order = 1)
+    val animationDisableRule = AnimationDisableRule()
 
     @Inject
     lateinit var tokenManager: TokenManager
@@ -214,8 +218,8 @@ class SalesDetailFragmentTest {
                                 .setBody(
                                     """
                                     [
-                                        {"ingredientId": "i1", "name": "Rice", "unit": "kg", "quantity": 10.0},
-                                        {"ingredientId": "i2", "name": "Chicken", "unit": "kg", "quantity": 5.0}
+                                        {"ingredientId": "i1", "ingredientName": "Rice", "unit": "kg", "quantity": 10.0},
+                                        {"ingredientId": "i2", "ingredientName": "Chicken", "unit": "kg", "quantity": 5.0}
                                     ]
                                     """.trimIndent(),
                                 )
@@ -238,8 +242,8 @@ class SalesDetailFragmentTest {
                                 .setBody(
                                     """
                                     [
-                                        {"recipeId": "r1", "name": "Chicken Rice", "quantity": 80},
-                                        {"recipeId": "r2", "name": "Nasi Lemak", "quantity": 60}
+                                        {"recipeId": "r1", "recipeName": "Chicken Rice", "quantity": 80},
+                                        {"recipeId": "r2", "recipeName": "Nasi Lemak", "quantity": 60}
                                     ]
                                     """.trimIndent(),
                                 )
@@ -247,6 +251,27 @@ class SalesDetailFragmentTest {
                         }
 
                     path.contains("/api/sales/trend") ->
+                        MockResponse()
+                            .setResponseCode(200)
+                            .setBody("[]")
+                            .addHeader("Content-Type", "application/json")
+
+                    path.contains("/api/forecast/weather") ->
+                        MockResponse()
+                            .setResponseCode(200)
+                            .setBody(
+                                """
+                                {
+                                    "temperature": 28.5,
+                                    "condition": "Sunny",
+                                    "description": "Clear skies",
+                                    "humidity": 65
+                                }
+                                """.trimIndent(),
+                            )
+                            .addHeader("Content-Type", "application/json")
+
+                    path.contains("/api/forecast/holidays") ->
                         MockResponse()
                             .setResponseCode(200)
                             .setBody("[]")

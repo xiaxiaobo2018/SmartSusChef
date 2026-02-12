@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SettingsActivity.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">com.smartsuschef.mobile.ui.settings</a> &gt; <span class="el_source">SettingsActivity.kt</span></div><h1>SettingsActivity.kt</h1><pre class="source lang-java linenums">package com.smartsuschef.mobile.ui.settings
+
+import android.os.Bundle
+import android.view.MenuItem
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
+import androidx.core.widget.addTextChangedListener
+import com.smartsuschef.mobile.R
+import com.smartsuschef.mobile.databinding.ActivitySettingsBinding
+import com.smartsuschef.mobile.util.PasswordValidator
+import com.smartsuschef.mobile.util.showToast
+import dagger.hilt.android.AndroidEntryPoint
+
+<span class="fc" id="L15">@AndroidEntryPoint</span>
+<span class="fc" id="L16">class SettingsActivity : AppCompatActivity() {</span>
+    private lateinit var binding: ActivitySettingsBinding
+<span class="fc" id="L18">    private val viewModel: SettingsViewModel by viewModels()</span>
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+<span class="fc" id="L21">        super.onCreate(savedInstanceState)</span>
+<span class="fc" id="L22">        binding = ActivitySettingsBinding.inflate(layoutInflater)</span>
+<span class="pc bpc" id="L23" title="1 of 2 branches missed.">        setContentView(binding.root)</span>
+
+<span class="fc" id="L25">        setupToolbar()</span>
+<span class="fc" id="L26">        setupPasswordValidation()</span>
+<span class="fc" id="L27">        setupObservers()</span>
+<span class="fc" id="L28">        setupClickListeners()</span>
+<span class="fc" id="L29">    }</span>
+
+    private fun setupToolbar() {
+<span class="pc bpc" id="L32" title="1 of 2 branches missed.">        setSupportActionBar(binding.toolbar)</span>
+<span class="pc bpc" id="L33" title="1 of 2 branches missed.">        supportActionBar?.apply {</span>
+<span class="fc" id="L34">            setDisplayHomeAsUpEnabled(true)</span>
+<span class="fc" id="L35">            setDisplayShowHomeEnabled(true)</span>
+<span class="fc" id="L36">            title = &quot;Settings&quot;</span>
+<span class="fc" id="L37">            subtitle = &quot;Manage your profile and account security&quot;</span>
+<span class="fc" id="L38">        }</span>
+<span class="fc" id="L39">    }</span>
+
+    /**
+     * Setup real-time password validation
+     * Shows errors as user types in the new password field
+     */
+    private fun setupPasswordValidation() {
+        // Real-time validation for new password
+<span class="pc bpc" id="L47" title="2 of 4 branches missed.">        binding.tilNewPassword.editText?.addTextChangedListener { text -&gt;</span>
+            val password = text?.toString() ?: &quot;&quot;
+
+            // Don't show errors for empty field (until user starts typing)
+            if (password.isEmpty()) {
+                binding.tilNewPassword.error = null
+                binding.tilNewPassword.isErrorEnabled = false
+                return@addTextChangedListener
+            }
+
+            // Show validation errors as user types
+            val result = PasswordValidator.validate(password)
+            binding.tilNewPassword.error = result.errorMessage
+            binding.tilNewPassword.isErrorEnabled = result.errorMessage != null
+        }
+
+        // Real-time validation for confirm password (check if matches)
+<span class="pc bpc" id="L64" title="2 of 4 branches missed.">        binding.tilConfirmPassword.editText?.addTextChangedListener { text -&gt;</span>
+            val confirmPassword = text?.toString() ?: &quot;&quot;
+            val newPassword = binding.tilNewPassword.editText?.text?.toString() ?: &quot;&quot;
+
+            // Don't show errors for empty field
+            if (confirmPassword.isEmpty()) {
+                binding.tilConfirmPassword.error = null
+                binding.tilConfirmPassword.isErrorEnabled = false
+                return@addTextChangedListener
+            }
+
+            // Check if passwords match
+            if (confirmPassword != newPassword) {
+                binding.tilConfirmPassword.error = &quot;Passwords do not match&quot;
+                binding.tilConfirmPassword.isErrorEnabled = true
+            } else {
+                binding.tilConfirmPassword.error = null
+                binding.tilConfirmPassword.isErrorEnabled = false
+            }
+        }
+<span class="fc" id="L84">    }</span>
+
+    private fun setupObservers() {
+        // Observe current user to populate profile fields
+<span class="fc" id="L88">        viewModel.currentUser.observe(this) { user -&gt;</span>
+<span class="pc bpc" id="L89" title="1 of 2 branches missed.">            user?.let {</span>
+<span class="pc bpc" id="L90" title="1 of 2 branches missed.">                binding.etFullName.setText(it.name)</span>
+<span class="pc bpc" id="L91" title="1 of 2 branches missed.">                binding.etEmail.setText(it.email)</span>
+<span class="fc" id="L92">            }</span>
+<span class="fc" id="L93">        }</span>
+
+        // Observe profile loading state
+<span class="fc" id="L96">        viewModel.isLoadingProfile.observe(this) { loading -&gt;</span>
+<span class="pc bpc" id="L97" title="1 of 4 branches missed.">            binding.btnSaveProfile.isEnabled = !loading</span>
+<span class="pc bpc" id="L98" title="1 of 2 branches missed.">            binding.progressBarProfile.isVisible = loading</span>
+<span class="fc" id="L99">        }</span>
+
+        // Observe password loading state
+<span class="fc" id="L102">        viewModel.isLoadingPassword.observe(this) { loading -&gt;</span>
+<span class="pc bpc" id="L103" title="1 of 4 branches missed.">            binding.btnUpdatePassword.isEnabled = !loading</span>
+<span class="pc bpc" id="L104" title="1 of 2 branches missed.">            binding.progressBarPassword.isVisible = loading</span>
+<span class="fc" id="L105">        }</span>
+
+        // Observe profile update results
+<span class="fc" id="L108">        viewModel.profileUpdateResult.observe(this) { message -&gt;</span>
+<span class="fc bfc" id="L109" title="All 2 branches covered.">            message?.let {</span>
+<span class="fc" id="L110">                showToast(it)</span>
+<span class="fc" id="L111">                viewModel.clearProfileResult()</span>
+<span class="fc" id="L112">            }</span>
+<span class="fc" id="L113">        }</span>
+
+        // Observe password update results
+<span class="fc" id="L116">        viewModel.passwordUpdateResult.observe(this) { message -&gt;</span>
+<span class="fc bfc" id="L117" title="All 2 branches covered.">            message?.let {</span>
+<span class="fc" id="L118">                showToast(it)</span>
+<span class="fc bfc" id="L119" title="All 2 branches covered.">                if (it.contains(&quot;successfully&quot;, ignoreCase = true)) {</span>
+<span class="fc" id="L120">                    clearPasswordFields()</span>
+                }
+<span class="fc" id="L122">                viewModel.clearPasswordResult()</span>
+<span class="fc" id="L123">            }</span>
+<span class="fc" id="L124">        }</span>
+<span class="fc" id="L125">    }</span>
+
+    private fun setupClickListeners() {
+        // Update Password button
+<span class="pc bpc" id="L129" title="1 of 2 branches missed.">        binding.btnUpdatePassword.setOnClickListener {</span>
+<span class="pc bpc" id="L130" title="1 of 2 branches missed.">            val currentPassword = binding.etCurrentPassword.text.toString()</span>
+<span class="pc bpc" id="L131" title="1 of 2 branches missed.">            val newPassword = binding.etNewPassword.text.toString()</span>
+<span class="pc bpc" id="L132" title="1 of 2 branches missed.">            val confirmPassword = binding.etConfirmPassword.text.toString()</span>
+
+<span class="fc" id="L134">            viewModel.changePassword(currentPassword, newPassword, confirmPassword)</span>
+<span class="fc" id="L135">        }</span>
+
+        // Save Profile button
+<span class="pc bpc" id="L138" title="1 of 2 branches missed.">        binding.btnSaveProfile.setOnClickListener {</span>
+<span class="pc bpc" id="L139" title="1 of 2 branches missed.">            val name = binding.etFullName.text.toString()</span>
+<span class="pc bpc" id="L140" title="1 of 2 branches missed.">            val email = binding.etEmail.text.toString()</span>
+
+<span class="fc" id="L142">            viewModel.updateProfile(name, email)</span>
+<span class="fc" id="L143">        }</span>
+<span class="fc" id="L144">    }</span>
+
+    private fun clearPasswordFields() {
+<span class="pc bpc" id="L147" title="2 of 4 branches missed.">        binding.etCurrentPassword.text?.clear()</span>
+<span class="pc bpc" id="L148" title="2 of 4 branches missed.">        binding.etNewPassword.text?.clear()</span>
+<span class="pc bpc" id="L149" title="2 of 4 branches missed.">        binding.etConfirmPassword.text?.clear()</span>
+
+        // Clear any error states
+<span class="pc bpc" id="L152" title="1 of 2 branches missed.">        binding.tilCurrentPassword.error = null</span>
+<span class="pc bpc" id="L153" title="1 of 2 branches missed.">        binding.tilCurrentPassword.isErrorEnabled = false</span>
+<span class="pc bpc" id="L154" title="1 of 2 branches missed.">        binding.tilNewPassword.error = null</span>
+<span class="pc bpc" id="L155" title="1 of 2 branches missed.">        binding.tilNewPassword.isErrorEnabled = false</span>
+<span class="pc bpc" id="L156" title="1 of 2 branches missed.">        binding.tilConfirmPassword.error = null</span>
+<span class="pc bpc" id="L157" title="1 of 2 branches missed.">        binding.tilConfirmPassword.isErrorEnabled = false</span>
+<span class="fc" id="L158">    }</span>
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+<span class="nc" id="L161">        return when (item.itemId) {</span>
+<span class="nc bnc" id="L162" title="All 2 branches missed.">            android.R.id.home -&gt; {</span>
+<span class="nc" id="L163">                finish()</span>
+<span class="nc" id="L164">                true</span>
+            }
+<span class="nc" id="L166">            else -&gt; super.onOptionsItemSelected(item)</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
