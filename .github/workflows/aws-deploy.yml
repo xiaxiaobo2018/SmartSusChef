@@ -281,12 +281,31 @@ jobs:
         continue-on-error: true
 
       # --- Upload combined artifacts ---
+      - name: Generate Snyk HTML report
+        if: always()
+        run: |
+          SARIF_FILES=""
+          for f in snyk-backend.sarif snyk-frontend.sarif snyk-ml.sarif; do
+            [ -f "$f" ] && SARIF_FILES="$SARIF_FILES $f"
+          done
+          if [ -n "$SARIF_FILES" ]; then
+            python3 tools/sarif_to_html.py \
+              --title "Snyk Dependency Scan Report" \
+              -o snyk-dependency-report.html \
+              $SARIF_FILES
+          else
+            echo "No Snyk SARIF files found to convert"
+          fi
+        continue-on-error: true
+
       - name: Upload Snyk reports
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: snyk-dependency-reports
-          path: snyk-*.sarif
+          path: |
+            snyk-*.sarif
+            snyk-dependency-report.html
           if-no-files-found: warn
           retention-days: 30
 
