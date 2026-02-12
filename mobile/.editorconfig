@@ -1,0 +1,6 @@
+root = true
+
+[*.{kt,kts}]
+# Disable backing-property-naming rule — Android ViewBinding pattern
+# uses private `_binding` with internal `binding` getter, which ktlint 1.5+ flags
+ktlint_standard_backing-property-naming = disabled
