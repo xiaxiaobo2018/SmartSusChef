@@ -108,7 +108,7 @@ class ForecastFragmentTest {
         mockWebServer.dispatcher = createDispatcher()
         launchAndNavigateToForecast()
 
-        onView(withId(R.id.dishForecastStackedChart)).check(matches(isDisplayed()))
+        onView(withId(R.id.dishForecastStackedChart)).perform(scrollTo()).check(matches(isDisplayed()))
     }
 
     @Test

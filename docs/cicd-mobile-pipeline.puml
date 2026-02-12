@@ -1,0 +1,188 @@
+@startuml SmartSusChef_Mobile_CICD_Pipeline
+title SmartSusChef Mobile CI/CD Pipeline\n(mobile-ci.yml)
+
+skinparam backgroundColor #FEFEFE
+skinparam activity {
+  BackgroundColor #F3E5F5
+  BorderColor #7B1FA2
+  ArrowColor #333333
+  DiamondBackgroundColor #FFF9C4
+  DiamondBorderColor #F9A825
+}
+skinparam partition {
+  BackgroundColor #F5F5F5
+  BorderColor #BDBDBD
+}
+skinparam note {
+  BackgroundColor #FFFDE7
+  BorderColor #FBC02D
+}
+
+start
+:Developer pushes to:\n- **mobile-release** (Production APK)\n- **main** (Debug APK)\n- **feature/mobile-*** branches\nor opens PR to main / mobile-release;
+
+note right
+  Triggers:
+  - push (mobile/** or workflow file)
+  - pull_request (mobile/**)
+  - workflow_dispatch
+end note
+
+fork
+partition "STAGE 1: Static Analysis" #E8EAF6 {
+  :<<static-analysis>>\nCheckout code (with push access);
+
+  :Setup JDK 17 + Gradle cache;
+
+  :Android Lint\n(lintUatDebug);
+
+  :Detekt\n(Kotlin static analysis);
+
+  :Ktlint auto-format\n→ auto-commit fixes\n[skip ci];
+
+  :Ktlint check\n(verify formatting);
+
+  :Upload Lint report artifact;
+}
+fork again
+partition "STAGE 1b: Snyk Dependency Scan" #E8EAF6 {
+  :<<snyk-scan>>\nSetup JDK 17;
+
+  :Build for dependency resolution\n(gradlew dependencies);
+
+  :Install Snyk CLI;
+
+  :Snyk scan\n(build.gradle.kts, severity≥high);
+
+  :Upload SARIF to GitHub Security;
+
+  :Upload Snyk report artifact;
+}
+end fork
+
+partition "STAGE 2: Unit Tests" #E3F2FD {
+  :<<unit-test>>\nSetup JDK 17 + Gradle cache;
+
+  :Run Unit Tests\n(testUatDebugUnitTest);
+
+  :Generate JaCoCo coverage report;
+
+  :Upload test report artifact;
+}
+
+partition "STAGE 2b: Espresso UI Tests (Instrumented)" #E3F2FD {
+  :<<espresso-ui-tests>>\n(needs: unit-test);
+
+  :Setup JDK 17;
+
+  :Enable KVM for Android emulator;
+
+  :AVD cache (API 31);
+
+  :Run Espresso on emulator\n(android-emulator-runner@v2)\nAPI 31 / x86_64 / google_apis\nconnectedUatDebugAndroidTest;
+
+  :Upload Espresso HTML report\nUpload JUnit XML results;
+
+  :Espresso test summary\n(Total / Passed / Failed / Errors / Skipped);
+}
+
+if (Branch?) then (NOT mobile-release)
+
+  partition "STAGE 3: Build Debug APK" #E8F5E9 {
+    :<<build-debug-apk>>\n(needs: unit-test);
+
+    :Setup JDK 17;
+
+    :Build UAT Debug APK\n(assembleUatDebug);
+
+    :Sanitize branch name\n(replace / with -);
+
+    :Upload Debug APK artifact\n(retention: 30 days);
+  }
+
+  partition "STAGE 3b: MobSF Security Scan (Debug)" #FFF3E0 {
+    :<<mobsf-scan-debug>>\n(needs: build-debug-apk);
+
+    :Download Debug APK artifact;
+
+    :Start MobSF Docker container\n(opensecurity/mobile-security-framework-mobsf)\nWait for API ready (up to 90 attempts);
+
+    :Find APK file;
+
+    :Upload APK to MobSF;
+
+    :Run MobSF scan;
+
+    fork
+      :Download MobSF JSON report;
+    fork again
+      :Download MobSF PDF report;
+    end fork
+
+    :Parse MobSF results:\n- Security Score\n- App Name / Package / SDK\n- Code Issues (High / Warning / Info)\n- Manifest Issues (High / Warning / Info);
+
+    :Upload MobSF reports artifact\n(retention: 30 days);
+
+    :Stop MobSF container;
+  }
+
+else (mobile-release)
+
+  partition "STAGE 4: Build Production APK" #FFEBEE {
+    :<<build-production-apk>>\n(needs: unit-test);
+
+    :Setup JDK 17;
+
+    :Decode Keystore (from secrets);
+
+    fork
+      :Build Production Release APK\n(assembleProductionRelease);
+    fork again
+      :Build Production Release AAB\n(bundleProductionRelease);
+    end fork
+
+    :Upload Production APK artifact\n(retention: 90 days);
+
+    :Upload Production AAB artifact\n(retention: 90 days);
+
+    :Get version from build.gradle.kts;
+
+    :Create GitHub Release\n- Tag: mobile-v{version}-{run_number}\n- Attach APK + AAB files;
+  }
+
+  partition "STAGE 4b: MobSF Security Scan (Production)" #FFF3E0 {
+    :<<mobsf-scan-production>>\n(needs: build-production-apk);
+
+    :Download Production APK artifact;
+
+    :Start MobSF Docker container\nWait for API ready;
+
+    :Upload → Scan → Download reports;
+
+    :Parse MobSF Production results:\n- Security Score\n- Code / Manifest issues;
+
+    :Upload MobSF reports artifact\n(retention: 90 days);
+
+    :Stop MobSF container;
+  }
+
+endif
+
+stop
+
+legend right
+  |= Stage |= Description |
+  |<#E8EAF6>| Static Analysis & Security |
+  |<#E3F2FD>| Testing (Unit + UI) |
+  |<#E8F5E9>| Debug Build (non-release branches) |
+  |<#FFEBEE>| Production Build (mobile-release only) |
+  |<#FFF3E0>| MobSF Security Scan |
+endlegend
+
+footer
+  SmartSusChef Mobile CI/CD Pipeline
+  Android (Kotlin) · Gradle · JDK 17
+  GitHub Actions
+end footer
+
+@enduml

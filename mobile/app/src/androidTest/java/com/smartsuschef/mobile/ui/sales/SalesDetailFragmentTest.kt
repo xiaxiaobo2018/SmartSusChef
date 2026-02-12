@@ -5,6 +5,7 @@ import androidx.navigation.Navigation
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
+import androidx.test.espresso.action.ViewActions.scrollTo
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
@@ -109,7 +110,7 @@ class SalesDetailFragmentTest {
         mockWebServer.dispatcher = createDispatcher()
         navigateToSalesDetail()
 
-        onView(withId(R.id.rvIngredients)).check(matches(isDisplayed()))
+        onView(withId(R.id.rvIngredients)).perform(scrollTo()).check(matches(isDisplayed()))
     }
 
     @Test

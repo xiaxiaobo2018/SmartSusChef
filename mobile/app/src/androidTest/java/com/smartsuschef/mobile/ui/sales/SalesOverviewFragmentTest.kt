@@ -3,6 +3,7 @@ package com.smartsuschef.mobile.ui.sales
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
+import androidx.test.espresso.action.ViewActions.scrollTo
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
@@ -76,10 +77,10 @@ class SalesOverviewFragmentTest {
         mockWebServer.dispatcher = createDispatcher()
         scenario = ActivityScenario.launch(DashboardActivity::class.java)
 
-        onView(withId(R.id.tvWeatherCondition)).check(matches(isDisplayed()))
-        onView(withId(R.id.tvWeatherDescription)).check(matches(isDisplayed()))
-        onView(withId(R.id.tvWeatherHumidity)).check(matches(isDisplayed()))
-        onView(withId(R.id.ivWeatherIcon)).check(matches(isDisplayed()))
+        onView(withId(R.id.tvWeatherCondition)).perform(scrollTo()).check(matches(isDisplayed()))
+        onView(withId(R.id.tvWeatherDescription)).perform(scrollTo()).check(matches(isDisplayed()))
+        onView(withId(R.id.tvWeatherHumidity)).perform(scrollTo()).check(matches(isDisplayed()))
+        onView(withId(R.id.ivWeatherIcon)).perform(scrollTo()).check(matches(isDisplayed()))
     }
 
     @Test
@@ -147,7 +148,7 @@ class SalesOverviewFragmentTest {
         scenario = ActivityScenario.launch(DashboardActivity::class.java)
 
         onView(withId(R.id.tvSalesTitle)).check(matches(isDisplayed()))
-        onView(withId(R.id.tvWeatherCondition)).check(matches(isDisplayed()))
+        onView(withId(R.id.tvWeatherCondition)).perform(scrollTo()).check(matches(isDisplayed()))
     }
 
     @Test
