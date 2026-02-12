@@ -1,0 +1,11 @@
+timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,failureMessage,bytes,sentBytes,grpThreads,allThreads,URL,Latency,IdleTime,Connect
+1770793815709,604,POST /api/auth/login,200,OK,Main User Journey 1-1,text,true,,1043,249,1,1,http://localhost:5001/api/auth/login,604,0,9
+1770793816326,2161,GET /api/dashboard,200,OK,Main User Journey 1-1,text,true,,4438,697,1,1,http://localhost:5001/api/Dashboard/summary,2160,0,0
+1770793818488,470,GET /api/Ingredients,200,OK,Main User Journey 1-1,text,true,,1305,691,1,1,http://localhost:5001/api/Ingredients,470,0,0
+1770793818960,785,POST /api/Ingredients,201,Created,Main User Journey 1-1,text,true,,440,829,1,1,http://localhost:5001/api/Ingredients,785,0,0
+1770793819747,1560,POST /api/recipes,201,Created,Main User Journey 1-1,text,true,,600,1056,1,1,http://localhost:5001/api/recipes,1560,0,0
+1770793821316,2,Debug Sampler,200,OK,Main User Journey 1-1,text,true,,1081,0,1,1,null,0,0,0
+1770793821319,2192,PUT /api/recipes/3882b466-2895-4a75-88a5-1fd6d7d9bff4,200,OK,Main User Journey 1-1,text,true,,521,1098,1,1,http://localhost:5001/api/recipes/3882b466-2895-4a75-88a5-1fd6d7d9bff4,2192,0,0
+1770793823512,1750,DELETE /api/recipes/3882b466-2895-4a75-88a5-1fd6d7d9bff4,204,No Content,Main User Journey 1-1,,true,,81,810,1,1,http://localhost:5001/api/recipes/3882b466-2895-4a75-88a5-1fd6d7d9bff4,0,0,0
+1770793825264,1096,PUT /api/Ingredients/853827cc-13c3-46bc-a3d3-bb6602a50982,200,OK,Main User Journey 1-1,text,true,,356,873,1,1,http://localhost:5001/api/Ingredients/853827cc-13c3-46bc-a3d3-bb6602a50982,1096,0,0
+1770793826361,1102,DELETE /api/Ingredients/853827cc-13c3-46bc-a3d3-bb6602a50982,204,No Content,Main User Journey 1-1,,true,,81,814,1,1,http://localhost:5001/api/Ingredients/853827cc-13c3-46bc-a3d3-bb6602a50982,0,0,0
