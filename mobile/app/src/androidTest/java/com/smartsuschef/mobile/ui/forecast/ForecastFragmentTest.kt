@@ -4,6 +4,7 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.action.ViewActions.scrollTo
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
@@ -13,6 +14,7 @@ import com.smartsuschef.mobile.R
 import com.smartsuschef.mobile.data.TokenManager
 import com.smartsuschef.mobile.di.TestNetworkModule
 import com.smartsuschef.mobile.ui.dashboard.DashboardActivity
+import com.smartsuschef.mobile.util.AnimationDisableRule
 import com.smartsuschef.mobile.util.OkHttp3IdlingResource
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -34,6 +36,9 @@ import javax.inject.Inject
 class ForecastFragmentTest {
     @get:Rule(order = 0)
     val hiltRule = HiltAndroidRule(this)
+
+    @get:Rule(order = 1)
+    val animationDisableRule = AnimationDisableRule()
 
     @Inject
     lateinit var tokenManager: TokenManager
@@ -122,7 +127,7 @@ class ForecastFragmentTest {
         mockWebServer.dispatcher = createDispatcher()
         launchAndNavigateToForecast()
 
-        onView(withId(R.id.rvIngredientForecast)).check(matches(isDisplayed()))
+        onView(withId(R.id.rvIngredientForecast)).perform(scrollTo()).check(matches(isDisplayed()))
     }
 
     @Test
@@ -130,8 +135,8 @@ class ForecastFragmentTest {
         mockWebServer.dispatcher = createDispatcher()
         launchAndNavigateToForecast()
 
-        onView(withId(R.id.tvAccuracy)).check(matches(isDisplayed()))
-        onView(withId(R.id.tvAccuracyDiff)).check(matches(isDisplayed()))
+        onView(withId(R.id.tvAccuracy)).perform(scrollTo()).check(matches(isDisplayed()))
+        onView(withId(R.id.tvAccuracyDiff)).perform(scrollTo()).check(matches(isDisplayed()))
     }
 
     @Test
@@ -139,7 +144,7 @@ class ForecastFragmentTest {
         mockWebServer.dispatcher = createDispatcher()
         launchAndNavigateToForecast()
 
-        onView(withId(R.id.comparisonBarChart)).check(matches(isDisplayed()))
+        onView(withId(R.id.comparisonBarChart)).perform(scrollTo()).check(matches(isDisplayed()))
     }
 
     @Test
@@ -278,7 +283,34 @@ class ForecastFragmentTest {
                         } else {
                             MockResponse()
                                 .setResponseCode(200)
-                                .setBody("[]")
+                                .setBody(
+                                    """
+                                    {
+                                        "date": "2026-02-12",
+                                        "calendar": {
+                                            "date": "2026-02-12",
+                                            "isHoliday": false,
+                                            "isSchoolHoliday": false,
+                                            "isWeekend": false,
+                                            "holidayName": null,
+                                            "weather": {
+                                                "temperatureMax": 28.0,
+                                                "temperatureMin": 22.0,
+                                                "rainMm": 5.0,
+                                                "weatherCode": 800,
+                                                "weatherDescription": "Partly Cloudy"
+                                            }
+                                        },
+                                        "weather": {
+                                            "temperatureMax": 28.0,
+                                            "temperatureMin": 22.0,
+                                            "rainMm": 5.0,
+                                            "weatherCode": 800,
+                                            "weatherDescription": "Partly Cloudy"
+                                        }
+                                    }
+                                    """.trimIndent(),
+                                )
                                 .addHeader("Content-Type", "application/json")
                         }
 
@@ -299,7 +331,7 @@ class ForecastFragmentTest {
                                     """
                                     [
                                         {
-                                            "date": "2026-02-11",
+                                            "date": "2099-01-15",
                                             "recipeName": "Chicken Rice",
                                             "quantity": 80,
                                             "ingredients": [
@@ -308,7 +340,7 @@ class ForecastFragmentTest {
                                             ]
                                         },
                                         {
-                                            "date": "2026-02-11",
+                                            "date": "2099-01-15",
                                             "recipeName": "Nasi Lemak",
                                             "quantity": 60,
                                             "ingredients": [

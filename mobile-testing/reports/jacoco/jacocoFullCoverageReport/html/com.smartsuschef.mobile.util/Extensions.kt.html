@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Extensions.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">com.smartsuschef.mobile.util</a> &gt; <span class="el_source">Extensions.kt</span></div><h1>Extensions.kt</h1><pre class="source lang-java linenums">package com.smartsuschef.mobile.util
+
+import android.content.Context
+import android.text.Editable
+import android.text.TextWatcher
+import android.view.View
+import android.widget.Toast
+import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.textfield.TextInputLayout
+
+// Context Extensions
+<span class="fc" id="L12">fun Context.showToast(</span>
+    message: String,
+<span class="fc" id="L14">    duration: Int = Toast.LENGTH_SHORT,</span>
+) {
+<span class="fc" id="L16">    Toast.makeText(this, message, duration).show()</span>
+<span class="fc" id="L17">}</span>
+
+// View Extensions
+fun View.visible() {
+<span class="fc" id="L21">    visibility = View.VISIBLE</span>
+<span class="fc" id="L22">}</span>
+
+fun View.gone() {
+<span class="fc" id="L25">    visibility = View.GONE</span>
+<span class="fc" id="L26">}</span>
+
+fun View.invisible() {
+<span class="nc" id="L29">    visibility = View.INVISIBLE</span>
+<span class="nc" id="L30">}</span>
+
+<span class="nc" id="L32">fun View.showSnackbar(</span>
+    message: String,
+<span class="nc" id="L34">    duration: Int = Snackbar.LENGTH_SHORT,</span>
+) {
+<span class="nc" id="L36">    Snackbar.make(this, message, duration).show()</span>
+<span class="nc" id="L37">}</span>
+
+/**
+ Extension functions for form validation for text input
+ Sets error message on TextInputLayout
+*/
+
+fun TextInputLayout.setError(message: String?) {
+<span class="nc" id="L45">    error = message</span>
+<span class="nc bnc" id="L46" title="All 2 branches missed.">    isErrorEnabled = message != null</span>
+<span class="nc" id="L47">}</span>
+
+// Clears error from TextInputLayout
+fun TextInputLayout.clearError() {
+<span class="nc" id="L51">    error = null</span>
+<span class="nc" id="L52">    isErrorEnabled = false</span>
+<span class="nc" id="L53">}</span>
+
+// Gets the text from the TextInputLayout's EditText
+fun TextInputLayout.getText(): String {
+<span class="nc bnc" id="L57" title="All 6 branches missed.">    return editText?.text?.toString() ?: &quot;&quot;</span>
+}
+
+// Adds a text change listener that validates on each change
+// Returns the TextWatcher so it can be removed if needed
+
+fun TextInputLayout.addValidationWatcher(validator: (String) -&gt; String?): TextWatcher {
+<span class="nc" id="L64">    val textWatcher =</span>
+<span class="nc" id="L65">        object : TextWatcher {</span>
+            override fun beforeTextChanged(
+                s: CharSequence?,
+                start: Int,
+                count: Int,
+                after: Int,
+            ) {
+                // No action needed before text changes.
+<span class="nc" id="L73">            }</span>
+
+            override fun onTextChanged(
+                s: CharSequence?,
+                start: Int,
+                before: Int,
+                count: Int,
+            ) {
+                // No action needed during text changes.
+<span class="nc" id="L82">            }</span>
+
+            override fun afterTextChanged(s: Editable?) {
+<span class="nc bnc" id="L85" title="All 4 branches missed.">                val text = s?.toString() ?: &quot;&quot;</span>
+<span class="nc" id="L86">                val errorMessage = validator(text)</span>
+<span class="nc" id="L87">                setError(errorMessage)</span>
+<span class="nc" id="L88">            }</span>
+        }
+<span class="nc bnc" id="L90" title="All 2 branches missed.">    editText?.addTextChangedListener(textWatcher)</span>
+<span class="nc" id="L91">    return textWatcher</span>
+}
+
+// Validates password field using PasswordValidator
+// Shows first error encountered
+fun TextInputLayout.validatePassword(): Boolean {
+<span class="nc" id="L97">    val password = getText()</span>
+<span class="nc" id="L98">    val result = PasswordValidator.validate(password)</span>
+<span class="nc" id="L99">    setError(result.errorMessage)</span>
+<span class="nc" id="L100">    return result.isValid</span>
+}
+
+// Validates that two password fields match
+fun TextInputLayout.validatePasswordMatch(otherField: TextInputLayout): Boolean {
+<span class="nc" id="L105">    val password1 = getText()</span>
+<span class="nc" id="L106">    val password2 = otherField.getText()</span>
+
+<span class="nc bnc" id="L108" title="All 2 branches missed.">    return if (password1 != password2) {</span>
+<span class="nc" id="L109">        setError(&quot;Passwords do not match&quot;)</span>
+<span class="nc" id="L110">        false</span>
+    } else {
+<span class="nc" id="L112">        clearError()</span>
+<span class="nc" id="L113">        true</span>
+    }
+}
+
+// Validates that field is not empty
+<span class="nc" id="L118">fun TextInputLayout.validateNotEmpty(fieldName: String = &quot;This field&quot;): Boolean {</span>
+<span class="nc" id="L119">    val text = getText()</span>
+<span class="nc bnc" id="L120" title="All 2 branches missed.">    return if (text.isBlank()) {</span>
+<span class="nc" id="L121">        setError(&quot;$fieldName is required&quot;)</span>
+<span class="nc" id="L122">        false</span>
+    } else {
+<span class="nc" id="L124">        clearError()</span>
+<span class="nc" id="L125">        true</span>
+    }
+}
+
+// Validates email format using pure Kotlin regex (no Android framework dependencies)
+// Uses RFC 5322 compliant pattern for email validation
+fun TextInputLayout.validateEmail(): Boolean {
+<span class="nc" id="L132">    val email = getText()</span>
+
+    // RFC 5322 compliant email regex (simplified version)
+    // Matches: user@domain.com, user.name@domain.co.uk, user+tag@domain.com
+<span class="nc" id="L136">    val emailRegex = &quot;^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$&quot;.toRegex()</span>
+
+<span class="nc" id="L138">    return when {</span>
+<span class="nc bnc" id="L139" title="All 2 branches missed.">        email.isBlank() -&gt; {</span>
+<span class="nc" id="L140">            setError(&quot;Email is required&quot;)</span>
+<span class="nc" id="L141">            false</span>
+        }
+<span class="nc bnc" id="L143" title="All 2 branches missed.">        !email.matches(emailRegex) -&gt; {</span>
+<span class="nc" id="L144">            setError(&quot;Please enter a valid email address&quot;)</span>
+<span class="nc" id="L145">            false</span>
+        }
+        else -&gt; {
+<span class="nc" id="L148">            clearError()</span>
+<span class="nc" id="L149">            true</span>
+        }
+    }
+}
+
+/**
+ * Usage Examples:
+ *
+ * // In Activity/Fragment:
+ * showToast(&quot;Login successful&quot;)
+ * binding.root.showSnackbar(&quot;Error occurred&quot;)
+ *
+ * // View visibility:
+ * binding.progressBar.visible()
+ * binding.errorText.gone()
+ *
+ * // TextInputLayout validation in Activity/Fragment:
+ * if (!binding.tilPassword.validatePassword()) {
+ *     return // Error already shown
+ * }
+ *
+ * if (!binding.tilConfirmPassword.validatePasswordMatch(binding.tilPassword)) {
+ *     return // Error already shown
+ * }
+ *
+ * if (!binding.tilEmail.validateEmail()) {
+ *     return // Error already shown
+ * }
+ *
+ * // For ViewModel validation, inject validators:
+ * class MyViewModel @Inject constructor(
+ *     private val emailValidator: EmailValidator
+ * ) {
+ *     private fun isValidEmail(email: String): Boolean {
+ *         return emailValidator.isValid(email)  // Testable without Robolectric
+ *     }
+ * }
+ */
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

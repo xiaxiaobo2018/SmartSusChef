@@ -239,7 +239,12 @@ class ForecastViewModelTest {
             assertNotNull(dishes)
             // Should be 9 top dishes + 1 "Others" = 10
             assertEquals(10, dishes?.size)
-            assertEquals("Others", dishes?.last()?.name)
+
+            val othersDish = dishes?.find { it.name == "Others" }
+            assertNotNull(othersDish)
+            // Quantity should be the sum of the two smallest forecasts: (100-10) + (100-11) = 90 + 89 = 179
+            assertEquals(179, othersDish?.predictedSales)
+            assertEquals("Dish 9", dishes?.get(8)?.name)
         }
 
     @Test

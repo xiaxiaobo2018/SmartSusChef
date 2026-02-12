@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>WastageDtos.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">com.smartsuschef.mobile.network.dto</a> &gt; <span class="el_source">WastageDtos.kt</span></div><h1>WastageDtos.kt</h1><pre class="source lang-java linenums">package com.smartsuschef.mobile.network.dto
+
+import android.os.Parcelable
+import com.google.gson.annotations.SerializedName
+import kotlinx.parcelize.Parcelize
+
+/**
+ * Wastage Data DTO
+ * Maps to: WastageDataDto in WastageDtos.cs
+ */
+<span class="nc" id="L11">@Parcelize</span>
+<span class="pc" id="L12">data class WastageDataDto(</span>
+<span class="fc" id="L13">    @SerializedName(&quot;id&quot;)</span>
+    val id: String,
+<span class="fc" id="L15">    @SerializedName(&quot;date&quot;)</span>
+    val date: String,
+<span class="fc" id="L17">    @SerializedName(&quot;ingredientId&quot;)</span>
+<span class="nc" id="L18">    val ingredientId: String? = null,</span>
+<span class="fc" id="L19">    @SerializedName(&quot;recipeId&quot;)</span>
+<span class="nc" id="L20">    val recipeId: String? = null,</span>
+<span class="fc" id="L21">    @SerializedName(&quot;displayName&quot;)</span>
+    val displayName: String,
+<span class="fc" id="L23">    @SerializedName(&quot;unit&quot;)</span>
+    val unit: String,
+<span class="fc" id="L25">    @SerializedName(&quot;quantity&quot;)</span>
+    val quantity: Double,
+<span class="fc" id="L27">    @SerializedName(&quot;carbonFootprint&quot;)</span>
+    val carbonFootprint: Double,
+<span class="pc" id="L29">    @SerializedName(&quot;createdAt&quot;)</span>
+    val createdAt: String,
+<span class="fc" id="L31">    @SerializedName(&quot;updatedAt&quot;)</span>
+    val updatedAt: String,
+<span class="nc" id="L33">) : Parcelable</span>
+
+/**
+ * Create Wastage Data Request
+ * Maps to: CreateWastageDataRequest in WastageDtos.cs
+ */
+<span class="fc" id="L39">data class CreateWastageDataRequest(</span>
+<span class="pc" id="L40">    @SerializedName(&quot;date&quot;)</span>
+    val date: String,
+<span class="fc" id="L42">    @SerializedName(&quot;ingredientId&quot;)</span>
+<span class="fc" id="L43">    val ingredientId: String? = null,</span>
+<span class="fc" id="L44">    @SerializedName(&quot;recipeId&quot;)</span>
+<span class="fc" id="L45">    val recipeId: String? = null,</span>
+<span class="fc" id="L46">    @SerializedName(&quot;quantity&quot;)</span>
+    val quantity: Double,
+<span class="fc" id="L48">)</span>
+
+/**
+ * Update Wastage Data Request
+ * Maps to: UpdateWastageDataRequest in WastageDtos.cs
+ */
+<span class="fc" id="L54">data class UpdateWastageDataRequest(</span>
+<span class="pc" id="L55">    @SerializedName(&quot;date&quot;)</span>
+    val date: String,
+<span class="fc" id="L57">    @SerializedName(&quot;ingredientId&quot;)</span>
+<span class="fc" id="L58">    val ingredientId: String? = null,</span>
+<span class="fc" id="L59">    @SerializedName(&quot;recipeId&quot;)</span>
+<span class="fc" id="L60">    val recipeId: String? = null,</span>
+<span class="fc" id="L61">    @SerializedName(&quot;quantity&quot;)</span>
+    val quantity: Double,
+<span class="fc" id="L63">)</span>
+
+/**
+ * Wastage Trend DTO (for charts/dashboard)
+ * Maps to: WastageTrendDto in WastageDtos.cs
+ */
+<span class="nc" id="L69">@Parcelize</span>
+<span class="fc" id="L70">data class WastageTrendDto(</span>
+<span class="fc" id="L71">    @SerializedName(&quot;date&quot;)</span>
+    val date: String,
+<span class="fc" id="L73">    @SerializedName(&quot;totalQuantity&quot;)</span>
+    val totalQuantity: Double,
+<span class="fc" id="L75">    @SerializedName(&quot;totalCarbonFootprint&quot;)</span>
+    val totalCarbonFootprint: Double,
+<span class="fc" id="L77">    @SerializedName(&quot;itemBreakdown&quot;)</span>
+    val itemBreakdown: List&lt;ItemWastageDto&gt;,
+<span class="nc" id="L79">) : Parcelable</span>
+
+/**
+ * Item Wastage DTO (nested in WastageTrendDto)
+ * Maps to: ItemWastageDto in WastageDtos.cs
+ */
+<span class="nc" id="L85">@Parcelize</span>
+<span class="fc" id="L86">data class ItemWastageDto(</span>
+<span class="fc" id="L87">    @SerializedName(&quot;ingredientId&quot;)</span>
+<span class="fc" id="L88">    val ingredientId: String? = null,</span>
+<span class="fc" id="L89">    @SerializedName(&quot;recipeId&quot;)</span>
+<span class="fc" id="L90">    val recipeId: String? = null,</span>
+<span class="fc" id="L91">    @SerializedName(&quot;displayName&quot;)</span>
+    val displayName: String,
+<span class="fc" id="L93">    @SerializedName(&quot;unit&quot;)</span>
+    val unit: String,
+<span class="fc" id="L95">    @SerializedName(&quot;quantity&quot;)</span>
+    val quantity: Double,
+<span class="fc" id="L97">    @SerializedName(&quot;carbonFootprint&quot;)</span>
+    val carbonFootprint: Double,
+<span class="pc" id="L99">) : Parcelable</span>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

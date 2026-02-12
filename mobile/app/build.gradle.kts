@@ -96,11 +96,12 @@ android {
             isReturnDefaultValues = true
         }
         animationsDisabled = true
-        execution = "ANDROIDX_TEST_ORCHESTRATOR"
+        // execution = "ANDROIDX_TEST_ORCHESTRATOR"
     }
 
     lint {
         abortOnError = true
+        checkTestSources = false
         disable += "NullSafeMutableLiveData"
     }
 }
@@ -186,6 +187,13 @@ jacoco {
     toolVersion = "0.8.12"
 }
 
+// Disable lint analysis on test sources — AGP bug crashes on Hilt/FIR resolution
+tasks.configureEach {
+    if (name.startsWith("lintAnalyze") && (name.contains("UnitTest") || name.contains("AndroidTest"))) {
+        enabled = false
+    }
+}
+
 tasks.withType<Test> {
     testLogging {
         showStandardStreams = true
@@ -193,8 +201,10 @@ tasks.withType<Test> {
         exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
     }
     configure<JacocoTaskExtension> {
+        isIncludeNoLocationClasses = true
         excludes =
             listOf(
+                "jdk.internal.*",
                 "**/R.class",
                 "**/R\$*.class",
                 "**/BuildConfig.*",
@@ -202,28 +212,62 @@ tasks.withType<Test> {
                 "**/*Test*.*",
                 "android/**/*.*",
                 "**/di/**",
+                "dagger/**",
+                "hilt_aggregated_deps/**",
+                "**/*_HiltModules*.*",
+                "**/*_Factory.*",
+                "**/*_MembersInjector.*",
+                "**/*_GeneratedInjector.*",
+                "**/Hilt_*.*",
+                "**/*_ComponentTreeDeps.*",
             )
     }
 }
 
+// Unit-test-only coverage report
 tasks.register<JacocoReport>("jacocoTestReportDebug") {
-    dependsOn("testUatDebugUnitTest")
+    dependsOn("testLocalDebugUnitTest")
     reports {
         xml.required.set(true)
         html.required.set(true)
     }
     val fileFilter =
         listOf(
+            // Android generated
             "**/R.class",
             "**/R\$*.class",
             "**/BuildConfig.*",
             "**/Manifest*.*",
             "**/*Test*.*",
             "android/**/*.*",
+            // DI & Hilt generated
             "**/di/**",
+            "dagger/**",
+            "hilt_aggregated_deps/**",
+            "**/*_HiltModules*.*",
+            "**/*_Factory.*",
+            "**/*_MembersInjector.*",
+            "**/*_GeneratedInjector.*",
+            "**/Hilt_*.*",
+            "**/*_ComponentTreeDeps.*",
+            // UI layer (covered by instrumented tests, not unit tests)
+            "**/*Fragment.*",
+            "**/*Fragment\$*.*",
+            "**/*Activity.*",
+            "**/*Activity\$*.*",
+            "**/*Adapter.*",
+            "**/*Adapter\$*.*",
+            "**/*MarkerView.*",
+            "**/*MarkerView\$*.*",
+            "**/*Application.*",
+            // Network interfaces (no logic to test)
+            "**/network/api/**",
+            // Android-framework-dependent classes (tested via instrumented tests)
+            "**/data/TokenManager.*",
+            "**/data/TokenManager\$*.*",
         )
     val debugTree =
-        fileTree("${layout.buildDirectory.get().asFile}/tmp/kotlin-classes/uatDebug") {
+        fileTree("${layout.buildDirectory.get().asFile}/tmp/kotlin-classes/localDebug") {
             exclude(fileFilter)
         }
     val mainSrc = "${project.projectDir}/src/main/java"
@@ -231,7 +275,67 @@ tasks.register<JacocoReport>("jacocoTestReportDebug") {
     classDirectories.setFrom(files(debugTree))
     executionData.setFrom(
         fileTree(layout.buildDirectory.get().asFile) {
-            include("jacoco/testUatDebugUnitTest.exec")
+            include("outputs/unit_test_code_coverage/localDebugUnitTest/testLocalDebugUnitTest.exec")
+        },
+    )
+}
+
+// Consolidated coverage report combining Unit Tests + Instrumented Tests
+tasks.register<JacocoReport>("jacocoFullCoverageReport") {
+    dependsOn("testLocalDebugUnitTest")
+    // Run instrumented tests separately first: ./gradlew connectedLocalDebugAndroidTest
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+    val fileFilter =
+        listOf(
+            // Android generated
+            "**/R.class",
+            "**/R\$*.class",
+            "**/BuildConfig.*",
+            "**/Manifest*.*",
+            "**/*Test*.*",
+            "android/**/*.*",
+            // DI & Hilt generated
+            "**/di/**",
+            "dagger/**",
+            "hilt_aggregated_deps/**",
+            "**/*_HiltModules*.*",
+            "**/*_Factory.*",
+            "**/*_MembersInjector.*",
+            "**/*_GeneratedInjector.*",
+            "**/Hilt_*.*",
+            "**/*_ComponentTreeDeps.*",
+            "**/Dagger*.*",
+            "**/*_HiltComponents*.*",
+            // Generated ViewBinding classes
+            "**/databinding/**",
+            // Application class (no testable logic)
+            "**/*Application.*",
+            "**/*Application\$*.*",
+            // Network interfaces (no logic to test)
+            "**/network/api/**",
+        )
+    // Use Hilt ASM-transformed classes so class IDs match instrumented test .ec files
+    val debugTree =
+        fileTree(
+            "${layout.buildDirectory.get().asFile}/intermediates/classes/localDebug/transformLocalDebugClassesWithAsm/dirs",
+        ) {
+            exclude(fileFilter)
+        }
+    val mainSrc = "${project.projectDir}/src/main/java"
+    sourceDirectories.setFrom(files(mainSrc))
+    classDirectories.setFrom(files(debugTree))
+    executionData.setFrom(
+        fileTree(layout.buildDirectory.get().asFile) {
+            include(
+                // Unit test coverage data (.exec)
+                "outputs/unit_test_code_coverage/localDebugUnitTest/testLocalDebugUnitTest.exec",
+                // Instrumented test coverage data (.ec)
+                "outputs/code_coverage/localDebugAndroidTest/connected/**/*.ec",
+            )
         },
     )
 }

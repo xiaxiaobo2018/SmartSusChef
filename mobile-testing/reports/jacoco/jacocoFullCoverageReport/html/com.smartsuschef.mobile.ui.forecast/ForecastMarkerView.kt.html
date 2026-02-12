@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ForecastMarkerView.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">com.smartsuschef.mobile.ui.forecast</a> &gt; <span class="el_source">ForecastMarkerView.kt</span></div><h1>ForecastMarkerView.kt</h1><pre class="source lang-java linenums">package com.smartsuschef.mobile.ui.forecast
+
+import android.annotation.SuppressLint
+import android.content.Context
+import android.widget.TextView
+import com.github.mikephil.charting.components.MarkerView
+import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.highlight.Highlight
+import com.github.mikephil.charting.utils.MPPointF
+import com.smartsuschef.mobile.R
+
+/**
+ * Enhanced Marker View for displaying detailed data on chart tap
+ * Supports:
+ * - Simple values (Prediction Summary)
+ * - Stacked bar breakdown (Dishes Forecast)
+ * - Grouped bar comparison (Predicted vs Actual)
+ */
+@SuppressLint(&quot;ViewConstructor&quot;)
+<span class="fc" id="L21">class ForecastMarkerView(context: Context, layoutResource: Int) : MarkerView(context, layoutResource) {</span>
+<span class="fc" id="L22">    private val tvDate: TextView = findViewById(R.id.tvMarkerDate)</span>
+<span class="fc" id="L23">    private val tvQuantity: TextView = findViewById(R.id.tvMarkerQuantity)</span>
+<span class="fc" id="L24">    private val tvDetails: TextView = findViewById(R.id.tvMarkerDetails)</span>
+
+    // Store dish names for stacked bars
+<span class="pc" id="L27">    var dishNames: Array&lt;String&gt;? = null</span>
+
+    // Store date labels for display
+<span class="pc" id="L30">    var labels: List&lt;String&gt;? = null</span>
+
+    // Store chart type for proper formatting
+<span class="pc" id="L33">    var chartType: ChartType = ChartType.SIMPLE</span>
+
+    enum class ChartType {
+<span class="fc" id="L36">        SIMPLE, // Prediction Summary (single value)</span>
+<span class="fc" id="L37">        STACKED, // Dishes Forecast (breakdown)</span>
+<span class="fc" id="L38">        COMPARISON, // Comparison chart (predicted vs actual)</span>
+<span class="nc" id="L39">    }</span>
+
+    override fun refreshContent(
+        e: Entry?,
+        highlight: Highlight?,
+    ) {
+<span class="nc bnc" id="L45" title="All 2 branches missed.">        if (e == null) return</span>
+
+        // Set date if available
+<span class="nc" id="L48">        val index = e.x.toInt()</span>
+<span class="nc bnc" id="L49" title="All 4 branches missed.">        val dateLabel = labels?.getOrNull(index) ?: &quot;&quot;</span>
+<span class="nc" id="L50">        tvDate.text = dateLabel</span>
+<span class="nc bnc" id="L51" title="All 4 branches missed.">        tvDate.visibility = if (dateLabel.isNotEmpty()) VISIBLE else GONE</span>
+
+<span class="nc bnc" id="L53" title="All 3 branches missed.">        when (chartType) {</span>
+            ChartType.SIMPLE -&gt; {
+                // Prediction Summary Chart
+<span class="nc" id="L56">                val quantity = e.y.toInt()</span>
+<span class="nc" id="L57">                tvQuantity.text = &quot;Dishes: $quantity&quot;</span>
+<span class="nc" id="L58">                tvDetails.visibility = GONE</span>
+            }
+
+            ChartType.STACKED -&gt; {
+                // Dishes Forecast Chart - Show breakdown
+<span class="nc bnc" id="L63" title="All 4 branches missed.">                if (e is BarEntry &amp;&amp; e.yVals != null) {</span>
+<span class="nc" id="L64">                    val total = e.yVals.sum().toInt()</span>
+<span class="nc" id="L65">                    tvQuantity.text = &quot;Total: $total dishes&quot;</span>
+
+                    // Build breakdown string
+<span class="nc" id="L68">                    val breakdown = StringBuilder()</span>
+<span class="nc" id="L69">                    e.yVals.forEachIndexed { index, value -&gt;</span>
+<span class="nc bnc" id="L70" title="All 4 branches missed.">                        val dishName = dishNames?.getOrNull(index) ?: &quot;Dish ${index + 1}&quot;</span>
+<span class="nc" id="L71">                        breakdown.append(&quot;$dishName: ${value.toInt()}\n&quot;)</span>
+<span class="nc" id="L72">                    }</span>
+
+<span class="nc" id="L74">                    tvDetails.text = breakdown.toString().trim()</span>
+<span class="nc" id="L75">                    tvDetails.visibility = VISIBLE</span>
+                } else {
+<span class="nc" id="L77">                    tvQuantity.text = &quot;Dishes: ${e.y.toInt()}&quot;</span>
+<span class="nc" id="L78">                    tvDetails.visibility = GONE</span>
+                }
+            }
+
+            ChartType.COMPARISON -&gt; {
+                // Comparison Chart - Show both predicted and actual
+                // The data should be passed via Entry.data
+<span class="nc bnc" id="L85" title="All 2 branches missed.">                if (e.data is ComparisonData) {</span>
+<span class="nc" id="L86">                    val data = e.data as ComparisonData</span>
+<span class="nc" id="L87">                    tvQuantity.text = &quot;Predicted: ${data.predicted}&quot;</span>
+<span class="nc" id="L88">                    tvDetails.text = &quot;Actual: ${data.actual}&quot;</span>
+<span class="nc" id="L89">                    tvDetails.visibility = VISIBLE</span>
+                } else {
+                    // Fallback if data not provided
+<span class="nc" id="L92">                    tvQuantity.text = &quot;Dishes: ${e.y.toInt()}&quot;</span>
+<span class="nc" id="L93">                    tvDetails.visibility = GONE</span>
+                }
+            }
+        }
+
+<span class="nc" id="L98">        super.refreshContent(e, highlight)</span>
+<span class="nc" id="L99">    }</span>
+
+    override fun getOffset(): MPPointF {
+        // Center the marker above the selected value
+<span class="nc" id="L103">        return MPPointF((-(width / 2)).toFloat(), (-height).toFloat())</span>
+    }
+
+    /**
+     * Data class for comparison chart
+     */
+<span class="fc" id="L109">    data class ComparisonData(</span>
+<span class="pc" id="L110">        val predicted: Int,</span>
+<span class="pc" id="L111">        val actual: Int,</span>
+    )
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

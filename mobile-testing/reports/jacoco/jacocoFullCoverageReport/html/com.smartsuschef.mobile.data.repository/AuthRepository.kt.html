@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AuthRepository.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">com.smartsuschef.mobile.data.repository</a> &gt; <span class="el_source">AuthRepository.kt</span></div><h1>AuthRepository.kt</h1><pre class="source lang-java linenums">package com.smartsuschef.mobile.data.repository
+
+import android.util.Log
+import com.smartsuschef.mobile.data.TokenManager
+import com.smartsuschef.mobile.network.api.AuthApiService
+import com.smartsuschef.mobile.network.dto.ChangePasswordRequest
+import com.smartsuschef.mobile.network.dto.ForgotPasswordRequest
+import com.smartsuschef.mobile.network.dto.LoginRequest
+import com.smartsuschef.mobile.network.dto.LoginResponse
+import com.smartsuschef.mobile.util.Resource
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import retrofit2.HttpException
+import java.io.IOException
+import javax.inject.Inject
+import javax.inject.Singleton
+
+@Singleton
+class AuthRepository
+<span class="fc" id="L20">    @Inject</span>
+    constructor(
+<span class="fc" id="L22">        private val authApi: AuthApiService,</span>
+<span class="fc" id="L23">        private val tokenManager: TokenManager,</span>
+    ) {
+        companion object {
+            private const val TAG = &quot;AuthRepository&quot;
+            private const val HTTP_UNAUTHORIZED = 401
+            private const val HTTP_BAD_REQUEST = 400
+        }
+
+        /**
+         * Executes login and saves the token if successful.
+         * Maps to .NET AuthController.Login
+         */
+        suspend fun login(request: LoginRequest): Resource&lt;LoginResponse&gt; {
+<span class="fc" id="L36">            return withContext(Dispatchers.IO) {</span>
+<span class="fc" id="L37">                try {</span>
+<span class="fc" id="L38">                    val response = authApi.login(request)</span>
+<span class="pc bpc" id="L39" title="1 of 4 branches missed.">                    if (response.isSuccessful &amp;&amp; response.body() != null) {</span>
+<span class="fc" id="L40">                        val loginResponse = response.body()!!</span>
+
+                        // Persist the token and user role locally
+<span class="fc" id="L43">                        tokenManager.saveToken(loginResponse.token)</span>
+<span class="fc" id="L44">                        tokenManager.saveUserRole(loginResponse.user.role)</span>
+
+<span class="fc" id="L46">                        Resource.Success(loginResponse)</span>
+                    } else {
+<span class="fc" id="L48">                        Resource.Error(&quot;Invalid username or password&quot;)</span>
+                    }
+<span class="fc" id="L50">                } catch (e: Exception) {</span>
+<span class="fc" id="L51">                    Log.e(TAG, &quot;Login failed: ${e.localizedMessage}&quot;, e)</span>
+<span class="pc bpc" id="L52" title="1 of 2 branches missed.">                    Resource.Error(e.localizedMessage ?: &quot;An unexpected error occurred&quot;)</span>
+<span class="fc" id="L53">                }</span>
+            }
+        }
+
+        /**
+         * Sends a password reset request.
+         */
+        suspend fun forgotPassword(request: ForgotPasswordRequest): Resource&lt;Unit&gt; {
+<span class="fc" id="L61">            return withContext(Dispatchers.IO) {</span>
+<span class="fc" id="L62">                try {</span>
+<span class="fc" id="L63">                    val response = authApi.forgotPassword(request)</span>
+<span class="fc bfc" id="L64" title="All 2 branches covered.">                    if (response.isSuccessful) {</span>
+<span class="fc" id="L65">                        Resource.Success(Unit)</span>
+                    } else {
+<span class="fc" id="L67">                        Log.e(TAG, &quot;Failed to send password reset request: ${response.message()}&quot;, null)</span>
+<span class="fc" id="L68">                        Resource.Error(&quot;Failed to send password reset request: ${response.message()}&quot;)</span>
+                    }
+<span class="fc" id="L70">                } catch (e: HttpException) {</span>
+<span class="fc" id="L71">                    Log.e(TAG, &quot;HTTP error in forgotPassword: ${e.message()}&quot;, e)</span>
+<span class="fc" id="L72">                    Resource.Error(&quot;An unexpected error occurred: ${e.message()}&quot;)</span>
+<span class="fc" id="L73">                } catch (e: IOException) {</span>
+<span class="fc" id="L74">                    Log.e(TAG, &quot;Network error in forgotPassword: ${e.message}&quot;, e)</span>
+<span class="fc" id="L75">                    Resource.Error(&quot;Couldn't reach the server. Check your internet connection.&quot;)</span>
+<span class="nc" id="L76">                } catch (e: Exception) {</span>
+<span class="nc" id="L77">                    Log.e(TAG, &quot;Unexpected error in forgotPassword: ${e.message}&quot;, e)</span>
+<span class="pc" id="L78">                    Resource.Error(&quot;An unexpected error occurred: ${e.message}&quot;)</span>
+<span class="fc" id="L79">                }</span>
+            }
+        }
+
+        /**
+         * Change user password
+         * Requires current password for verification
+         * Maps to .NET AuthController.ChangePassword
+         */
+        suspend fun changePassword(request: ChangePasswordRequest): Resource&lt;Unit&gt; {
+<span class="fc" id="L89">            return withContext(Dispatchers.IO) {</span>
+<span class="fc" id="L90">                try {</span>
+<span class="fc" id="L91">                    val response = authApi.changePassword(request)</span>
+<span class="fc bfc" id="L92" title="All 2 branches covered.">                    if (response.isSuccessful) {</span>
+<span class="fc" id="L93">                        Resource.Success(Unit)</span>
+                    } else {
+                        // Handle session expiry by logging out
+<span class="fc bfc" id="L96" title="All 2 branches covered.">                        if (response.code() == HTTP_UNAUTHORIZED) {</span>
+<span class="fc" id="L97">                            logout()</span>
+<span class="fc" id="L98">                            Log.e(TAG, &quot;Session expired, user logged out.&quot;, null)</span>
+<span class="fc" id="L99">                            return@withContext Resource.Error(&quot;Session expired. Please log in again.&quot;)</span>
+                        }
+
+                        // Parse other error messages from response
+<span class="pc bpc" id="L103" title="1 of 2 branches missed.">                        val errorBody = response.errorBody()?.string()</span>
+<span class="fc" id="L104">                        val errorMessage =</span>
+<span class="fc" id="L105">                            when {</span>
+<span class="pc bpc" id="L106" title="1 of 6 branches missed.">                                errorBody?.contains(&quot;incorrect&quot;, ignoreCase = true) == true -&gt;</span>
+<span class="fc" id="L107">                                    &quot;Current password is incorrect&quot;</span>
+<span class="pc bpc" id="L108" title="1 of 6 branches missed.">                                errorBody?.contains(&quot;invalid&quot;, ignoreCase = true) == true -&gt;</span>
+<span class="fc" id="L109">                                    &quot;Invalid password format&quot;</span>
+<span class="fc bfc" id="L110" title="All 2 branches covered.">                                response.code() == HTTP_BAD_REQUEST -&gt;</span>
+<span class="fc" id="L111">                                    &quot;Password does not meet requirements&quot;</span>
+                                else -&gt;
+<span class="fc" id="L113">                                    &quot;Failed to change password: ${response.message()}&quot;</span>
+                            }
+<span class="fc" id="L115">                        Log.e(TAG, &quot;Failed to change password: $errorMessage&quot;, null)</span>
+<span class="fc" id="L116">                        Resource.Error(errorMessage)</span>
+                    }
+<span class="fc" id="L118">                } catch (e: HttpException) {</span>
+<span class="fc" id="L119">                    Log.e(TAG, &quot;HTTP error in changePassword: ${e.message()}&quot;, e)</span>
+<span class="fc" id="L120">                    Resource.Error(&quot;An unexpected error occurred: ${e.message()}&quot;)</span>
+<span class="fc" id="L121">                } catch (e: IOException) {</span>
+<span class="fc" id="L122">                    Log.e(TAG, &quot;Network error in changePassword: ${e.message}&quot;, e)</span>
+<span class="fc" id="L123">                    Resource.Error(&quot;Couldn't reach the server. Check your internet connection.&quot;)</span>
+<span class="nc" id="L124">                } catch (e: Exception) {</span>
+<span class="nc" id="L125">                    Log.e(TAG, &quot;Unexpected error in changePassword: ${e.message}&quot;, e)</span>
+<span class="pc" id="L126">                    Resource.Error(&quot;An unexpected error occurred: ${e.message}&quot;)</span>
+<span class="fc" id="L127">                }</span>
+            }
+        }
+
+        /**
+         * Clears local session data.
+         * Essential for your security requirement to log out after inactivity.
+         */
+        fun logout() {
+<span class="fc" id="L136">            tokenManager.clearSession()</span>
+<span class="fc" id="L137">        }</span>
+
+        /**
+         * Checks if a user is currently authenticated.
+         */
+        fun isUserLoggedIn(): Boolean {
+<span class="fc bfc" id="L143" title="All 6 branches covered.">            return !tokenManager.getToken().isNullOrEmpty()</span>
+        }
+    }
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

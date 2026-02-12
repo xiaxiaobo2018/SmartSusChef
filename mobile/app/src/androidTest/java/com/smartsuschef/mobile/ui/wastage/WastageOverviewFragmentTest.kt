@@ -13,6 +13,7 @@ import com.smartsuschef.mobile.R
 import com.smartsuschef.mobile.data.TokenManager
 import com.smartsuschef.mobile.di.TestNetworkModule
 import com.smartsuschef.mobile.ui.dashboard.DashboardActivity
+import com.smartsuschef.mobile.util.AnimationDisableRule
 import com.smartsuschef.mobile.util.OkHttp3IdlingResource
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -34,6 +35,9 @@ import javax.inject.Inject
 class WastageOverviewFragmentTest {
     @get:Rule(order = 0)
     val hiltRule = HiltAndroidRule(this)
+
+    @get:Rule(order = 1)
+    val animationDisableRule = AnimationDisableRule()
 
     @Inject
     lateinit var tokenManager: TokenManager
@@ -210,6 +214,27 @@ class WastageOverviewFragmentTest {
                         }
 
                     path.contains("/api/sales/trend") ->
+                        MockResponse()
+                            .setResponseCode(200)
+                            .setBody("[]")
+                            .addHeader("Content-Type", "application/json")
+
+                    path.contains("/api/forecast/weather") ->
+                        MockResponse()
+                            .setResponseCode(200)
+                            .setBody(
+                                """
+                                {
+                                    "temperature": 30.5,
+                                    "condition": "Partly Cloudy",
+                                    "description": "Partly Cloudy",
+                                    "humidity": 75
+                                }
+                                """.trimIndent(),
+                            )
+                            .addHeader("Content-Type", "application/json")
+
+                    path.contains("/api/forecast/holidays") ->
                         MockResponse()
                             .setResponseCode(200)
                             .setBody("[]")

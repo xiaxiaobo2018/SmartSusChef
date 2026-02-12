@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ForecastRepository.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">com.smartsuschef.mobile.data.repository</a> &gt; <span class="el_source">ForecastRepository.kt</span></div><h1>ForecastRepository.kt</h1><pre class="source lang-java linenums">package com.smartsuschef.mobile.data.repository
+
+import android.util.Log
+import com.smartsuschef.mobile.network.api.ForecastApiService
+import com.smartsuschef.mobile.network.dto.ForecastDto
+import com.smartsuschef.mobile.network.dto.HolidayDto
+import com.smartsuschef.mobile.network.dto.WeatherDto
+import com.smartsuschef.mobile.util.Resource
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import retrofit2.HttpException
+import java.io.IOException
+import javax.inject.Inject
+
+class ForecastRepository
+<span class="fc" id="L16">    @Inject</span>
+    constructor(
+<span class="fc" id="L18">        private val forecastApiService: ForecastApiService,</span>
+    ) {
+        companion object {
+            private const val TAG = &quot;ForecastRepository&quot;
+        }
+
+<span class="fc" id="L24">        suspend fun getForecast(</span>
+            days: Int,
+<span class="fc" id="L26">            includePastDays: Int = 0,</span>
+        ): Resource&lt;List&lt;ForecastDto&gt;&gt; {
+<span class="fc" id="L28">            return withContext(Dispatchers.IO) {</span>
+<span class="fc" id="L29">                try {</span>
+<span class="fc" id="L30">                    val response = forecastApiService.getForecast(days, includePastDays)</span>
+<span class="fc bfc" id="L31" title="All 2 branches covered.">                    if (response.isSuccessful) {</span>
+<span class="pc bpc" id="L32" title="1 of 2 branches missed.">                        Resource.Success(response.body() ?: emptyList())</span>
+                    } else {
+<span class="pc bpc" id="L34" title="1 of 2 branches missed.">                        val errorBody = response.errorBody()?.string()</span>
+<span class="pc bpc" id="L35" title="1 of 2 branches missed.">                        Resource.Error(&quot;Failed to fetch forecast: ${errorBody ?: response.message()}&quot;)</span>
+                    }
+<span class="fc" id="L37">                } catch (e: HttpException) {</span>
+<span class="fc" id="L38">                    Log.e(TAG, &quot;HTTP error in getForecast: ${e.message()}&quot;, e)</span>
+<span class="fc" id="L39">                    Resource.Error(&quot;An unexpected error occurred: ${e.message()}&quot;)</span>
+<span class="fc" id="L40">                } catch (e: IOException) {</span>
+<span class="fc" id="L41">                    Log.e(TAG, &quot;Network error in getForecast: ${e.message}&quot;, e)</span>
+<span class="fc" id="L42">                    Resource.Error(&quot;Couldn't reach the server. Check your internet connection.&quot;)</span>
+<span class="nc" id="L43">                } catch (e: Exception) {</span>
+<span class="nc" id="L44">                    Log.e(TAG, &quot;Unexpected error in getForecast: ${e.message}&quot;, e)</span>
+<span class="pc" id="L45">                    Resource.Error(&quot;An unexpected error occurred: ${e.message}&quot;)</span>
+<span class="fc" id="L46">                }</span>
+            }
+        }
+
+        suspend fun getWeather(): Resource&lt;WeatherDto?&gt; {
+<span class="nc" id="L51">            return withContext(Dispatchers.IO) {</span>
+<span class="nc" id="L52">                try {</span>
+<span class="nc" id="L53">                    val response = forecastApiService.getWeather()</span>
+<span class="nc bnc" id="L54" title="All 2 branches missed.">                    if (response.isSuccessful) {</span>
+<span class="nc" id="L55">                        Resource.Success(response.body())</span>
+                    } else {
+<span class="nc bnc" id="L57" title="All 2 branches missed.">                        val errorBody = response.errorBody()?.string()</span>
+<span class="nc bnc" id="L58" title="All 2 branches missed.">                        Resource.Error(&quot;Failed to fetch weather: ${errorBody ?: response.message()}&quot;)</span>
+                    }
+<span class="nc" id="L60">                } catch (e: HttpException) {</span>
+<span class="nc" id="L61">                    Log.e(TAG, &quot;HTTP error in getWeather: ${e.message()}&quot;, e)</span>
+<span class="nc" id="L62">                    Resource.Error(&quot;An unexpected error occurred: ${e.message()}&quot;)</span>
+<span class="nc" id="L63">                } catch (e: IOException) {</span>
+<span class="nc" id="L64">                    Log.e(TAG, &quot;Network error in getWeather: ${e.message}&quot;, e)</span>
+<span class="nc" id="L65">                    Resource.Error(&quot;Couldn't reach the server. Check your internet connection.&quot;)</span>
+<span class="nc" id="L66">                } catch (e: Exception) {</span>
+<span class="nc" id="L67">                    Log.e(TAG, &quot;Unexpected error in getWeather: ${e.message}&quot;, e)</span>
+<span class="nc" id="L68">                    Resource.Error(&quot;An unexpected error occurred: ${e.message}&quot;)</span>
+<span class="nc" id="L69">                }</span>
+            }
+        }
+
+        suspend fun getHolidays(year: Int): Resource&lt;List&lt;HolidayDto&gt;&gt; {
+<span class="nc" id="L74">            return withContext(Dispatchers.IO) {</span>
+<span class="nc" id="L75">                try {</span>
+<span class="nc" id="L76">                    val response = forecastApiService.getHolidays(year)</span>
+<span class="nc bnc" id="L77" title="All 2 branches missed.">                    if (response.isSuccessful) {</span>
+<span class="nc bnc" id="L78" title="All 2 branches missed.">                        Resource.Success(response.body() ?: emptyList())</span>
+                    } else {
+<span class="nc bnc" id="L80" title="All 2 branches missed.">                        val errorBody = response.errorBody()?.string()</span>
+<span class="nc bnc" id="L81" title="All 2 branches missed.">                        Resource.Error(&quot;Failed to fetch holidays: ${errorBody ?: response.message()}&quot;)</span>
+                    }
+<span class="nc" id="L83">                } catch (e: HttpException) {</span>
+<span class="nc" id="L84">                    Log.e(TAG, &quot;HTTP error in getHolidays: ${e.message()}&quot;, e)</span>
+<span class="nc" id="L85">                    Resource.Error(&quot;An unexpected error occurred: ${e.message()}&quot;)</span>
+<span class="nc" id="L86">                } catch (e: IOException) {</span>
+<span class="nc" id="L87">                    Log.e(TAG, &quot;Network error in getHolidays: ${e.message}&quot;, e)</span>
+<span class="nc" id="L88">                    Resource.Error(&quot;Couldn't reach the server. Check your internet connection.&quot;)</span>
+<span class="nc" id="L89">                } catch (e: Exception) {</span>
+<span class="nc" id="L90">                    Log.e(TAG, &quot;Unexpected error in getHolidays: ${e.message}&quot;, e)</span>
+<span class="nc" id="L91">                    Resource.Error(&quot;An unexpected error occurred: ${e.message}&quot;)</span>
+<span class="nc" id="L92">                }</span>
+            }
+        }
+    }
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

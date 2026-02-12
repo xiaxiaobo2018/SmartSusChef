@@ -1,0 +1,516 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ForecastFragment.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">com.smartsuschef.mobile.ui.forecast</a> &gt; <span class="el_source">ForecastFragment.kt</span></div><h1>ForecastFragment.kt</h1><pre class="source lang-java linenums">package com.smartsuschef.mobile.ui.forecast
+
+import android.graphics.Color
+import android.os.Bundle
+import android.util.Log
+import android.view.View
+import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.github.mikephil.charting.components.Legend
+import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.data.CombinedData
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import com.smartsuschef.mobile.R
+import com.smartsuschef.mobile.databinding.FragmentForecastBinding
+import com.smartsuschef.mobile.util.Resource
+import com.smartsuschef.mobile.util.showToast
+import dagger.hilt.android.AndroidEntryPoint
+import java.text.SimpleDateFormat
+import java.util.Locale
+import kotlin.math.abs
+
+<span class="fc" id="L31">@AndroidEntryPoint</span>
+<span class="fc" id="L32">class ForecastFragment : Fragment(R.layout.fragment_forecast) {</span>
+    companion object {
+        private const val TAG = &quot;ForecastFragment&quot;
+        private const val HUNDRED_PERCENT = 100.0
+    }
+
+    private var _binding: FragmentForecastBinding? = null
+<span class="fc" id="L39">    private val binding get() = _binding!!</span>
+<span class="fc" id="L40">    private val viewModel: ForecastViewModel by viewModels()</span>
+    private lateinit var forecastSummaryAdapter: ForecastSummaryAdapter
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
+<span class="fc" id="L47">        super.onViewCreated(view, savedInstanceState)</span>
+<span class="fc" id="L48">        _binding = FragmentForecastBinding.bind(view)</span>
+
+<span class="fc" id="L50">        setupRecyclerView()</span>
+<span class="fc" id="L51">        observeViewModel()</span>
+<span class="fc" id="L52">    }</span>
+
+    private fun setupRecyclerView() {
+<span class="fc" id="L55">        forecastSummaryAdapter = ForecastSummaryAdapter(emptyList(), emptyList())</span>
+<span class="fc" id="L56">        binding.rvIngredientForecast.apply {</span>
+<span class="pc bpc" id="L57" title="1 of 2 branches missed.">            adapter = forecastSummaryAdapter</span>
+<span class="fc" id="L58">            layoutManager = LinearLayoutManager(requireContext())</span>
+<span class="fc" id="L59">            setHasFixedSize(true)</span>
+<span class="fc" id="L60">        }</span>
+<span class="fc" id="L61">    }</span>
+
+    private fun observeViewModel() {
+<span class="fc" id="L64">        observeSummaryTrend()</span>
+<span class="fc" id="L65">        observeDishForecasts()</span>
+<span class="fc" id="L66">        observeIngredientForecast()</span>
+<span class="fc" id="L67">        observeComparisonData()</span>
+<span class="fc" id="L68">    }</span>
+
+    private fun observeSummaryTrend() {
+<span class="fc" id="L71">        viewModel.summaryTrend.observe(viewLifecycleOwner) { result -&gt;</span>
+<span class="fc" id="L72">            when (result) {</span>
+<span class="fc bfc" id="L73" title="All 2 branches covered.">                is Resource.Success -&gt; {</span>
+<span class="fc" id="L74">                    binding.progressBar.isVisible = false</span>
+<span class="pc bpc" id="L75" title="1 of 2 branches missed.">                    result.data?.let { setupSummaryChart(it) }</span>
+                }
+<span class="fc bfc" id="L77" title="All 2 branches covered.">                is Resource.Loading -&gt; binding.progressBar.isVisible = true</span>
+<span class="fc" id="L78">                is Resource.Error -&gt; {</span>
+<span class="fc" id="L79">                    binding.progressBar.isVisible = false</span>
+<span class="pc bpc" id="L80" title="1 of 2 branches missed.">                    requireContext().showToast(result.message ?: &quot;Error loading forecast&quot;)</span>
+                }
+            }
+<span class="fc" id="L83">        }</span>
+<span class="fc" id="L84">    }</span>
+
+    private fun observeDishForecasts() {
+<span class="fc" id="L87">        viewModel.dishForecasts.observe(viewLifecycleOwner) { result -&gt;</span>
+<span class="fc" id="L88">            when (result) {</span>
+<span class="pc bpc" id="L89" title="1 of 4 branches missed.">                is Resource.Success -&gt; result.data?.let { setupStackedBarChart(it) }</span>
+<span class="pc bpc" id="L90" title="1 of 4 branches missed.">                is Resource.Error -&gt; requireContext().showToast(result.message ?: &quot;Error&quot;)</span>
+                else -&gt; {}
+            }
+<span class="fc" id="L93">        }</span>
+<span class="fc" id="L94">    }</span>
+
+    private fun observeIngredientForecast() {
+<span class="fc" id="L97">        viewModel.ingredientForecast.observe(viewLifecycleOwner) { result -&gt;</span>
+<span class="fc" id="L98">            when (result) {</span>
+<span class="fc bfc" id="L99" title="All 2 branches covered.">                is Resource.Success -&gt; {</span>
+<span class="pc bpc" id="L100" title="1 of 2 branches missed.">                    result.data?.let { ingredientData -&gt;</span>
+<span class="pc bpc" id="L101" title="1 of 2 branches missed.">                        val dates = viewModel.dateHeaders.value ?: emptyList()</span>
+<span class="pc bpc" id="L102" title="1 of 2 branches missed.">                        forecastSummaryAdapter.updateData(ingredientData, dates)</span>
+<span class="fc" id="L103">                    }</span>
+                }
+<span class="pc bpc" id="L105" title="1 of 4 branches missed.">                is Resource.Error -&gt; requireContext().showToast(result.message ?: &quot;Error&quot;)</span>
+                else -&gt; {}
+            }
+<span class="fc" id="L108">        }</span>
+<span class="fc" id="L109">    }</span>
+
+    private fun observeComparisonData() {
+<span class="fc" id="L112">        viewModel.comparisonData.observe(viewLifecycleOwner) { result -&gt;</span>
+<span class="fc" id="L113">            when (result) {</span>
+<span class="pc bpc" id="L114" title="1 of 4 branches missed.">                is Resource.Success -&gt; result.data?.let { setupComparisonChart(it) }</span>
+<span class="pc bpc" id="L115" title="1 of 4 branches missed.">                is Resource.Error -&gt; requireContext().showToast(result.message ?: &quot;Error&quot;)</span>
+                else -&gt; {}
+            }
+<span class="fc" id="L118">        }</span>
+<span class="fc" id="L119">    }</span>
+
+    /**
+     * CHART 1: Prediction Summary (Combined Bar + Line)
+     */
+    private fun setupSummaryChart(summaryData: List&lt;DailySummary&gt;) {
+<span class="fc" id="L125">        val (barEntries, lineEntries, labels) = prepareSummaryChartData(summaryData)</span>
+
+<span class="fc" id="L127">        val barSet = createBarDataSet(barEntries)</span>
+<span class="fc" id="L128">        val lineSet = createLineDataSet(lineEntries)</span>
+
+<span class="fc" id="L130">        val combinedData =</span>
+<span class="fc" id="L131">            CombinedData().apply {</span>
+<span class="fc" id="L132">                setData(BarData(barSet))</span>
+<span class="fc" id="L133">                setData(LineData(lineSet))</span>
+<span class="fc" id="L134">            }</span>
+
+<span class="fc" id="L136">        styleSummaryChart(labels, combinedData)</span>
+<span class="fc" id="L137">    }</span>
+
+    @Suppress(&quot;MaxLineLength&quot;)
+    private fun prepareSummaryChartData(summaryData: List&lt;DailySummary&gt;): Triple&lt;List&lt;BarEntry&gt;, List&lt;Entry&gt;, List&lt;String&gt;&gt; {
+<span class="fc" id="L141">        val barEntries = mutableListOf&lt;BarEntry&gt;()</span>
+<span class="fc" id="L142">        val lineEntries = mutableListOf&lt;Entry&gt;()</span>
+<span class="fc" id="L143">        val labels = mutableListOf&lt;String&gt;()</span>
+<span class="fc" id="L144">        var totalDishes = 0</span>
+
+<span class="fc" id="L146">        summaryData.forEachIndexed { index, summary -&gt;</span>
+<span class="fc" id="L147">            barEntries.add(BarEntry(index.toFloat(), summary.totalQuantity.toFloat()))</span>
+<span class="fc" id="L148">            lineEntries.add(Entry(index.toFloat(), summary.totalQuantity.toFloat()))</span>
+<span class="fc" id="L149">            labels.add(formatDate(summary.date))</span>
+<span class="fc" id="L150">            totalDishes += summary.totalQuantity</span>
+<span class="fc" id="L151">        }</span>
+
+<span class="fc" id="L153">        binding.tvTotalWeeklyDishes.text = totalDishes.toString()</span>
+<span class="fc" id="L154">        return Triple(barEntries, lineEntries, labels)</span>
+    }
+
+    private fun createBarDataSet(barEntries: List&lt;BarEntry&gt;): BarDataSet {
+<span class="fc" id="L158">        return BarDataSet(barEntries, &quot;Predicted Sales&quot;).apply {</span>
+<span class="fc" id="L159">            color = ContextCompat.getColor(requireContext(), R.color.forecast_gold)</span>
+<span class="fc" id="L160">            setDrawValues(false)</span>
+<span class="fc" id="L161">        }</span>
+    }
+
+    @Suppress(&quot;MagicNumber&quot;)
+    private fun createLineDataSet(lineEntries: List&lt;Entry&gt;): LineDataSet {
+<span class="fc" id="L166">        return LineDataSet(lineEntries, &quot;Trend&quot;).apply {</span>
+<span class="fc" id="L167">            color = ContextCompat.getColor(requireContext(), R.color.forecast_trend)</span>
+<span class="fc" id="L168">            lineWidth = 2.5f</span>
+<span class="fc" id="L169">            circleRadius = 4f</span>
+<span class="fc" id="L170">            setCircleColor(ContextCompat.getColor(requireContext(), R.color.forecast_trend))</span>
+<span class="fc" id="L171">            mode = LineDataSet.Mode.CUBIC_BEZIER</span>
+<span class="fc" id="L172">            setDrawValues(false)</span>
+<span class="fc" id="L173">            setDrawCircleHole(false)</span>
+<span class="fc" id="L174">        }</span>
+    }
+
+    @Suppress(&quot;MagicNumber&quot;)
+    private fun styleSummaryChart(
+        labels: List&lt;String&gt;,
+        data: CombinedData,
+    ) {
+<span class="fc" id="L182">        binding.summaryCombinedChart.apply {</span>
+<span class="fc" id="L183">            this.data = data</span>
+<span class="fc" id="L184">            description.isEnabled = false</span>
+<span class="fc" id="L185">            setDrawGridBackground(false)</span>
+<span class="fc" id="L186">            setExtraOffsets(10f, 10f, 10f, 20f)</span>
+
+<span class="fc" id="L188">            val markerView = ForecastMarkerView(requireContext(), R.layout.marker_view)</span>
+<span class="fc" id="L189">            markerView.chartView = this</span>
+<span class="fc" id="L190">            markerView.chartType = ForecastMarkerView.ChartType.SIMPLE</span>
+<span class="fc" id="L191">            markerView.labels = labels</span>
+<span class="fc" id="L192">            marker = markerView</span>
+
+<span class="fc" id="L194">            isHighlightPerTapEnabled = true</span>
+<span class="fc" id="L195">            isHighlightPerDragEnabled = false</span>
+
+<span class="fc" id="L197">            xAxis.apply {</span>
+<span class="fc" id="L198">                position = XAxis.XAxisPosition.BOTTOM</span>
+<span class="fc" id="L199">                valueFormatter = IndexAxisValueFormatter(labels)</span>
+<span class="fc" id="L200">                labelRotationAngle = -45f</span>
+<span class="fc" id="L201">                textSize = 8f</span>
+<span class="fc" id="L202">                granularity = 1f</span>
+<span class="fc" id="L203">                setDrawGridLines(false)</span>
+<span class="fc" id="L204">                textColor = ContextCompat.getColor(requireContext(), R.color.muted_text)</span>
+<span class="fc" id="L205">                axisLineColor = Color.TRANSPARENT</span>
+<span class="fc" id="L206">                setAvoidFirstLastClipping(false)</span>
+<span class="fc" id="L207">                axisMinimum = -0.5f</span>
+<span class="fc" id="L208">                axisMaximum = (labels.size - 1).toFloat() + 0.5f</span>
+<span class="fc" id="L209">                setLabelCount(labels.size, false)</span>
+<span class="fc" id="L210">            }</span>
+
+<span class="fc" id="L212">            axisLeft.apply {</span>
+<span class="fc" id="L213">                setDrawGridLines(true)</span>
+<span class="fc" id="L214">                gridColor = ContextCompat.getColor(requireContext(), R.color.border_grey)</span>
+<span class="fc" id="L215">                textColor = ContextCompat.getColor(requireContext(), R.color.muted_text)</span>
+<span class="fc" id="L216">                axisLineColor = Color.TRANSPARENT</span>
+<span class="fc" id="L217">                axisMinimum = 0f</span>
+<span class="fc" id="L218">            }</span>
+
+<span class="fc" id="L220">            axisRight.isEnabled = false</span>
+
+<span class="fc" id="L222">            legend.apply {</span>
+<span class="fc" id="L223">                verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM</span>
+<span class="fc" id="L224">                horizontalAlignment = Legend.LegendHorizontalAlignment.CENTER</span>
+<span class="fc" id="L225">                orientation = Legend.LegendOrientation.HORIZONTAL</span>
+<span class="fc" id="L226">                setDrawInside(false)</span>
+<span class="fc" id="L227">                textColor = ContextCompat.getColor(requireContext(), R.color.muted_text)</span>
+<span class="fc" id="L228">            }</span>
+
+<span class="fc" id="L230">            invalidate()</span>
+<span class="fc" id="L231">        }</span>
+<span class="fc" id="L232">    }</span>
+
+    /**
+     * CHART 2: Dishes Forecast (Stacked Bar Chart)
+     */
+    @Suppress(&quot;MagicNumber&quot;)
+    private fun setupStackedBarChart(forecastData: List&lt;DailyDishForecast&gt;) {
+<span class="fc" id="L239">        val (entries, labels, dishNames) = prepareStackedBarChartData(forecastData)</span>
+
+<span class="fc" id="L241">        val dataSet = createStackedBarDataSet(entries, dishNames)</span>
+<span class="fc" id="L242">        val barData = BarData(dataSet).apply { barWidth = 0.8f }</span>
+
+<span class="fc" id="L244">        styleStackedBarChart(labels, dishNames, barData)</span>
+<span class="fc" id="L245">    }</span>
+
+    @Suppress(&quot;MaxLineLength&quot;)
+    private fun prepareStackedBarChartData(forecastData: List&lt;DailyDishForecast&gt;): Triple&lt;List&lt;BarEntry&gt;, List&lt;String&gt;, Array&lt;String&gt;&gt; {
+<span class="fc" id="L249">        val labels = mutableListOf&lt;String&gt;()</span>
+<span class="fc bfc" id="L250" title="All 4 branches covered.">        val totalDishes = forecastData.sumOf { it.dishes.sumOf { d -&gt; d.predictedSales } }</span>
+<span class="fc bfc" id="L251" title="All 4 branches covered.">        val avg = if (forecastData.isNotEmpty()) totalDishes / forecastData.size else 0</span>
+
+<span class="fc" id="L253">        binding.tvDishesSubtitle.text =</span>
+<span class="fc" id="L254">            &quot;AI-predicted main dishes breakdown for next 7 days · Avg: $avg dishes/day&quot;</span>
+
+        // Collect all unique dish names across all days
+<span class="fc" id="L257">        val allDishNames =</span>
+<span class="fc" id="L258">            forecastData</span>
+<span class="fc" id="L259">                .flatMap { it.dishes }</span>
+<span class="fc" id="L260">                .map { it.name }</span>
+<span class="fc" id="L261">                .distinct()</span>
+
+<span class="fc" id="L263">        val entries =</span>
+<span class="fc" id="L264">            forecastData.mapIndexed { index, daily -&gt;</span>
+<span class="fc" id="L265">                val values =</span>
+<span class="fc" id="L266">                    allDishNames.map { dishName -&gt;</span>
+<span class="pc bpc" id="L267" title="2 of 6 branches missed.">                        daily.dishes.find { it.name == dishName }?.predictedSales?.toFloat() ?: 0f</span>
+<span class="fc" id="L268">                    }.toFloatArray()</span>
+<span class="fc" id="L269">                labels.add(formatDate(daily.date))</span>
+<span class="fc" id="L270">                BarEntry(index.toFloat(), values)</span>
+            }
+
+<span class="fc" id="L273">        return Triple(entries, labels, allDishNames.toTypedArray())</span>
+    }
+
+    private fun createStackedBarDataSet(
+        entries: List&lt;BarEntry&gt;,
+        dishNames: Array&lt;String&gt;,
+    ): BarDataSet {
+<span class="fc" id="L280">        return BarDataSet(entries, &quot;&quot;).apply {</span>
+<span class="fc" id="L281">            colors = getChartColors()</span>
+<span class="fc" id="L282">            stackLabels = dishNames</span>
+<span class="fc" id="L283">            setDrawValues(false)</span>
+<span class="fc" id="L284">            highLightAlpha = 0</span>
+<span class="fc" id="L285">        }</span>
+    }
+
+    private fun getChartColors(): List&lt;Int&gt; {
+<span class="fc" id="L289">        val colorIds =</span>
+<span class="fc" id="L290">            listOf(</span>
+<span class="fc" id="L291">                R.color.chart_1,</span>
+<span class="fc" id="L292">                R.color.chart_2,</span>
+<span class="fc" id="L293">                R.color.chart_3,</span>
+<span class="fc" id="L294">                R.color.chart_4,</span>
+<span class="fc" id="L295">                R.color.chart_5,</span>
+<span class="fc" id="L296">                R.color.chart_6,</span>
+<span class="fc" id="L297">                R.color.chart_7,</span>
+<span class="fc" id="L298">                R.color.chart_8,</span>
+<span class="fc" id="L299">                R.color.chart_9,</span>
+<span class="fc" id="L300">                R.color.chart_10,</span>
+            )
+<span class="fc" id="L302">        return colorIds.map { ContextCompat.getColor(requireContext(), it) }</span>
+    }
+
+    @Suppress(&quot;MagicNumber&quot;)
+    private fun styleStackedBarChart(
+        labels: List&lt;String&gt;,
+        dishNames: Array&lt;String&gt;,
+        data: BarData,
+    ) {
+<span class="fc" id="L311">        binding.dishForecastStackedChart.apply {</span>
+<span class="fc" id="L312">            this.data = data</span>
+<span class="fc" id="L313">            description.isEnabled = false</span>
+<span class="fc" id="L314">            setDrawGridBackground(false)</span>
+<span class="fc" id="L315">            setExtraOffsets(5f, 10f, 10f, 20f)</span>
+
+<span class="fc" id="L317">            val markerView = ForecastMarkerView(requireContext(), R.layout.marker_view)</span>
+<span class="fc" id="L318">            markerView.chartView = this</span>
+<span class="fc" id="L319">            markerView.chartType = ForecastMarkerView.ChartType.STACKED</span>
+<span class="fc" id="L320">            markerView.dishNames = dishNames</span>
+<span class="fc" id="L321">            markerView.labels = labels</span>
+<span class="fc" id="L322">            marker = markerView</span>
+
+<span class="fc" id="L324">            isHighlightPerTapEnabled = true</span>
+<span class="fc" id="L325">            isHighlightPerDragEnabled = false</span>
+
+<span class="fc" id="L327">            xAxis.apply {</span>
+<span class="fc" id="L328">                position = XAxis.XAxisPosition.BOTTOM</span>
+<span class="fc" id="L329">                valueFormatter = IndexAxisValueFormatter(labels)</span>
+<span class="fc" id="L330">                labelRotationAngle = -45f</span>
+<span class="fc" id="L331">                textSize = 8f</span>
+<span class="fc" id="L332">                granularity = 1f</span>
+<span class="fc" id="L333">                setDrawGridLines(false)</span>
+<span class="fc" id="L334">                textColor = ContextCompat.getColor(requireContext(), R.color.muted_text)</span>
+<span class="fc" id="L335">                axisLineColor = Color.TRANSPARENT</span>
+<span class="fc" id="L336">                setAvoidFirstLastClipping(false)</span>
+<span class="fc" id="L337">                axisMinimum = -0.5f</span>
+<span class="fc" id="L338">                axisMaximum = (labels.size - 1).toFloat() + 0.5f</span>
+<span class="fc" id="L339">                setLabelCount(labels.size, false)</span>
+<span class="fc" id="L340">            }</span>
+
+<span class="fc" id="L342">            axisLeft.apply {</span>
+<span class="fc" id="L343">                setDrawGridLines(true)</span>
+<span class="fc" id="L344">                gridColor = ContextCompat.getColor(requireContext(), R.color.border_grey)</span>
+<span class="fc" id="L345">                textColor = ContextCompat.getColor(requireContext(), R.color.muted_text)</span>
+<span class="fc" id="L346">                axisLineColor = Color.TRANSPARENT</span>
+<span class="fc" id="L347">                axisMinimum = 0f</span>
+<span class="fc" id="L348">                textSize = 8f</span>
+<span class="fc" id="L349">            }</span>
+
+<span class="fc" id="L351">            axisRight.isEnabled = false</span>
+
+<span class="fc" id="L353">            legend.apply {</span>
+<span class="fc" id="L354">                verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM</span>
+<span class="fc" id="L355">                horizontalAlignment = Legend.LegendHorizontalAlignment.CENTER</span>
+<span class="fc" id="L356">                orientation = Legend.LegendOrientation.HORIZONTAL</span>
+<span class="fc" id="L357">                setDrawInside(false)</span>
+<span class="fc" id="L358">                textColor = ContextCompat.getColor(requireContext(), R.color.muted_text)</span>
+<span class="fc" id="L359">            }</span>
+
+<span class="fc" id="L361">            invalidate()</span>
+<span class="fc" id="L362">        }</span>
+<span class="fc" id="L363">    }</span>
+
+    /**
+     * CHART 4: Comparison (Grouped Bar - Predicted vs Actual)
+     */
+    @Suppress(&quot;MagicNumber&quot;)
+    private fun setupComparisonChart(comparisonData: List&lt;ComparisonDay&gt;) {
+<span class="fc bfc" id="L370" title="All 2 branches covered.">        if (comparisonData.isEmpty()) {</span>
+<span class="fc" id="L371">            binding.comparisonBarChart.clear()</span>
+<span class="fc" id="L372">            binding.comparisonBarChart.invalidate()</span>
+<span class="fc" id="L373">            binding.tvAccuracy.text = &quot;—&quot;</span>
+<span class="fc" id="L374">            binding.tvAccuracyDiff.text = &quot;No prediction data available&quot;</span>
+<span class="fc" id="L375">            return</span>
+        }
+
+<span class="fc" id="L378">        updateAccuracyDisplay(comparisonData)</span>
+
+<span class="fc" id="L380">        val labels = comparisonData.map { formatDate(it.date) }</span>
+<span class="fc" id="L381">        val predictedEntries = mutableListOf&lt;BarEntry&gt;()</span>
+<span class="fc" id="L382">        val actualEntries = mutableListOf&lt;BarEntry&gt;()</span>
+
+<span class="fc" id="L384">        comparisonData.forEachIndexed { index, day -&gt;</span>
+<span class="fc" id="L385">            val compData =</span>
+<span class="fc" id="L386">                ForecastMarkerView.ComparisonData(day.predicted, day.actual)</span>
+<span class="fc" id="L387">            predictedEntries.add(</span>
+<span class="fc" id="L388">                BarEntry(index.toFloat(), day.predicted.toFloat()).apply { data = compData },</span>
+            )
+<span class="fc" id="L390">            actualEntries.add(</span>
+<span class="fc" id="L391">                BarEntry(index.toFloat(), day.actual.toFloat()).apply { data = compData },</span>
+            )
+<span class="fc" id="L393">        }</span>
+
+<span class="fc" id="L395">        val predictedSet =</span>
+<span class="fc" id="L396">            BarDataSet(predictedEntries, &quot;Predicted&quot;).apply {</span>
+<span class="fc" id="L397">                color = ContextCompat.getColor(requireContext(), R.color.forecast_gold)</span>
+<span class="fc" id="L398">                setDrawValues(false)</span>
+<span class="fc" id="L399">            }</span>
+<span class="fc" id="L400">        val actualSet =</span>
+<span class="fc" id="L401">            BarDataSet(actualEntries, &quot;Actual Sales&quot;).apply {</span>
+<span class="fc" id="L402">                color = ContextCompat.getColor(requireContext(), R.color.primary)</span>
+<span class="fc" id="L403">                setDrawValues(false)</span>
+<span class="fc" id="L404">            }</span>
+
+<span class="fc" id="L406">        val groupSpace = 0.3f</span>
+<span class="fc" id="L407">        val barSpace = 0.05f</span>
+<span class="fc" id="L408">        val barWidth = 0.3f</span>
+
+<span class="fc" id="L410">        val barData =</span>
+<span class="fc" id="L411">            BarData(predictedSet, actualSet).apply {</span>
+<span class="fc" id="L412">                this.barWidth = barWidth</span>
+<span class="fc" id="L413">            }</span>
+
+<span class="fc" id="L415">        styleComparisonChart(labels, barData, groupSpace, barSpace)</span>
+<span class="fc" id="L416">    }</span>
+
+    private fun updateAccuracyDisplay(comparisonData: List&lt;ComparisonDay&gt;) {
+<span class="fc bfc" id="L419" title="All 2 branches covered.">        val totalPredicted = comparisonData.sumOf { it.predicted }</span>
+<span class="fc bfc" id="L420" title="All 2 branches covered.">        val totalActual = comparisonData.sumOf { it.actual }</span>
+<span class="fc" id="L421">        val accuracy =</span>
+<span class="pc bpc" id="L422" title="1 of 2 branches missed.">            if (totalPredicted &gt; 0) {</span>
+<span class="fc" id="L423">                (1 - abs(totalActual - totalPredicted).toDouble() / totalPredicted) * HUNDRED_PERCENT</span>
+            } else {
+<span class="nc" id="L425">                0.0</span>
+            }
+<span class="fc" id="L427">        val difference = totalActual - totalPredicted</span>
+
+<span class="fc" id="L429">        binding.tvAccuracy.text = String.format(Locale.getDefault(), &quot;%.1f%%&quot;, accuracy)</span>
+
+<span class="pc bpc" id="L431" title="1 of 2 branches missed.">        val diffText = &quot;${abs(difference)} dishes ${if (difference &gt;= 0) &quot;above&quot; else &quot;below&quot;} prediction&quot;</span>
+<span class="fc" id="L432">        binding.tvAccuracyDiff.text = diffText</span>
+<span class="fc" id="L433">        val diffColor =</span>
+<span class="pc bpc" id="L434" title="1 of 2 branches missed.">            if (difference &gt;= 0) R.color.success_green else R.color.destructive</span>
+<span class="fc" id="L435">        binding.tvAccuracyDiff.setTextColor(ContextCompat.getColor(requireContext(), diffColor))</span>
+<span class="fc" id="L436">    }</span>
+
+    @Suppress(&quot;MagicNumber&quot;)
+    private fun styleComparisonChart(
+        labels: List&lt;String&gt;,
+        data: BarData,
+        groupSpace: Float,
+        barSpace: Float,
+    ) {
+<span class="fc" id="L445">        val chart = binding.comparisonBarChart</span>
+<span class="fc" id="L446">        chart.apply {</span>
+<span class="fc" id="L447">            this.data = data</span>
+<span class="fc" id="L448">            description.isEnabled = false</span>
+<span class="fc" id="L449">            setDrawGridBackground(false)</span>
+<span class="fc" id="L450">            setExtraOffsets(10f, 10f, 10f, 20f)</span>
+
+<span class="fc" id="L452">            val markerView = ForecastMarkerView(requireContext(), R.layout.marker_view)</span>
+<span class="fc" id="L453">            markerView.chartView = this</span>
+<span class="fc" id="L454">            markerView.chartType = ForecastMarkerView.ChartType.COMPARISON</span>
+<span class="fc" id="L455">            markerView.labels = labels</span>
+<span class="fc" id="L456">            marker = markerView</span>
+
+<span class="fc" id="L458">            isHighlightPerTapEnabled = true</span>
+<span class="fc" id="L459">            isHighlightPerDragEnabled = false</span>
+
+<span class="fc" id="L461">            val groupWidth = data.getGroupWidth(groupSpace, barSpace)</span>
+
+<span class="fc" id="L463">            xAxis.apply {</span>
+<span class="fc" id="L464">                position = XAxis.XAxisPosition.BOTTOM</span>
+<span class="fc" id="L465">                valueFormatter = IndexAxisValueFormatter(labels)</span>
+<span class="fc" id="L466">                labelRotationAngle = -45f</span>
+<span class="fc" id="L467">                textSize = 8f</span>
+<span class="fc" id="L468">                granularity = 1f</span>
+<span class="fc" id="L469">                setDrawGridLines(false)</span>
+<span class="fc" id="L470">                textColor = ContextCompat.getColor(requireContext(), R.color.muted_text)</span>
+<span class="fc" id="L471">                axisLineColor = Color.TRANSPARENT</span>
+<span class="fc" id="L472">                setCenterAxisLabels(true)</span>
+<span class="fc" id="L473">                axisMinimum = 0f</span>
+<span class="fc" id="L474">                axisMaximum = groupWidth * labels.size</span>
+<span class="fc" id="L475">            }</span>
+
+<span class="fc" id="L477">            axisLeft.apply {</span>
+<span class="fc" id="L478">                setDrawGridLines(true)</span>
+<span class="fc" id="L479">                gridColor = ContextCompat.getColor(requireContext(), R.color.border_grey)</span>
+<span class="fc" id="L480">                textColor = ContextCompat.getColor(requireContext(), R.color.muted_text)</span>
+<span class="fc" id="L481">                axisLineColor = Color.TRANSPARENT</span>
+<span class="fc" id="L482">                axisMinimum = 0f</span>
+<span class="fc" id="L483">            }</span>
+
+<span class="fc" id="L485">            axisRight.isEnabled = false</span>
+
+<span class="fc" id="L487">            legend.apply {</span>
+<span class="fc" id="L488">                verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM</span>
+<span class="fc" id="L489">                horizontalAlignment = Legend.LegendHorizontalAlignment.CENTER</span>
+<span class="fc" id="L490">                orientation = Legend.LegendOrientation.HORIZONTAL</span>
+<span class="fc" id="L491">                setDrawInside(false)</span>
+<span class="fc" id="L492">                textColor = ContextCompat.getColor(requireContext(), R.color.muted_text)</span>
+<span class="fc" id="L493">            }</span>
+
+<span class="fc" id="L495">            groupBars(0f, groupSpace, barSpace)</span>
+<span class="fc" id="L496">            invalidate()</span>
+<span class="fc" id="L497">        }</span>
+<span class="fc" id="L498">    }</span>
+
+    private fun formatDate(dateStr: String): String {
+<span class="fc" id="L501">        return try {</span>
+<span class="fc" id="L502">            val parser = SimpleDateFormat(&quot;yyyy-MM-dd&quot;, Locale.getDefault())</span>
+<span class="fc" id="L503">            val formatter = SimpleDateFormat(&quot;d MMM&quot;, Locale.getDefault())</span>
+<span class="pc bpc" id="L504" title="2 of 4 branches missed.">            parser.parse(dateStr)?.let { formatter.format(it) } ?: dateStr</span>
+<span class="nc" id="L505">        } catch (e: Exception) {</span>
+<span class="nc" id="L506">            Log.e(TAG, &quot;Error formatting date: $dateStr&quot;, e)</span>
+<span class="pc" id="L507">            dateStr</span>
+        }
+    }
+
+    override fun onDestroyView() {
+<span class="fc" id="L512">        super.onDestroyView()</span>
+<span class="fc" id="L513">        _binding = null</span>
+<span class="fc" id="L514">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

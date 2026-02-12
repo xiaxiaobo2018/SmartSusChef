@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RecentEntriesAdapter.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">com.smartsuschef.mobile.ui.datainput</a> &gt; <span class="el_source">RecentEntriesAdapter.kt</span></div><h1>RecentEntriesAdapter.kt</h1><pre class="source lang-java linenums">package com.smartsuschef.mobile.ui.datainput
+
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
+import com.smartsuschef.mobile.databinding.ItemRecentEntryBinding
+
+interface RecentEntryActions {
+    fun onEditClick(entry: RecentEntry)
+
+    fun onDeleteClick(entry: RecentEntry)
+}
+
+/**
+ * Adapter to display today's submitted sales or wastage entries.
+ */
+<span class="fc" id="L19">class RecentEntriesAdapter(</span>
+<span class="fc" id="L20">    private val actions: RecentEntryActions,</span>
+<span class="fc" id="L21">) : ListAdapter&lt;RecentEntry, RecentEntriesAdapter.RecentViewHolder&gt;(DiffCallback) {</span>
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): RecentViewHolder {
+<span class="fc" id="L26">        val binding =</span>
+<span class="fc" id="L27">            ItemRecentEntryBinding.inflate(</span>
+<span class="fc" id="L28">                LayoutInflater.from(parent.context),</span>
+<span class="fc" id="L29">                parent,</span>
+<span class="fc" id="L30">                false,</span>
+            )
+<span class="fc" id="L32">        return RecentViewHolder(binding)</span>
+    }
+
+    override fun onBindViewHolder(
+        holder: RecentViewHolder,
+        position: Int,
+    ) {
+<span class="fc" id="L39">        holder.bind(getItem(position), actions)</span>
+<span class="fc" id="L40">    }</span>
+
+<span class="fc" id="L42">    class RecentViewHolder(private val binding: ItemRecentEntryBinding) :</span>
+<span class="fc" id="L43">        RecyclerView.ViewHolder(binding.root) {</span>
+        fun bind(
+            item: RecentEntry,
+            actions: RecentEntryActions,
+        ) {
+<span class="fc" id="L48">            binding.tvItemName.text = item.name</span>
+<span class="fc" id="L49">            binding.tvQuantity.text = &quot;${item.quantity} ${item.unit}&quot;</span>
+<span class="fc" id="L50">            binding.tvEntryTime.text = item.time // Display only the time</span>
+            // Assuming your layout has these buttons
+<span class="pc" id="L52">            binding.btnEdit.setOnClickListener { actions.onEditClick(item) }</span>
+<span class="pc" id="L53">            binding.btnDelete.setOnClickListener { actions.onDeleteClick(item) }</span>
+<span class="fc" id="L54">        }</span>
+    }
+
+    companion object DiffCallback : DiffUtil.ItemCallback&lt;RecentEntry&gt;() {
+        override fun areItemsTheSame(
+            oldItem: RecentEntry,
+            newItem: RecentEntry,
+<span class="nc" id="L61">        ) = oldItem.id == newItem.id // Compare by ID now</span>
+
+        override fun areContentsTheSame(
+            oldItem: RecentEntry,
+            newItem: RecentEntry,
+<span class="nc" id="L66">        ) = oldItem == newItem</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

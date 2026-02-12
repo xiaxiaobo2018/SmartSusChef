@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>IngredientsRepository.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">com.smartsuschef.mobile.data.repository</a> &gt; <span class="el_source">IngredientsRepository.kt</span></div><h1>IngredientsRepository.kt</h1><pre class="source lang-java linenums">package com.smartsuschef.mobile.data.repository
+
+import android.util.Log
+import com.smartsuschef.mobile.network.api.IngredientApiService
+import com.smartsuschef.mobile.network.dto.CreateIngredientRequest
+import com.smartsuschef.mobile.network.dto.IngredientDto
+import com.smartsuschef.mobile.util.Resource
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import retrofit2.HttpException
+import java.io.IOException
+import javax.inject.Inject
+
+class IngredientsRepository
+<span class="fc" id="L15">    @Inject</span>
+    constructor(
+<span class="fc" id="L17">        private val ingredientApiService: IngredientApiService,</span>
+    ) {
+        companion object {
+            private const val TAG = &quot;IngredientsRepository&quot;
+        }
+
+        suspend fun getAll(): Resource&lt;List&lt;IngredientDto&gt;&gt; {
+<span class="fc" id="L24">            return withContext(Dispatchers.IO) {</span>
+<span class="fc" id="L25">                try {</span>
+<span class="fc" id="L26">                    val response = ingredientApiService.getAll()</span>
+<span class="fc bfc" id="L27" title="All 2 branches covered.">                    if (response.isSuccessful) {</span>
+<span class="pc bpc" id="L28" title="1 of 2 branches missed.">                        Resource.Success(response.body() ?: emptyList())</span>
+                    } else {
+<span class="pc bpc" id="L30" title="1 of 2 branches missed.">                        val errorBody = response.errorBody()?.string()</span>
+<span class="pc bpc" id="L31" title="1 of 2 branches missed.">                        Resource.Error(&quot;Failed to fetch ingredients: ${errorBody ?: response.message()}&quot;)</span>
+                    }
+<span class="fc" id="L33">                } catch (e: HttpException) {</span>
+<span class="fc" id="L34">                    Log.e(TAG, &quot;HTTP error in repository: ${e.message()}&quot;, e)</span>
+<span class="fc" id="L35">                    Resource.Error(&quot;An unexpected error occurred: ${e.message()}&quot;)</span>
+<span class="fc" id="L36">                } catch (e: IOException) {</span>
+<span class="fc" id="L37">                    Log.e(TAG, &quot;Network error in repository: ${e.message}&quot;, e)</span>
+<span class="fc" id="L38">                    Resource.Error(&quot;Couldn't reach the server. Check your internet connection.&quot;)</span>
+<span class="nc" id="L39">                } catch (e: Exception) {</span>
+<span class="nc" id="L40">                    Log.e(TAG, &quot;Unexpected error in repository: ${e.message}&quot;, e)</span>
+<span class="pc" id="L41">                    Resource.Error(&quot;An unexpected error occurred: ${e.message}&quot;)</span>
+<span class="fc" id="L42">                }</span>
+            }
+        }
+
+        suspend fun create(request: CreateIngredientRequest): Resource&lt;IngredientDto&gt; {
+<span class="fc" id="L47">            return withContext(Dispatchers.IO) {</span>
+<span class="fc" id="L48">                try {</span>
+<span class="fc" id="L49">                    val response = ingredientApiService.create(request)</span>
+<span class="fc bfc" id="L50" title="All 2 branches covered.">                    if (response.isSuccessful) {</span>
+<span class="fc" id="L51">                        Resource.Success(response.body()!!)</span>
+                    } else {
+<span class="pc bpc" id="L53" title="1 of 2 branches missed.">                        val errorBody = response.errorBody()?.string()</span>
+<span class="pc bpc" id="L54" title="1 of 2 branches missed.">                        Resource.Error(&quot;Failed to add ingredient: ${errorBody ?: response.message()}&quot;)</span>
+                    }
+<span class="fc" id="L56">                } catch (e: HttpException) {</span>
+<span class="fc" id="L57">                    Log.e(TAG, &quot;HTTP error in repository: ${e.message()}&quot;, e)</span>
+<span class="fc" id="L58">                    Resource.Error(&quot;An unexpected error occurred: ${e.message()}&quot;)</span>
+<span class="fc" id="L59">                } catch (e: IOException) {</span>
+<span class="fc" id="L60">                    Log.e(TAG, &quot;Network error in repository: ${e.message}&quot;, e)</span>
+<span class="fc" id="L61">                    Resource.Error(&quot;Couldn't reach the server. Check your internet connection.&quot;)</span>
+<span class="nc" id="L62">                } catch (e: Exception) {</span>
+<span class="nc" id="L63">                    Log.e(TAG, &quot;Unexpected error in repository: ${e.message}&quot;, e)</span>
+<span class="pc" id="L64">                    Resource.Error(&quot;An unexpected error occurred: ${e.message}&quot;)</span>
+<span class="fc" id="L65">                }</span>
+            }
+        }
+    }
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

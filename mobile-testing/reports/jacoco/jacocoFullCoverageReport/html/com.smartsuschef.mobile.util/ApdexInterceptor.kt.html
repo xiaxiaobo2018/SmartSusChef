@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ApdexInterceptor.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">com.smartsuschef.mobile.util</a> &gt; <span class="el_source">ApdexInterceptor.kt</span></div><h1>ApdexInterceptor.kt</h1><pre class="source lang-java linenums">package com.smartsuschef.mobile.util
+
+import android.util.Log
+import okhttp3.Interceptor
+import okhttp3.Response
+import java.io.IOException
+import java.util.Locale
+
+<span class="fc" id="L9">class ApdexInterceptor : Interceptor {</span>
+    companion object {
+        private const val NANOS_PER_MILLISECOND = 1_000_000.0
+    }
+
+    @Throws(IOException::class)
+    override fun intercept(chain: Interceptor.Chain): Response {
+<span class="fc" id="L16">        val startTime = System.nanoTime()</span>
+<span class="fc" id="L17">        val request = chain.request()</span>
+<span class="fc" id="L18">        val response = chain.proceed(request)</span>
+<span class="fc" id="L19">        val durationMs = (System.nanoTime() - startTime) / NANOS_PER_MILLISECOND</span>
+
+<span class="fc" id="L21">        Log.i(</span>
+<span class="fc" id="L22">            &quot;ApdexMetrics&quot;,</span>
+<span class="fc" id="L23">            &quot;Endpoint=${request.url.encodedPath}, Method=${request.method}, StatusCode=${response.code}, DurationMs=${String.format(</span>
+<span class="fc" id="L24">                Locale.US,</span>
+<span class="fc" id="L25">                &quot;%.2f&quot;,</span>
+<span class="fc" id="L26">                durationMs,</span>
+            )}&quot;,
+        )
+
+<span class="fc" id="L30">        return response</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

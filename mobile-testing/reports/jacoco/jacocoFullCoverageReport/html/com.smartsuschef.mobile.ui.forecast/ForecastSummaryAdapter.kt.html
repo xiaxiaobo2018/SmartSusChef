@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ForecastSummaryAdapter.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">com.smartsuschef.mobile.ui.forecast</a> &gt; <span class="el_source">ForecastSummaryAdapter.kt</span></div><h1>ForecastSummaryAdapter.kt</h1><pre class="source lang-java linenums">package com.smartsuschef.mobile.ui.forecast
+
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
+import com.smartsuschef.mobile.databinding.ItemIngredientForecastRowBinding
+import com.smartsuschef.mobile.databinding.ItemIngredientHeaderBinding
+import java.text.SimpleDateFormat
+import java.util.Locale
+
+<span class="fc" id="L13">class ForecastSummaryAdapter(</span>
+<span class="fc" id="L14">    private var items: List&lt;IngredientForecast&gt;,</span>
+<span class="fc" id="L15">    private var dates: List&lt;String&gt;,</span>
+<span class="fc" id="L16">) : RecyclerView.Adapter&lt;RecyclerView.ViewHolder&gt;() {</span>
+    companion object {
+        private const val TAG = &quot;ForecastSummaryAdapter&quot;
+        private const val VIEW_TYPE_HEADER = 0
+        private const val VIEW_TYPE_ITEM = 1
+        private const val DAYS_COUNT = 7
+    }
+
+    // Header ViewHolder
+<span class="fc" id="L25">    class HeaderViewHolder(val binding: ItemIngredientHeaderBinding) : RecyclerView.ViewHolder(binding.root)</span>
+
+    // Data ViewHolder
+<span class="nc" id="L28">    class DataViewHolder(val binding: ItemIngredientForecastRowBinding) : RecyclerView.ViewHolder(binding.root)</span>
+
+    override fun getItemViewType(position: Int): Int {
+<span class="pc bpc" id="L31" title="1 of 2 branches missed.">        return if (position == 0) VIEW_TYPE_HEADER else VIEW_TYPE_ITEM</span>
+    }
+
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): RecyclerView.ViewHolder {
+<span class="pc bpc" id="L38" title="1 of 2 branches missed.">        return if (viewType == VIEW_TYPE_HEADER) {</span>
+<span class="fc" id="L39">            val binding =</span>
+<span class="fc" id="L40">                ItemIngredientHeaderBinding.inflate(</span>
+<span class="fc" id="L41">                    LayoutInflater.from(parent.context),</span>
+<span class="fc" id="L42">                    parent,</span>
+<span class="fc" id="L43">                    false,</span>
+                )
+<span class="fc" id="L45">            HeaderViewHolder(binding)</span>
+        } else {
+<span class="nc" id="L47">            val binding =</span>
+<span class="nc" id="L48">                ItemIngredientForecastRowBinding.inflate(</span>
+<span class="nc" id="L49">                    LayoutInflater.from(parent.context),</span>
+<span class="nc" id="L50">                    parent,</span>
+<span class="nc" id="L51">                    false,</span>
+                )
+<span class="nc" id="L53">            DataViewHolder(binding)</span>
+        }
+    }
+
+    override fun onBindViewHolder(
+        holder: RecyclerView.ViewHolder,
+        position: Int,
+    ) {
+<span class="pc bpc" id="L61" title="1 of 2 branches missed.">        if (holder is HeaderViewHolder) {</span>
+<span class="fc" id="L62">            bindHeader(holder)</span>
+<span class="nc bnc" id="L63" title="All 2 branches missed.">        } else if (holder is DataViewHolder) {</span>
+<span class="nc" id="L64">            bindData(holder, position - 1) // Adjust for header offset</span>
+        }
+<span class="fc" id="L66">    }</span>
+
+    private fun bindHeader(holder: HeaderViewHolder) {
+<span class="fc" id="L69">        holder.binding.apply {</span>
+            // Set date headers (formatted to &quot;d MMM&quot;)
+<span class="fc" id="L71">            val headerViews = listOf(day1Header, day2Header, day3Header, day4Header, day5Header, day6Header, day7Header)</span>
+<span class="fc" id="L72">            dates.take(DAYS_COUNT).forEachIndexed { index, date -&gt;</span>
+<span class="pc bpc" id="L73" title="1 of 2 branches missed.">                if (index &lt; headerViews.size) {</span>
+<span class="fc" id="L74">                    headerViews[index].text = formatDate(date)</span>
+                }
+<span class="fc" id="L76">            }</span>
+<span class="fc" id="L77">        }</span>
+<span class="fc" id="L78">    }</span>
+
+    private fun bindData(
+        holder: DataViewHolder,
+        position: Int,
+    ) {
+<span class="nc" id="L84">        val item = items[position]</span>
+<span class="nc" id="L85">        holder.binding.apply {</span>
+<span class="nc" id="L86">            tvIngredientName.text = &quot;${item.name} (${item.unit})&quot;</span>
+
+            // Map the 7 quantities to the 7 textviews
+<span class="nc" id="L89">            val quantityViews = listOf(day1, day2, day3, day4, day5, day6, day7)</span>
+<span class="nc" id="L90">            item.totalQuantity.forEachIndexed { index, qty -&gt;</span>
+<span class="nc bnc" id="L91" title="All 2 branches missed.">                if (index &lt; quantityViews.size) {</span>
+<span class="nc bnc" id="L92" title="All 2 branches missed.">                    quantityViews[index].text = if (qty &gt; 0) String.format(Locale.US, &quot;%.1f&quot;, qty) else &quot;-&quot;</span>
+                }
+<span class="nc" id="L94">            }</span>
+<span class="nc" id="L95">        }</span>
+<span class="nc" id="L96">    }</span>
+
+<span class="fc" id="L98">    override fun getItemCount() = items.size + 1 // +1 for header</span>
+
+    fun updateData(
+        newItems: List&lt;IngredientForecast&gt;,
+        newDates: List&lt;String&gt;,
+    ) {
+<span class="fc" id="L104">        val oldItems = items</span>
+<span class="fc" id="L105">        val oldDates = dates</span>
+<span class="fc" id="L106">        val diffResult =</span>
+<span class="fc" id="L107">            DiffUtil.calculateDiff(</span>
+<span class="fc" id="L108">                object : DiffUtil.Callback() {</span>
+<span class="fc" id="L109">                    override fun getOldListSize() = oldItems.size + 1</span>
+
+<span class="fc" id="L111">                    override fun getNewListSize() = newItems.size + 1</span>
+
+                    override fun areItemsTheSame(
+                        oldPos: Int,
+                        newPos: Int,
+                    ): Boolean {
+<span class="pc bpc" id="L117" title="1 of 4 branches missed.">                        if (oldPos == 0 &amp;&amp; newPos == 0) return true</span>
+<span class="pc bpc" id="L118" title="3 of 4 branches missed.">                        if (oldPos == 0 || newPos == 0) return false</span>
+<span class="nc" id="L119">                        return oldItems[oldPos - 1].name == newItems[newPos - 1].name</span>
+                    }
+
+                    override fun areContentsTheSame(
+                        oldPos: Int,
+                        newPos: Int,
+                    ): Boolean {
+<span class="pc bpc" id="L126" title="2 of 4 branches missed.">                        if (oldPos == 0 &amp;&amp; newPos == 0) return oldDates == newDates</span>
+<span class="nc bnc" id="L127" title="All 4 branches missed.">                        if (oldPos == 0 || newPos == 0) return false</span>
+<span class="nc" id="L128">                        return oldItems[oldPos - 1] == newItems[newPos - 1]</span>
+                    }
+                },
+            )
+<span class="fc" id="L132">        items = newItems</span>
+<span class="fc" id="L133">        dates = newDates</span>
+<span class="fc" id="L134">        diffResult.dispatchUpdatesTo(this)</span>
+<span class="fc" id="L135">    }</span>
+
+    private fun formatDate(dateStr: String): String {
+<span class="fc" id="L138">        return try {</span>
+<span class="fc" id="L139">            val parser = SimpleDateFormat(&quot;yyyy-MM-dd&quot;, Locale.getDefault())</span>
+<span class="fc" id="L140">            val formatter = SimpleDateFormat(&quot;d MMM&quot;, Locale.getDefault())</span>
+<span class="pc bpc" id="L141" title="2 of 4 branches missed.">            parser.parse(dateStr)?.let { formatter.format(it) } ?: dateStr</span>
+<span class="nc" id="L142">        } catch (e: Exception) {</span>
+<span class="nc" id="L143">            Log.e(TAG, &quot;Error formatting date: $dateStr&quot;, e)</span>
+<span class="pc" id="L144">            dateStr</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

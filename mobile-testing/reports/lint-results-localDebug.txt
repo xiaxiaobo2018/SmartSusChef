@@ -1,0 +1,666 @@
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/build.gradle.kts:30: Warning: Not targeting the latest versions of Android; compatibility modes apply. Consider testing and updating this version. Consult the android.os.Build.VERSION_CODES javadoc for details. [OldTargetApi]
+        targetSdk = 35
+        ~~~~~~~~~~~~~~
+
+   Explanation for issues of type "OldTargetApi":
+   When your application runs on a version of Android that is more recent than
+   your targetSdkVersion specifies that it has been tested with, various
+   compatibility modes kick in. This ensures that your application continues
+   to work, but it may look out of place. For example, if the targetSdkVersion
+   is less than 14, your app may get an option button in the UI.
+
+   To fix this issue, set the targetSdkVersion to the highest available value.
+   Then test your app to make sure everything works correctly. You may want to
+   consult the compatibility notes to see what changes apply to each version
+   you are adding support for:
+   https://developer.android.com/reference/android/os/Build.VERSION_CODES.html
+   as well as follow this guide:
+   https://developer.android.com/distribute/best-practices/develop/target-sdk.
+   html
+
+   https://developer.android.com/distribute/best-practices/develop/target-sdk.html
+
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/gradle/libs.versions.toml:2: Warning: A newer version of com.android.application than 8.7.3 is available: 9.0.0 [AndroidGradlePluginVersion]
+agp = "8.7.3"
+      ~~~~~~~
+
+   Explanation for issues of type "AndroidGradlePluginVersion":
+   This detector looks for usage of the Android Gradle Plugin where the
+   version you are using is not the current stable release. Using older
+   versions is fine, and there are cases where you deliberately want to stick
+   with an older version. However, you may simply not be aware that a more
+   recent version is available, and that is what this lint check helps find.
+
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/gradle/libs.versions.toml:5: Warning: A newer version of androidx.core:core-ktx than 1.15.0 is available: 1.17.0 [GradleDependency]
+coreKtx = "1.15.0"
+          ~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/gradle/libs.versions.toml:11: Warning: A newer version of com.google.android.material:material than 1.12.0 is available: 1.13.0 [GradleDependency]
+material = "1.12.0"
+           ~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/gradle/libs.versions.toml:12: Warning: A newer version of androidx.activity:activity than 1.9.3 is available: 1.12.4 [GradleDependency]
+activity = "1.9.3"
+           ~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/gradle/libs.versions.toml:13: Warning: A newer version of androidx.constraintlayout:constraintlayout than 2.2.0 is available: 2.2.1 [GradleDependency]
+constraintlayout = "2.2.0"
+                   ~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/gradle/libs.versions.toml:18: Warning: A newer version of androidx.navigation:navigation-fragment-ktx than 2.8.5 is available: 2.9.7 [GradleDependency]
+navigation = "2.8.5"
+             ~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/gradle/libs.versions.toml:18: Warning: A newer version of androidx.navigation:navigation-ui-ktx than 2.8.5 is available: 2.9.7 [GradleDependency]
+navigation = "2.8.5"
+             ~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/gradle/libs.versions.toml:22: Warning: A newer version of androidx.datastore:datastore-preferences than 1.1.1 is available: 1.2.0 [GradleDependency]
+datastore = "1.1.1"
+            ~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/gradle/libs.versions.toml:33: Warning: A newer version of org.jetbrains.kotlinx:kotlinx-coroutines-test than 1.8.0 is available: 1.9.0 [GradleDependency]
+coroutinesTest = "1.8.0"
+                 ~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/gradle/libs.versions.toml:35: Warning: A newer version of androidx.test:runner than 1.6.2 is available: 1.7.0 [GradleDependency]
+androidxTestRunner = "1.6.2"
+                     ~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/gradle/libs.versions.toml:36: Warning: A newer version of androidx.test:orchestrator than 1.5.1 is available: 1.6.1 [GradleDependency]
+androidxTestOrchestrator = "1.5.1"
+                           ~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/gradle/libs.versions.toml:37: Warning: A newer version of androidx.datastore:datastore-preferences-core than 1.1.1 is available: 1.2.0 [GradleDependency]
+datastorePreferencesCore = "1.1.1"
+                           ~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/gradle/libs.versions.toml:49: Warning: A newer version of androidx.security:security-crypto than 1.1.0-alpha06 is available: 1.1.0 [GradleDependency]
+securityCrypto = "1.1.0-alpha06"
+                 ~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/gradle/libs.versions.toml:51: Warning: A newer version of com.android.tools:desugar_jdk_libs than 2.0.4 is available: 2.1.5 [GradleDependency]
+desugarJdkLibs = "2.0.4"
+                 ~~~~~~~
+
+   Explanation for issues of type "GradleDependency":
+   This detector looks for usages of libraries where the version you are using
+   is not the current stable release. Using older versions is fine, and there
+   are cases where you deliberately want to stick with an older version.
+   However, you may simply not be aware that a more recent version is
+   available, and that is what this lint check helps find.
+
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/xml/network_security_config.xml:3: Warning: Insecure Base Configuration [InsecureBaseConfiguration]
+    <base-config cleartextTrafficPermitted="true">
+                                            ~~~~
+
+   Explanation for issues of type "InsecureBaseConfiguration":
+   Permitting cleartext traffic could allow eavesdroppers to intercept data
+   sent by your app, which impacts the privacy of your users. Consider only
+   allowing encrypted traffic by setting the cleartextTrafficPermitted tag to
+   false.
+
+   https://goo.gle/InsecureBaseConfiguration
+   https://developer.android.com/preview/features/security-config.html
+
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/activity_login.xml:184: Warning: This tag and its children can be replaced by one <TextView/> and a compound drawable [UseCompoundDrawables]
+                <LinearLayout
+                 ~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/activity_settings.xml:63: Warning: This tag and its children can be replaced by one <TextView/> and a compound drawable [UseCompoundDrawables]
+                    <LinearLayout
+                     ~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/activity_settings.xml:203: Warning: This tag and its children can be replaced by one <TextView/> and a compound drawable [UseCompoundDrawables]
+                    <LinearLayout
+                     ~~~~~~~~~~~~
+
+   Explanation for issues of type "UseCompoundDrawables":
+   A LinearLayout which contains an ImageView and a TextView can be more
+   efficiently handled as a compound drawable (a single TextView, using the
+   drawableTop, drawableLeft, drawableRight and/or drawableBottom attributes
+   to draw one or more images adjacent to the text).
+
+   If the two widgets are offset from each other with margins, this can be
+   replaced with a drawablePadding attribute.
+
+   There's a lint quickfix to perform this conversion in the Eclipse plugin.
+
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/item_ingredient_forecast_row.xml:30: Warning: Nested weights are bad for performance [NestedWeights]
+            <TextView android:id="@+id/day1" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:textSize="10sp" />
+                                                                                                             ~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/item_ingredient_header.xml:32: Warning: Nested weights are bad for performance [NestedWeights]
+            android:layout_weight="1"
+            ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "NestedWeights":
+   Layout weights require a widget to be measured twice. When a LinearLayout
+   with non-zero weights is nested inside another LinearLayout with non-zero
+   weights, then the number of measurements increase exponentially.
+
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/item_ingredient_header.xml:5: Warning: Possible overdraw: Root element paints background @color/border_grey with a theme that also paints a background (inferred theme is @style/Theme.SmartSusChef) [Overdraw]
+    android:background="@color/border_grey"
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "Overdraw":
+   If you set a background drawable on a root view, then you should use a
+   custom theme where the theme background is null. Otherwise, the theme
+   background will be painted first, only to have your custom background
+   completely cover it; this is called "overdraw".
+
+   NOTE: This detector relies on figuring out which layouts are associated
+   with which activities based on scanning the Java code, and it's currently
+   doing that using an inexact pattern matching algorithm. Therefore, it can
+   incorrectly conclude which activity the layout is associated with and then
+   wrongly complain that a background-theme is hidden.
+
+   If you want your custom background on multiple pages, then you should
+   consider making a custom theme with your custom background and just using
+   that theme instead of a root element background.
+
+   Of course it's possible that your custom drawable is translucent and you
+   want it to be mixed with the background. However, you will get better
+   performance if you pre-mix the background with your drawable and use that
+   resulting image or color as a custom theme background instead.
+
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/item_ingredient_forecast_row.xml:19: Warning: Avoid using sizes smaller than 11sp: 10sp [SmallSp]
+            android:textSize="10sp"
+            ~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/item_ingredient_forecast_row.xml:30: Warning: Avoid using sizes smaller than 11sp: 10sp [SmallSp]
+            <TextView android:id="@+id/day1" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:textSize="10sp" />
+                                                                                                                                                                ~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/item_ingredient_forecast_row.xml:31: Warning: Avoid using sizes smaller than 11sp: 10sp [SmallSp]
+            <TextView android:id="@+id/day2" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:textSize="10sp" />
+                                                                                                                                                                ~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/item_ingredient_forecast_row.xml:32: Warning: Avoid using sizes smaller than 11sp: 10sp [SmallSp]
+            <TextView android:id="@+id/day3" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:textSize="10sp" />
+                                                                                                                                                                ~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/item_ingredient_forecast_row.xml:33: Warning: Avoid using sizes smaller than 11sp: 10sp [SmallSp]
+            <TextView android:id="@+id/day4" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:textSize="10sp" />
+                                                                                                                                                                ~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/item_ingredient_forecast_row.xml:34: Warning: Avoid using sizes smaller than 11sp: 10sp [SmallSp]
+            <TextView android:id="@+id/day5" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:textSize="10sp" />
+                                                                                                                                                                ~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/item_ingredient_forecast_row.xml:35: Warning: Avoid using sizes smaller than 11sp: 10sp [SmallSp]
+            <TextView android:id="@+id/day6" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:textSize="10sp" />
+                                                                                                                                                                ~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/item_ingredient_forecast_row.xml:36: Warning: Avoid using sizes smaller than 11sp: 10sp [SmallSp]
+            <TextView android:id="@+id/day7" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:textSize="10sp" />
+                                                                                                                                                                ~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/item_ingredient_header.xml:16: Warning: Avoid using sizes smaller than 11sp: 10sp [SmallSp]
+        android:textSize="10sp"
+        ~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/item_ingredient_header.xml:34: Warning: Avoid using sizes smaller than 11sp: 10sp [SmallSp]
+            android:textSize="10sp"
+            ~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/item_ingredient_header.xml:44: Warning: Avoid using sizes smaller than 11sp: 10sp [SmallSp]
+            android:textSize="10sp"
+            ~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/item_ingredient_header.xml:54: Warning: Avoid using sizes smaller than 11sp: 10sp [SmallSp]
+            android:textSize="10sp"
+            ~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/item_ingredient_header.xml:64: Warning: Avoid using sizes smaller than 11sp: 10sp [SmallSp]
+            android:textSize="10sp"
+            ~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/item_ingredient_header.xml:74: Warning: Avoid using sizes smaller than 11sp: 10sp [SmallSp]
+            android:textSize="10sp"
+            ~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/item_ingredient_header.xml:84: Warning: Avoid using sizes smaller than 11sp: 10sp [SmallSp]
+            android:textSize="10sp"
+            ~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/item_ingredient_header.xml:94: Warning: Avoid using sizes smaller than 11sp: 10sp [SmallSp]
+            android:textSize="10sp"
+            ~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/marker_view.xml:14: Warning: Avoid using sizes smaller than 11sp: 10sp [SmallSp]
+        android:textSize="10sp"
+        ~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/marker_view.xml:31: Warning: Avoid using sizes smaller than 11sp: 10sp [SmallSp]
+        android:textSize="10sp"
+        ~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "SmallSp":
+   Avoid using sizes smaller than 11sp.
+
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/menu/dashboard_menu.xml:8: Warning: Prefer "ifRoom" instead of "always" [AlwaysShowAction]
+        app:showAsAction="always" />
+        ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "AlwaysShowAction":
+   Using showAsAction="always" in menu XML, or MenuItem.SHOW_AS_ACTION_ALWAYS
+   in Java code is usually a deviation from the user interface style guide.Use
+   ifRoom or the corresponding MenuItem.SHOW_AS_ACTION_IF_ROOM instead.
+
+   If always is used sparingly there are usually no problems and behavior is
+   roughly equivalent to ifRoom but with preference over other ifRoom items.
+   Using it more than twice in the same menu is a bad idea.
+
+   This check looks for menu XML files that contain more than two always
+   actions, or some always actions and no ifRoom actions. In Java code, it
+   looks for projects that contain references to
+   MenuItem.SHOW_AS_ACTION_ALWAYS and no references to
+   MenuItem.SHOW_AS_ACTION_IF_ROOM.
+
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/datainput/DataInputFragment.kt:256: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+        binding.btnSaveData.text = "Save" // Reset button text
+                                    ~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/datainput/DataInputFragment.kt:263: Warning: Number formatting does not take into account locale settings. Consider using String.format instead. [SetTextI18n]
+        binding.etQuantity.setText(entry.quantity.toString())
+                                   ~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/datainput/DataInputFragment.kt:276: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+        binding.btnSaveData.text = "Update" // Change button text
+                                    ~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/forecast/ForecastFragment.kt:153: Warning: Number formatting does not take into account locale settings. Consider using String.format instead. [SetTextI18n]
+        binding.tvTotalWeeklyDishes.text = totalDishes.toString()
+                                           ~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/forecast/ForecastFragment.kt:254: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+            "AI-predicted main dishes breakdown for next 7 days · Avg: $avg dishes/day"
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/forecast/ForecastFragment.kt:254: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+            "AI-predicted main dishes breakdown for next 7 days · Avg: $avg dishes/day"
+             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/forecast/ForecastFragment.kt:254: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+            "AI-predicted main dishes breakdown for next 7 days · Avg: $avg dishes/day"
+                                                                           ~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/forecast/ForecastFragment.kt:374: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+            binding.tvAccuracyDiff.text = "No prediction data available"
+                                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/forecast/ForecastMarkerView.kt:57: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+                tvQuantity.text = "Dishes: $quantity"
+                                  ~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/forecast/ForecastMarkerView.kt:57: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+                tvQuantity.text = "Dishes: $quantity"
+                                   ~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/forecast/ForecastMarkerView.kt:65: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+                    tvQuantity.text = "Total: $total dishes"
+                                      ~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/forecast/ForecastMarkerView.kt:65: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+                    tvQuantity.text = "Total: $total dishes"
+                                       ~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/forecast/ForecastMarkerView.kt:65: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+                    tvQuantity.text = "Total: $total dishes"
+                                                    ~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/forecast/ForecastMarkerView.kt:77: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+                    tvQuantity.text = "Dishes: ${e.y.toInt()}"
+                                      ~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/forecast/ForecastMarkerView.kt:77: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+                    tvQuantity.text = "Dishes: ${e.y.toInt()}"
+                                       ~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/forecast/ForecastMarkerView.kt:87: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+                    tvQuantity.text = "Predicted: ${data.predicted}"
+                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/forecast/ForecastMarkerView.kt:87: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+                    tvQuantity.text = "Predicted: ${data.predicted}"
+                                       ~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/forecast/ForecastMarkerView.kt:88: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+                    tvDetails.text = "Actual: ${data.actual}"
+                                     ~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/forecast/ForecastMarkerView.kt:88: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+                    tvDetails.text = "Actual: ${data.actual}"
+                                      ~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/forecast/ForecastMarkerView.kt:92: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+                    tvQuantity.text = "Dishes: ${e.y.toInt()}"
+                                      ~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/forecast/ForecastMarkerView.kt:92: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+                    tvQuantity.text = "Dishes: ${e.y.toInt()}"
+                                       ~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/forecast/ForecastSummaryAdapter.kt:86: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+            tvIngredientName.text = "${item.name} (${item.unit})"
+                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/sales/IngredientAdapter.kt:34: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+        holder.quantity.text = "${item.quantity} ${item.unit}"
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/datainput/RecentEntriesAdapter.kt:49: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+            binding.tvQuantity.text = "${item.quantity} ${item.unit}"
+                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/sales/SalesDetailFragment.kt:54: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+        binding.tvDetailTitle.text = "Sales Breakdown: ${args.date}"
+                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/sales/SalesDetailFragment.kt:54: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+        binding.tvDetailTitle.text = "Sales Breakdown: ${args.date}"
+                                      ~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/sales/SalesDetailFragment.kt:116: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+                        binding.tvSalesSubtitle.text = "No dishes sold on this date"
+                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/sales/SalesDetailFragment.kt:152: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+        binding.tvSalesSubtitle.text = "Total dishes sold: $totalDishes"
+                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/sales/SalesDetailFragment.kt:152: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+        binding.tvSalesSubtitle.text = "Total dishes sold: $totalDishes"
+                                        ~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/sales/SalesOverviewFragment.kt:153: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+        binding.tvSalesSubtitle.text = "Total dishes sold · Average: $avgSales per day"
+                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/sales/SalesOverviewFragment.kt:153: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+        binding.tvSalesSubtitle.text = "Total dishes sold · Average: $avgSales per day"
+                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/sales/SalesOverviewFragment.kt:153: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+        binding.tvSalesSubtitle.text = "Total dishes sold · Average: $avgSales per day"
+                                                                              ~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/sales/SalesOverviewFragment.kt:266: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+                            "${weather.temperature.toInt()}°C | ${weather.description}"
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/sales/SalesOverviewFragment.kt:267: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+                        binding.tvWeatherHumidity.text = "${weather.humidity}%"
+                                                         ~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/sales/SalesOverviewFragment.kt:270: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+                        binding.tvWeatherCondition.text = "Unavailable"
+                                                           ~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/sales/SalesOverviewFragment.kt:271: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+                        binding.tvWeatherDescription.text = "Weather data not available"
+                                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/sales/SalesOverviewFragment.kt:276: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+                    binding.tvWeatherCondition.text = "Unavailable"
+                                                       ~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/sales/SalesOverviewFragment.kt:277: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+                    binding.tvWeatherDescription.text = "Could not load weather"
+                                                         ~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/sales/SalesOverviewFragment.kt:281: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+                    binding.tvWeatherCondition.text = "Loading..."
+                                                       ~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/sales/SalesOverviewFragment.kt:305: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+                                    text = "\u2022 $formattedDate: ${holiday.name}"
+                                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/sales/SalesOverviewFragment.kt:317: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+                    binding.tvNoHolidays.text = "Could not load events"
+                                                 ~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/sales/SalesOverviewFragment.kt:322: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+                    binding.tvNoHolidays.text = "Loading events..."
+                                                 ~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/wastage/WastageAdapter.kt:36: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+        holder.type.text = "Type: ${item.type}"
+                           ~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/wastage/WastageAdapter.kt:36: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+        holder.type.text = "Type: ${item.type}"
+                            ~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/wastage/WastageAdapter.kt:37: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+        holder.quantity.text = "Quantity: ${item.quantity} ${item.unit}"
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/wastage/WastageAdapter.kt:37: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+        holder.quantity.text = "Quantity: ${item.quantity} ${item.unit}"
+                                ~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/wastage/WastageAdapter.kt:38: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+        holder.co2.text = "CO2: %.2f kg".format(item.carbonFootprint)
+                           ~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/wastage/WastageDetailFragment.kt:48: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+        binding.tvDetailTitle.text = "Wastage for ${args.date}"
+                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/wastage/WastageDetailFragment.kt:48: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+        binding.tvDetailTitle.text = "Wastage for ${args.date}"
+                                      ~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/wastage/WastageDetailFragment.kt:64: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+        binding.tvWastageSubtitle.text = "Total Carbon Footprint: %.2f kg CO2".format(totalCarbonFootprint)
+                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/java/com/smartsuschef/mobile/ui/wastage/WastageOverviewFragment.kt:143: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+        binding.tvWastageSubtitle.text = "Total Carbon Footprint: %.2f kg".format(totalCarbonFootprint)
+                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "SetTextI18n":
+   When calling TextView#setText
+   * Never call Number#toString() to format numbers; it will not handle
+   fraction separators and locale-specific digits properly. Consider using
+   String#format with proper format specifications (%d or %f) instead.
+   * Do not pass a string literal (e.g. "Hello") to display text. Hardcoded
+   text can not be properly translated to other languages. Consider using
+   Android resource strings instead.
+   * Do not build messages by concatenating text chunks. Such messages can not
+   be properly translated.
+
+   https://developer.android.com/guide/topics/resources/localization.html
+
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/activity_login.xml:46: Warning: Hardcoded string "SmartSus Chef", should use @string resource [HardcodedText]
+                android:text="SmartSus Chef"
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/activity_login.xml:62: Warning: Hardcoded string "Demand Forecasting & Food Prep Recommendation", should use @string resource [HardcodedText]
+                    android:text="Demand Forecasting &amp; Food Prep Recommendation"
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/activity_login.xml:71: Warning: Hardcoded string "Username", should use @string resource [HardcodedText]
+                    android:text="Username"
+                    ~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/activity_login.xml:83: Warning: Hardcoded string "Enter your username", should use @string resource [HardcodedText]
+                    android:hint="Enter your username"
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/activity_login.xml:96: Warning: Hardcoded string "Password", should use @string resource [HardcodedText]
+                        android:text="Password"
+                        ~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/activity_login.xml:105: Warning: Hardcoded string "Forgot Password?", should use @string resource [HardcodedText]
+                        android:text="Forgot Password?"
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/activity_login.xml:117: Warning: Hardcoded string "Enter your password", should use @string resource [HardcodedText]
+                    android:hint="Enter your password"
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/activity_login.xml:127: Warning: Hardcoded string "Sign In", should use @string resource [HardcodedText]
+                    android:text="Sign In"
+                    ~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/activity_login.xml:151: Warning: Hardcoded string "Request Password Reset", should use @string resource [HardcodedText]
+                    android:text="Request Password Reset"
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/activity_login.xml:159: Warning: Hardcoded string "Email Address", should use @string resource [HardcodedText]
+                    android:text="Email Address"
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/activity_login.xml:171: Warning: Hardcoded string "Enter your registered email", should use @string resource [HardcodedText]
+                    android:hint="Enter your registered email"
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/activity_login.xml:181: Warning: Hardcoded string "Send Reset Link", should use @string resource [HardcodedText]
+                    android:text="Send Reset Link"
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/activity_login.xml:207: Warning: Hardcoded string "Back to Login", should use @string resource [HardcodedText]
+                        android:text="Back to Login"
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/activity_settings.xml:41: Warning: Hardcoded string "Security & Profile", should use @string resource [HardcodedText]
+                android:text="Security &amp; Profile"
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/activity_settings.xml:74: Warning: Hardcoded string "Password icon", should use @string resource [HardcodedText]
+                            android:contentDescription="Password icon"
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/activity_settings.xml:81: Warning: Hardcoded string "Password Management", should use @string resource [HardcodedText]
+                            android:text="Password Management"
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/activity_settings.xml:90: Warning: Hardcoded string "Securely change your account password", should use @string resource [HardcodedText]
+                        android:text="Securely change your account password"
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/activity_settings.xml:101: Warning: Hardcoded string "Current Password", should use @string resource [HardcodedText]
+                        android:hint="Current Password"
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/activity_settings.xml:123: Warning: Hardcoded string "New Password", should use @string resource [HardcodedText]
+                        android:hint="New Password"
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/activity_settings.xml:145: Warning: Hardcoded string "Confirm New Password", should use @string resource [HardcodedText]
+                        android:hint="Confirm New Password"
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/activity_settings.xml:170: Warning: Hardcoded string "Update Password", should use @string resource [HardcodedText]
+                            android:text="Update Password"
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/activity_settings.xml:214: Warning: Hardcoded string "Profile icon", should use @string resource [HardcodedText]
+                            android:contentDescription="Profile icon"
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/activity_settings.xml:221: Warning: Hardcoded string "Personal Profile", should use @string resource [HardcodedText]
+                            android:text="Personal Profile"
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/activity_settings.xml:230: Warning: Hardcoded string "Update your personal contact information", should use @string resource [HardcodedText]
+                        android:text="Update your personal contact information"
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/activity_settings.xml:240: Warning: Hardcoded string "Full Name", should use @string resource [HardcodedText]
+                        android:hint="Full Name"
+                        ~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/activity_settings.xml:260: Warning: Hardcoded string "Email Address", should use @string resource [HardcodedText]
+                        android:hint="Email Address"
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/activity_settings.xml:284: Warning: Hardcoded string "Save Profile Info", should use @string resource [HardcodedText]
+                            android:text="Save Profile Info"
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/menu/bottom_nav_menu.xml:6: Warning: Hardcoded string "Overview", should use @string resource [HardcodedText]
+        android:title="Overview" />
+        ~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/menu/bottom_nav_menu.xml:10: Warning: Hardcoded string "Predictions", should use @string resource [HardcodedText]
+        android:title="Predictions" />
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/menu/bottom_nav_menu.xml:14: Warning: Hardcoded string "Wastage", should use @string resource [HardcodedText]
+        android:title="Wastage" />
+        ~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/menu/bottom_nav_menu.xml:18: Warning: Hardcoded string "Data Input", should use @string resource [HardcodedText]
+        android:title="Data Input" />
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/menu/dashboard_menu.xml:7: Warning: Hardcoded string "Notifications", should use @string resource [HardcodedText]
+        android:title="Notifications"
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/menu/dashboard_menu.xml:12: Warning: Hardcoded string "Profile", should use @string resource [HardcodedText]
+        android:title="Profile"
+        ~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/menu/dashboard_menu.xml:18: Warning: Hardcoded string "Settings", should use @string resource [HardcodedText]
+                android:title="Settings" />
+                ~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/menu/dashboard_menu.xml:22: Warning: Hardcoded string "Log Out", should use @string resource [HardcodedText]
+                android:title="Log Out" />
+                ~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/menu/date_filter_menu.xml:5: Warning: Hardcoded string "Today", should use @string resource [HardcodedText]
+        android:title="Today" />
+        ~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/menu/date_filter_menu.xml:8: Warning: Hardcoded string "Last 7 Days", should use @string resource [HardcodedText]
+        android:title="Last 7 Days" />
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/fragment_data_input.xml:25: Warning: Hardcoded string "Sales", should use @string resource [HardcodedText]
+            android:text="Sales"
+            ~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/fragment_data_input.xml:33: Warning: Hardcoded string "Wastage", should use @string resource [HardcodedText]
+            android:text="Wastage"
+            ~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/fragment_data_input.xml:54: Warning: Hardcoded string "Step 1: Select Item", should use @string resource [HardcodedText]
+                android:text="Step 1: Select Item"
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/fragment_data_input.xml:73: Warning: Hardcoded string "Main Dish", should use @string resource [HardcodedText]
+                    android:text="Main Dish"
+                    ~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/fragment_data_input.xml:86: Warning: Hardcoded string "Sub-Recipe", should use @string resource [HardcodedText]
+                    android:text="Sub-Recipe"
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/fragment_data_input.xml:99: Warning: Hardcoded string "Ingredient", should use @string resource [HardcodedText]
+                    android:text="Ingredient"
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/fragment_data_input.xml:119: Warning: Hardcoded string "Step 2: Enter Quantity", should use @string resource [HardcodedText]
+                android:text="Step 2: Enter Quantity"
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/fragment_data_input.xml:128: Warning: Hardcoded string "0.00", should use @string resource [HardcodedText]
+                android:hint="0.00"
+                ~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/fragment_data_input.xml:139: Warning: Hardcoded string "Save Entry", should use @string resource [HardcodedText]
+                android:text="Save Entry"
+                ~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/fragment_data_input.xml:150: Warning: Hardcoded string "Recent Entries for Today", should use @string resource [HardcodedText]
+        android:text="Recent Entries for Today"
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/fragment_forecast.xml:40: Warning: Hardcoded string "Prediction Summary", should use @string resource [HardcodedText]
+                            android:text="Prediction Summary"
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/fragment_forecast.xml:73: Warning: Hardcoded string "Forecasted dish sales for next 7 days", should use @string resource [HardcodedText]
+                        android:text="Forecasted dish sales for next 7 days"
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/fragment_forecast.xml:102: Warning: Hardcoded string "Dishes Forecast", should use @string resource [HardcodedText]
+                        android:text="Dishes Forecast"
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/fragment_forecast.xml:110: Warning: Hardcoded string "AI-predicted main dishes breakdown for next 7 days · Avg: 267 dishes/day", should use @string resource [HardcodedText]
+                        android:text="AI-predicted main dishes breakdown for next 7 days · Avg: 267 dishes/day"
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/fragment_forecast.xml:140: Warning: Hardcoded string "Ingredients Forecast", should use @string resource [HardcodedText]
+                        android:text="Ingredients Forecast"
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/fragment_forecast.xml:147: Warning: Hardcoded string "Ingredient requirements for next 7 days (including sub-recipes)", should use @string resource [HardcodedText]
+                        android:text="Ingredient requirements for next 7 days (including sub-recipes)"
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/fragment_forecast.xml:182: Warning: Hardcoded string "Prediction Accuracy", should use @string resource [HardcodedText]
+                            android:text="Prediction Accuracy"
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/fragment_forecast.xml:212: Warning: Hardcoded string "Last 7 days predicted vs actual sales comparison", should use @string resource [HardcodedText]
+                        android:text="Last 7 days predicted vs actual sales comparison"
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/fragment_sales_detail.xml:41: Warning: Hardcoded string "Dish Sales Distribution", should use @string resource [HardcodedText]
+                        android:text="Dish Sales Distribution"
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/fragment_sales_detail.xml:49: Warning: Hardcoded string "Total dishes sold: 0", should use @string resource [HardcodedText]
+                        android:text="Total dishes sold: 0"
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/fragment_sales_detail.xml:73: Warning: Hardcoded string "Ingredients Used", should use @string resource [HardcodedText]
+            android:text="Ingredients Used"
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/fragment_sales_overview.xml:35: Warning: Hardcoded string "Sales Trend", should use @string resource [HardcodedText]
+                        android:text="Sales Trend"
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/fragment_sales_overview.xml:46: Warning: Hardcoded string "Last 7 Days", should use @string resource [HardcodedText]
+                        android:text="Last 7 Days"
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/fragment_sales_overview.xml:59: Warning: Hardcoded string "Total dishes sold · Average: 0 per day", should use @string resource [HardcodedText]
+                        android:text="Total dishes sold · Average: 0 per day"
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/fragment_sales_overview.xml:70: Warning: Hardcoded string "Click on any bar to view details", should use @string resource [HardcodedText]
+                        android:text="Click on any bar to view details"
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/fragment_sales_overview.xml:108: Warning: Hardcoded string "Upcoming Events", should use @string resource [HardcodedText]
+                        android:text="Upcoming Events"
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/fragment_sales_overview.xml:124: Warning: Hardcoded string "No upcoming events", should use @string resource [HardcodedText]
+                        android:text="No upcoming events"
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/fragment_sales_overview.xml:149: Warning: Hardcoded string "Weather icon", should use @string resource [HardcodedText]
+                        android:contentDescription="Weather icon"
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/fragment_sales_overview.xml:164: Warning: Hardcoded string "Loading...", should use @string resource [HardcodedText]
+                            android:text="Loading..."
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/fragment_sales_overview.xml:178: Warning: Hardcoded string "Humidity icon", should use @string resource [HardcodedText]
+                        android:contentDescription="Humidity icon"
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/fragment_sales_overview.xml:186: Warning: Hardcoded string "--", should use @string resource [HardcodedText]
+                        android:text="--"
+                        ~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/fragment_wastage_detail.xml:37: Warning: Hardcoded string "Wastage Breakdown", should use @string resource [HardcodedText]
+                    android:text="Wastage Breakdown"
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/fragment_wastage_detail.xml:45: Warning: Hardcoded string "Total Carbon Footprint: 0.00 kg CO2", should use @string resource [HardcodedText]
+                    android:text="Total Carbon Footprint: 0.00 kg CO2"
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/fragment_wastage_detail.xml:61: Warning: Hardcoded string "Wasted Items", should use @string resource [HardcodedText]
+            android:text="Wasted Items"
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/fragment_wastage_overview.xml:34: Warning: Hardcoded string "Wastage Trend", should use @string resource [HardcodedText]
+                        android:text="Wastage Trend"
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/fragment_wastage_overview.xml:45: Warning: Hardcoded string "Last 7 Days", should use @string resource [HardcodedText]
+                        android:text="Last 7 Days"
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/fragment_wastage_overview.xml:58: Warning: Hardcoded string "Total wastage · Average: 0 kg per day", should use @string resource [HardcodedText]
+                        android:text="Total wastage · Average: 0 kg per day"
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/fragment_wastage_overview.xml:69: Warning: Hardcoded string "Click on any bar to view details", should use @string resource [HardcodedText]
+                        android:text="Click on any bar to view details"
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/item_ingredient_forecast_row.xml:21: Warning: Hardcoded string "Tomato", should use @string resource [HardcodedText]
+            android:text="Tomato" />
+            ~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/item_ingredient_header.xml:15: Warning: Hardcoded string "Ingredient (unit)", should use @string resource [HardcodedText]
+        android:text="Ingredient (unit)"
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/item_ingredient_row.xml:18: Warning: Hardcoded string "Ingredient Name", should use @string resource [HardcodedText]
+            android:text="Ingredient Name"
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/item_ingredient_row.xml:26: Warning: Hardcoded string "0.0 unit", should use @string resource [HardcodedText]
+            android:text="0.0 unit"
+            ~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/item_wastage_row.xml:12: Warning: Hardcoded string "Wasted Item Name", should use @string resource [HardcodedText]
+        android:text="Wasted Item Name"
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/item_wastage_row.xml:22: Warning: Hardcoded string "Type: Main Dish", should use @string resource [HardcodedText]
+        android:text="Type: Main Dish"
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/item_wastage_row.xml:37: Warning: Hardcoded string "Quantity: 0.0 unit", should use @string resource [HardcodedText]
+            android:text="Quantity: 0.0 unit"
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/item_wastage_row.xml:45: Warning: Hardcoded string "CO2: 0.0 kg", should use @string resource [HardcodedText]
+            android:text="CO2: 0.0 kg"
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/marker_view.xml:13: Warning: Hardcoded string "Date", should use @string resource [HardcodedText]
+        android:text="Date"
+        ~~~~~~~~~~~~~~~~~~~
+/Users/tangyingchun/Documents/Github/SmartSusChef/mobile/app/src/main/res/layout/marker_view.xml:22: Warning: Hardcoded string "Dishes: 0", should use @string resource [HardcodedText]
+        android:text="Dishes: 0"
+        ~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "HardcodedText":
+   Hardcoding text attributes directly in layout files is bad for several
+   reasons:
+
+   * When creating configuration variations (for example for landscape or
+   portrait) you have to repeat the actual text (and keep it up to date when
+   making changes)
+
+   * The application cannot be translated to other languages by just adding
+   new translations for existing string resources.
+
+   There are quickfixes to automatically extract this hardcoded string into a
+   resource lookup.
+
+0 errors, 177 warnings

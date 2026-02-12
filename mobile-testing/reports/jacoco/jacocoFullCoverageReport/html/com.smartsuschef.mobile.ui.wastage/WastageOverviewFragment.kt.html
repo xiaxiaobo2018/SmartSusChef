@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>WastageOverviewFragment.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">com.smartsuschef.mobile.ui.wastage</a> &gt; <span class="el_source">WastageOverviewFragment.kt</span></div><h1>WastageOverviewFragment.kt</h1><pre class="source lang-java linenums">package com.smartsuschef.mobile.ui.wastage
+
+import android.graphics.Color
+import android.os.Bundle
+import android.view.View
+import androidx.appcompat.widget.PopupMenu
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
+import com.github.mikephil.charting.charts.CombinedChart
+import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.data.CombinedData
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import com.github.mikephil.charting.highlight.Highlight
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener
+import com.smartsuschef.mobile.R
+import com.smartsuschef.mobile.databinding.FragmentWastageOverviewBinding
+import com.smartsuschef.mobile.network.dto.WastageTrendDto
+import com.smartsuschef.mobile.util.Resource
+import com.smartsuschef.mobile.util.gone
+import com.smartsuschef.mobile.util.showToast
+import com.smartsuschef.mobile.util.visible
+import dagger.hilt.android.AndroidEntryPoint
+import java.text.SimpleDateFormat
+import java.util.Locale
+
+<span class="fc" id="L34">@AndroidEntryPoint</span>
+<span class="fc" id="L35">class WastageOverviewFragment : Fragment(R.layout.fragment_wastage_overview) {</span>
+    private var _binding: FragmentWastageOverviewBinding? = null
+<span class="fc" id="L37">    private val binding get() = _binding!!</span>
+<span class="fc" id="L38">    private val viewModel: WastageViewModel by viewModels()</span>
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
+<span class="fc" id="L44">        super.onViewCreated(view, savedInstanceState)</span>
+<span class="fc" id="L45">        _binding = FragmentWastageOverviewBinding.bind(view)</span>
+
+<span class="fc" id="L47">        setupCombinedChart()</span>
+<span class="fc" id="L48">        observeViewModel()</span>
+<span class="fc" id="L49">        observeFilter()</span>
+<span class="pc" id="L50">        binding.tvDateContext.setOnClickListener { v -&gt; showFilterMenu(v) }</span>
+<span class="fc" id="L51">    }</span>
+
+    @Suppress(&quot;MagicNumber&quot;)
+    private fun setupCombinedChart() {
+<span class="fc" id="L55">        binding.wastageCombinedChart.apply {</span>
+<span class="fc" id="L56">            description.isEnabled = false</span>
+<span class="fc" id="L57">            setDrawGridBackground(false)</span>
+<span class="fc" id="L58">            setExtraOffsets(10f, 10f, 10f, 20f)</span>
+
+<span class="fc" id="L60">            setDrawOrder(arrayOf(CombinedChart.DrawOrder.BAR, CombinedChart.DrawOrder.LINE))</span>
+
+<span class="fc" id="L62">            xAxis.apply {</span>
+<span class="fc" id="L63">                position = XAxis.XAxisPosition.BOTTOM</span>
+<span class="fc" id="L64">                setDrawGridLines(false)</span>
+<span class="fc" id="L65">                granularity = 1f</span>
+<span class="fc" id="L66">                isGranularityEnabled = true</span>
+<span class="fc" id="L67">                textColor = ContextCompat.getColor(requireContext(), R.color.muted_text)</span>
+<span class="fc" id="L68">                axisLineColor = Color.TRANSPARENT</span>
+<span class="fc" id="L69">                labelRotationAngle = -45f</span>
+<span class="fc" id="L70">                textSize = 8f</span>
+<span class="fc" id="L71">                setAvoidFirstLastClipping(false)</span>
+<span class="fc" id="L72">            }</span>
+
+<span class="fc" id="L74">            axisLeft.apply {</span>
+<span class="fc" id="L75">                setDrawGridLines(true)</span>
+<span class="fc" id="L76">                gridColor = ContextCompat.getColor(requireContext(), R.color.border_grey)</span>
+<span class="fc" id="L77">                textColor = ContextCompat.getColor(requireContext(), R.color.muted_text)</span>
+<span class="fc" id="L78">                axisLineColor = Color.TRANSPARENT</span>
+<span class="fc" id="L79">                axisMinimum = 0f</span>
+<span class="fc" id="L80">                setSpaceBottom(15f)</span>
+<span class="fc" id="L81">            }</span>
+<span class="fc" id="L82">            axisRight.isEnabled = false</span>
+<span class="fc" id="L83">            legend.isEnabled = true</span>
+
+<span class="fc" id="L85">            setOnChartValueSelectedListener(</span>
+<span class="fc" id="L86">                object : OnChartValueSelectedListener {</span>
+                    override fun onValueSelected(
+                        e: Entry?,
+                        h: Highlight?,
+                    ) {
+<span class="nc bnc" id="L91" title="All 2 branches missed.">                        val selectedDateIndex = e?.x?.toInt() ?: return</span>
+<span class="nc" id="L92">                        val wastageTrendData =</span>
+<span class="nc bnc" id="L93" title="All 4 branches missed.">                            (viewModel.wastageTrend.value as? Resource.Success)?.data</span>
+<span class="nc bnc" id="L94" title="All 2 branches missed.">                        val trendItem = wastageTrendData?.getOrNull(selectedDateIndex)</span>
+
+<span class="nc bnc" id="L96" title="All 2 branches missed.">                        if (trendItem != null) {</span>
+<span class="nc" id="L97">                            val action =</span>
+<span class="nc" id="L98">                                WastageOverviewFragmentDirections.actionNavWastageToWastageDetailFragment(</span>
+<span class="nc" id="L99">                                    date = trendItem.date,</span>
+<span class="nc" id="L100">                                    itemBreakdown = trendItem.itemBreakdown.toTypedArray(),</span>
+                                )
+<span class="nc" id="L102">                            findNavController().navigate(action)</span>
+                        } else {
+<span class="nc" id="L104">                            requireContext().showToast(&quot;Could not retrieve details for selected entry.&quot;)</span>
+                        }
+<span class="nc" id="L106">                    }</span>
+
+                    override fun onNothingSelected() {
+                        // This is intentionally left empty because no action is needed when nothing is selected.
+<span class="nc" id="L110">                    }</span>
+                },
+            )
+<span class="fc" id="L113">        }</span>
+<span class="fc" id="L114">    }</span>
+
+    private fun observeViewModel() {
+<span class="fc" id="L117">        viewModel.wastageTrend.observe(viewLifecycleOwner) { result -&gt;</span>
+<span class="fc" id="L118">            when (result) {</span>
+<span class="fc bfc" id="L119" title="All 2 branches covered.">                is Resource.Loading -&gt; binding.progressBar.visible()</span>
+<span class="fc bfc" id="L120" title="All 2 branches covered.">                is Resource.Success -&gt; {</span>
+<span class="fc" id="L121">                    binding.progressBar.gone()</span>
+<span class="pc bpc" id="L122" title="1 of 2 branches missed.">                    val wastageData = result.data ?: emptyList()</span>
+
+<span class="pc bpc" id="L124" title="2 of 4 branches missed.">                    if (wastageData.isNotEmpty()) {</span>
+<span class="fc" id="L125">                        updateChart(wastageData)</span>
+                    } else {
+<span class="nc" id="L127">                        binding.wastageCombinedChart.clear()</span>
+<span class="nc" id="L128">                        requireContext().showToast(&quot;No wastage data available&quot;)</span>
+                    }
+                }
+<span class="fc" id="L131">                is Resource.Error -&gt; {</span>
+<span class="fc" id="L132">                    binding.progressBar.gone()</span>
+<span class="fc" id="L133">                    binding.wastageCombinedChart.clear()</span>
+<span class="pc bpc" id="L134" title="1 of 2 branches missed.">                    requireContext().showToast(result.message ?: &quot;Error loading wastage data&quot;)</span>
+                }
+            }
+<span class="fc" id="L137">        }</span>
+<span class="fc" id="L138">    }</span>
+
+    @Suppress(&quot;MagicNumber&quot;)
+    private fun updateChart(wastageData: List&lt;WastageTrendDto&gt;) {
+<span class="fc bfc" id="L142" title="All 2 branches covered.">        val totalCarbonFootprint = wastageData.sumOf { it.totalCarbonFootprint }</span>
+<span class="fc" id="L143">        binding.tvWastageSubtitle.text = &quot;Total Carbon Footprint: %.2f kg&quot;.format(totalCarbonFootprint)</span>
+
+<span class="fc" id="L145">        val barEntries = mutableListOf&lt;BarEntry&gt;()</span>
+<span class="fc" id="L146">        val lineEntries = mutableListOf&lt;Entry&gt;()</span>
+<span class="fc" id="L147">        val labels = mutableListOf&lt;String&gt;()</span>
+
+<span class="fc" id="L149">        val inputFormat = SimpleDateFormat(&quot;yyyy-MM-dd&quot;, Locale.getDefault())</span>
+<span class="fc" id="L150">        val outputFormat = SimpleDateFormat(&quot;d MMM&quot;, Locale.getDefault())</span>
+
+<span class="fc" id="L152">        wastageData.forEachIndexed { index, item -&gt;</span>
+<span class="fc" id="L153">            barEntries.add(BarEntry(index.toFloat(), item.totalQuantity.toFloat()))</span>
+<span class="fc" id="L154">            lineEntries.add(Entry(index.toFloat(), item.totalCarbonFootprint.toFloat()))</span>
+
+<span class="fc" id="L156">            val formattedLabel =</span>
+<span class="fc" id="L157">                try {</span>
+<span class="pc bpc" id="L158" title="2 of 4 branches missed.">                    inputFormat.parse(item.date)?.let { outputFormat.format(it) } ?: item.date</span>
+<span class="nc" id="L159">                } catch (e: Exception) {</span>
+<span class="nc" id="L160">                    e.printStackTrace()</span>
+<span class="nc" id="L161">                    item.date</span>
+                }
+<span class="fc" id="L163">            labels.add(formattedLabel)</span>
+<span class="fc" id="L164">        }</span>
+
+<span class="fc" id="L166">        binding.wastageCombinedChart.xAxis.apply {</span>
+<span class="fc" id="L167">            valueFormatter = IndexAxisValueFormatter(labels)</span>
+<span class="fc" id="L168">            axisMinimum = -0.5f</span>
+<span class="fc" id="L169">            axisMaximum = (wastageData.size - 1).toFloat() + 0.5f</span>
+<span class="fc" id="L170">            setLabelCount(wastageData.size, false)</span>
+<span class="fc" id="L171">        }</span>
+
+<span class="fc" id="L173">        val combinedData = CombinedData()</span>
+
+<span class="fc" id="L175">        val barDataSet =</span>
+<span class="fc" id="L176">            BarDataSet(barEntries, &quot;Daily Wastage (kg)&quot;).apply {</span>
+<span class="fc" id="L177">                color = ContextCompat.getColor(requireContext(), R.color.destructive)</span>
+<span class="fc" id="L178">                setDrawValues(false)</span>
+<span class="fc" id="L179">            }</span>
+
+<span class="fc" id="L181">        val barData = BarData(barDataSet)</span>
+<span class="fc bfc" id="L182" title="All 2 branches covered.">        barData.barWidth = if (wastageData.size == 1) 0.5f else 0.8f</span>
+<span class="fc" id="L183">        combinedData.setData(barData)</span>
+
+<span class="fc bfc" id="L185" title="All 2 branches covered.">        if (wastageData.size &gt; 1) {</span>
+<span class="fc" id="L186">            val lineDataSet =</span>
+<span class="fc" id="L187">                LineDataSet(lineEntries, &quot;Carbon Footprint (kg CO2)&quot;).apply {</span>
+<span class="fc" id="L188">                    color = ContextCompat.getColor(requireContext(), R.color.primary)</span>
+<span class="fc" id="L189">                    setCircleColor(ContextCompat.getColor(requireContext(), R.color.primary))</span>
+<span class="fc" id="L190">                    lineWidth = 2.5f</span>
+<span class="fc" id="L191">                    circleRadius = 4f</span>
+<span class="fc" id="L192">                    setDrawCircleHole(false)</span>
+<span class="fc" id="L193">                    mode = LineDataSet.Mode.CUBIC_BEZIER</span>
+<span class="fc" id="L194">                    setDrawValues(false)</span>
+<span class="fc" id="L195">                }</span>
+<span class="fc" id="L196">            combinedData.setData(LineData(lineDataSet))</span>
+        }
+
+<span class="fc" id="L199">        binding.wastageCombinedChart.data = combinedData</span>
+<span class="fc" id="L200">        binding.wastageCombinedChart.notifyDataSetChanged()</span>
+<span class="fc" id="L201">        binding.wastageCombinedChart.invalidate()</span>
+<span class="fc" id="L202">    }</span>
+
+    override fun onDestroyView() {
+<span class="fc" id="L205">        super.onDestroyView()</span>
+<span class="fc" id="L206">        _binding = null</span>
+<span class="fc" id="L207">    }</span>
+
+    private fun showFilterMenu(view: View) {
+<span class="nc" id="L210">        val popup = PopupMenu(requireContext(), view)</span>
+<span class="nc" id="L211">        popup.menuInflater.inflate(R.menu.date_filter_menu, popup.menu)</span>
+
+<span class="nc" id="L213">        popup.setOnMenuItemClickListener { item -&gt;</span>
+<span class="nc" id="L214">            when (item.itemId) {</span>
+<span class="nc bnc" id="L215" title="All 2 branches missed.">                R.id.filter_today -&gt; {</span>
+<span class="nc" id="L216">                    viewModel.setFilter(WastageFilter.TODAY)</span>
+<span class="nc" id="L217">                    true</span>
+                }
+<span class="nc bnc" id="L219" title="All 2 branches missed.">                R.id.filter_7_days -&gt; {</span>
+<span class="nc" id="L220">                    viewModel.setFilter(WastageFilter.LAST_7_DAYS)</span>
+<span class="nc" id="L221">                    true</span>
+                }
+<span class="nc" id="L223">                else -&gt; false</span>
+<span class="nc" id="L224">            }</span>
+        }
+<span class="nc" id="L226">        popup.show()</span>
+<span class="nc" id="L227">    }</span>
+
+    private fun observeFilter() {
+<span class="fc" id="L230">        viewModel.currentFilter.observe(viewLifecycleOwner) { filter -&gt;</span>
+<span class="pc bpc" id="L231" title="1 of 2 branches missed.">            binding.tvDateContext.text = if (filter == WastageFilter.TODAY) &quot;Today&quot; else &quot;Last 7 Days&quot;</span>
+<span class="fc" id="L232">        }</span>
+<span class="fc" id="L233">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

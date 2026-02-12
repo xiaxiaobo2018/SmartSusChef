@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AuthDtos.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">com.smartsuschef.mobile.network.dto</a> &gt; <span class="el_source">AuthDtos.kt</span></div><h1>AuthDtos.kt</h1><pre class="source lang-java linenums">package com.smartsuschef.mobile.network.dto
+
+import com.google.gson.annotations.SerializedName
+
+/**
+ * Login Request DTO
+ * Maps to: LoginRequest in AuthDtos.cs
+ */
+<span class="fc" id="L9">data class LoginRequest(</span>
+<span class="fc" id="L10">    @SerializedName(&quot;username&quot;)</span>
+    val username: String,
+<span class="fc" id="L12">    @SerializedName(&quot;password&quot;)</span>
+    val password: String,
+)
+
+/**
+ * Login Response DTO
+ * Maps to: LoginResponse in AuthDtos.cs
+ */
+<span class="fc" id="L20">data class LoginResponse(</span>
+<span class="fc" id="L21">    @SerializedName(&quot;token&quot;)</span>
+    val token: String,
+<span class="fc" id="L23">    @SerializedName(&quot;user&quot;)</span>
+    val user: UserDto,
+<span class="fc" id="L25">    @SerializedName(&quot;storeSetupRequired&quot;)</span>
+    val storeSetupRequired: Boolean,
+)
+
+/**
+ * User DTO
+ * Maps to: UserDto in AuthDtos.cs
+ */
+<span class="fc" id="L33">data class UserDto(</span>
+<span class="fc" id="L34">    @SerializedName(&quot;id&quot;)</span>
+    val id: String,
+<span class="fc" id="L36">    @SerializedName(&quot;username&quot;)</span>
+    val username: String,
+<span class="fc" id="L38">    @SerializedName(&quot;name&quot;)</span>
+    val name: String,
+<span class="fc" id="L40">    @SerializedName(&quot;email&quot;)</span>
+    val email: String,
+    // &quot;manager&quot; or &quot;employee&quot;
+<span class="fc" id="L43">    @SerializedName(&quot;role&quot;)</span>
+    val role: String,
+    // &quot;Active&quot; or &quot;Inactive&quot;
+<span class="fc" id="L46">    @SerializedName(&quot;status&quot;)</span>
+    val status: String,
+<span class="fc" id="L48">    @SerializedName(&quot;createdAt&quot;)</span>
+    val createdAt: String,
+<span class="fc" id="L50">    @SerializedName(&quot;updatedAt&quot;)</span>
+    val updatedAt: String,
+)
+
+/**
+ * Update Profile Request
+ * For users to update their own name and email
+ * Username cannot be changed
+ */
+<span class="fc" id="L59">data class UpdateProfileRequest(</span>
+<span class="pc" id="L60">    @SerializedName(&quot;name&quot;)</span>
+    val name: String,
+<span class="pc" id="L62">    @SerializedName(&quot;email&quot;)</span>
+    val email: String,
+)
+
+/**
+ * Change Password Request
+ * For users to change their own password
+ */
+<span class="fc" id="L70">data class ChangePasswordRequest(</span>
+<span class="pc" id="L71">    @SerializedName(&quot;currentPassword&quot;)</span>
+    val currentPassword: String,
+<span class="pc" id="L73">    @SerializedName(&quot;newPassword&quot;)</span>
+    val newPassword: String,
+)
+
+/**
+ * Forgot Password Request
+ * For &quot;Forgot Password&quot; feature on login screen
+ * Maps to: ForgotPasswordRequest in AuthDtos.cs
+ */
+<span class="fc" id="L82">data class ForgotPasswordRequest(</span>
+<span class="fc" id="L83">    @SerializedName(&quot;emailOrUsername&quot;)</span>
+    val emailOrUsername: String,
+)
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

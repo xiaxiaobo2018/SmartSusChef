@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RecipeDtos.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">com.smartsuschef.mobile.network.dto</a> &gt; <span class="el_source">RecipeDtos.kt</span></div><h1>RecipeDtos.kt</h1><pre class="source lang-java linenums">package com.smartsuschef.mobile.network.dto
+
+import com.google.gson.annotations.SerializedName
+
+/**
+ * Recipe DTO
+ * Maps to: RecipeDto(string Id, string Name, bool IsSellable, bool IsSubRecipe, List&lt;RecipeIngredientDto&gt; Ingredients)
+ */
+<span class="fc" id="L9">data class RecipeDto(</span>
+<span class="fc" id="L10">    @SerializedName(&quot;id&quot;)</span>
+    val id: String,
+<span class="fc" id="L12">    @SerializedName(&quot;name&quot;)</span>
+    val name: String,
+<span class="fc" id="L14">    @SerializedName(&quot;isSellable&quot;)</span>
+    val isSellable: Boolean,
+<span class="fc" id="L16">    @SerializedName(&quot;isSubRecipe&quot;)</span>
+    val isSubRecipe: Boolean,
+<span class="fc" id="L18">    @SerializedName(&quot;ingredients&quot;)</span>
+    val ingredients: List&lt;RecipeIngredientDto&gt;,
+<span class="pc" id="L20">    @SerializedName(&quot;createdAt&quot;)</span>
+    val createdAt: String,
+<span class="pc" id="L22">    @SerializedName(&quot;updatedAt&quot;)</span>
+    val updatedAt: String,
+)
+
+/**
+ * Recipe Ingredient DTO
+ * Maps to: RecipeIngredientDto with IngredientId OR ChildRecipeId
+ */
+<span class="pc" id="L30">data class RecipeIngredientDto(</span>
+<span class="fc" id="L31">    @SerializedName(&quot;ingredientId&quot;)</span>
+<span class="nc" id="L32">    val ingredientId: String? = null,</span>
+<span class="fc" id="L33">    @SerializedName(&quot;childRecipeId&quot;)</span>
+<span class="nc" id="L34">    val childRecipeId: String? = null,</span>
+    // Either Ingredient Name or Recipe Name
+<span class="fc" id="L36">    @SerializedName(&quot;displayName&quot;)</span>
+    val displayName: String,
+<span class="fc" id="L38">    @SerializedName(&quot;unit&quot;)</span>
+    val unit: String,
+<span class="fc" id="L40">    @SerializedName(&quot;quantity&quot;)</span>
+    val quantity: Double,
+<span class="nc" id="L42">)</span>
+
+/**
+ * Create Recipe Request
+ * Maps to: CreateRecipeRequest
+ */
+<span class="fc" id="L48">data class CreateRecipeRequest(</span>
+<span class="pc" id="L49">    @SerializedName(&quot;name&quot;)</span>
+    val name: String,
+<span class="pc" id="L51">    @SerializedName(&quot;isSellable&quot;)</span>
+    val isSellable: Boolean,
+<span class="pc" id="L53">    @SerializedName(&quot;isSubRecipe&quot;)</span>
+    val isSubRecipe: Boolean,
+<span class="pc" id="L55">    @SerializedName(&quot;ingredients&quot;)</span>
+    val ingredients: List&lt;CreateRecipeIngredientRequest&gt;,
+)
+
+/**
+ * Create Recipe Ingredient Request
+ * Either IngredientId or ChildRecipeId must be provided
+ */
+<span class="fc" id="L63">data class CreateRecipeIngredientRequest(</span>
+<span class="fc" id="L64">    @SerializedName(&quot;ingredientId&quot;)</span>
+<span class="fc" id="L65">    val ingredientId: String? = null,</span>
+<span class="fc" id="L66">    @SerializedName(&quot;childRecipeId&quot;)</span>
+<span class="fc" id="L67">    val childRecipeId: String? = null,</span>
+<span class="pc" id="L68">    @SerializedName(&quot;quantity&quot;)</span>
+    val quantity: Double,
+<span class="fc" id="L70">)</span>
+
+/**
+ * Update Recipe Request
+ * Maps to: UpdateRecipeRequest
+ */
+<span class="fc" id="L76">data class UpdateRecipeRequest(</span>
+<span class="fc" id="L77">    @SerializedName(&quot;name&quot;)</span>
+    val name: String,
+<span class="fc" id="L79">    @SerializedName(&quot;isSellable&quot;)</span>
+    val isSellable: Boolean,
+<span class="fc" id="L81">    @SerializedName(&quot;isSubRecipe&quot;)</span>
+    val isSubRecipe: Boolean,
+<span class="fc" id="L83">    @SerializedName(&quot;ingredients&quot;)</span>
+    val ingredients: List&lt;CreateRecipeIngredientRequest&gt;,
+)
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

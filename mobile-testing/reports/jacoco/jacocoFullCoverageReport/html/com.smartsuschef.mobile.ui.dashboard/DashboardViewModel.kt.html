@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DashboardViewModel.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">com.smartsuschef.mobile.ui.dashboard</a> &gt; <span class="el_source">DashboardViewModel.kt</span></div><h1>DashboardViewModel.kt</h1><pre class="source lang-java linenums">package com.smartsuschef.mobile.ui.dashboard
+
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.smartsuschef.mobile.data.TokenManager
+import com.smartsuschef.mobile.data.repository.AuthRepository
+import com.smartsuschef.mobile.data.repository.StoreRepository
+import com.smartsuschef.mobile.data.repository.UsersRepository
+import com.smartsuschef.mobile.util.Resource
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+@HiltViewModel
+class DashboardViewModel
+<span class="fc" id="L18">    @Inject</span>
+    constructor(
+<span class="fc" id="L20">        private val authRepository: AuthRepository,</span>
+<span class="fc" id="L21">        private val usersRepository: UsersRepository,</span>
+<span class="fc" id="L22">        private val storeRepository: StoreRepository,</span>
+<span class="fc" id="L23">        private val tokenManager: TokenManager,</span>
+<span class="fc" id="L24">    ) : ViewModel() {</span>
+<span class="fc" id="L25">        private val _username = MutableLiveData&lt;String&gt;()</span>
+<span class="fc" id="L26">        val username: LiveData&lt;String&gt; = _username</span>
+
+<span class="fc" id="L28">        private val _userRole = MutableLiveData&lt;String&gt;()</span>
+<span class="fc" id="L29">        val userRole: LiveData&lt;String&gt; = _userRole</span>
+
+<span class="fc" id="L31">        private val _storeName = MutableLiveData&lt;String&gt;()</span>
+<span class="fc" id="L32">        val storeName: LiveData&lt;String&gt; = _storeName</span>
+
+<span class="fc" id="L34">        private val _outletLocation = MutableLiveData&lt;String&gt;()</span>
+<span class="fc" id="L35">        val outletLocation: LiveData&lt;String&gt; = _outletLocation</span>
+
+<span class="fc" id="L37">        private val _isLoading = MutableLiveData&lt;Boolean&gt;()</span>
+<span class="fc" id="L38">        val isLoading: LiveData&lt;Boolean&gt; = _isLoading</span>
+
+<span class="fc" id="L40">        init {</span>
+<span class="fc" id="L41">            loadUserInfo()</span>
+<span class="fc" id="L42">        }</span>
+
+        private fun loadUserInfo() {
+<span class="fc" id="L45">            viewModelScope.launch {</span>
+<span class="fc" id="L46">                _isLoading.value = true // Start loading indicator</span>
+<span class="fc bfc" id="L47" title="All 2 branches covered.">                _userRole.value = tokenManager.getUserRole() ?: &quot;Employee&quot;</span>
+
+<span class="fc" id="L49">                when (val userResult = usersRepository.getCurrentUser()) {</span>
+<span class="fc bfc" id="L50" title="All 2 branches covered.">                    is Resource.Success -&gt; {</span>
+<span class="pc bpc" id="L51" title="2 of 4 branches missed.">                        _username.value = userResult.data?.name ?: &quot;User&quot;</span>
+<span class="fc" id="L52">                        fetchStoreInfo()</span>
+                    }
+<span class="pc bpc" id="L54" title="1 of 2 branches missed.">                    is Resource.Error -&gt; {</span>
+<span class="fc" id="L55">                        _username.value = &quot;User&quot;</span>
+<span class="fc" id="L56">                        _isLoading.value = false</span>
+                    }
+<span class="nc" id="L58">                    is Resource.Loading -&gt; {</span>
+<span class="nc" id="L59">                        _isLoading.value = true</span>
+                    }
+                }
+<span class="fc" id="L62">            }</span>
+<span class="fc" id="L63">        }</span>
+
+<span class="fc" id="L65">        private suspend fun fetchStoreInfo() {</span>
+<span class="fc" id="L66">            when (val storeResult = storeRepository.getStore()) {</span>
+<span class="fc bfc" id="L67" title="All 2 branches covered.">                is Resource.Success -&gt; {</span>
+                    // API call succeeds, Elvis operator to handle empty fields in JSON
+<span class="pc bpc" id="L69" title="2 of 4 branches missed.">                    _storeName.value = storeResult.data?.storeName ?: &quot;Store&quot;</span>
+<span class="pc bpc" id="L70" title="2 of 4 branches missed.">                    _outletLocation.value = storeResult.data?.outletLocation ?: &quot;Unknown&quot;</span>
+<span class="fc" id="L71">                    _isLoading.value = false</span>
+                }
+<span class="pc bpc" id="L73" title="1 of 2 branches missed.">                is Resource.Error -&gt; {</span>
+                    // When API call has failed, to use fallback values
+<span class="fc" id="L75">                    _storeName.value = &quot;SmartSus Chef&quot;</span>
+<span class="fc" id="L76">                    _outletLocation.value = &quot;Offline Mode&quot;</span>
+<span class="fc" id="L77">                    _isLoading.value = false</span>
+                }
+                else -&gt; {
+<span class="nc" id="L80">                    _isLoading.value = true</span>
+                }
+            }
+<span class="fc" id="L83">        }</span>
+
+        fun logout() {
+<span class="pc bpc" id="L86" title="1 of 2 branches missed.">            viewModelScope.launch {</span>
+<span class="fc" id="L87">                authRepository.logout()</span>
+<span class="fc" id="L88">            }</span>
+<span class="fc" id="L89">        }</span>
+    }
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

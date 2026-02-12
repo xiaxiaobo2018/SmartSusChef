@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SalesViewModel.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">com.smartsuschef.mobile.ui.sales</a> &gt; <span class="el_source">SalesViewModel.kt</span></div><h1>SalesViewModel.kt</h1><pre class="source lang-java linenums">package com.smartsuschef.mobile.ui.sales
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.smartsuschef.mobile.data.repository.ForecastRepository
+import com.smartsuschef.mobile.data.repository.SalesRepository
+import com.smartsuschef.mobile.network.dto.HolidayDto
+import com.smartsuschef.mobile.network.dto.WeatherDto
+import com.smartsuschef.mobile.util.Resource
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
+import javax.inject.Inject
+
+<span class="pc" id="L18">enum class SalesFilter { TODAY, LAST_7_DAYS }</span>
+
+@HiltViewModel
+class SalesViewModel
+<span class="fc" id="L22">    @Inject</span>
+    constructor(
+<span class="fc" id="L24">        private val salesRepository: SalesRepository,</span>
+<span class="fc" id="L25">        private val forecastRepository: ForecastRepository,</span>
+<span class="fc" id="L26">    ) : ViewModel() {</span>
+        // Sales Trend (7 days)
+<span class="fc" id="L28">        private val _salesTrend = MutableLiveData&lt;Resource&lt;List&lt;SalesTrendItem&gt;&gt;&gt;()</span>
+<span class="fc" id="L29">        val salesTrend: LiveData&lt;Resource&lt;List&lt;SalesTrendItem&gt;&gt;&gt; = _salesTrend</span>
+<span class="fc" id="L30">        private val _currentFilter = MutableLiveData(SalesFilter.LAST_7_DAYS)</span>
+<span class="fc" id="L31">        val currentFilter: LiveData&lt;SalesFilter&gt; = _currentFilter</span>
+
+        // Ingredient breakdown for a specific date
+<span class="fc" id="L34">        private val _ingredientBreakdown = MutableLiveData&lt;Resource&lt;List&lt;IngredientRequirement&gt;&gt;&gt;()</span>
+<span class="fc" id="L35">        val ingredientBreakdown: LiveData&lt;Resource&lt;List&lt;IngredientRequirement&gt;&gt;&gt; = _ingredientBreakdown</span>
+
+        // Recipe sales breakdown for a specific date (for pie chart)
+<span class="fc" id="L38">        private val _recipeSales = MutableLiveData&lt;Resource&lt;List&lt;RecipeSalesItem&gt;&gt;&gt;()</span>
+<span class="fc" id="L39">        val recipeSales: LiveData&lt;Resource&lt;List&lt;RecipeSalesItem&gt;&gt;&gt; = _recipeSales</span>
+
+        // Weather
+<span class="fc" id="L42">        private val _weather = MutableLiveData&lt;Resource&lt;WeatherDto?&gt;&gt;()</span>
+<span class="fc" id="L43">        val weather: LiveData&lt;Resource&lt;WeatherDto?&gt;&gt; = _weather</span>
+
+        // Holidays
+<span class="fc" id="L46">        private val _holidays = MutableLiveData&lt;Resource&lt;List&lt;HolidayDto&gt;&gt;&gt;()</span>
+<span class="fc" id="L47">        val holidays: LiveData&lt;Resource&lt;List&lt;HolidayDto&gt;&gt;&gt; = _holidays</span>
+
+<span class="fc" id="L49">        init {</span>
+<span class="fc" id="L50">            fetchOverviewData()</span>
+<span class="fc" id="L51">            fetchWeather()</span>
+<span class="fc" id="L52">            fetchHolidays()</span>
+<span class="fc" id="L53">        }</span>
+
+        fun setFilter(filter: SalesFilter) {
+<span class="fc" id="L56">            _currentFilter.value = filter</span>
+<span class="fc" id="L57">            fetchOverviewData(filter)</span>
+<span class="fc" id="L58">        }</span>
+
+<span class="fc" id="L60">        fun fetchOverviewData(filter: SalesFilter = SalesFilter.LAST_7_DAYS) {</span>
+<span class="fc" id="L61">            viewModelScope.launch {</span>
+<span class="fc" id="L62">                _salesTrend.value = Resource.Loading()</span>
+
+<span class="fc" id="L64">                val dateFormat = SimpleDateFormat(&quot;yyyy-MM-dd&quot;, Locale.getDefault())</span>
+<span class="fc" id="L65">                val calendar = Calendar.getInstance()</span>
+                // Always get today's date as the end date
+<span class="fc" id="L67">                val endDate = dateFormat.format(calendar.time)</span>
+
+                // Calculate the start date based on selected filter
+<span class="fc" id="L70">                val startDate =</span>
+<span class="fc bfc" id="L71" title="All 2 branches covered.">                    if (filter == SalesFilter.TODAY) {</span>
+<span class="fc" id="L72">                        endDate // Start and end are the same for &quot;Today&quot;</span>
+                    } else {
+<span class="fc" id="L74">                        calendar.add(Calendar.DAY_OF_YEAR, -DAYS_BACK) // Go back 6 days from today</span>
+<span class="fc" id="L75">                        dateFormat.format(calendar.time)</span>
+                    }
+
+<span class="fc" id="L78">                when (val result = salesRepository.getTrend(startDate, endDate)) {</span>
+<span class="fc bfc" id="L79" title="All 2 branches covered.">                    is Resource.Success -&gt; {</span>
+<span class="pc bpc" id="L80" title="1 of 2 branches missed.">                        val trendItems = result.data?.map { SalesTrendItem(it.date, it.totalQuantity) }</span>
+<span class="pc bpc" id="L81" title="1 of 2 branches missed.">                        _salesTrend.value = Resource.Success(trendItems ?: emptyList())</span>
+                    }
+<span class="fc bfc" id="L83" title="All 2 branches covered.">                    is Resource.Error -&gt; {</span>
+<span class="pc bpc" id="L84" title="1 of 2 branches missed.">                        _salesTrend.value = Resource.Error(result.message ?: &quot;Failed to load sales trend&quot;)</span>
+                    }
+                    else -&gt; { /* Loading state is already set */ }
+                }
+<span class="fc" id="L88">            }</span>
+<span class="fc" id="L89">        }</span>
+
+        fun fetchIngredientsForDate(date: String) {
+//        val formattedDate = DateUtils.formatDateForApi(date)
+<span class="fc" id="L93">            viewModelScope.launch {</span>
+<span class="fc" id="L94">                _ingredientBreakdown.value = Resource.Loading()</span>
+<span class="fc" id="L95">                when (val result = salesRepository.getIngredientUsageByDate(date)) {</span>
+<span class="fc bfc" id="L96" title="All 2 branches covered.">                    is Resource.Success -&gt; {</span>
+<span class="fc" id="L97">                        val requirements =</span>
+<span class="pc bpc" id="L98" title="1 of 2 branches missed.">                            result.data?.map {</span>
+<span class="fc" id="L99">                                IngredientRequirement(it.ingredientName, it.quantity, it.unit)</span>
+                            }
+<span class="pc bpc" id="L101" title="1 of 2 branches missed.">                        _ingredientBreakdown.value = Resource.Success(requirements ?: emptyList())</span>
+                    }
+<span class="pc bpc" id="L103" title="1 of 2 branches missed.">                    is Resource.Error -&gt; {</span>
+<span class="fc" id="L104">                        _ingredientBreakdown.value =</span>
+<span class="pc bpc" id="L105" title="1 of 2 branches missed.">                            Resource.Error(result.message ?: &quot;Failed to load ingredient breakdown&quot;)</span>
+                    }
+                    else -&gt; { /* Loading state is already set */ }
+                }
+<span class="fc" id="L109">            }</span>
+<span class="fc" id="L110">        }</span>
+
+        fun fetchRecipeSalesForDate(date: String) {
+<span class="fc" id="L113">            viewModelScope.launch {</span>
+<span class="fc" id="L114">                _recipeSales.value = Resource.Loading()</span>
+<span class="fc" id="L115">                when (val result = salesRepository.getRecipeSalesByDate(date)) {</span>
+<span class="fc bfc" id="L116" title="All 2 branches covered.">                    is Resource.Success -&gt; {</span>
+<span class="fc" id="L117">                        val salesItems =</span>
+<span class="pc bpc" id="L118" title="1 of 2 branches missed.">                            result.data?.map {</span>
+<span class="fc" id="L119">                                RecipeSalesItem(it.recipeName, it.quantity)</span>
+                            }
+<span class="pc bpc" id="L121" title="1 of 2 branches missed.">                        _recipeSales.value = Resource.Success(salesItems ?: emptyList())</span>
+                    }
+<span class="pc bpc" id="L123" title="1 of 2 branches missed.">                    is Resource.Error -&gt; {</span>
+<span class="pc bpc" id="L124" title="1 of 2 branches missed.">                        _recipeSales.value = Resource.Error(result.message ?: &quot;Failed to load recipe sales breakdown&quot;)</span>
+                    }
+                    else -&gt; { /* Loading state is already set */ }
+                }
+<span class="fc" id="L128">            }</span>
+<span class="fc" id="L129">        }</span>
+
+        private fun fetchWeather() {
+<span class="fc" id="L132">            viewModelScope.launch {</span>
+<span class="fc" id="L133">                _weather.value = Resource.Loading()</span>
+<span class="fc" id="L134">                when (val result = forecastRepository.getWeather()) {</span>
+<span class="fc bfc" id="L135" title="All 2 branches covered.">                    is Resource.Success -&gt; _weather.value = Resource.Success(result.data)</span>
+<span class="pc bpc" id="L136" title="1 of 4 branches missed.">                    is Resource.Error -&gt; _weather.value = Resource.Error(result.message ?: &quot;Failed to load weather&quot;)</span>
+                    else -&gt; { /* Loading state is already set */ }
+                }
+<span class="fc" id="L139">            }</span>
+<span class="fc" id="L140">        }</span>
+
+        private fun fetchHolidays() {
+<span class="fc" id="L143">            viewModelScope.launch {</span>
+<span class="fc" id="L144">                _holidays.value = Resource.Loading()</span>
+<span class="fc" id="L145">                val year = Calendar.getInstance().get(Calendar.YEAR)</span>
+<span class="fc" id="L146">                when (val result = forecastRepository.getHolidays(year)) {</span>
+<span class="pc bpc" id="L147" title="1 of 4 branches missed.">                    is Resource.Success -&gt; _holidays.value = Resource.Success(result.data ?: emptyList())</span>
+<span class="pc bpc" id="L148" title="1 of 4 branches missed.">                    is Resource.Error -&gt; _holidays.value = Resource.Error(result.message ?: &quot;Failed to load holidays&quot;)</span>
+                    else -&gt; { /* Loading state is already set */ }
+                }
+<span class="fc" id="L151">            }</span>
+<span class="fc" id="L152">        }</span>
+
+        companion object {
+            private const val DAYS_BACK = 6
+        }
+    }
+
+// Data models matching UI needs
+<span class="pc" id="L160">data class SalesTrendItem(val date: String, val sales: Int)</span>
+
+<span class="pc" id="L162">data class IngredientRequirement(val name: String, val quantity: Double, val unit: String)</span>
+
+<span class="pc" id="L164">data class RecipeSalesItem(val name: String, val quantity: Int)</span>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

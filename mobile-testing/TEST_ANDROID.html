@@ -1,0 +1,477 @@
+<!DOCTYPE html><html><head>
+      <title>TEST_ANDROID</title>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      
+      <link rel="stylesheet" href="file:////Users/tangyingchun/.vscode/extensions/shd101wyy.markdown-preview-enhanced-0.8.20/crossnote/dependencies/katex/katex.min.css">
+      
+      
+      
+      
+      
+      <style>
+      code[class*=language-],pre[class*=language-]{color:#333;background:0 0;font-family:Consolas,"Liberation Mono",Menlo,Courier,monospace;text-align:left;white-space:pre;word-spacing:normal;word-break:normal;word-wrap:normal;line-height:1.4;-moz-tab-size:8;-o-tab-size:8;tab-size:8;-webkit-hyphens:none;-moz-hyphens:none;-ms-hyphens:none;hyphens:none}pre[class*=language-]{padding:.8em;overflow:auto;border-radius:3px;background:#f5f5f5}:not(pre)>code[class*=language-]{padding:.1em;border-radius:.3em;white-space:normal;background:#f5f5f5}.token.blockquote,.token.comment{color:#969896}.token.cdata{color:#183691}.token.doctype,.token.macro.property,.token.punctuation,.token.variable{color:#333}.token.builtin,.token.important,.token.keyword,.token.operator,.token.rule{color:#a71d5d}.token.attr-value,.token.regex,.token.string,.token.url{color:#183691}.token.atrule,.token.boolean,.token.code,.token.command,.token.constant,.token.entity,.token.number,.token.property,.token.symbol{color:#0086b3}.token.prolog,.token.selector,.token.tag{color:#63a35c}.token.attr-name,.token.class,.token.class-name,.token.function,.token.id,.token.namespace,.token.pseudo-class,.token.pseudo-element,.token.url-reference .token.variable{color:#795da3}.token.entity{cursor:help}.token.title,.token.title .token.punctuation{font-weight:700;color:#1d3e81}.token.list{color:#ed6a43}.token.inserted{background-color:#eaffea;color:#55a532}.token.deleted{background-color:#ffecec;color:#bd2c00}.token.bold{font-weight:700}.token.italic{font-style:italic}.language-json .token.property{color:#183691}.language-markup .token.tag .token.punctuation{color:#333}.language-css .token.function,code.language-css{color:#0086b3}.language-yaml .token.atrule{color:#63a35c}code.language-yaml{color:#183691}.language-ruby .token.function{color:#333}.language-markdown .token.url{color:#795da3}.language-makefile .token.symbol{color:#795da3}.language-makefile .token.variable{color:#183691}.language-makefile .token.builtin{color:#0086b3}.language-bash .token.keyword{color:#0086b3}pre[data-line]{position:relative;padding:1em 0 1em 3em}pre[data-line] .line-highlight-wrapper{position:absolute;top:0;left:0;background-color:transparent;display:block;width:100%}pre[data-line] .line-highlight{position:absolute;left:0;right:0;padding:inherit 0;margin-top:1em;background:hsla(24,20%,50%,.08);background:linear-gradient(to right,hsla(24,20%,50%,.1) 70%,hsla(24,20%,50%,0));pointer-events:none;line-height:inherit;white-space:pre}pre[data-line] .line-highlight:before,pre[data-line] .line-highlight[data-end]:after{content:attr(data-start);position:absolute;top:.4em;left:.6em;min-width:1em;padding:0 .5em;background-color:hsla(24,20%,50%,.4);color:#f4f1ef;font:bold 65%/1.5 sans-serif;text-align:center;vertical-align:.3em;border-radius:999px;text-shadow:none;box-shadow:0 1px #fff}pre[data-line] .line-highlight[data-end]:after{content:attr(data-end);top:auto;bottom:.4em}html body{font-family:'Helvetica Neue',Helvetica,'Segoe UI',Arial,freesans,sans-serif;font-size:16px;line-height:1.6;color:#333;background-color:#fff;overflow:initial;box-sizing:border-box;word-wrap:break-word}html body>:first-child{margin-top:0}html body h1,html body h2,html body h3,html body h4,html body h5,html body h6{line-height:1.2;margin-top:1em;margin-bottom:16px;color:#000}html body h1{font-size:2.25em;font-weight:300;padding-bottom:.3em}html body h2{font-size:1.75em;font-weight:400;padding-bottom:.3em}html body h3{font-size:1.5em;font-weight:500}html body h4{font-size:1.25em;font-weight:600}html body h5{font-size:1.1em;font-weight:600}html body h6{font-size:1em;font-weight:600}html body h1,html body h2,html body h3,html body h4,html body h5{font-weight:600}html body h5{font-size:1em}html body h6{color:#5c5c5c}html body strong{color:#000}html body del{color:#5c5c5c}html body a:not([href]){color:inherit;text-decoration:none}html body a{color:#08c;text-decoration:none}html body a:hover{color:#00a3f5;text-decoration:none}html body img{max-width:100%}html body>p{margin-top:0;margin-bottom:16px;word-wrap:break-word}html body>ol,html body>ul{margin-bottom:16px}html body ol,html body ul{padding-left:2em}html body ol.no-list,html body ul.no-list{padding:0;list-style-type:none}html body ol ol,html body ol ul,html body ul ol,html body ul ul{margin-top:0;margin-bottom:0}html body li{margin-bottom:0}html body li.task-list-item{list-style:none}html body li>p{margin-top:0;margin-bottom:0}html body .task-list-item-checkbox{margin:0 .2em .25em -1.8em;vertical-align:middle}html body .task-list-item-checkbox:hover{cursor:pointer}html body blockquote{margin:16px 0;font-size:inherit;padding:0 15px;color:#5c5c5c;background-color:#f0f0f0;border-left:4px solid #d6d6d6}html body blockquote>:first-child{margin-top:0}html body blockquote>:last-child{margin-bottom:0}html body hr{height:4px;margin:32px 0;background-color:#d6d6d6;border:0 none}html body table{margin:10px 0 15px 0;border-collapse:collapse;border-spacing:0;display:block;width:100%;overflow:auto;word-break:normal;word-break:keep-all}html body table th{font-weight:700;color:#000}html body table td,html body table th{border:1px solid #d6d6d6;padding:6px 13px}html body dl{padding:0}html body dl dt{padding:0;margin-top:16px;font-size:1em;font-style:italic;font-weight:700}html body dl dd{padding:0 16px;margin-bottom:16px}html body code{font-family:Menlo,Monaco,Consolas,'Courier New',monospace;font-size:.85em;color:#000;background-color:#f0f0f0;border-radius:3px;padding:.2em 0}html body code::after,html body code::before{letter-spacing:-.2em;content:'\00a0'}html body pre>code{padding:0;margin:0;word-break:normal;white-space:pre;background:0 0;border:0}html body .highlight{margin-bottom:16px}html body .highlight pre,html body pre{padding:1em;overflow:auto;line-height:1.45;border:#d6d6d6;border-radius:3px}html body .highlight pre{margin-bottom:0;word-break:normal}html body pre code,html body pre tt{display:inline;max-width:initial;padding:0;margin:0;overflow:initial;line-height:inherit;word-wrap:normal;background-color:transparent;border:0}html body pre code:after,html body pre code:before,html body pre tt:after,html body pre tt:before{content:normal}html body blockquote,html body dl,html body ol,html body p,html body pre,html body ul{margin-top:0;margin-bottom:16px}html body kbd{color:#000;border:1px solid #d6d6d6;border-bottom:2px solid #c7c7c7;padding:2px 4px;background-color:#f0f0f0;border-radius:3px}@media print{html body{background-color:#fff}html body h1,html body h2,html body h3,html body h4,html body h5,html body h6{color:#000;page-break-after:avoid}html body blockquote{color:#5c5c5c}html body pre{page-break-inside:avoid}html body table{display:table}html body img{display:block;max-width:100%;max-height:100%}html body code,html body pre{word-wrap:break-word;white-space:pre}}.markdown-preview{width:100%;height:100%;box-sizing:border-box}.markdown-preview ul{list-style:disc}.markdown-preview ul ul{list-style:circle}.markdown-preview ul ul ul{list-style:square}.markdown-preview ol{list-style:decimal}.markdown-preview ol ol,.markdown-preview ul ol{list-style-type:lower-roman}.markdown-preview ol ol ol,.markdown-preview ol ul ol,.markdown-preview ul ol ol,.markdown-preview ul ul ol{list-style-type:lower-alpha}.markdown-preview .newpage,.markdown-preview .pagebreak{page-break-before:always}.markdown-preview pre.line-numbers{position:relative;padding-left:3.8em;counter-reset:linenumber}.markdown-preview pre.line-numbers>code{position:relative}.markdown-preview pre.line-numbers .line-numbers-rows{position:absolute;pointer-events:none;top:1em;font-size:100%;left:0;width:3em;letter-spacing:-1px;border-right:1px solid #999;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.markdown-preview pre.line-numbers .line-numbers-rows>span{pointer-events:none;display:block;counter-increment:linenumber}.markdown-preview pre.line-numbers .line-numbers-rows>span:before{content:counter(linenumber);color:#999;display:block;padding-right:.8em;text-align:right}.markdown-preview .mathjax-exps .MathJax_Display{text-align:center!important}.markdown-preview:not([data-for=preview]) .code-chunk .code-chunk-btn-group{display:none}.markdown-preview:not([data-for=preview]) .code-chunk .status{display:none}.markdown-preview:not([data-for=preview]) .code-chunk .output-div{margin-bottom:16px}.markdown-preview .md-toc{padding:0}.markdown-preview .md-toc .md-toc-link-wrapper .md-toc-link{display:inline;padding:.25rem 0}.markdown-preview .md-toc .md-toc-link-wrapper .md-toc-link div,.markdown-preview .md-toc .md-toc-link-wrapper .md-toc-link p{display:inline}.markdown-preview .md-toc .md-toc-link-wrapper.highlighted .md-toc-link{font-weight:800}.scrollbar-style::-webkit-scrollbar{width:8px}.scrollbar-style::-webkit-scrollbar-track{border-radius:10px;background-color:transparent}.scrollbar-style::-webkit-scrollbar-thumb{border-radius:5px;background-color:rgba(150,150,150,.66);border:4px solid rgba(150,150,150,.66);background-clip:content-box}html body[for=html-export]:not([data-presentation-mode]){position:relative;width:100%;height:100%;top:0;left:0;margin:0;padding:0;overflow:auto}html body[for=html-export]:not([data-presentation-mode]) .markdown-preview{position:relative;top:0;min-height:100vh}@media screen and (min-width:914px){html body[for=html-export]:not([data-presentation-mode]) .markdown-preview{padding:2em calc(50% - 457px + 2em)}}@media screen and (max-width:914px){html body[for=html-export]:not([data-presentation-mode]) .markdown-preview{padding:2em}}@media screen and (max-width:450px){html body[for=html-export]:not([data-presentation-mode]) .markdown-preview{font-size:14px!important;padding:1em}}@media print{html body[for=html-export]:not([data-presentation-mode]) #sidebar-toc-btn{display:none}}html body[for=html-export]:not([data-presentation-mode]) #sidebar-toc-btn{position:fixed;bottom:8px;left:8px;font-size:28px;cursor:pointer;color:inherit;z-index:99;width:32px;text-align:center;opacity:.4}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] #sidebar-toc-btn{opacity:1}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc{position:fixed;top:0;left:0;width:300px;height:100%;padding:32px 0 48px 0;font-size:14px;box-shadow:0 0 4px rgba(150,150,150,.33);box-sizing:border-box;overflow:auto;background-color:inherit}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar{width:8px}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar-track{border-radius:10px;background-color:transparent}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar-thumb{border-radius:5px;background-color:rgba(150,150,150,.66);border:4px solid rgba(150,150,150,.66);background-clip:content-box}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc a{text-decoration:none}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc{padding:0 16px}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper .md-toc-link{display:inline;padding:.25rem 0}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper .md-toc-link div,html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper .md-toc-link p{display:inline}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper.highlighted .md-toc-link{font-weight:800}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{left:300px;width:calc(100% - 300px);padding:2em calc(50% - 457px - 300px / 2);margin:0;box-sizing:border-box}@media screen and (max-width:1274px){html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{padding:2em}}@media screen and (max-width:450px){html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{width:100%}}html body[for=html-export]:not([data-presentation-mode]):not([html-show-sidebar-toc]) .markdown-preview{left:50%;transform:translateX(-50%)}html body[for=html-export]:not([data-presentation-mode]):not([html-show-sidebar-toc]) .md-sidebar-toc{display:none}
+/* Please visit the URL below for more information: */
+/*   https://shd101wyy.github.io/markdown-preview-enhanced/#/customize-css */
+
+      </style>
+      <!-- The content below will be included at the end of the <head> element. --><script type="text/javascript">
+  document.addEventListener("DOMContentLoaded", function () {
+    // your code here
+  });
+</script></head><body for="html-export">
+    
+    
+      <div class="crossnote markdown-preview  ">
+      
+<h1 id="smartsuschef-android---testing--code-quality-guide">SmartSusChef Android - Testing &amp; Code Quality Guide </h1>
+<h2 id="1-overview">1. Overview </h2>
+<p>The SmartSusChef Android app uses a two-tier testing strategy to achieve comprehensive code coverage across all architectural layers.</p>
+<h3 id="why-two-types-of-tests">Why Two Types of Tests? </h3>
+<p>Android applications have code that can run on a standard JVM (business logic, ViewModels, repositories) and code that <strong>requires the Android framework</strong> (Activities, Fragments, UI interactions, encrypted storage). These fundamentally different environments require different testing approaches:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Unit Tests</th>
+<th>Instrumented Tests</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Runs on</strong></td>
+<td>Local JVM (no device needed)</td>
+<td>Physical device or emulator</td>
+</tr>
+<tr>
+<td><strong>Speed</strong></td>
+<td>Fast (~30 seconds)</td>
+<td>Slower (~3-5 minutes)</td>
+</tr>
+<tr>
+<td><strong>What it tests</strong></td>
+<td>ViewModels, Repositories, DTOs, Utilities, Models</td>
+<td>Activities, Fragments, UI interactions, TokenManager</td>
+</tr>
+<tr>
+<td><strong>Why separate?</strong></td>
+<td>Business logic doesn't need Android framework</td>
+<td>UI components, navigation, and encrypted storage <strong>require</strong> the Android runtime</td>
+</tr>
+</tbody>
+</table>
+<h3 id="test-counts">Test Counts </h3>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Test Files</th>
+<th>Test Cases</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Unit Tests</td>
+<td>30</td>
+<td>347</td>
+</tr>
+<tr>
+<td>Instrumented (UI) Tests</td>
+<td>9</td>
+<td>126</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td><strong>39</strong></td>
+<td><strong>473</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="frameworks--libraries">Frameworks &amp; Libraries </h3>
+<table>
+<thead>
+<tr>
+<th>Framework</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>JUnit 4</strong></td>
+<td>Test runner and assertions</td>
+</tr>
+<tr>
+<td><strong>Mockito / MockK</strong></td>
+<td>Mocking dependencies for unit tests</td>
+</tr>
+<tr>
+<td><strong>Google Truth</strong></td>
+<td>Fluent assertion library</td>
+</tr>
+<tr>
+<td><strong>Kotlin Coroutines Test</strong></td>
+<td>Testing coroutine-based async code</td>
+</tr>
+<tr>
+<td><strong>AndroidX Arch Core Testing</strong></td>
+<td><code>InstantTaskExecutorRule</code> for LiveData</td>
+</tr>
+<tr>
+<td><strong>Robolectric</strong></td>
+<td>Android framework simulation for unit tests</td>
+</tr>
+<tr>
+<td><strong>Espresso</strong></td>
+<td>UI interaction testing (click, type, scroll, assert)</td>
+</tr>
+<tr>
+<td><strong>MockWebServer (OkHttp)</strong></td>
+<td>Mock HTTP backend for instrumented tests</td>
+</tr>
+<tr>
+<td><strong>Hilt Testing</strong></td>
+<td>Dependency injection in test environment</td>
+</tr>
+<tr>
+<td><strong>JaCoCo</strong></td>
+<td>Code coverage measurement and reporting</td>
+</tr>
+</tbody>
+</table>
+<h3 id="test-architecture">Test Architecture </h3>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>src/test/java/                          # Unit Tests (JVM)
+├── data/models/                        # Data model validation
+├── data/repository/                    # Repository logic (mocked API)
+├── network/dto/                        # DTO serialization/deserialization
+├── ui/auth/LoginViewModelTest          # ViewModel business logic
+├── ui/dashboard/DashboardViewModelTest
+├── ui/datainput/DataInputViewModelTest
+├── ui/forecast/ForecastViewModelTest
+├── ui/sales/SalesViewModelTest
+├── ui/settings/SettingsViewModelTest
+├── ui/wastage/WastageViewModelTest
+└── util/                               # Utility function tests
+
+src/androidTest/java/                   # Instrumented Tests (Device)
+├── data/TokenManagerTest               # Encrypted SharedPreferences
+├── ui/auth/LoginActivityTest           # Login screen UI flow
+├── ui/dashboard/DashboardActivityTest  # Navigation, toolbar, tab switching
+├── ui/datainput/DataInputFragmentTest  # Sales/wastage data entry forms
+├── ui/forecast/ForecastFragmentTest    # Prediction charts and data display
+├── ui/sales/SalesOverviewFragmentTest  # Sales trend charts
+├── ui/sales/SalesDetailFragmentTest    # Daily sales breakdown
+├── ui/settings/SettingsActivityTest    # Password change, profile update
+├── ui/wastage/WastageOverviewFragmentTest  # Wastage trend charts
+└── ui/wastage/WastageDetailFragmentTest    # Daily wastage breakdown
+</code></pre><hr>
+<h2 id="2-how-to-run-the-tests">2. How to Run the Tests </h2>
+<h3 id="prerequisites">Prerequisites </h3>
+<ul>
+<li><strong>Java 17</strong> (required by AGP 8.7)</li>
+<li><strong>Android SDK</strong> with compile SDK 35</li>
+<li>For instrumented tests: a physical Android device (USB debugging enabled) or an Android emulator</li>
+</ul>
+<h3 id="running-unit-tests">Running Unit Tests </h3>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token builtin class-name">cd</span> mobile
+./gradlew testLocalDebugUnitTest
+</code></pre><p><strong>Test results report (pass/fail):</strong></p>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>app/build/reports/tests/testLocalDebugUnitTest/index.html
+</code></pre><h3 id="running-instrumented-tests">Running Instrumented Tests </h3>
+<p>Connect a physical device or start an emulator, then:</p>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token builtin class-name">cd</span> mobile
+./gradlew connectedLocalDebugAndroidTest
+</code></pre><p><strong>Test results report (pass/fail):</strong></p>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>app/build/reports/androidTests/connected/localDebug/index.html
+</code></pre><h3 id="running-both-together">Running Both Together </h3>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token builtin class-name">cd</span> mobile
+./gradlew testLocalDebugUnitTest connectedLocalDebugAndroidTest
+</code></pre><hr>
+<h2 id="3-code-coverage-reports">3. Code Coverage Reports </h2>
+<p>The project uses <strong>JaCoCo</strong> (v0.8.12) for code coverage measurement. Two coverage reports are available, each serving a different purpose.</p>
+<h3 id="report-a-unit-test-coverage-jacocotestreportdebug">Report A: Unit Test Coverage (<code>jacocoTestReportDebug</code>) </h3>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token builtin class-name">cd</span> mobile
+./gradlew jacocoTestReportDebug
+</code></pre><p><strong>Report location:</strong></p>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>app/build/reports/jacoco/jacocoTestReportDebug/html/index.html
+</code></pre><p>This report measures coverage from <strong>unit tests only</strong>. It intentionally <strong>excludes UI-layer classes</strong> (Activities, Fragments, Adapters) because these classes require the Android framework and cannot be meaningfully tested with JVM-only unit tests. Testing them in unit tests would require excessive mocking of Android internals, producing brittle tests that verify mock behavior rather than real functionality.</p>
+<p><strong>Excluded from this report (in addition to generated code):</strong></p>
+<ul>
+<li><code>*Activity</code>, <code>*Fragment</code>, <code>*Adapter</code>, <code>*MarkerView</code>, <code>*Application</code></li>
+<li><code>TokenManager</code> (requires Android EncryptedSharedPreferences)</li>
+<li>Network API interfaces (Retrofit interface definitions with no logic)</li>
+</ul>
+<p><strong>Current coverage: 77.8% instruction coverage</strong></p>
+<h3 id="report-b-full-coverage--unit--instrumented-jacocofullcoveragereport">Report B: Full Coverage — Unit + Instrumented (<code>jacocoFullCoverageReport</code>) </h3>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token builtin class-name">cd</span> mobile
+./gradlew jacocoFullCoverageReport
+</code></pre><p><strong>Report location:</strong></p>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>app/build/reports/jacoco/jacocoFullCoverageReport/html/index.html
+</code></pre><p>This report <strong>combines coverage data from both unit tests and instrumented tests</strong>, providing a complete picture across all architectural layers. UI-layer classes are included because instrumented tests exercise them on a real Android device.</p>
+<p><strong>Current coverage: 81.2% instruction coverage</strong></p>
+<h3 id="why-unit-test-coverage-778-is-lower-than-full-coverage-812">Why Unit Test Coverage (77.8%) Is Lower Than Full Coverage (81.2%) </h3>
+<p>Unit tests deliberately exclude UI-layer classes because:</p>
+<ol>
+<li><strong>Activities and Fragments</strong> depend heavily on the Android lifecycle, view binding, and navigation — these cannot run on a standard JVM</li>
+<li><strong>TokenManager</strong> uses Android's <code>EncryptedSharedPreferences</code>, which requires the Android Keystore system</li>
+<li><strong>UI interactions</strong> (button clicks, form validation, scrolling, toast messages) can only be verified through Espresso on a real device</li>
+</ol>
+<p>The full coverage report includes these classes because <strong>instrumented tests provide the real Android runtime</strong> needed to test them properly. This is the standard Android testing practice recommended by Google's testing guidelines.</p>
+<h3 id="coverage-breakdown-by-layer">Coverage Breakdown by Layer </h3>
+<table>
+<thead>
+<tr>
+<th>Package</th>
+<th>Unit Tests</th>
+<th>Full (Unit + Instrumented)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>data (TokenManager)</td>
+<td>excluded</td>
+<td>98.3%</td>
+</tr>
+<tr>
+<td>ui/dashboard</td>
+<td>91.7%</td>
+<td>88.8%</td>
+</tr>
+<tr>
+<td>ui/forecast</td>
+<td>97.3%</td>
+<td>86.1%</td>
+</tr>
+<tr>
+<td>ui/settings</td>
+<td>90.7%</td>
+<td>85.2%</td>
+</tr>
+<tr>
+<td>ui/sales</td>
+<td>81.3%</td>
+<td>83.8%</td>
+</tr>
+<tr>
+<td>ui/auth</td>
+<td>97.8%</td>
+<td>83.2%</td>
+</tr>
+<tr>
+<td>ui/datainput</td>
+<td>91.4%</td>
+<td>82.8%</td>
+</tr>
+<tr>
+<td>ui/wastage</td>
+<td>54.9%</td>
+<td>80.0%</td>
+</tr>
+<tr>
+<td>data/models</td>
+<td>87.6%</td>
+<td>87.6%</td>
+</tr>
+<tr>
+<td>data/repository</td>
+<td>68.7%</td>
+<td>73.8%</td>
+</tr>
+<tr>
+<td>network/dto</td>
+<td>73.4%</td>
+<td>75.2%</td>
+</tr>
+<tr>
+<td>util</td>
+<td>63.4%</td>
+<td>67.2%</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Note: The unit test column only reflects ViewModel coverage for UI packages (Activities/Fragments are excluded). The full report column includes both ViewModel and UI component coverage.</p>
+</blockquote>
+<h3 id="generating-both-reports">Generating Both Reports </h3>
+<blockquote>
+<p><strong>Important:</strong> The full coverage report must be generated in <strong>sequential steps</strong>, not a single command. The <code>jacocoFullCoverageReport</code> task does not depend on instrumented tests — if instrumented tests fail or are skipped, it will silently generate a report with only unit test data, producing misleadingly low coverage numbers.</p>
+</blockquote>
+<p><strong>Step 1: Clean and run unit tests</strong></p>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token builtin class-name">cd</span> mobile
+./gradlew clean testLocalDebugUnitTest
+</code></pre><p><strong>Step 2: Run instrumented tests (requires a connected device or emulator)</strong></p>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code>./gradlew connectedLocalDebugAndroidTest
+</code></pre><blockquote>
+<p>Verify this step completes successfully before proceeding. If it fails, the full coverage report will be inaccurate.</p>
+</blockquote>
+<p><strong>Step 3: Generate both coverage reports</strong></p>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code>./gradlew jacocoTestReportDebug jacocoFullCoverageReport
+</code></pre><blockquote>
+<p>Always start with <code>clean</code> (Step 1) when generating the full coverage report to ensure class files match between unit test and instrumented test runs.</p>
+</blockquote>
+<h3 id="what-is-excluded-from-coverage-both-reports">What Is Excluded from Coverage (Both Reports) </h3>
+<p>The following are <strong>auto-generated code</strong> with no hand-written logic, excluded from all coverage reports:</p>
+<ul>
+<li><code>R.class</code>, <code>BuildConfig</code>, <code>Manifest</code> — Android build-generated</li>
+<li><code>*_Factory</code>, <code>*_MembersInjector</code>, <code>Hilt_*</code>, <code>Dagger*</code> — Hilt/Dagger dependency injection generated</li>
+<li><code>*_HiltModules</code>, <code>*_GeneratedInjector</code>, <code>*_ComponentTreeDeps</code> — Hilt component wiring</li>
+<li><code>databinding/*</code> — ViewBinding generated classes</li>
+<li><code>*Application</code> — Application bootstrap class</li>
+<li><code>network/api/*</code> — Retrofit interface definitions (no implementation logic)</li>
+</ul>
+<hr>
+<h2 id="4-code-quality-checks">4. Code Quality Checks </h2>
+<p>Three static analysis tools are configured to enforce code quality and style consistency.</p>
+<h3 id="41-ktlint--kotlin-code-style">4.1 ktlint — Kotlin Code Style </h3>
+<p>Enforces the official Kotlin coding conventions and Android Kotlin style guide.</p>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token builtin class-name">cd</span> mobile
+./gradlew ktlintCheck
+</code></pre><p>Auto-fix formatting issues:</p>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code>./gradlew ktlintFormat
+</code></pre><h3 id="42-android-lint--bug--performance-detection">4.2 Android Lint — Bug &amp; Performance Detection </h3>
+<p>Android's built-in static analysis that detects potential bugs, security issues, performance problems, and accessibility concerns.</p>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token builtin class-name">cd</span> mobile
+./gradlew lintLocalDebug
+</code></pre><p><strong>Report location:</strong></p>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>app/build/reports/lint-results-localDebug.html
+</code></pre><h4 id="android-lint-results-summary">Android Lint Results Summary </h4>
+<p>The latest lint scan reports <strong>0 errors and 177 warnings</strong>. Lint analysis on test sources is disabled due to a known AGP bug with Hilt/FIR resolution. All warnings have been reviewed and are acceptable for the current project scope. Below is the breakdown and justification for each category:</p>
+<table>
+<thead>
+<tr>
+<th>Warning</th>
+<th>Count</th>
+<th>Justification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>HardcodedText</strong></td>
+<td>85</td>
+<td>UI strings are hardcoded directly in XML layouts instead of using <code>strings.xml</code>. This is acceptable because SmartSusChef is a B2B application targeting the Singapore market with no internationalization (i18n) requirement in the current scope. Extracting strings would add overhead with no user-facing benefit.</td>
+</tr>
+<tr>
+<td><strong>SetTextI18n</strong></td>
+<td>51</td>
+<td>Dynamic text is set programmatically using string concatenation (e.g., <code>"$value kg"</code>). Same justification as HardcodedText — no i18n requirement for this B2B tool.</td>
+</tr>
+<tr>
+<td><strong>SmallSp</strong></td>
+<td>18</td>
+<td>Font size of <code>10sp</code> is used in the 7-day ingredient forecast grid table where column width is constrained. The small font is a deliberate design choice to fit daily quantities across 7 columns on screen.</td>
+</tr>
+<tr>
+<td><strong>GradleDependency</strong></td>
+<td>13</td>
+<td>Some dependencies are not on the latest available version. Dependencies are intentionally pinned to tested, stable versions to avoid breaking changes during active development. Upgrades are done deliberately in dedicated dependency update cycles.</td>
+</tr>
+<tr>
+<td><strong>UseCompoundDrawables</strong></td>
+<td>3</td>
+<td>Lint suggests replacing an <code>ImageView</code> + <code>TextView</code> pair with a compound drawable. The current layout structure is preferred for readability and flexibility.</td>
+</tr>
+<tr>
+<td><strong>NestedWeights</strong></td>
+<td>2</td>
+<td>Nested <code>layout_weight</code> in LinearLayouts. The nesting is minimal (one level deep) and does not cause measurable performance impact for the affected screens.</td>
+</tr>
+<tr>
+<td><strong>OldTargetApi</strong></td>
+<td>1</td>
+<td><code>targetSdkVersion</code> is set to 35, which is current. This warning is informational and resolves when the next SDK level is released.</td>
+</tr>
+<tr>
+<td><strong>AndroidGradlePluginVersion</strong></td>
+<td>1</td>
+<td>The Android Gradle Plugin is not the latest version. Pinned for build stability — same rationale as GradleDependency.</td>
+</tr>
+<tr>
+<td><strong>InsecureBaseConfiguration</strong></td>
+<td>1</td>
+<td>The app allows cleartext (HTTP) traffic in its network security configuration. This is required for local development (<code>http://10.0.2.2:5001</code>) and the UAT environment which runs behind an AWS Application Load Balancer over HTTP. Production traffic uses the same ALB endpoint.</td>
+</tr>
+<tr>
+<td><strong>Overdraw</strong></td>
+<td>1</td>
+<td>A root layout has a background that is also set by the theme. Minor rendering optimization that does not affect functionality or performance.</td>
+</tr>
+<tr>
+<td><strong>AlwaysShowAction</strong></td>
+<td>1</td>
+<td>A menu item uses <code>app:showAsAction="always"</code>. This is intentional for the specific toolbar action.</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Note:</strong> The build is configured with <code>abortOnError = true</code> in the lint block, meaning <strong>any lint errors will fail the build</strong>. Only warnings (non-blocking) are present, and all have been reviewed as documented above.</p>
+</blockquote>
+<h3 id="43-detekt--kotlin-static-analysis">4.3 Detekt — Kotlin Static Analysis </h3>
+<p>Detects code smells, complexity issues, and potential bugs in Kotlin code.</p>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token builtin class-name">cd</span> mobile
+./gradlew detekt
+</code></pre><p><strong>Report location:</strong></p>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>app/build/reports/detekt/detekt.html
+</code></pre><h3 id="running-all-code-quality-checks-together">Running All Code Quality Checks Together </h3>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token builtin class-name">cd</span> mobile
+./gradlew ktlintCheck lintLocalDebug detekt
+</code></pre><hr>
+<h2 id="5-complete-verification">5. Complete Verification </h2>
+<blockquote>
+<p><strong>Do NOT run all tasks in a single command.</strong> The full coverage report (<code>jacocoFullCoverageReport</code>) does not depend on instrumented tests. If instrumented tests fail or are skipped mid-command, the report will silently generate with only unit test data, producing misleadingly low coverage.</p>
+</blockquote>
+<p><strong>Step 1: Clean, run unit tests, and code quality checks</strong></p>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token builtin class-name">cd</span> mobile
+./gradlew clean testLocalDebugUnitTest jacocoTestReportDebug ktlintCheck lintLocalDebug detekt
+</code></pre><p><strong>Step 2: Run instrumented tests (requires connected device or emulator)</strong></p>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code>./gradlew connectedLocalDebugAndroidTest
+</code></pre><blockquote>
+<p>Verify this step completes successfully before proceeding.</p>
+</blockquote>
+<p><strong>Step 3: Generate the full coverage report</strong></p>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code>./gradlew jacocoFullCoverageReport
+</code></pre><h3 id="summary-of-all-report-locations">Summary of All Report Locations </h3>
+<table>
+<thead>
+<tr>
+<th>Report</th>
+<th>Location</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Unit test results (pass/fail)</td>
+<td><code>app/build/reports/tests/testLocalDebugUnitTest/index.html</code></td>
+</tr>
+<tr>
+<td>Instrumented test results (pass/fail)</td>
+<td><code>app/build/reports/androidTests/connected/localDebug/index.html</code></td>
+</tr>
+<tr>
+<td>Unit test coverage (JaCoCo)</td>
+<td><code>app/build/reports/jacoco/jacocoTestReportDebug/html/index.html</code></td>
+</tr>
+<tr>
+<td>Full coverage (JaCoCo)</td>
+<td><code>app/build/reports/jacoco/jacocoFullCoverageReport/html/index.html</code></td>
+</tr>
+<tr>
+<td>Android Lint</td>
+<td><code>app/build/reports/lint-results-localDebug.html</code></td>
+</tr>
+<tr>
+<td>Detekt</td>
+<td><code>app/build/reports/detekt/detekt.html</code></td>
+</tr>
+</tbody>
+</table>
+
+      </div>
+      
+      
+    
+    
+    
+    
+    
+    
+  
+    </body></html>

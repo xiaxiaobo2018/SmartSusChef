@@ -35,6 +35,9 @@ class StoreRepository
                 } catch (e: IOException) {
                     Log.e(TAG, "Network error in getStore: ${e.message}", e)
                     Resource.Error("Couldn't reach the server. Check your internet connection.")
+                } catch (e: Exception) {
+                    Log.e(TAG, "Unexpected error in getStore: ${e.message}", e)
+                    Resource.Error("An unexpected error occurred: ${e.message}")
                 }
             }
         }

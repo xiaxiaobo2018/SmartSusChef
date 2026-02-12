@@ -143,8 +143,8 @@ class SettingsViewModel
                 return
             }
 
+            _isLoadingPassword.value = true
             viewModelScope.launch {
-                _isLoadingPassword.value = true
                 val request =
                     ChangePasswordRequest(
                         currentPassword = currentPassword,

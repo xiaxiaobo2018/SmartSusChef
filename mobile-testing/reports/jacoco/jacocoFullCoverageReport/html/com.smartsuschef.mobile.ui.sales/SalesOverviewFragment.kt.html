@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SalesOverviewFragment.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">com.smartsuschef.mobile.ui.sales</a> &gt; <span class="el_source">SalesOverviewFragment.kt</span></div><h1>SalesOverviewFragment.kt</h1><pre class="source lang-java linenums">package com.smartsuschef.mobile.ui.sales
+
+import android.graphics.Color
+import android.os.Bundle
+import android.util.Log
+import android.view.View
+import android.widget.TextView
+import androidx.appcompat.widget.PopupMenu
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
+import com.github.mikephil.charting.charts.CombinedChart
+import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.data.CombinedData
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import com.github.mikephil.charting.highlight.Highlight
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener
+import com.smartsuschef.mobile.R
+import com.smartsuschef.mobile.databinding.FragmentSalesOverviewBinding
+import com.smartsuschef.mobile.network.dto.HolidayDto
+import com.smartsuschef.mobile.util.Resource
+import com.smartsuschef.mobile.util.gone
+import com.smartsuschef.mobile.util.showToast
+import com.smartsuschef.mobile.util.visible
+import dagger.hilt.android.AndroidEntryPoint
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+
+<span class="fc" id="L37">@AndroidEntryPoint</span>
+<span class="fc" id="L38">class SalesOverviewFragment : Fragment(R.layout.fragment_sales_overview) {</span>
+    private var _binding: FragmentSalesOverviewBinding? = null
+<span class="fc" id="L40">    private val binding get() = _binding!!</span>
+<span class="fc" id="L41">    private val viewModel: SalesViewModel by viewModels()</span>
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
+<span class="fc" id="L47">        super.onViewCreated(view, savedInstanceState)</span>
+<span class="fc" id="L48">        _binding = FragmentSalesOverviewBinding.bind(view)</span>
+
+<span class="fc" id="L50">        setupCombinedChart()</span>
+<span class="fc" id="L51">        observeViewModel()</span>
+<span class="fc" id="L52">        observeWeather()</span>
+<span class="fc" id="L53">        observeHolidays()</span>
+<span class="fc" id="L54">        observeFilter()</span>
+<span class="pc" id="L55">        binding.tvDateContext.setOnClickListener { v -&gt; showFilterMenu(v) }</span>
+<span class="fc" id="L56">    }</span>
+
+    @Suppress(&quot;MagicNumber&quot;)
+    private fun setupCombinedChart() {
+<span class="fc" id="L60">        binding.salesCombinedChart.apply {</span>
+<span class="fc" id="L61">            description.isEnabled = false</span>
+<span class="fc" id="L62">            setDrawGridBackground(false)</span>
+<span class="fc" id="L63">            setExtraOffsets(10f, 10f, 10f, 20f)</span>
+
+            // Ensures the line is drawn on top of the bars
+<span class="fc" id="L66">            setDrawOrder(arrayOf(CombinedChart.DrawOrder.BAR, CombinedChart.DrawOrder.LINE))</span>
+
+<span class="fc" id="L68">            xAxis.apply {</span>
+<span class="fc" id="L69">                position = XAxis.XAxisPosition.BOTTOM</span>
+<span class="fc" id="L70">                setDrawGridLines(false)</span>
+<span class="fc" id="L71">                granularity = 1f // Ensures only whole numbers are displayed for entries</span>
+<span class="fc" id="L72">                isGranularityEnabled = true</span>
+<span class="fc" id="L73">                textColor = ContextCompat.getColor(requireContext(), R.color.muted_text)</span>
+<span class="fc" id="L74">                axisLineColor = Color.TRANSPARENT</span>
+<span class="fc" id="L75">                labelRotationAngle = -45f</span>
+<span class="fc" id="L76">                textSize = 8f</span>
+                // Allow MPAndroidChart to handle spacing naturally without facing labels inward
+<span class="fc" id="L78">                setAvoidFirstLastClipping(false)</span>
+<span class="fc" id="L79">            }</span>
+
+<span class="fc" id="L81">            axisLeft.apply {</span>
+<span class="fc" id="L82">                setDrawGridLines(true)</span>
+<span class="fc" id="L83">                gridColor = ContextCompat.getColor(requireContext(), R.color.border_grey)</span>
+<span class="fc" id="L84">                textColor = ContextCompat.getColor(requireContext(), R.color.muted_text)</span>
+<span class="fc" id="L85">                axisLineColor = Color.TRANSPARENT</span>
+                // Ensure min value starts at 0, max is dynamic based on data
+<span class="fc" id="L87">                axisMinimum = 0f</span>
+<span class="fc" id="L88">                setSpaceBottom(15f)</span>
+<span class="fc" id="L89">            }</span>
+<span class="fc" id="L90">            axisRight.isEnabled = false // Disable right y-axis</span>
+<span class="fc" id="L91">            legend.isEnabled = true</span>
+
+<span class="fc" id="L93">            setOnChartValueSelectedListener(</span>
+<span class="fc" id="L94">                object : OnChartValueSelectedListener {</span>
+                    override fun onValueSelected(
+                        e: Entry?,
+                        h: Highlight?,
+                    ) {
+                        // Get the actual date label from the X-axis (e.g. &quot;31 Jan&quot;)
+<span class="nc bnc" id="L100" title="All 2 branches missed.">                        val selectedDateIndex = e?.x?.toInt() ?: return</span>
+
+                        // Find the original full date string from the ViewModel's salesTrend
+<span class="nc" id="L103">                        val salesTrendData =</span>
+<span class="nc bnc" id="L104" title="All 4 branches missed.">                            (viewModel.salesTrend.value as? Resource.Success)?.data</span>
+<span class="nc bnc" id="L105" title="All 4 branches missed.">                        val fullDate = salesTrendData?.getOrNull(selectedDateIndex)?.date</span>
+
+<span class="nc bnc" id="L107" title="All 2 branches missed.">                        if (fullDate != null) {</span>
+<span class="nc" id="L108">                            val action =</span>
+<span class="nc" id="L109">                                SalesOverviewFragmentDirections</span>
+<span class="nc" id="L110">                                    .actionNavSalesToSalesDetailFragment(date = fullDate)</span>
+<span class="nc" id="L111">                            findNavController().navigate(action)</span>
+                        } else {
+<span class="nc" id="L113">                            requireContext().showToast(&quot;Could not retrieve full date for selected entry.&quot;)</span>
+                        }
+<span class="nc" id="L115">                    }</span>
+
+                    override fun onNothingSelected() {
+                        // This is intentionally left empty because no action is needed when nothing is selected.
+<span class="nc" id="L119">                    }</span>
+                },
+            )
+<span class="fc" id="L122">        }</span>
+<span class="fc" id="L123">    }</span>
+
+    private fun observeViewModel() {
+<span class="fc" id="L126">        viewModel.salesTrend.observe(viewLifecycleOwner) { result -&gt;</span>
+<span class="fc" id="L127">            when (result) {</span>
+<span class="fc bfc" id="L128" title="All 2 branches covered.">                is Resource.Loading -&gt; binding.progressBar.visible()</span>
+<span class="fc bfc" id="L129" title="All 2 branches covered.">                is Resource.Success -&gt; {</span>
+<span class="fc" id="L130">                    binding.progressBar.gone()</span>
+<span class="pc bpc" id="L131" title="1 of 2 branches missed.">                    val salesData = result.data ?: emptyList()</span>
+
+<span class="fc bfc" id="L133" title="All 4 branches covered.">                    if (salesData.isNotEmpty()) {</span>
+<span class="fc" id="L134">                        updateChart(salesData)</span>
+                    } else {
+<span class="fc" id="L136">                        binding.salesCombinedChart.clear()</span>
+<span class="fc" id="L137">                        requireContext().showToast(&quot;No sales data available&quot;)</span>
+                    }
+                }
+<span class="fc" id="L140">                is Resource.Error -&gt; {</span>
+<span class="fc" id="L141">                    binding.progressBar.gone()</span>
+<span class="fc" id="L142">                    binding.salesCombinedChart.clear()</span>
+<span class="pc bpc" id="L143" title="1 of 2 branches missed.">                    requireContext().showToast(result.message ?: &quot;Error loading sales data&quot;)</span>
+                }
+            }
+<span class="fc" id="L146">        }</span>
+<span class="fc" id="L147">    }</span>
+
+    @Suppress(&quot;MagicNumber&quot;)
+    private fun updateChart(salesData: List&lt;SalesTrendItem&gt;) {
+        // Calculate average for subtitle
+<span class="fc" id="L152">        val avgSales = salesData.map { it.sales }.average().toInt()</span>
+<span class="fc" id="L153">        binding.tvSalesSubtitle.text = &quot;Total dishes sold · Average: $avgSales per day&quot;</span>
+
+<span class="fc" id="L155">        val barEntries = mutableListOf&lt;BarEntry&gt;()</span>
+<span class="fc" id="L156">        val lineEntries = mutableListOf&lt;Entry&gt;()</span>
+<span class="fc" id="L157">        val labels = mutableListOf&lt;String&gt;()</span>
+
+<span class="fc" id="L159">        val inputFormat = SimpleDateFormat(&quot;yyyy-MM-dd&quot;, Locale.getDefault())</span>
+<span class="fc" id="L160">        val outputFormat = SimpleDateFormat(&quot;d MMM&quot;, Locale.getDefault())</span>
+
+        // Populate data
+<span class="fc" id="L163">        salesData.forEachIndexed { index, item -&gt;</span>
+<span class="fc" id="L164">            barEntries.add(BarEntry(index.toFloat(), item.sales.toFloat()))</span>
+<span class="fc" id="L165">            lineEntries.add(Entry(index.toFloat(), item.sales.toFloat()))</span>
+
+            // Format date label
+<span class="fc" id="L168">            val formattedLabel =</span>
+<span class="fc" id="L169">                try {</span>
+<span class="pc bpc" id="L170" title="2 of 4 branches missed.">                    inputFormat.parse(item.date)?.let { outputFormat.format(it) } ?: item.date</span>
+<span class="nc" id="L171">                } catch (e: Exception) {</span>
+<span class="nc" id="L172">                    e.printStackTrace()</span>
+<span class="nc" id="L173">                    item.date</span>
+                }
+<span class="fc" id="L175">            labels.add(formattedLabel)</span>
+<span class="fc" id="L176">        }</span>
+
+        // Configure X-axis based on data size
+<span class="fc" id="L179">        binding.salesCombinedChart.xAxis.apply {</span>
+<span class="fc" id="L180">            valueFormatter = IndexAxisValueFormatter(labels)</span>
+
+            // Dynamic axis range based on number of data points
+<span class="fc" id="L183">            axisMinimum = -0.5f</span>
+<span class="fc" id="L184">            axisMaximum = (salesData.size - 1).toFloat() + 0.5f</span>
+<span class="fc" id="L185">            setLabelCount(salesData.size, false)</span>
+<span class="fc" id="L186">        }</span>
+
+        // Create combined data
+<span class="fc" id="L189">        val combinedData = CombinedData()</span>
+
+        // Add bar chart data
+<span class="fc" id="L192">        val barDataSet =</span>
+<span class="fc" id="L193">            BarDataSet(barEntries, &quot;Daily Sales&quot;).apply {</span>
+<span class="fc" id="L194">                color = ContextCompat.getColor(requireContext(), R.color.primary)</span>
+<span class="fc" id="L195">                setDrawValues(false)</span>
+<span class="fc" id="L196">            }</span>
+
+<span class="fc" id="L198">        val barData = BarData(barDataSet)</span>
+
+        // Adjust bar width based on number of data points
+<span class="pc bpc" id="L201" title="1 of 2 branches missed.">        if (salesData.size == 1) {</span>
+            // Make bar wider for single day view (takes up more space)
+<span class="nc" id="L203">            barData.barWidth = 0.5f</span>
+        } else {
+            // Default bar width for multi-day view
+<span class="fc" id="L206">            barData.barWidth = 0.8f</span>
+        }
+
+<span class="fc" id="L209">        combinedData.setData(barData)</span>
+
+        // Add line chart data (only if more than 1 data point)
+<span class="pc bpc" id="L212" title="1 of 2 branches missed.">        if (salesData.size &gt; 1) {</span>
+<span class="fc" id="L213">            val lineDataSet =</span>
+<span class="fc" id="L214">                LineDataSet(lineEntries, &quot;Trend&quot;).apply {</span>
+<span class="fc" id="L215">                    color = ContextCompat.getColor(requireContext(), R.color.destructive)</span>
+<span class="fc" id="L216">                    setCircleColor(Color.RED)</span>
+<span class="fc" id="L217">                    lineWidth = 2.5f</span>
+<span class="fc" id="L218">                    circleRadius = 4f</span>
+<span class="fc" id="L219">                    setDrawCircleHole(false)</span>
+<span class="fc" id="L220">                    mode = LineDataSet.Mode.CUBIC_BEZIER</span>
+<span class="fc" id="L221">                    setDrawValues(false)</span>
+<span class="fc" id="L222">                }</span>
+<span class="fc" id="L223">            combinedData.setData(LineData(lineDataSet))</span>
+        }
+
+        // Update chart
+<span class="fc" id="L227">        binding.salesCombinedChart.data = combinedData</span>
+<span class="fc" id="L228">        binding.salesCombinedChart.notifyDataSetChanged()</span>
+<span class="fc" id="L229">        binding.salesCombinedChart.invalidate()</span>
+<span class="fc" id="L230">    }</span>
+
+    private fun showFilterMenu(view: View) {
+<span class="nc" id="L233">        val popup = PopupMenu(requireContext(), view)</span>
+<span class="nc" id="L234">        popup.menuInflater.inflate(R.menu.date_filter_menu, popup.menu)</span>
+
+<span class="nc" id="L236">        popup.setOnMenuItemClickListener { item -&gt;</span>
+<span class="nc" id="L237">            when (item.itemId) {</span>
+<span class="nc bnc" id="L238" title="All 2 branches missed.">                R.id.filter_today -&gt; {</span>
+<span class="nc" id="L239">                    viewModel.setFilter(SalesFilter.TODAY)</span>
+<span class="nc" id="L240">                    true</span>
+                }
+<span class="nc bnc" id="L242" title="All 2 branches missed.">                R.id.filter_7_days -&gt; {</span>
+<span class="nc" id="L243">                    viewModel.setFilter(SalesFilter.LAST_7_DAYS)</span>
+<span class="nc" id="L244">                    true</span>
+                }
+<span class="nc" id="L246">                else -&gt; false</span>
+<span class="nc" id="L247">            }</span>
+        }
+<span class="nc" id="L249">        popup.show()</span>
+<span class="nc" id="L250">    }</span>
+
+    private fun observeFilter() {
+<span class="fc" id="L253">        viewModel.currentFilter.observe(viewLifecycleOwner) { filter -&gt;</span>
+<span class="pc bpc" id="L254" title="1 of 2 branches missed.">            binding.tvDateContext.text = if (filter == SalesFilter.TODAY) &quot;Today&quot; else &quot;Last 7 Days&quot;</span>
+<span class="fc" id="L255">        }</span>
+<span class="fc" id="L256">    }</span>
+
+    private fun observeWeather() {
+<span class="fc" id="L259">        viewModel.weather.observe(viewLifecycleOwner) { result -&gt;</span>
+<span class="fc" id="L260">            when (result) {</span>
+<span class="fc bfc" id="L261" title="All 2 branches covered.">                is Resource.Success -&gt; {</span>
+<span class="fc" id="L262">                    val weather = result.data</span>
+<span class="pc bpc" id="L263" title="1 of 2 branches missed.">                    if (weather != null) {</span>
+<span class="fc" id="L264">                        binding.tvWeatherCondition.text = weather.condition</span>
+<span class="fc" id="L265">                        binding.tvWeatherDescription.text =</span>
+<span class="fc" id="L266">                            &quot;${weather.temperature.toInt()}°C | ${weather.description}&quot;</span>
+<span class="fc" id="L267">                        binding.tvWeatherHumidity.text = &quot;${weather.humidity}%&quot;</span>
+<span class="fc" id="L268">                        setWeatherIcon(weather.condition)</span>
+                    } else {
+<span class="nc" id="L270">                        binding.tvWeatherCondition.text = &quot;Unavailable&quot;</span>
+<span class="nc" id="L271">                        binding.tvWeatherDescription.text = &quot;Weather data not available&quot;</span>
+<span class="nc" id="L272">                        binding.tvWeatherHumidity.text = &quot;--&quot;</span>
+                    }
+                }
+<span class="fc bfc" id="L275" title="All 2 branches covered.">                is Resource.Error -&gt; {</span>
+<span class="fc" id="L276">                    binding.tvWeatherCondition.text = &quot;Unavailable&quot;</span>
+<span class="fc" id="L277">                    binding.tvWeatherDescription.text = &quot;Could not load weather&quot;</span>
+<span class="fc" id="L278">                    binding.tvWeatherHumidity.text = &quot;--&quot;</span>
+                }
+<span class="fc" id="L280">                is Resource.Loading -&gt; {</span>
+<span class="fc" id="L281">                    binding.tvWeatherCondition.text = &quot;Loading...&quot;</span>
+<span class="fc" id="L282">                    binding.tvWeatherDescription.text = &quot;&quot;</span>
+<span class="fc" id="L283">                    binding.tvWeatherHumidity.text = &quot;--&quot;</span>
+                }
+            }
+<span class="fc" id="L286">        }</span>
+<span class="fc" id="L287">    }</span>
+
+    @Suppress(&quot;MagicNumber&quot;)
+    private fun observeHolidays() {
+<span class="fc" id="L291">        viewModel.holidays.observe(viewLifecycleOwner) { result -&gt;</span>
+<span class="fc" id="L292">            when (result) {</span>
+<span class="fc bfc" id="L293" title="All 2 branches covered.">                is Resource.Success -&gt; {</span>
+<span class="pc bpc" id="L294" title="1 of 2 branches missed.">                    val holidays = result.data ?: emptyList()</span>
+<span class="fc" id="L295">                    val upcoming = getUpcomingHolidays(holidays)</span>
+<span class="fc" id="L296">                    binding.llHolidaysList.removeAllViews()</span>
+
+<span class="fc bfc" id="L298" title="All 4 branches covered.">                    if (upcoming.isNotEmpty()) {</span>
+<span class="fc" id="L299">                        binding.llHolidaysList.visible()</span>
+<span class="fc" id="L300">                        binding.tvNoHolidays.gone()</span>
+<span class="fc" id="L301">                        upcoming.forEach { holiday -&gt;</span>
+<span class="fc" id="L302">                            val formattedDate = formatHolidayDate(holiday.date)</span>
+<span class="fc" id="L303">                            val tv =</span>
+<span class="fc" id="L304">                                TextView(requireContext()).apply {</span>
+<span class="fc" id="L305">                                    text = &quot;\u2022 $formattedDate: ${holiday.name}&quot;</span>
+<span class="fc" id="L306">                                    setPadding(0, 4, 0, 4)</span>
+<span class="fc" id="L307">                                }</span>
+<span class="fc" id="L308">                            binding.llHolidaysList.addView(tv)</span>
+<span class="fc" id="L309">                        }</span>
+                    } else {
+<span class="fc" id="L311">                        binding.llHolidaysList.gone()</span>
+<span class="fc" id="L312">                        binding.tvNoHolidays.visible()</span>
+                    }
+                }
+<span class="fc bfc" id="L315" title="All 2 branches covered.">                is Resource.Error -&gt; {</span>
+<span class="fc" id="L316">                    binding.llHolidaysList.gone()</span>
+<span class="fc" id="L317">                    binding.tvNoHolidays.text = &quot;Could not load events&quot;</span>
+<span class="fc" id="L318">                    binding.tvNoHolidays.visible()</span>
+                }
+<span class="fc" id="L320">                is Resource.Loading -&gt; {</span>
+<span class="fc" id="L321">                    binding.llHolidaysList.gone()</span>
+<span class="fc" id="L322">                    binding.tvNoHolidays.text = &quot;Loading events...&quot;</span>
+<span class="fc" id="L323">                    binding.tvNoHolidays.visible()</span>
+                }
+            }
+<span class="fc" id="L326">        }</span>
+<span class="fc" id="L327">    }</span>
+
+    @Suppress(&quot;MagicNumber&quot;)
+    private fun getUpcomingHolidays(holidays: List&lt;HolidayDto&gt;): List&lt;HolidayDto&gt; {
+<span class="fc" id="L331">        val dateFormat = SimpleDateFormat(&quot;yyyy-MM-dd&quot;, Locale.getDefault())</span>
+<span class="fc" id="L332">        val today = dateFormat.format(Date())</span>
+<span class="fc" id="L333">        return holidays</span>
+<span class="pc bpc" id="L334" title="1 of 2 branches missed.">            .filter { it.date &gt;= today }</span>
+<span class="fc" id="L335">            .take(3)</span>
+    }
+
+    private fun formatHolidayDate(dateStr: String): String {
+<span class="fc" id="L339">        val inputFormat = SimpleDateFormat(&quot;yyyy-MM-dd&quot;, Locale.getDefault())</span>
+<span class="fc" id="L340">        val outputFormat = SimpleDateFormat(&quot;MMM d&quot;, Locale.getDefault())</span>
+<span class="fc" id="L341">        return try {</span>
+<span class="pc bpc" id="L342" title="2 of 4 branches missed.">            inputFormat.parse(dateStr)?.let { outputFormat.format(it) } ?: dateStr</span>
+<span class="nc" id="L343">        } catch (e: Exception) {</span>
+<span class="nc" id="L344">            Log.e(TAG, &quot;Error formatting holiday date: ${e.message}&quot;, e)</span>
+<span class="pc" id="L345">            dateStr</span>
+        }
+    }
+
+    private fun setWeatherIcon(condition: String?) {
+<span class="fc" id="L350">        val drawableRes =</span>
+<span class="pc bpc" id="L351" title="5 of 9 branches missed.">            when (condition?.lowercase()) {</span>
+<span class="nc" id="L352">                &quot;clear&quot; -&gt; R.drawable.sun</span>
+<span class="fc" id="L353">                &quot;partly cloudy&quot; -&gt; R.drawable.cloud</span>
+<span class="nc" id="L354">                &quot;drizzle&quot;, &quot;rainy&quot;, &quot;rain showers&quot; -&gt; R.drawable.cloud_rain</span>
+<span class="nc" id="L355">                &quot;thunderstorm&quot; -&gt; R.drawable.cloud_hail</span>
+<span class="fc" id="L356">                else -&gt; R.drawable.cloud</span>
+            }
+<span class="fc" id="L358">        binding.ivWeatherIcon.setImageResource(drawableRes)</span>
+<span class="fc" id="L359">    }</span>
+
+    override fun onDestroyView() {
+<span class="fc" id="L362">        super.onDestroyView()</span>
+<span class="fc" id="L363">        _binding = null</span>
+<span class="fc" id="L364">    }</span>
+
+    companion object {
+        private const val TAG = &quot;SalesOverviewFragment&quot;
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

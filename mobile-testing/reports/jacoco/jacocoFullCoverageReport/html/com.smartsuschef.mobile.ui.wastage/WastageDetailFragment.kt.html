@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>WastageDetailFragment.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">com.smartsuschef.mobile.ui.wastage</a> &gt; <span class="el_source">WastageDetailFragment.kt</span></div><h1>WastageDetailFragment.kt</h1><pre class="source lang-java linenums">package com.smartsuschef.mobile.ui.wastage
+
+import android.graphics.Color
+import android.os.Bundle
+import android.view.View
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
+import com.github.mikephil.charting.formatter.PercentFormatter
+import com.smartsuschef.mobile.R
+import com.smartsuschef.mobile.databinding.FragmentWastageDetailBinding
+import com.smartsuschef.mobile.util.Resource
+import dagger.hilt.android.AndroidEntryPoint
+
+<span class="fc" id="L21">@AndroidEntryPoint</span>
+<span class="fc" id="L22">class WastageDetailFragment : Fragment(R.layout.fragment_wastage_detail) {</span>
+    private var _binding: FragmentWastageDetailBinding? = null
+<span class="fc" id="L24">    private val binding get() = _binding!!</span>
+<span class="fc" id="L25">    private val viewModel: WastageViewModel by viewModels()</span>
+<span class="fc" id="L26">    private val args: WastageDetailFragmentArgs by navArgs()</span>
+    private lateinit var wastageAdapter: WastageAdapter
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
+<span class="fc" id="L33">        super.onViewCreated(view, savedInstanceState)</span>
+<span class="fc" id="L34">        _binding = FragmentWastageDetailBinding.bind(view)</span>
+
+<span class="fc" id="L36">        setupUI()</span>
+<span class="fc" id="L37">        setupRecyclerView()</span>
+<span class="pc bpc" id="L38" title="1 of 2 branches missed.">        args.itemBreakdown?.let {</span>
+<span class="fc" id="L39">            viewModel.setWastageBreakdown(it.toList())</span>
+<span class="fc" id="L40">        }</span>
+<span class="fc" id="L41">        observeData()</span>
+<span class="fc" id="L42">    }</span>
+
+    private fun setupUI() {
+<span class="pc bpc" id="L45" title="3 of 6 branches missed.">        (activity as? AppCompatActivity)?.supportActionBar?.apply {</span>
+<span class="fc" id="L46">            title = &quot;Wastage Details&quot;</span>
+<span class="fc" id="L47">        }</span>
+<span class="fc" id="L48">        binding.tvDetailTitle.text = &quot;Wastage for ${args.date}&quot;</span>
+<span class="fc" id="L49">    }</span>
+
+    @Suppress(&quot;MagicNumber&quot;)
+    private fun setupPieChart(data: List&lt;WastageBreakdownItem&gt;) {
+<span class="fc" id="L53">        val breakdown =</span>
+<span class="fc" id="L54">            data.groupBy { it.type }</span>
+<span class="fc bfc" id="L55" title="All 2 branches covered.">                .mapValues { entry -&gt; entry.value.sumOf { it.carbonFootprint } }</span>
+
+<span class="fc" id="L57">        val entries =</span>
+<span class="fc" id="L58">            breakdown.map { (type, carbonFootprint) -&gt;</span>
+<span class="fc" id="L59">                PieEntry(carbonFootprint.toFloat(), type)</span>
+            }
+
+        // Calculate total carbon footprint for subtitle
+<span class="fc bfc" id="L63" title="All 2 branches covered.">        val totalCarbonFootprint = data.sumOf { it.carbonFootprint }</span>
+<span class="fc" id="L64">        binding.tvWastageSubtitle.text = &quot;Total Carbon Footprint: %.2f kg CO2&quot;.format(totalCarbonFootprint)</span>
+
+<span class="fc" id="L66">        val dataSet =</span>
+<span class="fc" id="L67">            PieDataSet(entries, &quot;&quot;).apply {</span>
+<span class="fc" id="L68">                colors =</span>
+<span class="fc" id="L69">                    listOf(</span>
+<span class="fc" id="L70">                        ContextCompat.getColor(requireContext(), R.color.chart_1),</span>
+<span class="fc" id="L71">                        ContextCompat.getColor(requireContext(), R.color.chart_2),</span>
+<span class="fc" id="L72">                        ContextCompat.getColor(requireContext(), R.color.chart_3),</span>
+                    )
+<span class="fc" id="L74">                valueTextColor = Color.WHITE</span>
+<span class="fc" id="L75">                valueTextSize = 12f</span>
+<span class="fc" id="L76">            }</span>
+
+<span class="fc" id="L78">        val pieData =</span>
+<span class="fc" id="L79">            PieData(dataSet).apply {</span>
+<span class="fc" id="L80">                setValueFormatter(PercentFormatter(binding.pieChartWastageBreakdown))</span>
+<span class="fc" id="L81">            }</span>
+
+<span class="fc" id="L83">        binding.pieChartWastageBreakdown.apply {</span>
+<span class="fc" id="L84">            this.data = pieData</span>
+<span class="fc" id="L85">            description.isEnabled = false</span>
+<span class="fc" id="L86">            isDrawHoleEnabled = true</span>
+<span class="fc" id="L87">            holeRadius = 40f</span>
+<span class="fc" id="L88">            transparentCircleRadius = 45f</span>
+<span class="fc" id="L89">            setUsePercentValues(true)</span>
+<span class="fc" id="L90">            setEntryLabelColor(Color.WHITE)</span>
+<span class="fc" id="L91">            setEntryLabelTextSize(12f)</span>
+<span class="fc" id="L92">            animateY(1000)</span>
+<span class="fc" id="L93">            invalidate()</span>
+<span class="fc" id="L94">        }</span>
+<span class="fc" id="L95">    }</span>
+
+    private fun setupRecyclerView() {
+<span class="fc" id="L98">        wastageAdapter = WastageAdapter(emptyList())</span>
+<span class="fc" id="L99">        binding.rvWastedItems.layoutManager = LinearLayoutManager(requireContext())</span>
+<span class="pc bpc" id="L100" title="1 of 2 branches missed.">        binding.rvWastedItems.adapter = wastageAdapter</span>
+<span class="fc" id="L101">    }</span>
+
+    private fun observeData() {
+<span class="fc" id="L104">        viewModel.wastageBreakdown.observe(viewLifecycleOwner) { result -&gt;</span>
+<span class="fc" id="L105">            when (result) {</span>
+<span class="pc bpc" id="L106" title="1 of 2 branches missed.">                is Resource.Success -&gt; {</span>
+<span class="pc bpc" id="L107" title="1 of 2 branches missed.">                    val wastageData = result.data ?: emptyList()</span>
+<span class="pc bpc" id="L108" title="1 of 2 branches missed.">                    wastageAdapter.updateData(wastageData)</span>
+<span class="fc" id="L109">                    setupPieChart(wastageData)</span>
+                }
+                // Handle loading and error states if needed
+                else -&gt; {}
+            }
+<span class="fc" id="L114">        }</span>
+<span class="fc" id="L115">    }</span>
+
+    override fun onDestroyView() {
+<span class="fc" id="L118">        super.onDestroyView()</span>
+<span class="fc" id="L119">        _binding = null</span>
+<span class="fc" id="L120">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

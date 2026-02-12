@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SalesRepository.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">com.smartsuschef.mobile.data.repository</a> &gt; <span class="el_source">SalesRepository.kt</span></div><h1>SalesRepository.kt</h1><pre class="source lang-java linenums">package com.smartsuschef.mobile.data.repository
+
+import android.util.Log
+import com.smartsuschef.mobile.network.api.SalesApiService
+import com.smartsuschef.mobile.network.dto.CreateSalesDataRequest
+import com.smartsuschef.mobile.network.dto.IngredientUsageDto
+import com.smartsuschef.mobile.network.dto.RecipeSalesDto
+import com.smartsuschef.mobile.network.dto.SalesDataDto
+import com.smartsuschef.mobile.network.dto.SalesTrendDto
+import com.smartsuschef.mobile.network.dto.UpdateSalesDataRequest
+import com.smartsuschef.mobile.util.Resource
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import retrofit2.HttpException
+import java.io.IOException
+import javax.inject.Inject
+
+class SalesRepository
+<span class="fc" id="L19">    @Inject</span>
+    constructor(
+<span class="fc" id="L21">        private val salesApiService: SalesApiService,</span>
+    ) {
+        companion object {
+            private const val TAG = &quot;SalesRepository&quot;
+        }
+
+        suspend fun getAll(
+            startDate: String?,
+            endDate: String?,
+        ): Resource&lt;List&lt;SalesDataDto&gt;&gt; {
+<span class="fc" id="L31">            return withContext(Dispatchers.IO) {</span>
+<span class="fc" id="L32">                try {</span>
+<span class="fc" id="L33">                    val response = salesApiService.getAll(startDate, endDate)</span>
+<span class="fc bfc" id="L34" title="All 2 branches covered.">                    if (response.isSuccessful) {</span>
+<span class="pc bpc" id="L35" title="1 of 2 branches missed.">                        Resource.Success(response.body() ?: emptyList())</span>
+                    } else {
+<span class="pc bpc" id="L37" title="1 of 2 branches missed.">                        val errorBody = response.errorBody()?.string()</span>
+<span class="pc bpc" id="L38" title="1 of 2 branches missed.">                        Resource.Error(&quot;Failed to fetch sales history: ${errorBody ?: response.message()}&quot;)</span>
+                    }
+<span class="fc" id="L40">                } catch (e: HttpException) {</span>
+<span class="fc" id="L41">                    Log.e(TAG, &quot;HTTP error in repository: ${e.message()}&quot;, e)</span>
+<span class="fc" id="L42">                    Resource.Error(&quot;An unexpected error occurred: ${e.message()}&quot;)</span>
+<span class="fc" id="L43">                } catch (e: IOException) {</span>
+<span class="fc" id="L44">                    Log.e(TAG, &quot;Network error in repository: ${e.message}&quot;, e)</span>
+<span class="fc" id="L45">                    Resource.Error(&quot;Couldn't reach the server. Check your internet connection.&quot;)</span>
+<span class="nc" id="L46">                } catch (e: Exception) {</span>
+<span class="nc" id="L47">                    Log.e(TAG, &quot;Unexpected error in repository: ${e.message}&quot;, e)</span>
+<span class="pc" id="L48">                    Resource.Error(&quot;An unexpected error occurred: ${e.message}&quot;)</span>
+<span class="fc" id="L49">                }</span>
+            }
+        }
+
+        suspend fun getTrend(
+            startDate: String,
+            endDate: String,
+        ): Resource&lt;List&lt;SalesTrendDto&gt;&gt; {
+<span class="fc" id="L57">            return withContext(Dispatchers.IO) {</span>
+<span class="fc" id="L58">                try {</span>
+<span class="fc" id="L59">                    val response = salesApiService.getTrend(startDate, endDate)</span>
+<span class="fc bfc" id="L60" title="All 2 branches covered.">                    if (response.isSuccessful) {</span>
+<span class="pc bpc" id="L61" title="1 of 2 branches missed.">                        Resource.Success(response.body() ?: emptyList())</span>
+                    } else {
+<span class="pc bpc" id="L63" title="1 of 2 branches missed.">                        val errorBody = response.errorBody()?.string()</span>
+<span class="pc bpc" id="L64" title="1 of 2 branches missed.">                        Resource.Error(&quot;Failed to fetch sales trend: ${errorBody ?: response.message()}&quot;)</span>
+                    }
+<span class="fc" id="L66">                } catch (e: HttpException) {</span>
+<span class="fc" id="L67">                    Log.e(TAG, &quot;HTTP error in repository: ${e.message()}&quot;, e)</span>
+<span class="fc" id="L68">                    Resource.Error(&quot;An unexpected error occurred: ${e.message()}&quot;)</span>
+<span class="fc" id="L69">                } catch (e: IOException) {</span>
+<span class="fc" id="L70">                    Log.e(TAG, &quot;Network error in repository: ${e.message}&quot;, e)</span>
+<span class="fc" id="L71">                    Resource.Error(&quot;Couldn't reach the server. Check your internet connection.&quot;)</span>
+<span class="nc" id="L72">                } catch (e: Exception) {</span>
+<span class="nc" id="L73">                    Log.e(TAG, &quot;Unexpected error in repository: ${e.message}&quot;, e)</span>
+<span class="pc" id="L74">                    Resource.Error(&quot;An unexpected error occurred: ${e.message}&quot;)</span>
+<span class="fc" id="L75">                }</span>
+            }
+        }
+
+        suspend fun getIngredientUsageByDate(date: String): Resource&lt;List&lt;IngredientUsageDto&gt;&gt; {
+<span class="fc" id="L80">            return withContext(Dispatchers.IO) {</span>
+<span class="fc" id="L81">                try {</span>
+<span class="fc" id="L82">                    val response = salesApiService.getIngredientUsageByDate(date)</span>
+<span class="fc bfc" id="L83" title="All 2 branches covered.">                    if (response.isSuccessful) {</span>
+<span class="pc bpc" id="L84" title="1 of 2 branches missed.">                        Resource.Success(response.body() ?: emptyList())</span>
+                    } else {
+<span class="pc bpc" id="L86" title="1 of 2 branches missed.">                        val errorBody = response.errorBody()?.string()</span>
+<span class="pc bpc" id="L87" title="1 of 2 branches missed.">                        Resource.Error(&quot;Failed to fetch ingredient usage: ${errorBody ?: response.message()}&quot;)</span>
+                    }
+<span class="nc" id="L89">                } catch (e: HttpException) {</span>
+<span class="nc" id="L90">                    Log.e(TAG, &quot;HTTP error in repository: ${e.message()}&quot;, e)</span>
+<span class="nc" id="L91">                    Resource.Error(&quot;An unexpected error occurred: ${e.message()}&quot;)</span>
+<span class="fc" id="L92">                } catch (e: IOException) {</span>
+<span class="fc" id="L93">                    Log.e(TAG, &quot;Network error in repository: ${e.message}&quot;, e)</span>
+<span class="fc" id="L94">                    Resource.Error(&quot;Couldn't reach the server. Check your internet connection.&quot;)</span>
+<span class="nc" id="L95">                } catch (e: Exception) {</span>
+<span class="nc" id="L96">                    Log.e(TAG, &quot;Unexpected error in repository: ${e.message}&quot;, e)</span>
+<span class="pc" id="L97">                    Resource.Error(&quot;An unexpected error occurred: ${e.message}&quot;)</span>
+<span class="fc" id="L98">                }</span>
+            }
+        }
+
+        suspend fun getRecipeSalesByDate(date: String): Resource&lt;List&lt;RecipeSalesDto&gt;&gt; {
+<span class="fc" id="L103">            return withContext(Dispatchers.IO) {</span>
+<span class="fc" id="L104">                try {</span>
+<span class="fc" id="L105">                    val response = salesApiService.getRecipeSalesByDate(date)</span>
+<span class="fc bfc" id="L106" title="All 2 branches covered.">                    if (response.isSuccessful) {</span>
+<span class="pc bpc" id="L107" title="1 of 2 branches missed.">                        Resource.Success(response.body() ?: emptyList())</span>
+                    } else {
+<span class="pc bpc" id="L109" title="1 of 2 branches missed.">                        val errorBody = response.errorBody()?.string()</span>
+<span class="pc bpc" id="L110" title="1 of 2 branches missed.">                        Resource.Error(&quot;Failed to fetch recipe sales: ${errorBody ?: response.message()}&quot;)</span>
+                    }
+<span class="nc" id="L112">                } catch (e: HttpException) {</span>
+<span class="nc" id="L113">                    Log.e(TAG, &quot;HTTP error in repository: ${e.message()}&quot;, e)</span>
+<span class="nc" id="L114">                    Resource.Error(&quot;An unexpected error occurred: ${e.message()}&quot;)</span>
+<span class="fc" id="L115">                } catch (e: IOException) {</span>
+<span class="fc" id="L116">                    Log.e(TAG, &quot;Network error in repository: ${e.message}&quot;, e)</span>
+<span class="fc" id="L117">                    Resource.Error(&quot;Couldn't reach the server. Check your internet connection.&quot;)</span>
+<span class="nc" id="L118">                } catch (e: Exception) {</span>
+<span class="nc" id="L119">                    Log.e(TAG, &quot;Unexpected error in repository: ${e.message}&quot;, e)</span>
+<span class="pc" id="L120">                    Resource.Error(&quot;An unexpected error occurred: ${e.message}&quot;)</span>
+<span class="fc" id="L121">                }</span>
+            }
+        }
+
+        suspend fun create(request: CreateSalesDataRequest): Resource&lt;SalesDataDto&gt; {
+<span class="fc" id="L126">            return withContext(Dispatchers.IO) {</span>
+<span class="fc" id="L127">                try {</span>
+<span class="fc" id="L128">                    val response = salesApiService.create(request)</span>
+<span class="fc bfc" id="L129" title="All 2 branches covered.">                    if (response.isSuccessful) {</span>
+<span class="fc" id="L130">                        Resource.Success(response.body()!!)</span>
+                    } else {
+<span class="pc bpc" id="L132" title="1 of 2 branches missed.">                        val errorBody = response.errorBody()?.string()</span>
+<span class="pc bpc" id="L133" title="1 of 2 branches missed.">                        Resource.Error(&quot;Failed to add sale: ${errorBody ?: response.message()}&quot;)</span>
+                    }
+<span class="nc" id="L135">                } catch (e: HttpException) {</span>
+<span class="nc" id="L136">                    Log.e(TAG, &quot;HTTP error in repository: ${e.message()}&quot;, e)</span>
+<span class="nc" id="L137">                    Resource.Error(&quot;An unexpected error occurred: ${e.message()}&quot;)</span>
+<span class="fc" id="L138">                } catch (e: IOException) {</span>
+<span class="fc" id="L139">                    Log.e(TAG, &quot;Network error in repository: ${e.message}&quot;, e)</span>
+<span class="fc" id="L140">                    Resource.Error(&quot;Couldn't reach the server. Check your internet connection.&quot;)</span>
+<span class="nc" id="L141">                } catch (e: Exception) {</span>
+<span class="nc" id="L142">                    Log.e(TAG, &quot;Unexpected error in repository: ${e.message}&quot;, e)</span>
+<span class="pc" id="L143">                    Resource.Error(&quot;An unexpected error occurred: ${e.message}&quot;)</span>
+<span class="fc" id="L144">                }</span>
+            }
+        }
+
+        suspend fun update(
+            id: String,
+            request: UpdateSalesDataRequest,
+        ): Resource&lt;SalesDataDto&gt; {
+<span class="fc" id="L152">            return withContext(Dispatchers.IO) {</span>
+<span class="fc" id="L153">                try {</span>
+<span class="fc" id="L154">                    val response = salesApiService.update(id, request)</span>
+<span class="fc bfc" id="L155" title="All 2 branches covered.">                    if (response.isSuccessful) {</span>
+<span class="fc" id="L156">                        Resource.Success(response.body()!!)</span>
+                    } else {
+<span class="pc bpc" id="L158" title="1 of 2 branches missed.">                        val errorBody = response.errorBody()?.string()</span>
+<span class="pc bpc" id="L159" title="1 of 2 branches missed.">                        Resource.Error(&quot;Failed to update sale: ${errorBody ?: response.message()}&quot;)</span>
+                    }
+<span class="nc" id="L161">                } catch (e: HttpException) {</span>
+<span class="nc" id="L162">                    Log.e(TAG, &quot;HTTP error in repository: ${e.message()}&quot;, e)</span>
+<span class="nc" id="L163">                    Resource.Error(&quot;An unexpected error occurred: ${e.message()}&quot;)</span>
+<span class="fc" id="L164">                } catch (e: IOException) {</span>
+<span class="fc" id="L165">                    Log.e(TAG, &quot;Network error in repository: ${e.message}&quot;, e)</span>
+<span class="fc" id="L166">                    Resource.Error(&quot;Couldn't reach the server. Check your internet connection.&quot;)</span>
+<span class="nc" id="L167">                } catch (e: Exception) {</span>
+<span class="nc" id="L168">                    Log.e(TAG, &quot;Unexpected error in repository: ${e.message}&quot;, e)</span>
+<span class="pc" id="L169">                    Resource.Error(&quot;An unexpected error occurred: ${e.message}&quot;)</span>
+<span class="fc" id="L170">                }</span>
+            }
+        }
+
+        suspend fun delete(id: String): Resource&lt;Unit&gt; {
+<span class="fc" id="L175">            return withContext(Dispatchers.IO) {</span>
+<span class="fc" id="L176">                try {</span>
+<span class="fc" id="L177">                    val response = salesApiService.delete(id)</span>
+<span class="fc bfc" id="L178" title="All 2 branches covered.">                    if (response.isSuccessful) {</span>
+<span class="fc" id="L179">                        Resource.Success(Unit)</span>
+                    } else {
+<span class="pc bpc" id="L181" title="1 of 2 branches missed.">                        val errorBody = response.errorBody()?.string()</span>
+<span class="pc bpc" id="L182" title="1 of 2 branches missed.">                        Resource.Error(&quot;Failed to delete sale: ${errorBody ?: response.message()}&quot;)</span>
+                    }
+<span class="nc" id="L184">                } catch (e: HttpException) {</span>
+<span class="nc" id="L185">                    Log.e(TAG, &quot;HTTP error in repository: ${e.message()}&quot;, e)</span>
+<span class="nc" id="L186">                    Resource.Error(&quot;An unexpected error occurred: ${e.message()}&quot;)</span>
+<span class="fc" id="L187">                } catch (e: IOException) {</span>
+<span class="fc" id="L188">                    Log.e(TAG, &quot;Network error in repository: ${e.message}&quot;, e)</span>
+<span class="fc" id="L189">                    Resource.Error(&quot;Couldn't reach the server. Check your internet connection.&quot;)</span>
+<span class="nc" id="L190">                } catch (e: Exception) {</span>
+<span class="nc" id="L191">                    Log.e(TAG, &quot;Unexpected error in repository: ${e.message}&quot;, e)</span>
+<span class="pc" id="L192">                    Resource.Error(&quot;An unexpected error occurred: ${e.message}&quot;)</span>
+<span class="fc" id="L193">                }</span>
+            }
+        }
+    }
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

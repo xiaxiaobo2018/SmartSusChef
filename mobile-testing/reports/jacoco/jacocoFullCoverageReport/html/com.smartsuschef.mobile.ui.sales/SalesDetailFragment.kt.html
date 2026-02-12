@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SalesDetailFragment.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">com.smartsuschef.mobile.ui.sales</a> &gt; <span class="el_source">SalesDetailFragment.kt</span></div><h1>SalesDetailFragment.kt</h1><pre class="source lang-java linenums">package com.smartsuschef.mobile.ui.sales
+
+import android.graphics.Color
+import android.os.Bundle
+import android.view.View
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.github.mikephil.charting.components.Legend
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
+import com.github.mikephil.charting.formatter.LargeValueFormatter
+import com.smartsuschef.mobile.R
+import com.smartsuschef.mobile.databinding.FragmentSalesDetailBinding
+import com.smartsuschef.mobile.util.Resource
+import dagger.hilt.android.AndroidEntryPoint
+
+<span class="fc" id="L24">@AndroidEntryPoint</span>
+<span class="fc" id="L25">class SalesDetailFragment : Fragment(R.layout.fragment_sales_detail) {</span>
+    private var _binding: FragmentSalesDetailBinding? = null
+<span class="fc" id="L27">    private val binding get() = _binding!!</span>
+<span class="fc" id="L28">    private val viewModel: SalesViewModel by viewModels()</span>
+<span class="fc" id="L29">    private val args: SalesDetailFragmentArgs by navArgs()</span>
+    private lateinit var ingredientAdapter: IngredientAdapter
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
+<span class="fc" id="L36">        super.onViewCreated(view, savedInstanceState)</span>
+<span class="fc" id="L37">        _binding = FragmentSalesDetailBinding.bind(view)</span>
+
+<span class="fc" id="L39">        setupUI()</span>
+<span class="fc" id="L40">        setupPieChartStyle() // Renamed to clarify its purpose</span>
+<span class="fc" id="L41">        setupRecyclerView()</span>
+
+        // Fetch both data sets for the given date
+<span class="fc" id="L44">        viewModel.fetchIngredientsForDate(args.date)</span>
+<span class="fc" id="L45">        viewModel.fetchRecipeSalesForDate(args.date)</span>
+
+<span class="fc" id="L47">        observeData()</span>
+<span class="fc" id="L48">    }</span>
+
+    private fun setupUI() {
+<span class="pc bpc" id="L51" title="3 of 6 branches missed.">        (activity as? AppCompatActivity)?.supportActionBar?.apply {</span>
+<span class="fc" id="L52">            title = &quot;Sales Details&quot;</span>
+<span class="fc" id="L53">        }</span>
+<span class="fc" id="L54">        binding.tvDetailTitle.text = &quot;Sales Breakdown: ${args.date}&quot;</span>
+<span class="fc" id="L55">    }</span>
+
+    // This function now only sets up the chart's appearance
+    @Suppress(&quot;MagicNumber&quot;)
+    private fun setupPieChartStyle() {
+<span class="fc" id="L60">        binding.pieChartDishBreakdown.apply {</span>
+<span class="fc" id="L61">            description.isEnabled = false</span>
+<span class="fc" id="L62">            isDrawHoleEnabled = true</span>
+<span class="fc" id="L63">            setHoleColor(Color.TRANSPARENT)</span>
+<span class="fc" id="L64">            setDrawEntryLabels(false)</span>
+<span class="fc" id="L65">            animateY(1000)</span>
+
+<span class="fc" id="L67">            legend.apply {</span>
+<span class="fc" id="L68">                isEnabled = true</span>
+<span class="fc" id="L69">                isWordWrapEnabled = true</span>
+<span class="fc" id="L70">                horizontalAlignment = Legend.LegendHorizontalAlignment.CENTER</span>
+<span class="fc" id="L71">                verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM</span>
+<span class="fc" id="L72">                orientation = Legend.LegendOrientation.HORIZONTAL</span>
+<span class="fc" id="L73">                setDrawInside(false)</span>
+<span class="fc" id="L74">                xEntrySpace = 10f</span>
+<span class="fc" id="L75">                yEntrySpace = 5f</span>
+<span class="fc" id="L76">                form = Legend.LegendForm.SQUARE</span>
+<span class="fc" id="L77">                textColor = ContextCompat.getColor(requireContext(), R.color.muted_text)</span>
+<span class="fc" id="L78">            }</span>
+<span class="fc" id="L79">        }</span>
+<span class="fc" id="L80">    }</span>
+
+    private fun setupRecyclerView() {
+<span class="fc" id="L83">        ingredientAdapter = IngredientAdapter(emptyList())</span>
+<span class="fc" id="L84">        binding.rvIngredients.layoutManager = LinearLayoutManager(requireContext())</span>
+<span class="pc bpc" id="L85" title="1 of 2 branches missed.">        binding.rvIngredients.adapter = ingredientAdapter</span>
+<span class="fc" id="L86">    }</span>
+
+    private fun observeData() {
+        // Observer for the ingredient list
+<span class="fc" id="L90">        viewModel.ingredientBreakdown.observe(viewLifecycleOwner) { result -&gt;</span>
+<span class="fc" id="L91">            when (result) {</span>
+<span class="fc bfc" id="L92" title="All 2 branches covered.">                is Resource.Success -&gt; {</span>
+<span class="fc" id="L93">                    binding.progressBarIngredients.isVisible = false</span>
+<span class="pc bpc" id="L94" title="2 of 4 branches missed.">                    ingredientAdapter.updateData(result.data ?: emptyList())</span>
+                }
+<span class="fc bfc" id="L96" title="All 2 branches covered.">                is Resource.Error -&gt; {</span>
+<span class="fc" id="L97">                    binding.progressBarIngredients.isVisible = false</span>
+<span class="fc" id="L98">                    Toast.makeText(requireContext(), result.message, Toast.LENGTH_SHORT).show()</span>
+                }
+<span class="fc" id="L100">                is Resource.Loading -&gt; {</span>
+<span class="fc" id="L101">                    binding.progressBarIngredients.isVisible = true</span>
+                }
+            }
+<span class="fc" id="L104">        }</span>
+
+        // Observer for the pie chart data
+<span class="fc" id="L107">        viewModel.recipeSales.observe(viewLifecycleOwner) { result -&gt;</span>
+<span class="fc" id="L108">            when (result) {</span>
+<span class="fc bfc" id="L109" title="All 2 branches covered.">                is Resource.Success -&gt; {</span>
+<span class="fc" id="L110">                    binding.progressBarPieChart.isVisible = false</span>
+<span class="fc" id="L111">                    val recipeSales = result.data</span>
+<span class="pc bpc" id="L112" title="1 of 6 branches missed.">                    if (recipeSales.isNullOrEmpty()) {</span>
+                        // Handle empty state for pie chart
+<span class="fc" id="L114">                        binding.pieChartDishBreakdown.clear()</span>
+<span class="fc" id="L115">                        binding.pieChartDishBreakdown.invalidate()</span>
+<span class="fc" id="L116">                        binding.tvSalesSubtitle.text = &quot;No dishes sold on this date&quot;</span>
+                    } else {
+<span class="fc" id="L118">                        updatePieChart(recipeSales)</span>
+                    }
+                }
+<span class="fc bfc" id="L121" title="All 2 branches covered.">                is Resource.Error -&gt; {</span>
+<span class="fc" id="L122">                    binding.progressBarPieChart.isVisible = false</span>
+<span class="fc" id="L123">                    Toast.makeText(requireContext(), result.message, Toast.LENGTH_SHORT).show()</span>
+                }
+<span class="fc" id="L125">                is Resource.Loading -&gt; {</span>
+<span class="fc" id="L126">                    binding.progressBarPieChart.isVisible = true</span>
+                }
+            }
+<span class="fc" id="L129">        }</span>
+<span class="fc" id="L130">    }</span>
+
+    @Suppress(&quot;MagicNumber&quot;)
+    private fun updatePieChart(data: List&lt;RecipeSalesItem&gt;) {
+<span class="fc" id="L134">        val chartPalette =</span>
+<span class="fc" id="L135">            listOf(</span>
+<span class="fc" id="L136">                ContextCompat.getColor(requireContext(), R.color.chart_1),</span>
+<span class="fc" id="L137">                ContextCompat.getColor(requireContext(), R.color.chart_2),</span>
+<span class="fc" id="L138">                ContextCompat.getColor(requireContext(), R.color.chart_3),</span>
+<span class="fc" id="L139">                ContextCompat.getColor(requireContext(), R.color.chart_4),</span>
+<span class="fc" id="L140">                ContextCompat.getColor(requireContext(), R.color.chart_5),</span>
+<span class="fc" id="L141">                ContextCompat.getColor(requireContext(), R.color.chart_6),</span>
+<span class="fc" id="L142">                ContextCompat.getColor(requireContext(), R.color.chart_7),</span>
+<span class="fc" id="L143">                ContextCompat.getColor(requireContext(), R.color.chart_8),</span>
+<span class="fc" id="L144">                ContextCompat.getColor(requireContext(), R.color.chart_9),</span>
+<span class="fc" id="L145">                ContextCompat.getColor(requireContext(), R.color.chart_10),</span>
+            )
+
+<span class="fc" id="L148">        val rawEntries = data.map { PieEntry(it.quantity.toFloat(), it.name) }</span>
+
+        // Calculate total dishes sold from real data
+<span class="fc bfc" id="L151" title="All 2 branches covered.">        val totalDishes = rawEntries.sumOf { it.value.toDouble() }.toInt()</span>
+<span class="fc" id="L152">        binding.tvSalesSubtitle.text = &quot;Total dishes sold: $totalDishes&quot;</span>
+
+        // Logic to group smaller slices into &quot;Others&quot;
+<span class="fc" id="L155">        val finalEntries =</span>
+<span class="pc bpc" id="L156" title="1 of 2 branches missed.">            if (rawEntries.size &gt; 10) {</span>
+<span class="nc" id="L157">                val topNine = rawEntries.sortedByDescending { it.value }.take(9)</span>
+<span class="nc" id="L158">                val othersSum =</span>
+<span class="nc" id="L159">                    rawEntries.sortedByDescending { it.value }</span>
+<span class="nc" id="L160">                        .drop(9)</span>
+<span class="nc bnc" id="L161" title="All 2 branches missed.">                        .sumOf { it.value.toDouble() }</span>
+<span class="nc" id="L162">                        .toFloat()</span>
+<span class="nc" id="L163">                topNine + PieEntry(othersSum, &quot;Others&quot;)</span>
+            } else {
+<span class="fc" id="L165">                rawEntries</span>
+            }
+
+<span class="fc" id="L168">        val dataSet =</span>
+<span class="fc" id="L169">            PieDataSet(finalEntries, &quot;&quot;).apply {</span>
+<span class="fc" id="L170">                colors = chartPalette</span>
+<span class="fc" id="L171">                valueTextSize = 11f</span>
+<span class="fc" id="L172">                valueTextColor = Color.WHITE</span>
+<span class="fc" id="L173">                valueFormatter = LargeValueFormatter()</span>
+<span class="fc" id="L174">            }</span>
+
+<span class="fc" id="L176">        binding.pieChartDishBreakdown.data = PieData(dataSet)</span>
+<span class="fc" id="L177">        binding.pieChartDishBreakdown.invalidate()</span>
+<span class="fc" id="L178">    }</span>
+
+    override fun onDestroyView() {
+<span class="fc" id="L181">        super.onDestroyView()</span>
+<span class="fc" id="L182">        _binding = null // Avoid memory leaks</span>
+<span class="fc" id="L183">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
