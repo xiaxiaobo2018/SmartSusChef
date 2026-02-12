@@ -316,10 +316,17 @@ jobs:
         run: ./gradlew assembleUatDebug
         working-directory: ./mobile
 
+      - name: Set artifact name
+        id: artifact-name
+        run: |
+          REF_NAME="${{ github.event.pull_request.number || github.ref_name }}"
+          SAFE_NAME="${REF_NAME//\//-}"
+          echo "name=debug-apk-${{ github.run_number }}-${SAFE_NAME}" >> $GITHUB_OUTPUT
+
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: debug-apk-${{ github.run_number }}-${{ github.event.pull_request.number || github.ref_name }}
+          name: ${{ steps.artifact-name.outputs.name }}
           path: mobile/app/build/outputs/apk/uat/debug/*.apk
           retention-days: 30
 
@@ -337,10 +344,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set artifact name
+        id: artifact-name
+        run: |
+          REF_NAME="${{ github.event.pull_request.number || github.ref_name }}"
+          SAFE_NAME="${REF_NAME//\//-}"
+          echo "name=debug-apk-${{ github.run_number }}-${SAFE_NAME}" >> $GITHUB_OUTPUT
+
       - name: Download Debug APK
         uses: actions/download-artifact@v4
         with:
-          name: debug-apk-${{ github.run_number }}-${{ github.event.pull_request.number || github.ref_name }}
+          name: ${{ steps.artifact-name.outputs.name }}
           path: ./apk
 
       - name: Start MobSF container
