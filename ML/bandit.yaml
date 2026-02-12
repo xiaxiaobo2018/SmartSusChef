@@ -1,0 +1,13 @@
+exclude_dirs:
+  - Dataset_backup
+  - WastageData
+  - SaleData_Cleaning
+  - kaggle_data
+  - kaggle_data_v2
+  - catboost_info
+  - models
+  - backup
+  - __pycache__
+skips:
+  - B101
+  - B110
