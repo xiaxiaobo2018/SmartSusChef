@@ -1,12 +1,9 @@
 """
 Core ML pipeline logic for the SmartSus Chef project.
 
-This module is a backward-compatible re-export layer.  The actual
-implementations now live under ``core/`` (data_prep, feature_eng,
-model_train, cv_eval) and ``app/utils``.
-
-All public names that were historically importable from
-``training_logic_v2`` are still importable from here.
+This module is a re-export layer.  The actual implementations now live
+under ``core/`` (data_prep, feature_eng, model_train, cv_eval) and
+``app/utils``.
 """
 
 import os
@@ -33,27 +30,21 @@ except ImportError:
 warnings.filterwarnings("ignore")
 
 # ---------------------------------------------------------------------------
-# Re-exports from core modules  (preserves backward-compatible imports)
+# Re-exports from core modules
 # ---------------------------------------------------------------------------
 from app.utils import (  # noqa: E402, F401
     WEATHER_COLS,
     compute_lag_features_from_history,
     safe_filename,
 )
-from app.utils.logging_config import (  # noqa: E402, F401
-    silence_noisy_loggers,
-)
+from app.utils.logging_config import silence_noisy_loggers  # noqa: E402
 from core.cv_eval import (  # noqa: E402, F401
     _eval_hybrid_mae,
     _generate_cv_folds,
-    _optimize_hybrid,
     _prepare_cv_fold_cache,
 )
 from core.data_prep import (  # noqa: E402, F401
-    Nominatim,
-    _get_seasonal_historical_averages,
     add_local_context,
-    create_engine,
     fetch_training_data,
     fetch_weather_from_db,
     get_historical_weather,
@@ -66,25 +57,17 @@ from core.feature_eng import (  # noqa: E402, F401
     _add_date_features,
     _add_lag_roll_features,
     _build_residual_features,
-    add_hybrid_features,
 )
 from core.model_train import (  # noqa: E402, F401
     CFG,
-    CatBoostRegressor,
     PipelineConfig,
-    Prophet,
-    XGBRegressor,
     _detect_gpu,
     _fit_prophet,
     _load_hybrid_models,
     _prophet_predict,
     _save_hybrid_models,
     get_gpu_flags,
-    lgb,
     process_dish,
 )
-
-# Backward-compatible alias
-_silence_logs = silence_noisy_loggers
 
 silence_noisy_loggers()
