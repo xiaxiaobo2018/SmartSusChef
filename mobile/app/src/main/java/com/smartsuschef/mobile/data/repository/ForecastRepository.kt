@@ -24,8 +24,8 @@ class ForecastRepository
         suspend fun getForecast(
             days: Int,
             includePastDays: Int = 0,
-        ): Resource<List<ForecastDto>> {
-            return withContext(Dispatchers.IO) {
+        ): Resource<List<ForecastDto>> =
+            withContext(Dispatchers.IO) {
                 try {
                     val response = forecastApiService.getForecast(days, includePastDays)
                     if (response.isSuccessful) {
@@ -45,10 +45,9 @@ class ForecastRepository
                     Resource.Error("An unexpected error occurred: ${e.message}")
                 }
             }
-        }
 
-        suspend fun getWeather(): Resource<WeatherDto?> {
-            return withContext(Dispatchers.IO) {
+        suspend fun getWeather(): Resource<WeatherDto?> =
+            withContext(Dispatchers.IO) {
                 try {
                     val response = forecastApiService.getWeather()
                     if (response.isSuccessful) {
@@ -68,10 +67,9 @@ class ForecastRepository
                     Resource.Error("An unexpected error occurred: ${e.message}")
                 }
             }
-        }
 
-        suspend fun getHolidays(year: Int): Resource<List<HolidayDto>> {
-            return withContext(Dispatchers.IO) {
+        suspend fun getHolidays(year: Int): Resource<List<HolidayDto>> =
+            withContext(Dispatchers.IO) {
                 try {
                     val response = forecastApiService.getHolidays(year)
                     if (response.isSuccessful) {
@@ -91,5 +89,4 @@ class ForecastRepository
                     Resource.Error("An unexpected error occurred: ${e.message}")
                 }
             }
-        }
     }

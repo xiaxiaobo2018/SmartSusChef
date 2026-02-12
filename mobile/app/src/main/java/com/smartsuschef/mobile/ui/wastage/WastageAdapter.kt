@@ -8,9 +8,12 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.smartsuschef.mobile.R
 
-class WastageAdapter(private var wastedItems: List<WastageBreakdownItem>) :
-    RecyclerView.Adapter<WastageAdapter.ViewHolder>() {
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+class WastageAdapter(
+    private var wastedItems: List<WastageBreakdownItem>,
+) : RecyclerView.Adapter<WastageAdapter.ViewHolder>() {
+    class ViewHolder(
+        view: View,
+    ) : RecyclerView.ViewHolder(view) {
         val name: TextView = view.findViewById(R.id.tvWastedItemName)
         val type: TextView = view.findViewById(R.id.tvWastedItemType)
         val quantity: TextView = view.findViewById(R.id.tvWastedQuantity)
@@ -22,7 +25,8 @@ class WastageAdapter(private var wastedItems: List<WastageBreakdownItem>) :
         viewType: Int,
     ): ViewHolder {
         val view =
-            LayoutInflater.from(parent.context)
+            LayoutInflater
+                .from(parent.context)
                 .inflate(R.layout.item_wastage_row, parent, false)
         return ViewHolder(view)
     }

@@ -52,8 +52,14 @@ class LoginActivity : AppCompatActivity() {
         // --- Action Logic ---
 
         binding.btnSignIn.setOnClickListener {
-            val username = binding.etUsername.text.toString().trim()
-            val password = binding.etPassword.text.toString().trim()
+            val username =
+                binding.etUsername.text
+                    .toString()
+                    .trim()
+            val password =
+                binding.etPassword.text
+                    .toString()
+                    .trim()
 
             if (username.isNotEmpty() && password.isNotEmpty()) {
                 viewModel.login(LoginRequest(username, password))
@@ -63,7 +69,10 @@ class LoginActivity : AppCompatActivity() {
         }
 
         binding.btnSendReset.setOnClickListener {
-            val email = binding.etResetEmail.text.toString().trim()
+            val email =
+                binding.etResetEmail.text
+                    .toString()
+                    .trim()
             if (email.isNotEmpty()) {
                 // Password reset API call not yet implemented
                 showToast("Reset link sent to $email")

@@ -207,8 +207,7 @@ class ForecastFragmentTest {
                                     "updatedAt": "2026-01-01T00:00:00Z"
                                 }
                                 """.trimIndent(),
-                            )
-                            .addHeader("Content-Type", "application/json")
+                            ).addHeader("Content-Type", "application/json")
 
                     path.contains("/api/auth/me") ->
                         MockResponse()
@@ -226,8 +225,7 @@ class ForecastFragmentTest {
                                     "updatedAt": "2026-01-01T00:00:00Z"
                                 }
                                 """.trimIndent(),
-                            )
-                            .addHeader("Content-Type", "application/json")
+                            ).addHeader("Content-Type", "application/json")
 
                     path.contains("/api/sales/trend") ->
                         MockResponse()
@@ -239,8 +237,7 @@ class ForecastFragmentTest {
                                     {"date": "2026-02-10", "totalQuantity": 65, "recipeBreakdown": []}
                                 ]
                                 """.trimIndent(),
-                            )
-                            .addHeader("Content-Type", "application/json")
+                            ).addHeader("Content-Type", "application/json")
 
                     path.contains("/api/forecast/weather") ->
                         MockResponse()
@@ -254,8 +251,7 @@ class ForecastFragmentTest {
                                     "humidity": 75
                                 }
                                 """.trimIndent(),
-                            )
-                            .addHeader("Content-Type", "application/json")
+                            ).addHeader("Content-Type", "application/json")
 
                     path.contains("/api/forecast/holidays") ->
                         MockResponse()
@@ -265,7 +261,8 @@ class ForecastFragmentTest {
 
                     path.contains("/api/forecast/summary") ->
                         if (forecastError) {
-                            MockResponse().setResponseCode(500)
+                            MockResponse()
+                                .setResponseCode(500)
                                 .setBody("""{"message": "Internal Server Error"}""")
                                 .addHeader("Content-Type", "application/json")
                         } else {
@@ -277,7 +274,8 @@ class ForecastFragmentTest {
 
                     path.contains("/api/forecast/tomorrow") ->
                         if (forecastError) {
-                            MockResponse().setResponseCode(500)
+                            MockResponse()
+                                .setResponseCode(500)
                                 .setBody("""{"message": "Internal Server Error"}""")
                                 .addHeader("Content-Type", "application/json")
                         } else {
@@ -310,13 +308,13 @@ class ForecastFragmentTest {
                                         }
                                     }
                                     """.trimIndent(),
-                                )
-                                .addHeader("Content-Type", "application/json")
+                                ).addHeader("Content-Type", "application/json")
                         }
 
                     path.contains("/api/forecast") ->
                         if (forecastError) {
-                            MockResponse().setResponseCode(500)
+                            MockResponse()
+                                .setResponseCode(500)
                                 .setBody("""{"message": "Internal Server Error"}""")
                                 .addHeader("Content-Type", "application/json")
                         } else if (emptyForecast) {
@@ -361,8 +359,7 @@ class ForecastFragmentTest {
                                         }
                                     ]
                                     """.trimIndent(),
-                                )
-                                .addHeader("Content-Type", "application/json")
+                                ).addHeader("Content-Type", "application/json")
                         }
 
                     path.contains("/api/wastage/trend") ->
@@ -372,7 +369,8 @@ class ForecastFragmentTest {
                             .addHeader("Content-Type", "application/json")
 
                     else ->
-                        MockResponse().setResponseCode(200)
+                        MockResponse()
+                            .setResponseCode(200)
                             .setBody("[]")
                             .addHeader("Content-Type", "application/json")
                 }

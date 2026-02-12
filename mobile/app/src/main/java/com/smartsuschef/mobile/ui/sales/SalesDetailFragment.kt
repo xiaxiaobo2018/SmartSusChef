@@ -158,7 +158,8 @@ class SalesDetailFragment : Fragment(R.layout.fragment_sales_detail) {
             if (rawEntries.size > 10) {
                 val topNine = rawEntries.sortedByDescending { it.value }.take(9)
                 val othersSum =
-                    rawEntries.sortedByDescending { it.value }
+                    rawEntries
+                        .sortedByDescending { it.value }
                         .drop(9)
                         .sumOf { it.value.toDouble() }
                         .toFloat()

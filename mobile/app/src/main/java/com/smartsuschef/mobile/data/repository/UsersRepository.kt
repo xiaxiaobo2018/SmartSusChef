@@ -20,8 +20,8 @@ class UsersRepository
             private const val TAG = "UsersRepository"
         }
 
-        suspend fun getCurrentUser(): Resource<UserDto> {
-            return withContext(Dispatchers.IO) {
+        suspend fun getCurrentUser(): Resource<UserDto> =
+            withContext(Dispatchers.IO) {
                 try {
                     val response = authApiService.getCurrentUser()
                     if (response.isSuccessful) {
@@ -41,10 +41,9 @@ class UsersRepository
                     Resource.Error("An unexpected error occurred: ${e.message}")
                 }
             }
-        }
 
-        suspend fun updateUser(request: UpdateProfileRequest): Resource<UserDto> {
-            return withContext(Dispatchers.IO) {
+        suspend fun updateUser(request: UpdateProfileRequest): Resource<UserDto> =
+            withContext(Dispatchers.IO) {
                 try {
                     val response = authApiService.updateOwnProfile(request)
                     if (response.isSuccessful) {
@@ -64,5 +63,4 @@ class UsersRepository
                     Resource.Error("An unexpected error occurred: ${e.message}")
                 }
             }
-        }
     }

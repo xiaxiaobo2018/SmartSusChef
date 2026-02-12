@@ -18,7 +18,10 @@ import com.smartsuschef.mobile.R
  * - Grouped bar comparison (Predicted vs Actual)
  */
 @SuppressLint("ViewConstructor")
-class ForecastMarkerView(context: Context, layoutResource: Int) : MarkerView(context, layoutResource) {
+class ForecastMarkerView(
+    context: Context,
+    layoutResource: Int,
+) : MarkerView(context, layoutResource) {
     private val tvDate: TextView = findViewById(R.id.tvMarkerDate)
     private val tvQuantity: TextView = findViewById(R.id.tvMarkerQuantity)
     private val tvDetails: TextView = findViewById(R.id.tvMarkerDetails)

@@ -19,8 +19,8 @@ class StoreRepository
             private const val TAG = "StoreRepository"
         }
 
-        suspend fun getStore(): Resource<StoreDto> {
-            return withContext(Dispatchers.IO) {
+        suspend fun getStore(): Resource<StoreDto> =
+            withContext(Dispatchers.IO) {
                 try {
                     val response = storeApiService.getStore()
                     if (response.isSuccessful) {
@@ -40,5 +40,4 @@ class StoreRepository
                     Resource.Error("An unexpected error occurred: ${e.message}")
                 }
             }
-        }
     }

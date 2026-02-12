@@ -40,7 +40,8 @@ class ApdexInterceptorTest {
         val chain = mock<Interceptor.Chain>()
         whenever(chain.request()).thenReturn(request)
         val response =
-            Response.Builder()
+            Response
+                .Builder()
                 .request(request)
                 .protocol(Protocol.HTTP_1_1)
                 .code(responseCode)
@@ -63,7 +64,8 @@ class ApdexInterceptorTest {
     @Test
     fun `intercept passes original request to chain`() {
         val request =
-            Request.Builder()
+            Request
+                .Builder()
                 .url("http://localhost/api/sales/trend")
                 .addHeader("Authorization", "Bearer token")
                 .build()
@@ -91,7 +93,8 @@ class ApdexInterceptorTest {
     fun `intercept works with POST request`() {
         val body = """{"test": true}""".toRequestBody("application/json".toMediaType())
         val request =
-            Request.Builder()
+            Request
+                .Builder()
                 .url("http://localhost/api/data")
                 .post(body)
                 .build()

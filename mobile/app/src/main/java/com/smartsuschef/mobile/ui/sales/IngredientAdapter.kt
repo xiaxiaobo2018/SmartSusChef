@@ -8,9 +8,12 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.smartsuschef.mobile.R
 
-class IngredientAdapter(private var ingredients: List<IngredientRequirement>) :
-    RecyclerView.Adapter<IngredientAdapter.ViewHolder>() {
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+class IngredientAdapter(
+    private var ingredients: List<IngredientRequirement>,
+) : RecyclerView.Adapter<IngredientAdapter.ViewHolder>() {
+    class ViewHolder(
+        view: View,
+    ) : RecyclerView.ViewHolder(view) {
         val name: TextView = view.findViewById(R.id.tvIngredientName)
         val quantity: TextView = view.findViewById(R.id.tvQuantity)
     }
@@ -20,7 +23,8 @@ class IngredientAdapter(private var ingredients: List<IngredientRequirement>) :
         viewType: Int,
     ): ViewHolder {
         val view =
-            LayoutInflater.from(parent.context)
+            LayoutInflater
+                .from(parent.context)
                 .inflate(R.layout.item_ingredient_row, parent, false)
         return ViewHolder(view)
     }

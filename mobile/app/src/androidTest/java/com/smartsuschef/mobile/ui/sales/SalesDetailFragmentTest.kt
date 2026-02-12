@@ -186,8 +186,7 @@ class SalesDetailFragmentTest {
                                     "updatedAt": "2026-01-01T00:00:00Z"
                                 }
                                 """.trimIndent(),
-                            )
-                            .addHeader("Content-Type", "application/json")
+                            ).addHeader("Content-Type", "application/json")
 
                     path.contains("/api/auth/me") ->
                         MockResponse()
@@ -205,12 +204,12 @@ class SalesDetailFragmentTest {
                                     "updatedAt": "2026-01-01T00:00:00Z"
                                 }
                                 """.trimIndent(),
-                            )
-                            .addHeader("Content-Type", "application/json")
+                            ).addHeader("Content-Type", "application/json")
 
                     path.contains("/api/sales/ingredients") ->
                         if (serverError) {
-                            MockResponse().setResponseCode(500)
+                            MockResponse()
+                                .setResponseCode(500)
                                 .setBody("""{"message": "Internal Server Error"}""")
                                 .addHeader("Content-Type", "application/json")
                         } else {
@@ -223,13 +222,13 @@ class SalesDetailFragmentTest {
                                         {"ingredientId": "i2", "ingredientName": "Chicken", "unit": "kg", "quantity": 5.0}
                                     ]
                                     """.trimIndent(),
-                                )
-                                .addHeader("Content-Type", "application/json")
+                                ).addHeader("Content-Type", "application/json")
                         }
 
                     path.contains("/api/sales/recipes") ->
                         if (serverError) {
-                            MockResponse().setResponseCode(500)
+                            MockResponse()
+                                .setResponseCode(500)
                                 .setBody("""{"message": "Internal Server Error"}""")
                                 .addHeader("Content-Type", "application/json")
                         } else if (emptyRecipeSales) {
@@ -247,8 +246,7 @@ class SalesDetailFragmentTest {
                                         {"recipeId": "r2", "recipeName": "Nasi Lemak", "quantity": 60}
                                     ]
                                     """.trimIndent(),
-                                )
-                                .addHeader("Content-Type", "application/json")
+                                ).addHeader("Content-Type", "application/json")
                         }
 
                     path.contains("/api/sales/trend") ->
@@ -269,8 +267,7 @@ class SalesDetailFragmentTest {
                                     "humidity": 65
                                 }
                                 """.trimIndent(),
-                            )
-                            .addHeader("Content-Type", "application/json")
+                            ).addHeader("Content-Type", "application/json")
 
                     path.contains("/api/forecast/holidays") ->
                         MockResponse()
@@ -285,7 +282,8 @@ class SalesDetailFragmentTest {
                             .addHeader("Content-Type", "application/json")
 
                     else ->
-                        MockResponse().setResponseCode(200)
+                        MockResponse()
+                            .setResponseCode(200)
                             .setBody("[]")
                             .addHeader("Content-Type", "application/json")
                 }

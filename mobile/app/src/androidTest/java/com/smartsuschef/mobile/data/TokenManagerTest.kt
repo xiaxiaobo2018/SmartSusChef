@@ -35,7 +35,8 @@ class TokenManagerTest {
 
         // Create MasterKey using the new builder pattern
         val masterKey =
-            MasterKey.Builder(context)
+            MasterKey
+                .Builder(context)
                 .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
                 .build()
 
@@ -57,7 +58,8 @@ class TokenManagerTest {
     fun tearDown() {
         // Clear preferences after each test to prevent interference
         val masterKey =
-            MasterKey.Builder(context)
+            MasterKey
+                .Builder(context)
                 .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
                 .build()
         val testPrefs =

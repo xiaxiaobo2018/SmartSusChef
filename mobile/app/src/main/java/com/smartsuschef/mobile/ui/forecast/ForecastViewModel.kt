@@ -106,8 +106,7 @@ class ForecastViewModel
                             date = date,
                             totalQuantity = forecasts.sumOf { it.quantity },
                         )
-                    }
-                    .sortedBy { it.date }
+                    }.sortedBy { it.date }
             _summaryTrend.value = Resource.Success(dailySummaries)
 
             // 2. Date headers for ingredient table
@@ -154,8 +153,7 @@ class ForecastViewModel
                                 topDishes
                             }
                         DailyDishForecast(date = date, dishes = dishes)
-                    }
-                    .sortedBy { it.date }
+                    }.sortedBy { it.date }
 
             _dishForecasts.value = Resource.Success(dailyDishForecasts)
         }

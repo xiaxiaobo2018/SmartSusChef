@@ -23,12 +23,11 @@ enum class UserRole {
     ;
 
     companion object {
-        fun fromString(role: String): UserRole {
-            return when (role.lowercase()) {
+        fun fromString(role: String): UserRole =
+            when (role.lowercase()) {
                 "employee" -> Employee
                 "manager" -> Manager
                 else -> throw IllegalArgumentException("Invalid user role: $role")
             }
-        }
     }
 }

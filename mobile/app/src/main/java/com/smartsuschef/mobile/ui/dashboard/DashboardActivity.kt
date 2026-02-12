@@ -39,7 +39,8 @@ class DashboardActivity : AppCompatActivity() {
         binding.bottomNav.setupWithNavController(navController)
 
         // links the toolbar to NavController so the title changes and back arrow appears automatically
-        androidx.navigation.ui.NavigationUI.setupActionBarWithNavController(this, navController)
+        androidx.navigation.ui.NavigationUI
+            .setupActionBarWithNavController(this, navController)
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
             // Define main fragments (tabs in bottom navigation)
@@ -91,9 +92,7 @@ class DashboardActivity : AppCompatActivity() {
         }
     }
 
-    override fun onSupportNavigateUp(): Boolean {
-        return navController.navigateUp() || super.onSupportNavigateUp()
-    }
+    override fun onSupportNavigateUp(): Boolean = navController.navigateUp() || super.onSupportNavigateUp()
 
     private fun observeUserInfo() {
         // Observe loading state to show/hide progress bar
@@ -121,8 +120,8 @@ class DashboardActivity : AppCompatActivity() {
         return true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean =
+        when (item.itemId) {
             R.id.action_logout -> {
                 performLogout()
                 true
@@ -134,7 +133,6 @@ class DashboardActivity : AppCompatActivity() {
 
             else -> super.onOptionsItemSelected(item)
         }
-    }
 
     private fun performLogout() {
         viewModel.logout()

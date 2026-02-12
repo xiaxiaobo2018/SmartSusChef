@@ -14,22 +14,25 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 
 // ...
-class TokenManager(private val context: Context) {
+class TokenManager(
+    private val context: Context,
+) {
     companion object {
         private const val KEY_SIZE = 256
     }
 
     private val masterKey: MasterKey by lazy {
         val keyGenParameterSpec =
-            KeyGenParameterSpec.Builder(
-                MasterKey.DEFAULT_MASTER_KEY_ALIAS,
-                KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT,
-            )
-                .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+            KeyGenParameterSpec
+                .Builder(
+                    MasterKey.DEFAULT_MASTER_KEY_ALIAS,
+                    KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT,
+                ).setBlockModes(KeyProperties.BLOCK_MODE_GCM)
                 .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
                 .setKeySize(KEY_SIZE)
                 .build()
-        MasterKey.Builder(context)
+        MasterKey
+            .Builder(context)
             .setKeyGenParameterSpec(keyGenParameterSpec)
             .build()
     }
@@ -68,9 +71,7 @@ class TokenManager(private val context: Context) {
      For external preference changes (e.g., another app changing prefs directly), a more complex
      SharedPreferences.OnSharedPreferenceChangeListener would be needed, but usually not for EncryptedSharedPreferences.
      */
-    fun getTokenFlow(): Flow<String?> {
-        return authTokenFlow
-    }
+    fun getTokenFlow(): Flow<String?> = authTokenFlow
 
     /**
      * Synchronous token retrieval for the Hilt AuthInterceptor
@@ -91,15 +92,14 @@ class TokenManager(private val context: Context) {
     /**
      * Retrieves the user role synchronously
      */
-    fun getUserRole(): String? {
-        return sharedPreferences.getString(Constants.KEY_USER_ROLE, null)
-    }
+    fun getUserRole(): String? = sharedPreferences.getString(Constants.KEY_USER_ROLE, null)
 
     /**
      * Clears all session data (Logout)
      */
     fun clearSession() {
-        sharedPreferences.edit()
+        sharedPreferences
+            .edit()
             .remove(Constants.KEY_AUTH_TOKEN)
             .remove(Constants.KEY_USER_ROLE)
             .apply()

@@ -116,7 +116,14 @@ class ForecastViewModelTest {
             val dishResult = viewModel.dishForecasts.value
             assertTrue(dishResult is Resource.Success)
             assertEquals(2, (dishResult as Resource.Success).data?.size)
-            assertEquals("Pizza", dishResult.data?.find { it.date == today }?.dishes?.first()?.name)
+            assertEquals(
+                "Pizza",
+                dishResult.data
+                    ?.find { it.date == today }
+                    ?.dishes
+                    ?.first()
+                    ?.name,
+            )
 
             // Comparison Data (is now stubbed in the ViewModel, should be empty)
             val comparisonResult = viewModel.comparisonData.value

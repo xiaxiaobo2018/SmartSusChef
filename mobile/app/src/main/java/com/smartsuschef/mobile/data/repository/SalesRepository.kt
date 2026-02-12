@@ -27,8 +27,8 @@ class SalesRepository
         suspend fun getAll(
             startDate: String?,
             endDate: String?,
-        ): Resource<List<SalesDataDto>> {
-            return withContext(Dispatchers.IO) {
+        ): Resource<List<SalesDataDto>> =
+            withContext(Dispatchers.IO) {
                 try {
                     val response = salesApiService.getAll(startDate, endDate)
                     if (response.isSuccessful) {
@@ -48,13 +48,12 @@ class SalesRepository
                     Resource.Error("An unexpected error occurred: ${e.message}")
                 }
             }
-        }
 
         suspend fun getTrend(
             startDate: String,
             endDate: String,
-        ): Resource<List<SalesTrendDto>> {
-            return withContext(Dispatchers.IO) {
+        ): Resource<List<SalesTrendDto>> =
+            withContext(Dispatchers.IO) {
                 try {
                     val response = salesApiService.getTrend(startDate, endDate)
                     if (response.isSuccessful) {
@@ -74,10 +73,9 @@ class SalesRepository
                     Resource.Error("An unexpected error occurred: ${e.message}")
                 }
             }
-        }
 
-        suspend fun getIngredientUsageByDate(date: String): Resource<List<IngredientUsageDto>> {
-            return withContext(Dispatchers.IO) {
+        suspend fun getIngredientUsageByDate(date: String): Resource<List<IngredientUsageDto>> =
+            withContext(Dispatchers.IO) {
                 try {
                     val response = salesApiService.getIngredientUsageByDate(date)
                     if (response.isSuccessful) {
@@ -97,10 +95,9 @@ class SalesRepository
                     Resource.Error("An unexpected error occurred: ${e.message}")
                 }
             }
-        }
 
-        suspend fun getRecipeSalesByDate(date: String): Resource<List<RecipeSalesDto>> {
-            return withContext(Dispatchers.IO) {
+        suspend fun getRecipeSalesByDate(date: String): Resource<List<RecipeSalesDto>> =
+            withContext(Dispatchers.IO) {
                 try {
                     val response = salesApiService.getRecipeSalesByDate(date)
                     if (response.isSuccessful) {
@@ -120,10 +117,9 @@ class SalesRepository
                     Resource.Error("An unexpected error occurred: ${e.message}")
                 }
             }
-        }
 
-        suspend fun create(request: CreateSalesDataRequest): Resource<SalesDataDto> {
-            return withContext(Dispatchers.IO) {
+        suspend fun create(request: CreateSalesDataRequest): Resource<SalesDataDto> =
+            withContext(Dispatchers.IO) {
                 try {
                     val response = salesApiService.create(request)
                     if (response.isSuccessful) {
@@ -143,13 +139,12 @@ class SalesRepository
                     Resource.Error("An unexpected error occurred: ${e.message}")
                 }
             }
-        }
 
         suspend fun update(
             id: String,
             request: UpdateSalesDataRequest,
-        ): Resource<SalesDataDto> {
-            return withContext(Dispatchers.IO) {
+        ): Resource<SalesDataDto> =
+            withContext(Dispatchers.IO) {
                 try {
                     val response = salesApiService.update(id, request)
                     if (response.isSuccessful) {
@@ -169,10 +164,9 @@ class SalesRepository
                     Resource.Error("An unexpected error occurred: ${e.message}")
                 }
             }
-        }
 
-        suspend fun delete(id: String): Resource<Unit> {
-            return withContext(Dispatchers.IO) {
+        suspend fun delete(id: String): Resource<Unit> =
+            withContext(Dispatchers.IO) {
                 try {
                     val response = salesApiService.delete(id)
                     if (response.isSuccessful) {
@@ -192,5 +186,4 @@ class SalesRepository
                     Resource.Error("An unexpected error occurred: ${e.message}")
                 }
             }
-        }
     }

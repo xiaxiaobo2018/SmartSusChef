@@ -97,9 +97,11 @@ class DashboardActivityTest {
     fun dashboard_showsToolbarAndBottomNav() {
         scenario = ActivityScenario.launch(DashboardActivity::class.java)
 
-        Espresso.onView(ViewMatchers.withId(R.id.toolbar))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.toolbar))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        Espresso.onView(ViewMatchers.withId(R.id.bottom_nav))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.bottom_nav))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
     }
 
@@ -108,7 +110,8 @@ class DashboardActivityTest {
         scenario = ActivityScenario.launch(DashboardActivity::class.java)
 
         // Sales Overview fragment should be the start destination
-        Espresso.onView(ViewMatchers.withId(R.id.tvSalesTitle))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.tvSalesTitle))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
     }
 
@@ -124,7 +127,8 @@ class DashboardActivityTest {
         Espresso.onView(ViewMatchers.withId(R.id.nav_forecast)).perform(ViewActions.click())
 
         // Verify ForecastFragment views are displayed
-        Espresso.onView(ViewMatchers.withId(R.id.tvSummaryTitle))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.tvSummaryTitle))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
     }
 
@@ -136,7 +140,8 @@ class DashboardActivityTest {
         Espresso.onView(ViewMatchers.withId(R.id.nav_wastage)).perform(ViewActions.click())
 
         // Verify WastageOverviewFragment views are displayed
-        Espresso.onView(ViewMatchers.withId(R.id.tvWastageTitle))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.tvWastageTitle))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
     }
 
@@ -148,13 +153,17 @@ class DashboardActivityTest {
         Espresso.onView(ViewMatchers.withId(R.id.nav_input)).perform(ViewActions.click())
 
         // Verify DataInputFragment views are displayed
-        Espresso.onView(ViewMatchers.withId(R.id.toggleGroup))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.toggleGroup))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        Espresso.onView(ViewMatchers.withId(R.id.btnSalesTab))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.btnSalesTab))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        Espresso.onView(ViewMatchers.withId(R.id.btnWastageTab))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.btnWastageTab))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        Espresso.onView(ViewMatchers.withId(R.id.btnSaveData))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.btnSaveData))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
     }
 
@@ -168,7 +177,8 @@ class DashboardActivityTest {
         // Navigate back to Sales
         Espresso.onView(ViewMatchers.withId(R.id.nav_sales)).perform(ViewActions.click())
 
-        Espresso.onView(ViewMatchers.withId(R.id.tvSalesTitle))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.tvSalesTitle))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
     }
 
@@ -177,23 +187,28 @@ class DashboardActivityTest {
         scenario = ActivityScenario.launch(DashboardActivity::class.java)
 
         // Sales (start) -> Forecast -> Wastage -> Data Input -> Sales
-        Espresso.onView(ViewMatchers.withId(R.id.tvSalesTitle))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.tvSalesTitle))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
 
         Espresso.onView(ViewMatchers.withId(R.id.nav_forecast)).perform(ViewActions.click())
-        Espresso.onView(ViewMatchers.withId(R.id.tvSummaryTitle))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.tvSummaryTitle))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
 
         Espresso.onView(ViewMatchers.withId(R.id.nav_wastage)).perform(ViewActions.click())
-        Espresso.onView(ViewMatchers.withId(R.id.tvWastageTitle))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.tvWastageTitle))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
 
         Espresso.onView(ViewMatchers.withId(R.id.nav_input)).perform(ViewActions.click())
-        Espresso.onView(ViewMatchers.withId(R.id.toggleGroup))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.toggleGroup))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
 
         Espresso.onView(ViewMatchers.withId(R.id.nav_sales)).perform(ViewActions.click())
-        Espresso.onView(ViewMatchers.withId(R.id.tvSalesTitle))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.tvSalesTitle))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
     }
 
@@ -205,11 +220,14 @@ class DashboardActivityTest {
     fun salesOverview_displaysKeyElements() {
         scenario = ActivityScenario.launch(DashboardActivity::class.java)
 
-        Espresso.onView(ViewMatchers.withId(R.id.tvSalesTitle))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.tvSalesTitle))
             .check(ViewAssertions.matches(ViewMatchers.withText("Sales Trend")))
-        Espresso.onView(ViewMatchers.withId(R.id.tvDateContext))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.tvDateContext))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        Espresso.onView(ViewMatchers.withId(R.id.salesCombinedChart))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.salesCombinedChart))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
     }
 
@@ -218,7 +236,8 @@ class DashboardActivityTest {
         scenario = ActivityScenario.launch(DashboardActivity::class.java)
 
         // Toolbar should show store name from mock
-        Espresso.onView(ViewMatchers.withId(R.id.toolbar))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.toolbar))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
     }
 
@@ -232,9 +251,11 @@ class DashboardActivityTest {
 
         Espresso.onView(ViewMatchers.withId(R.id.nav_forecast)).perform(ViewActions.click())
 
-        Espresso.onView(ViewMatchers.withId(R.id.tvSummaryTitle))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.tvSummaryTitle))
             .check(ViewAssertions.matches(ViewMatchers.withText("Prediction Summary")))
-        Espresso.onView(ViewMatchers.withId(R.id.tvTotalWeeklyDishes))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.tvTotalWeeklyDishes))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
     }
 
@@ -245,7 +266,8 @@ class DashboardActivityTest {
         Espresso.onView(ViewMatchers.withId(R.id.nav_forecast)).perform(ViewActions.click())
 
         // Mock data for /api/forecast returns predicted quantities 80 and 60, summing to 140
-        Espresso.onView(ViewMatchers.withId(R.id.tvTotalWeeklyDishes))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.tvTotalWeeklyDishes))
             .check(ViewAssertions.matches(ViewMatchers.withText("140")))
     }
 
@@ -259,11 +281,14 @@ class DashboardActivityTest {
 
         Espresso.onView(ViewMatchers.withId(R.id.nav_wastage)).perform(ViewActions.click())
 
-        Espresso.onView(ViewMatchers.withId(R.id.tvWastageTitle))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.tvWastageTitle))
             .check(ViewAssertions.matches(ViewMatchers.withText("Wastage Trend")))
-        Espresso.onView(ViewMatchers.withId(R.id.tvDateContext))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.tvDateContext))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        Espresso.onView(ViewMatchers.withId(R.id.wastageCombinedChart))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.wastageCombinedChart))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
     }
 
@@ -277,7 +302,8 @@ class DashboardActivityTest {
         scenario = ActivityScenario.launch(DashboardActivity::class.java)
 
         // Sales chart or error indicator should still be visible (fragment loads)
-        Espresso.onView(ViewMatchers.withId(R.id.tvSalesTitle))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.tvSalesTitle))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
     }
 
@@ -289,7 +315,8 @@ class DashboardActivityTest {
         Espresso.onView(ViewMatchers.withId(R.id.nav_forecast)).perform(ViewActions.click())
 
         // Fragment should still load even with error
-        Espresso.onView(ViewMatchers.withId(R.id.tvSummaryTitle))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.tvSummaryTitle))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
     }
 
@@ -301,7 +328,8 @@ class DashboardActivityTest {
         Espresso.onView(ViewMatchers.withId(R.id.nav_wastage)).perform(ViewActions.click())
 
         // Fragment should still load even with error
-        Espresso.onView(ViewMatchers.withId(R.id.tvWastageTitle))
+        Espresso
+            .onView(ViewMatchers.withId(R.id.tvWastageTitle))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
     }
 
@@ -384,8 +412,7 @@ class DashboardActivityTest {
                                     "updatedAt": "2026-01-01T00:00:00Z"
                                 }
                                 """.trimIndent(),
-                            )
-                            .addHeader("Content-Type", "application/json")
+                            ).addHeader("Content-Type", "application/json")
 
                     // Current user
                     path.contains("/api/auth/me") ->
@@ -404,13 +431,13 @@ class DashboardActivityTest {
                                     "updatedAt": "2026-01-01T00:00:00Z"
                                 }
                                 """.trimIndent(),
-                            )
-                            .addHeader("Content-Type", "application/json")
+                            ).addHeader("Content-Type", "application/json")
 
                     // Sales trend
                     path.contains("/api/sales/trend") ->
                         if (salesTrendError) {
-                            MockResponse().setResponseCode(500)
+                            MockResponse()
+                                .setResponseCode(500)
                                 .setBody("""{"message": "Internal Server Error"}""")
                                 .addHeader("Content-Type", "application/json")
                         } else {
@@ -424,14 +451,14 @@ class DashboardActivityTest {
                                         {"date": "2026-02-08", "totalQuantity": 130, "recipeBreakdown": []}
                                     ]
                                     """.trimIndent(),
-                                )
-                                .addHeader("Content-Type", "application/json")
+                                ).addHeader("Content-Type", "application/json")
                         }
 
                     // Wastage trend
                     path.contains("/api/wastage/trend") ->
                         if (wastageTrendError) {
-                            MockResponse().setResponseCode(500)
+                            MockResponse()
+                                .setResponseCode(500)
                                 .setBody("""{"message": "Internal Server Error"}""")
                                 .addHeader("Content-Type", "application/json")
                         } else {
@@ -444,14 +471,14 @@ class DashboardActivityTest {
                                         {"date": "2026-02-09", "totalQuantity": 12.0, "totalCarbonFootprint": 2.8, "itemBreakdown": []}
                                     ]
                                     """.trimIndent(),
-                                )
-                                .addHeader("Content-Type", "application/json")
+                                ).addHeader("Content-Type", "application/json")
                         }
 
                     // Forecast summary
                     path.contains("/api/forecast/summary") ->
                         if (forecastError) {
-                            MockResponse().setResponseCode(500)
+                            MockResponse()
+                                .setResponseCode(500)
                                 .setBody("""{"message": "Internal Server Error"}""")
                                 .addHeader("Content-Type", "application/json")
                         } else {
@@ -464,14 +491,14 @@ class DashboardActivityTest {
                                         {"date": "2026-02-12", "totalPredicted": 155, "dishes": []}
                                     ]
                                     """.trimIndent(),
-                                )
-                                .addHeader("Content-Type", "application/json")
+                                ).addHeader("Content-Type", "application/json")
                         }
 
                     // Forecast weather
                     path.contains("/api/forecast/weather") ->
                         if (forecastError) {
-                            MockResponse().setResponseCode(500)
+                            MockResponse()
+                                .setResponseCode(500)
                                 .setBody("""{"message": "Internal Server Error"}""")
                                 .addHeader("Content-Type", "application/json")
                         } else {
@@ -486,14 +513,14 @@ class DashboardActivityTest {
                                         "humidity": 75
                                     }
                                     """.trimIndent(),
-                                )
-                                .addHeader("Content-Type", "application/json")
+                                ).addHeader("Content-Type", "application/json")
                         }
 
                     // Forecast holidays (must be before generic /api/forecast)
                     path.contains("/api/forecast/holidays") ->
                         if (forecastError) {
-                            MockResponse().setResponseCode(500)
+                            MockResponse()
+                                .setResponseCode(500)
                                 .setBody("""{"message": "Internal Server Error"}""")
                                 .addHeader("Content-Type", "application/json")
                         } else {
@@ -506,14 +533,14 @@ class DashboardActivityTest {
                                         {"date": "2026-04-18", "name": "Good Friday"}
                                     ]
                                     """.trimIndent(),
-                                )
-                                .addHeader("Content-Type", "application/json")
+                                ).addHeader("Content-Type", "application/json")
                         }
 
                     // Forecast tomorrow
                     path.contains("/api/forecast/tomorrow") ->
                         if (forecastError) {
-                            MockResponse().setResponseCode(500)
+                            MockResponse()
+                                .setResponseCode(500)
                                 .setBody("""{"message": "Internal Server Error"}""")
                                 .addHeader("Content-Type", "application/json")
                         } else {
@@ -546,14 +573,14 @@ class DashboardActivityTest {
                                         }
                                     }
                                     """.trimIndent(),
-                                )
-                                .addHeader("Content-Type", "application/json")
+                                ).addHeader("Content-Type", "application/json")
                         }
 
                     // Forecast (generic catch-all)
                     path.contains("/api/forecast") ->
                         if (forecastError) {
-                            MockResponse().setResponseCode(500)
+                            MockResponse()
+                                .setResponseCode(500)
                                 .setBody("""{"message": "Internal Server Error"}""")
                                 .addHeader("Content-Type", "application/json")
                         } else {
@@ -566,8 +593,7 @@ class DashboardActivityTest {
                                         {"date": "2099-01-15", "recipeName": "Nasi Lemak", "quantity": 60, "ingredients": []}
                                     ]
                                     """.trimIndent(),
-                                )
-                                .addHeader("Content-Type", "application/json")
+                                ).addHeader("Content-Type", "application/json")
                         }
 
                     // Recipes
@@ -581,8 +607,7 @@ class DashboardActivityTest {
                                     {"id": "r2", "name": "Nasi Lemak", "isSellable": true, "isSubRecipe": false, "ingredients": [], "createdAt": "2026-01-01T00:00:00Z", "updatedAt": "2026-01-01T00:00:00Z"}
                                 ]
                                 """.trimIndent(),
-                            )
-                            .addHeader("Content-Type", "application/json")
+                            ).addHeader("Content-Type", "application/json")
 
                     // Ingredients
                     path.contains("/api/ingredients") ->
@@ -595,8 +620,7 @@ class DashboardActivityTest {
                                     {"id": "i2", "name": "Chicken", "unit": "kg", "carbonFootprint": 5.0, "createdAt": "2026-01-01T00:00:00Z", "updatedAt": "2026-01-01T00:00:00Z"}
                                 ]
                                 """.trimIndent(),
-                            )
-                            .addHeader("Content-Type", "application/json")
+                            ).addHeader("Content-Type", "application/json")
 
                     // Sales data
                     path.contains("/api/sales") ->
