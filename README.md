@@ -57,7 +57,76 @@ Food waste is a major sustainability issue. SmartSusChef empowers operators to:
 
 ## Quick Start
 
-### Run Dev Environment
+### 1. Environment Configuration (`.env`)
+
+The project uses a `.env` file in the project root to manage local development configuration. Before first use, create it from the provided template:
+
+```powershell
+# Windows
+Copy-Item .env.example .env
+
+# Linux / macOS
+cp .env.example .env
+```
+
+Then edit `.env` and fill in your database connection details:
+
+```dotenv
+# SmartSusChef Local Development Environment
+
+DB_SERVER=localhost        # Database host address
+DB_PORT=3306               # Database port (MySQL default: 3306)
+DB_USER=root               # Database username
+DB_PASSWORD=your_password  # Database password
+DB_NAME=smartsuschef       # Database name
+```
+
+> **Note:** The startup scripts (`dev-start.ps1` / `dev-start.sh`) automatically load the `.env` file and inject variables into the runtime environment — no manual `export` required. Command-line parameters (e.g., `-DbServer`) take precedence over `.env` values.
+
+The frontend also has its own environment files (usually no changes needed):
+
+| File | Purpose |
+|------|---------|
+| `frontend/.env.example` | Frontend environment variable template |
+| `frontend/.env.production` | Production config (API uses nginx-proxied relative path `/api`) |
+
+Frontend development environment variables (`frontend/.env.example`):
+
+```dotenv
+VITE_API_URL=http://localhost:5001/api   # Backend API URL
+VITE_ENV=development                      # Environment identifier
+```
+
+---
+
+### 2. Database Setup
+
+The database initialization SQL script is located at **`database/smartsuschef.sql`**.
+
+#### Manual Import (Local MySQL)
+
+```bash
+# Make sure MySQL is running, then execute:
+mysql -u root -p < database/smartsuschef.sql
+```
+
+Or from within a MySQL client:
+
+```sql
+SOURCE database/smartsuschef.sql;
+```
+
+#### Using Docker Compose (Auto-Initialization)
+
+If you start the project via `docker-compose.yml`, the MySQL container will automatically run the initialization script on first launch — no manual import needed.
+
+```powershell
+docker-compose up -d
+```
+
+---
+
+### 3. Run Dev Environment
 Before running the dev environment for the first time, initialize the backend:
 ```powershell
 cd backend
@@ -87,25 +156,8 @@ If you want to use a different database server:
 - ML Service: http://localhost:8000
 - ML Documentation: http://localhost:8000/docs
 
-#### Troubleshooting
-- If a port is already in use: `netstat -ano | findstr :5173`
-- Kill a process: `taskkill /PID <process_id> /F`
-- To stop services: simply close the PowerShell windows
 
 ---
-
-## Servers:
-```bash
-#server only for deployment(no video card, 2GB RAM):
-ssh smartsuschef@oversea.zyh111.icu -p 234 
-
-#server for calculation(ML model training, with video card, 64GB RAM):
-ssh zyh@oversea.zyh111.icu -p 233
-
-Mysql:
-oversea.zyh111.icu:33333
-#user: grp4
-```
 
 ## Weather API:
 
@@ -115,7 +167,7 @@ https://open-meteo.com/en/docs
 ## Calendar API:
 
 ```bash
-https://developers.google.cn/workspace/calendar/api/guides/overview
+https://developers.google.com/workspace/calendar/api/guides/overview
 ```
 
 ## Terraform Deployment:
