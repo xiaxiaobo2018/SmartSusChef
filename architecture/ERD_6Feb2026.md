@@ -1,5 +1,24 @@
-erDiagram
+%%{init: {
+  "theme": "base",
+  "er": {
+    "layoutDirection": "LR",
+    "diagramPadding": 24,
+    "minEntityWidth": 170,
+    "minEntityHeight": 100,
+    "entityPadding": 14,
+    "stroke": "#7c3aed",
+    "strokeWidth": 1.2
+  },
+  "themeVariables": {
+    "fontFamily": "Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto",
+    "primaryColor": "#ffffff",
+    "primaryBorderColor": "#7c3aed",
+    "primaryTextColor": "#111827",
+    "lineColor": "#7c3aed"
+  }
+}}%%
 
+erDiagram
   Store {
     int Id PK
     string CompanyName
@@ -115,7 +134,7 @@ erDiagram
     string WeatherDesc
   }
 
-  %% Relationships
+  %% Relationships (keep them clean & readable)
   Store ||--o{ User : has
   Store ||--o{ Ingredient : has
   Store ||--o{ Recipe : has
@@ -123,13 +142,14 @@ erDiagram
   Store ||--o{ WastageData : generates
   Store ||--o{ ForecastData : generates
   Store ||--o{ WeatherDaily : records
+    Store ||--|| HolidayCalendar : date
 
   Recipe ||--o{ SalesData : sold_as
   Recipe ||--o{ WastageData : wasted_as
   Ingredient ||--o{ WastageData : wasted
 
   Recipe ||--o{ RecipeIngredient : composed_of
-  Ingredient }o--|| RecipeIngredient : used_in
-  Recipe }o--|| RecipeIngredient : ChildRecipe
+  Ingredient ||--o{ RecipeIngredient : used_in
+  Recipe ||--o{ RecipeIngredient : child_recipe
 
   Recipe ||--o{ ForecastData : forecasted

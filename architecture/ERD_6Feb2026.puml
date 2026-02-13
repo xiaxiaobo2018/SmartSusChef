@@ -138,6 +138,8 @@ Store ||--o{ ForecastData
 Store ||--o{ WeatherDaily
 
 Recipe ||--o{ SalesData
+Store ||--|| HolidayCalendar : "CountryCode"
+
 Recipe ||--o{ WastageData
 Ingredient ||--o{ WastageData
 Recipe ||--o{ RecipeIngredient
