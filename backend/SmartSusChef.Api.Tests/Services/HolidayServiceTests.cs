@@ -1,4 +1,5 @@
 namespace SmartSusChef.Api.Tests.Services;
+
 using Xunit;
 using Microsoft.EntityFrameworkCore;
 using SmartSusChef.Api.Data;
@@ -39,18 +40,18 @@ public class HolidayServiceTests
     {
         // 1. Arrange
         var context = GetDbContext();
-        
+
         var mockConfiguration = new Mock<IConfiguration>();
-        var mockHttpClient = new HttpClient(); 
+        var mockHttpClient = new HttpClient();
 
         var holidayDate = new DateTime(2026, 1, 1);
-        
-        context.GlobalCalendarSignals.Add(new GlobalCalendarSignals 
-        { 
-            Date = holidayDate, 
-            IsHoliday = true, 
+
+        context.GlobalCalendarSignals.Add(new GlobalCalendarSignals
+        {
+            Date = holidayDate,
+            IsHoliday = true,
             HolidayName = "New Year's Day",
-            WeatherDesc = "Sunny" 
+            WeatherDesc = "Sunny"
         });
         await context.SaveChangesAsync();
 
@@ -71,7 +72,7 @@ public class HolidayServiceTests
         var mockConfiguration = new Mock<IConfiguration>();
         var mockHttpClient = new HttpClient();
         var regularDate = new DateTime(2026, 1, 15);
-        
+
         var service = new HolidayService(mockHttpClient, mockConfiguration.Object, context);
 
         // 2. Act
@@ -93,8 +94,8 @@ public class HolidayServiceTests
         // Mock JSON response from the holiday API
         var jsonResponse = @"
         [
-            { ""date"": ""2024-10-01"", ""localName"": ""国庆节"", ""name"": ""National Day"" },
-            { ""date"": ""2024-10-02"", ""localName"": ""国庆节"", ""name"": ""National Day"" }
+            { ""date"": ""2024-10-01"", ""localName"": ""National Day"", ""name"": ""National Day"" },
+            { ""date"": ""2024-10-02"", ""localName"": ""National Day"", ""name"": ""National Day"" }
         ]";
 
         // Mock HttpMessageHandler to intercept the request
@@ -126,7 +127,7 @@ public class HolidayServiceTests
         var signal = await context.GlobalCalendarSignals.FindAsync(holidayDate);
         Assert.NotNull(signal);
         Assert.True(signal.IsHoliday);
-        Assert.Equal("国庆节", signal.HolidayName); // Verify the local name is parsed correctly
+        Assert.Equal("National Day", signal.HolidayName); // Verify the local name is parsed correctly
     }
 
     [Fact]
@@ -153,7 +154,7 @@ public class HolidayServiceTests
             });
         var httpClient = new HttpClient(mockHttpMessageHandler.Object);
         var mockConfiguration = new Mock<IConfiguration>();
-        
+
         var service = new HolidayService(httpClient, mockConfiguration.Object, context);
 
         // Act
@@ -181,7 +182,7 @@ public class HolidayServiceTests
             });
         var httpClient = new HttpClient(mockHttpMessageHandler.Object);
         var mockConfiguration = new Mock<IConfiguration>();
-        
+
         var service = new HolidayService(httpClient, mockConfiguration.Object, context);
 
         // Act

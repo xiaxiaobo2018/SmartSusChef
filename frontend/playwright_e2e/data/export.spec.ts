@@ -12,5 +12,5 @@ test('Export Data Test', async ({ page }) => {
     const download = await downloadPromise;
     expect(await download.failure()).toBeNull();
     await download.saveAs('./downloads/exported_data.csv');
-    console.log(`下载成功，文件名: ${download.suggestedFilename()}`);
+    console.log(`Download successful, filename: ${download.suggestedFilename()}`);
 });
