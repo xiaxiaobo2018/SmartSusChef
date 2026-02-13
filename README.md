@@ -135,24 +135,24 @@ cd backend
 
 Then start all services with:
 ```powershell
-.\dev-start.ps1
+.\dev-start-mobile.ps1
 ```
 
 This will launch three PowerShell windows running:
 - **ML Service** on port 8000 (http://localhost:8000)
-- **Backend API** on port 5000 (http://localhost:5000)
+- **Backend API** on port 5001 (http://localhost:5001)
 - **Frontend** on port 5173 (http://localhost:5173)
 
 #### Custom Database Configuration
 If you want to use a different database server:
 ```powershell
-.\dev-start.ps1 -DbServer localhost -DbPort 3306 -DbUser root -DbPassword password
+.\dev-start-mobile.ps1 -DbServer localhost -DbPort 3306 -DbUser root -DbPassword password
 ```
 
 #### Access Points
 - Frontend: http://localhost:5173
-- Backend API: http://localhost:5000
-- API Documentation: http://localhost:5000/swagger
+- Backend API: http://localhost:5001
+- API Documentation: http://localhost:5001/swagger
 - ML Service: http://localhost:8000
 - ML Documentation: http://localhost:8000/docs
 
