@@ -55,6 +55,17 @@ Food waste is a major sustainability issue. SmartSusChef empowers operators to:
 
 -----
 
+🛠️ My Role: Backend Development & Integration
+As the Backend Developer, I was responsible for:
+
+API Design: Developed the .NET 8 RESTful API to manage inventory, recipe scaling, and daily prep lists.
+
+Service Integration: Built the bridge between the .NET core and the Python ML service using asynchronous communication patterns.
+
+Data Modeling: Designed and optimized the MySQL schema to handle time-series historical data and real-time inventory updates.
+
+DevOps: Contributed to the GitHub Actions pipeline to ensure secure, automated deployments to AWS.
+
 ## Quick Start
 
 ### 1. Environment Configuration (`.env`)
