@@ -56,6 +56,7 @@ Food waste is a major sustainability issue. SmartSusChef empowers operators to:
 -----
 
 🛠️ My Role: Backend Development & Integration
+
 As the Backend Developer, I was responsible for:
 
 API Design: Developed the .NET 8 RESTful API to manage inventory, recipe scaling, and daily prep lists.
